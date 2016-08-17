@@ -56,7 +56,7 @@ var getGitHubAccessToken = function (callback) {
                 var email = user.email || 'email@example.com';
                 window.sessionStorage.setItem('githubUsername', user.login);
                 window.sessionStorage.setItem('gitUserName', user.name);
-                window.sessionStorage.setItem('gitUserEmail', user.email);
+                window.sessionStorage.setItem('gitUserEmail', email);
                 propogateSessionStorage();
                 callback();
             });
