@@ -2,6 +2,8 @@
 global.Evaluate = {};
 (function () {
 
+var images = [];
+
 Evaluate.evaluate = function (parentCell, columns, c, r) {
     var cells = getAt(columns, c);
     var cell = getAt(cells, r);
@@ -35,6 +37,24 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         ctx.beginPath();
         ctx.arc(0, 0, 50, 0, 2 * Math.PI);
         ctx.fill();
+        break;
+    case 'image':
+        var src = argResult(0);
+        var image;
+        for (var i = 0; i < images.length; i++) {
+            if (images[i].src === src) {
+                image = images[i];
+                break;
+            }
+        }
+        if (image) {
+            ctx.drawImage(image, 0, 0);
+        } else {
+            image = new Image();
+            image.src = src;
+            image.addEventListener('load', Ui.draw);
+            images.push(image);
+        }
         break;
     case 'scale':
         var scaleBy = argResult(1);

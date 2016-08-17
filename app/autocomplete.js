@@ -18,6 +18,7 @@ var entries = [
 
     'square',
     'circle',
+    'image',
     'scale',
     'scale x',
     'scale y',
@@ -60,6 +61,7 @@ var numArgsTable = {
 
     'square': 0,
     'circle': 0,
+    'image': 1,
     'scale': 2,
     'scale x': 2,
     'scale y': 2,
