@@ -12,7 +12,7 @@ global.$nextTickTime = 0;
 global.$fullscreen = false;
 
 global.$showResults = false;
-global.$resultTitle = '';
+global.$title = '';
 global.$results = [];
 global.$listRepos = false;
 
@@ -120,14 +120,15 @@ Main.listRepos = function (username) {
 
         $showResults = true;
         $listRepos = true;
-        $resultTitle = 'List of repositories';
+        username = username || window.sessionStorage.githubUsername;
+        $title = 'programs by ' + username;
         $results = [];
         var lenCells = Math.floor((window.innerHeight - 200) / Ui.ySpacing);
         if (lenCells > repos.length) {
             lenCells = repos.length;
         }
         var lenColumns = Math.ceil(repos.length / lenCells);
-        var emptyResult = {text: ''};
+        var emptyResult = {name: '', full_name: ''};
         var c;
         for (c = 0; c < lenColumns; c++) {
             $results[c] = [];
@@ -171,6 +172,7 @@ Main.initializeRepo = function () {
             firstDraw();
         } else {
             Remote.fetch(gitUrl, remoteCommit, $[Constants.zeroHash], function () {
+                $title = window.sessionStorage.repoName;
                 $head = remoteCommit;
                 $redoHead = $head;
                 firstDraw();
@@ -204,6 +206,7 @@ Main.initializeNewRepo = function () {
                          Commit.committerTime, now,
                          Commit.message, hash('automatic commit'));
     $redoHead = $head;
+    $title = window.sessionStorage.repoName;
 };
 
 Main.save = function () {

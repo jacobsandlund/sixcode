@@ -258,6 +258,10 @@ var drawGrid = function () {
     ctx.translate(xTranslation, yTranslation);
     ctx.scale(zoom, zoom);
 
+    ctx.font = '32px monospace';
+    ctx.fillText($title, 0, -20);
+    ctx.font = '12px monospace';
+
     if ($showResults) {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;

@@ -316,8 +316,13 @@ var selectMatch = function (keepCellSelected) {
         case 'go into':
             if ($listRepos) {
                 var result = $results[$c][$r];
+                if (!result.fullName) {
+                    makeCommit = false;
+                    break;
+                }
                 var gitUrl = GitHub.baseGitUrl(window.sessionStorage.githubAccessToken) + '/' + result.fullName + '.git';
                 window.sessionStorage.setItem('gitUrl', gitUrl);
+                window.sessionStorage.setItem('repoName', result.fullName);
                 $showResults = false;
                 $listRepos = false;
                 Main.initializeRepo();
@@ -329,6 +334,7 @@ var selectMatch = function (keepCellSelected) {
 
         case 'list repositories':
             window.sessionStorage.removeItem('gitUrl');
+            window.sessionStorage.removeItem('repoName');
             return Main.listRepos(null);
 
         case 'save':
@@ -439,6 +445,7 @@ var selectMatch = function (keepCellSelected) {
                 var accessToken = window.sessionStorage.githubAccessToken;
                 var gitUrl = GitHub.baseGitUrl(accessToken) + '/' + fullName + '.git';
                 window.sessionStorage.setItem('gitUrl', gitUrl);
+                window.sessionStorage.setItem('repoName', fullName);
 
                 var repoConfig = {
                     name: matchText,
@@ -446,6 +453,7 @@ var selectMatch = function (keepCellSelected) {
                 };
                 GitHub.createRepo(repoConfig, accessToken, function (err, repo, xhr) {
                     Main.initializeNewRepo();
+                    Main.save();
                     $listRepos = false;
                     $showResults = false;
                     $c = 0;
