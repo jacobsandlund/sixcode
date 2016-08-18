@@ -6,11 +6,12 @@ var canvas;
 var autocompleteContainer;
 var autocompleteInput;
 
-global.ctx = null;
+global.$ctx = null;
 
-global.zoom = 1;
-global.mouseX = 0;
-global.mouseY = 0;
+global.$mouseX = 0;
+global.$mouseY = 0;
+
+var zoom = 1;
 
 var xSpacing = 160;
 var ySpacing = 112;
@@ -39,8 +40,8 @@ Ui.initialize = function () {
     xTranslation = Math.floor(window.innerWidth / 3 - xSpacing / 2);
     yTranslation = Math.floor(window.innerHeight / 4 - ySpacing / 2);
 
-    ctx = canvas.getContext('2d');
-    ctx.font = '12px monospace';
+    $ctx = canvas.getContext('2d');
+    $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
         if ($fullscreen || movingGrid) {
@@ -153,10 +154,10 @@ Ui.initialize = function () {
     });
 
     canvas.addEventListener('mousedown', function (e) {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        mouseXAtDown = mouseX;
-        mouseYAtDown = mouseY;
+        $mouseX = e.clientX;
+        $mouseY = e.clientY;
+        mouseXAtDown = $mouseX;
+        mouseYAtDown = $mouseY;
         mouseDown = true;
         e.preventDefault();
     });
@@ -179,14 +180,14 @@ Ui.initialize = function () {
             }
         }
         if (movingGrid) {
-            var xDiff = e.clientX - mouseX;
-            var yDiff = e.clientY - mouseY;
+            var xDiff = e.clientX - $mouseX;
+            var yDiff = e.clientY - $mouseY;
             xTranslation += xDiff;
             yTranslation += yDiff;
             Ui.draw();
         }
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        $mouseX = e.clientX;
+        $mouseY = e.clientY;
     });
 
     window.addEventListener('wheel', function (e) {
@@ -209,9 +210,9 @@ Ui.draw = function () {
 
     Ui.moveAutocomplete();
 
-    ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    $ctx.save();
+    $ctx.clearRect(0, 0, canvas.width, canvas.height);
+    $ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
     if ($fullscreen) {
         drawFullscreen();
@@ -219,7 +220,7 @@ Ui.draw = function () {
         drawGrid();
     }
 
-    ctx.restore();
+    $ctx.restore();
 
     console.timeEnd('UI.draw');
 }
@@ -227,8 +228,8 @@ Ui.draw = function () {
 var drawFullscreen = function () {
     var centerX = Math.floor(window.innerWidth / 2);
     var centerY = Math.floor(window.innerHeight / 2);
-    ctx.translate(centerX, centerY);
-    ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
+    $ctx.translate(centerX, centerY);
+    $ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
 
     var project = get($head, Commit.tree);
     var parentCell = get(project, Project.cell);
@@ -247,7 +248,7 @@ var drawFullscreen = function () {
     }
     var r = lenCells - 1;
 
-    ctx.fillStyle = '#492e85';
+    $ctx.fillStyle = '#492e85';
 
     if (c >= 0 && c < lenColumns) {
         Evaluate.evaluate(parentCell, columns, c, r);
@@ -255,12 +256,12 @@ var drawFullscreen = function () {
 };
 
 var drawGrid = function () {
-    ctx.translate(xTranslation, yTranslation);
-    ctx.scale(zoom, zoom);
+    $ctx.translate(xTranslation, yTranslation);
+    $ctx.scale(zoom, zoom);
 
-    ctx.font = '32px monospace';
-    ctx.fillText($title, 0, -20);
-    ctx.font = '12px monospace';
+    $ctx.font = '32px monospace';
+    $ctx.fillText($title, 0, -20);
+    $ctx.font = '12px monospace';
 
     if ($showResults) {
         var lenColumns = $results.length;
@@ -298,9 +299,9 @@ var drawGrid = function () {
         }
     }
 
-    ctx.strokeStyle = '#ccc';
-    ctx.fillStyle = '#333';
-    ctx.lineWidth = 2;
+    $ctx.strokeStyle = '#ccc';
+    $ctx.fillStyle = '#333';
+    $ctx.lineWidth = 2;
 
     var minX = Math.round(-xTranslation / zoom) - 2 * xHalfGap;
     var maxX = Math.round((window.innerWidth - xTranslation) / zoom) + 2 * xHalfGap;
@@ -334,32 +335,32 @@ var drawGrid = function () {
 
             var argIndex = argRsForC.indexOf(r);
             if (argIndex >= 0) {
-                ctx.save();
-                ctx.strokeStyle = '#777';
-                ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+                $ctx.save();
+                $ctx.strokeStyle = '#777';
+                $ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
 
-                ctx.fillRect(x - 8, y + 9, 162, 104);
+                $ctx.fillRect(x - 8, y + 9, 162, 104);
 
                 if (argIndex === $argIndex) {
-                    ctx.lineDashOffset = 2.0;
-                    ctx.setLineDash([16, 4]);
+                    $ctx.lineDashOffset = 2.0;
+                    $ctx.setLineDash([16, 4]);
                 }
 
-                ctx.strokeRect(x, y + 15, 146, 92);
+                $ctx.strokeRect(x, y + 15, 146, 92);
 
-                ctx.restore();
+                $ctx.restore();
             } else if (c === $c && r === $r) {
-                ctx.save();
-                ctx.strokeStyle = '#333';
-                ctx.fillStyle = 'rgba(26, 138, 249, 0.2)';
-                ctx.lineWidth = 4;
+                $ctx.save();
+                $ctx.strokeStyle = '#333';
+                $ctx.fillStyle = 'rgba(26, 138, 249, 0.2)';
+                $ctx.lineWidth = 4;
 
-                ctx.strokeRect(x - 1, y + 14, 148, 94);
-                ctx.fillRect(x - 8, y + 9, 162, 104);
+                $ctx.strokeRect(x - 1, y + 14, 148, 94);
+                $ctx.fillRect(x - 8, y + 9, 162, 104);
 
-                ctx.restore();
+                $ctx.restore();
             } else {
-                ctx.strokeRect(x, y + 15, 146, 92);  // 144 by 90 internal area
+                $ctx.strokeRect(x, y + 15, 146, 92);  // 144 by 90 internal area
             }
 
             if ($showResults) {
@@ -369,57 +370,57 @@ var drawGrid = function () {
                 var text = val(get(cell, Cell.text));
 
                 // draw result
-                ctx.save();
+                $ctx.save();
 
-                ctx.beginPath();
-                ctx.rect(x + 1, y + 16, 144, 90);
-                ctx.clip();
+                $ctx.beginPath();
+                $ctx.rect(x + 1, y + 16, 144, 90);
+                $ctx.clip();
 
-                ctx.translate(x + 73, y + 61);
-                ctx.scale(0.1, 0.1);
+                $ctx.translate(x + 73, y + 61);
+                $ctx.scale(0.1, 0.1);
 
-                ctx.textAlign = 'center';
-                ctx.font = '180px monospace';
-                ctx.fillStyle = '#492e85';
+                $ctx.textAlign = 'center';
+                $ctx.font = '180px monospace';
+                $ctx.fillStyle = '#492e85';
 
                 var result = Evaluate.evaluate(parentCell, columns, c, r);
                 if (typeof result === 'number') {
-                    ctx.fillText('' + result, 0, 50, 1440);
+                    $ctx.fillText('' + result, 0, 50, 1440);
                 }
 
-                ctx.restore();
+                $ctx.restore();
             }
 
-            ctx.fillText(text, x + 2, y + 11);
+            $ctx.fillText(text, x + 2, y + 11);
         }
     }
 
     var newColumn = $c === lenColumns;
     var newRow = $r === lenCells;
     if (newColumn || newRow) {
-        ctx.strokeStyle = '#080';
-        ctx.fillStyle = 'rgba(26,138,249,0.2)';
-        ctx.lineWidth = 4;
+        $ctx.strokeStyle = '#080';
+        $ctx.fillStyle = 'rgba(26,138,249,0.2)';
+        $ctx.lineWidth = 4;
 
         var x = xSpacing * $c + xHalfGap;
         var y = ySpacing * $r + yHalfGap;
 
-        ctx.fillRect(x - 8, y + 9, 162, 104);
+        $ctx.fillRect(x - 8, y + 9, 162, 104);
 
-        ctx.lineDashOffset = 2.0;
-        ctx.setLineDash([16, 4]);
-        ctx.strokeRect(x - 1, y + 14, 148, 94);
+        $ctx.lineDashOffset = 2.0;
+        $ctx.setLineDash([16, 4]);
+        $ctx.strokeRect(x - 1, y + 14, 148, 94);
     }
 
     var emptyEscaped = $c === -1 && lenColumns === 0;
     if (emptyEscaped) {
-        ctx.strokeStyle = '#080';
-        ctx.fillStyle = 'rgba(26,138,249,0.2)';
-        ctx.lineWidth = 2;
+        $ctx.strokeStyle = '#080';
+        $ctx.fillStyle = 'rgba(26,138,249,0.2)';
+        $ctx.lineWidth = 2;
 
-        ctx.lineDashOffset = 4.0;
-        ctx.setLineDash([16, 4]);
-        ctx.strokeRect(xHalfGap, yHalfGap + 15, 146, 92);
+        $ctx.lineDashOffset = 4.0;
+        $ctx.setLineDash([16, 4]);
+        $ctx.strokeRect(xHalfGap, yHalfGap + 15, 146, 92);
     }
 };
 

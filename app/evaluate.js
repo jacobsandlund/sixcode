@@ -31,12 +31,12 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
     case '/':
         return argResult(0) / argResult(1);
     case 'square':
-        ctx.fillRect(-50, -50, 100, 100);
+        $ctx.fillRect(-50, -50, 100, 100);
         break;
     case 'circle':
-        ctx.beginPath();
-        ctx.arc(0, 0, 50, 0, 2 * Math.PI);
-        ctx.fill();
+        $ctx.beginPath();
+        $ctx.arc(0, 0, 50, 0, 2 * Math.PI);
+        $ctx.fill();
         break;
     case 'image':
         var src = argResult(0);
@@ -48,7 +48,7 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
             }
         }
         if (image) {
-            ctx.drawImage(image, 0, 0);
+            $ctx.drawImage(image, 0, 0);
         } else {
             image = new Image();
             image.src = src;
@@ -58,38 +58,38 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         break;
     case 'scale':
         var scaleBy = argResult(1);
-        ctx.save();
-        ctx.scale(scaleBy, scaleBy);
+        $ctx.save();
+        $ctx.scale(scaleBy, scaleBy);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'scale x':
         var scaleBy = argResult(1);
-        ctx.save();
-        ctx.scale(scaleBy, 1);
+        $ctx.save();
+        $ctx.scale(scaleBy, 1);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'scale y':
         var scaleBy = argResult(1);
-        ctx.save();
-        ctx.scale(1, scaleBy);
+        $ctx.save();
+        $ctx.scale(1, scaleBy);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'move x':
         var moveBy = argResult(1);
-        ctx.save();
-        ctx.translate(moveBy, 0);
+        $ctx.save();
+        $ctx.translate(moveBy, 0);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'move y':
         var moveBy = argResult(1);
-        ctx.save();
-        ctx.translate(0, moveBy);
+        $ctx.save();
+        $ctx.translate(0, moveBy);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'combine':
         argResult(0);
@@ -97,17 +97,17 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         break;
     case 'rotate':
         var rotateBy = argResult(1);
-        ctx.save();
-        ctx.rotate(rotateBy * Math.PI / 180);
+        $ctx.save();
+        $ctx.rotate(rotateBy * Math.PI / 180);
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
     case 'color':
         var color = argResult(1);
-        ctx.save();
-        ctx.fillStyle = color;
+        $ctx.save();
+        $ctx.fillStyle = color;
         argResult(0);
-        ctx.restore();
+        $ctx.restore();
         break;
 
     case 'mouse x':
