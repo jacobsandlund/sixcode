@@ -28,6 +28,7 @@ var mouseYAtDown = 0;
 
 var mouseDown = false;
 var movingGrid = false;
+var movingArg = false;
 var movingArgIndex = -1;
 
 var setMouseCoords = function () {
@@ -81,7 +82,7 @@ Ui.initialize = function () {
     $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
-        if ($fullscreen || movingGrid || movingArgIndex >= 0) {
+        if ($fullscreen || movingGrid || movingArg) {
             return;
         }
         e.preventDefault();
@@ -156,21 +157,27 @@ Ui.initialize = function () {
             $redoHead = $head;
         }
 
+        movingArgIndex = -1;
+
         setTimeout(function () {
             movingGrid = false;
-            movingArgIndex = -1;
+            movingArg = false;
             Ui.draw();
         });
     });
 
     canvas.addEventListener('mousemove', function (e) {
-        if (!movingGrid && movingArgIndex === -1) {
+        if (!movingGrid && !movingArg) {
             var moved = (
                 Math.abs(e.clientX - mouseXAtDown) > 2 ||
                 Math.abs(e.clientY - mouseYAtDown) > 2
             );
             if (mouseDown && moved) {
-                movingGrid = true;
+                if (movingArgIndex >= 0) {
+                    movingArg = true;
+                } else {
+                    movingGrid = true;
+                }
             }
         }
         if (movingGrid) {
@@ -183,7 +190,7 @@ Ui.initialize = function () {
         $mouseX = e.clientX;
         $mouseY = e.clientY;
 
-        if (movingArgIndex >= 0) {
+        if (movingArg) {
             setMouseCoords();
 
             var parentCell = get($project, Project.cell);
