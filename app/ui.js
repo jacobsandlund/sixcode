@@ -10,6 +10,8 @@ global.$ctx = null;
 
 global.$mouseX = 0;
 global.$mouseY = 0;
+var mouseC = 0;
+var mouseR = 0;
 
 var zoom = 1;
 
@@ -26,6 +28,41 @@ var mouseYAtDown = 0;
 
 var mouseDown = false;
 var movingGrid = false;
+var movingArgIndex = -1;
+
+var setMouseCoords = function () {
+    var x = Math.round(($mouseX - xTranslation) / zoom);
+    var y = Math.round(($mouseY - yTranslation) / zoom);
+    mouseC = Math.floor(x / xSpacing);
+    mouseR = Math.floor(y / ySpacing);
+
+    if ($showResults) {
+        var lenColumns = $results.length;
+        var lenCells = lenColumns > 0 ? $results[0].length : 0;
+    } else {
+        var parentCell = get($project, Project.cell);
+        var columns = get(parentCell, Cell.columns);
+        var lenColumns = len(columns);
+        if (lenColumns > 0) {
+            var lenCells = len(getAt(columns, 0));
+        } else {
+            var lenCells = 0;
+        }
+    }
+
+    if (mouseC >= lenColumns) {
+        mouseC = lenColumns;
+    }
+    if (mouseC < 0) {
+        mouseC = 0;
+    }
+    if (mouseR >= lenCells) {
+        mouseR = lenCells;
+    }
+    if (mouseR < 0) {
+        mouseR = 0;
+    }
+};
 
 Ui.initialize = function () {
     canvas = document.getElementById('canvas');
@@ -44,22 +81,32 @@ Ui.initialize = function () {
     $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
-        if ($fullscreen || movingGrid) {
+        if ($fullscreen || movingGrid || movingArgIndex >= 0) {
             return;
         }
         e.preventDefault();
 
-        var x = Math.round((e.clientX - xTranslation) / zoom);
-        var y = Math.round((e.clientY - yTranslation) / zoom);
-        var c = Math.floor(x / xSpacing);
-        var r = Math.floor(y / ySpacing);
+        setMouseCoords();
 
-        if ($showResults) {
-            var lenColumns = $results.length;
-            var lenCells = lenColumns > 0 ? $results[0].length : 0;
-        } else {
-            var project = get($head, Commit.tree);
-            var parentCell = get(project, Project.cell);
+        $c = mouseC;
+        $r = mouseR;
+        Autocomplete.setSelectedCell();
+
+        Ui.draw();
+    });
+
+    canvas.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        $mouseX = e.clientX;
+        $mouseY = e.clientY;
+        mouseXAtDown = $mouseX;
+        mouseYAtDown = $mouseY;
+        mouseDown = true;
+
+        setMouseCoords();
+
+        if (!$showResults) {
+            var parentCell = get($project, Project.cell);
             var columns = get(parentCell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
@@ -67,22 +114,87 @@ Ui.initialize = function () {
             } else {
                 var lenCells = 0;
             }
+
+            var selectedCell = null;
+            if ($c >= 0 && $c < lenColumns) {
+                var selectedColumn = getAt(columns, $c);
+                if ($r >= 0 && $r < len(selectedColumn)) {
+                    selectedCell = getAt(selectedColumn, $r);
+                }
+            }
+
+            if (!selectedCell) {
+                return;
+            }
+
+            var args = get(selectedCell, Cell.args);
+            var lenArgs = len(args);
+            var i;
+            for (i = 0; i < lenArgs; i++) {
+                var arg = getAt(args, i);
+                var argC = $c + val(get(arg, Cell.Arg.cDiff));
+                var argR = $r + val(get(arg, Cell.Arg.rDiff));
+
+                if (mouseC === argC && mouseR === argR) {
+                    movingArgIndex = i;
+                    Ui.draw();
+                }
+            }
+        }
+    });
+
+    canvas.addEventListener('mouseup', function (e) {
+        mouseDown = false;
+        var oldProject = get($head, Commit.tree);
+
+        if ($project !== oldProject) {
+            var now = Math.floor(+Date.now() / 1000);
+            $head = createCommit($head,
+                                 Commit.tree, $project,
+                                 Commit.parent, $head,
+                                 Commit.committerTime, now);
+            $redoHead = $head;
         }
 
-        if (c >= lenColumns) {
-            c = lenColumns;
-        }
-        if (c < 0) {
-            c = 0;
-        }
-        if (r >= lenCells) {
-            r = lenCells;
-        }
-        if (r < 0) {
-            r = 0;
-        }
+        setTimeout(function () {
+            movingGrid = false;
+            movingArgIndex = -1;
+            Ui.draw();
+        });
+    });
 
-        if (e.shiftKey && !$showResults) {
+    canvas.addEventListener('mousemove', function (e) {
+        if (!movingGrid && movingArgIndex === -1) {
+            var moved = (
+                Math.abs(e.clientX - mouseXAtDown) > 2 ||
+                Math.abs(e.clientY - mouseYAtDown) > 2
+            );
+            if (mouseDown && moved) {
+                movingGrid = true;
+            }
+        }
+        if (movingGrid) {
+            var xDiff = e.clientX - $mouseX;
+            var yDiff = e.clientY - $mouseY;
+            xTranslation += xDiff;
+            yTranslation += yDiff;
+            Ui.draw();
+        }
+        $mouseX = e.clientX;
+        $mouseY = e.clientY;
+
+        if (movingArgIndex >= 0) {
+            setMouseCoords();
+
+            var parentCell = get($project, Project.cell);
+            var columns = get(parentCell, Cell.columns);
+            var lenColumns = len(columns);
+            if (lenColumns > 0) {
+                var lenCells = len(getAt(columns, 0));
+            } else {
+                var lenCells = 0;
+            }
+
             var selectedCell = null;
             var selectedColumn = null;
             if ($c >= 0 && $c < lenColumns) {
@@ -102,92 +214,37 @@ Ui.initialize = function () {
                 return;
             }
 
-            if (c > $c || (c === $c && r >= $r)) {
+            if (mouseC > $c || (mouseC === $c && mouseR >= $r)) {
                 return;
             }
 
-            var i;
+			var i;
             for (i = 0; i < lenArgs; i++) {
                 var arg = getAt(args, i);
                 var argC = $c + val(get(arg, Cell.Arg.cDiff));
                 var argR = $r + val(get(arg, Cell.Arg.rDiff));
-                if (c === argC && r === argR) {
-                    $argIndex = i;
-                    Ui.draw();
+                if (mouseC === argC && mouseR === argR) {
                     return;
                 }
             }
 
-            var cDiff = c - $c;
-            var rDiff = r - $r;
-            var arg = getAt(args, $argIndex);
+            var cDiff = mouseC - $c;
+            var rDiff = mouseR - $r;
+
+            var arg = getAt(args, movingArgIndex);
 
             arg = set(arg,
                       Cell.Arg.cDiff, hash(cDiff),
                       Cell.Arg.rDiff, hash(rDiff));
 
-            args = setAt(args, $argIndex, arg);
+            args = setAt(args, movingArgIndex, arg);
             selectedCell = set(selectedCell, Cell.args, args);
             selectedColumn = setAt(selectedColumn, $r, selectedCell);
             columns = setAt(columns, $c, selectedColumn);
             parentCell = set(parentCell, Cell.columns, columns);
-            var oldProject = project;
-            project = set(project, Project.cell, parentCell);
-
-            if (project !== oldProject) {
-                var now = Math.floor(+Date.now() / 1000);
-                $head = createCommit($head,
-                                     Commit.tree, project,
-                                     Commit.parent, $head,
-                                     Commit.committerTime, now);
-                $redoHead = $head;
-            }
-
-        } else {
-            $c = c;
-            $r = r;
-            $argIndex = 0;
-            Autocomplete.setSelectedCell();
-        }
-
-        Ui.draw();
-    });
-
-    canvas.addEventListener('mousedown', function (e) {
-        $mouseX = e.clientX;
-        $mouseY = e.clientY;
-        mouseXAtDown = $mouseX;
-        mouseYAtDown = $mouseY;
-        mouseDown = true;
-        e.preventDefault();
-    });
-
-    canvas.addEventListener('mouseup', function (e) {
-        mouseDown = false;
-        setTimeout(function () {
-            movingGrid = false;
-        });
-    });
-
-    canvas.addEventListener('mousemove', function (e) {
-        if (!movingGrid) {
-            var moved = (
-                Math.abs(e.clientX - mouseXAtDown) > 2 ||
-                Math.abs(e.clientY - mouseYAtDown) > 2
-            );
-            if (mouseDown && moved) {
-                movingGrid = true;
-            }
-        }
-        if (movingGrid) {
-            var xDiff = e.clientX - $mouseX;
-            var yDiff = e.clientY - $mouseY;
-            xTranslation += xDiff;
-            yTranslation += yDiff;
+            $project = set($project, Project.cell, parentCell);
             Ui.draw();
         }
-        $mouseX = e.clientX;
-        $mouseY = e.clientY;
     });
 
     window.addEventListener('wheel', function (e) {
@@ -231,8 +288,7 @@ var drawFullscreen = function () {
     $ctx.translate(centerX, centerY);
     $ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
 
-    var project = get($head, Commit.tree);
-    var parentCell = get(project, Project.cell);
+    var parentCell = get($project, Project.cell);
     var columns = get(parentCell, Cell.columns);
     var lenColumns = len(columns);
     if (lenColumns > 0) {
@@ -267,8 +323,7 @@ var drawGrid = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var project = get($head, Commit.tree);
-        var parentCell = get(project, Project.cell);
+        var parentCell = get($project, Project.cell);
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -341,7 +396,7 @@ var drawGrid = function () {
 
                 $ctx.fillRect(x - 8, y + 9, 162, 104);
 
-                if (argIndex === $argIndex) {
+                if (argIndex === movingArgIndex) {
                     $ctx.lineDashOffset = 2.0;
                     $ctx.setLineDash([16, 4]);
                 }

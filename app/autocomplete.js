@@ -110,8 +110,7 @@ var getSelectedCell = function () {
                        Cell.text, hash(result.text));
         }
     } else {
-        var project = get($head, Commit.tree);
-        var parentCell = get(project, Project.cell);
+        var parentCell = get($project, Project.cell);
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -246,8 +245,7 @@ var selectMatch = function (keepCellSelected) {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var project = get($head, Commit.tree);
-        var parentCell = get(project, Project.cell);
+        var parentCell = get($project, Project.cell);
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -261,7 +259,6 @@ var selectMatch = function (keepCellSelected) {
 
     var originalText = val(get(selectedCell, Cell.text));
     var makeCommit = true;
-    var forceMakeCommit = false;
     var keepCommandSelected = true;
 
     if (isAction) {
@@ -270,6 +267,7 @@ var selectMatch = function (keepCellSelected) {
             var parent = get($head, Commit.parent);
             if (parent) {
                 $head = parent;
+                $project = get($head, Commit.tree);
             }
             makeCommit = false;
             break;
@@ -282,6 +280,7 @@ var selectMatch = function (keepCellSelected) {
                 head = get(head, Commit.parent);
             }
             $head = childHead;
+            $project = get($head, Commit.tree);
             makeCommit = false;
             break;
 
@@ -292,8 +291,6 @@ var selectMatch = function (keepCellSelected) {
             $nextTickTime = 0;
             $playFrame = 0;
 
-            // commit will be mutated into final after-play state
-            forceMakeCommit = true;
             autocompleteContainer.style.display = 'none';
             document.body.style.cursor = 'none';
             window.requestAnimationFrame(Main.tick);
@@ -501,13 +498,13 @@ var selectMatch = function (keepCellSelected) {
 
     if (makeCommit) {
         parentCell = set(parentCell, Cell.columns, columns);
-        var oldProject = project;
-        project = set(project, Project.cell, parentCell);
+        var oldProject = $project;
+        $project = set($project, Project.cell, parentCell);
 
-        if (project !== oldProject || forceMakeCommit) {
+        if ($project !== oldProject) {
             var now = Math.floor(+Date.now() / 1000);
             $head = createCommit($head,
-                                 Commit.tree, project,
+                                 Commit.tree, $project,
                                  Commit.parent, $head,
                                  Commit.committerTime, now);
             $redoHead = $head;
@@ -526,8 +523,6 @@ var selectMatch = function (keepCellSelected) {
         }
         Autocomplete.setSelectedCell();
     }
-
-    $argIndex = 0;
 
     Ui.draw();
 };

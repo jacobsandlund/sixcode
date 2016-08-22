@@ -16,8 +16,7 @@ Input.initialize = function () {
 };
 
 Input.capture = function () {
-    var project = get($head, Commit.tree);
-    var parentCell = get(project, Project.cell);
+    var parentCell = get($project, Project.cell);
     var input = get(parentCell, Cell.input);
     var mouseXs = get(input, Input.mouseXs);
     var mouseYs = get(input, Input.mouseYs);
@@ -38,7 +37,7 @@ Input.capture = function () {
     }
 
     var scaledX = Math.floor($mouseX / window.innerWidth * 1440) - 720;
-    var scaledY = Math.floor(mouseY / window.innerHeight * 900) - 450;
+    var scaledY = Math.floor($mouseY / window.innerHeight * 900) - 450;
     mouseXs = setAt(mouseXs, $playFrame, hash(scaledX));
     mouseYs = setAt(mouseYs, $playFrame, hash(scaledY));
 
@@ -46,14 +45,7 @@ Input.capture = function () {
                 Input.mouseXs, mouseXs,
                 Input.mouseYs, mouseYs);
     parentCell = set(parentCell, Cell.input, input);
-    project = set(project, Project.cell, parentCell);
-
-    var now = Math.round(+Date.now() / 1000);
-
-    $head = createCommit($head,
-                         Commit.tree, project,
-                         Commit.committerTime, now);
-    $redoHead = $head;
+    $project = set($project, Project.cell, parentCell);
 };
 
 })();

@@ -4,9 +4,9 @@ global.Main = {};
 
 global.$head = 0;
 global.$redoHead = 0;
+global.$project = 0;
 global.$r = 0;
 global.$c = 0;
-global.$argIndex = 0;
 global.$playFrame = -1;
 global.$nextTickTime = 0;
 global.$fullscreen = false;
@@ -175,6 +175,7 @@ Main.initializeRepo = function () {
                 $title = window.sessionStorage.repoName;
                 $head = remoteCommit;
                 $redoHead = $head;
+                $project = get($head, Commit.tree);
                 firstDraw();
             });
         }
@@ -182,7 +183,7 @@ Main.initializeRepo = function () {
 };
 
 Main.initializeNewRepo = function () {
-    var project = $[Project.zero];
+    $project = $[Project.zero];
 
     var userName = window.sessionStorage.gitUserName;
     var userEmail = window.sessionStorage.gitUserEmail;
@@ -201,7 +202,7 @@ Main.initializeNewRepo = function () {
 
     $head = createCommit($[Commit.zero],
                          Commit.info, info,
-                         Commit.tree, project,
+                         Commit.tree, $project,
                          Commit.parent, 0,
                          Commit.committerTime, now,
                          Commit.message, hash('automatic commit'));
@@ -234,13 +235,22 @@ Main.tick = function (now) {
     Input.capture();
     Ui.draw();
 
-    var project = get($head, Commit.tree);
-    var parentCell = get(project, Project.cell);
+    var parentCell = get($project, Project.cell);
     var columns = get(parentCell, Cell.columns);
 
     $playFrame++;
     if ($playFrame >= len(columns)) {
         $playFrame = -1;
+        var oldProject = get($head, Commit.tree);
+
+        if ($project !== oldProject) {
+            var now = Math.floor(+Date.now() / 1000);
+            $head = createCommit($head,
+                                 Commit.tree, $project,
+                                 Commit.parent, $head,
+                                 Commit.committerTime, now);
+            $redoHead = $head;
+        }
         Autocomplete.show();
         return;
     }
