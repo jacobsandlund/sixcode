@@ -15,6 +15,7 @@ var entries = [
     '-',
     '*',
     '/',
+    '^',
 
     'square',
     'circle',
@@ -58,6 +59,7 @@ var numArgsTable = {
     '-': 2,
     '*': 2,
     '/': 2,
+    '^': 2,
 
     'square': 0,
     'circle': 0,
