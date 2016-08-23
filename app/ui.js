@@ -42,7 +42,7 @@ var setMouseCoords = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = get($project, Project.cell);
+        var parentCell = Main.getParentCell();
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -90,6 +90,7 @@ Ui.initialize = function () {
     $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
+        console.log('click');
         if ($fullscreen || movingGrid || movingArg || selectingRange) {
             return;
         }
@@ -115,6 +116,10 @@ Ui.initialize = function () {
         Ui.draw();
     });
 
+    canvas.addEventListener('dblclick', function (e) {
+        Autocomplete.performMatch('go into');
+    });
+
     canvas.addEventListener('mousedown', function (e) {
         e.preventDefault();
         $mouseX = e.clientX;
@@ -130,7 +135,7 @@ Ui.initialize = function () {
                 return;
             }
 
-            var parentCell = get($project, Project.cell);
+            var parentCell = Main.getParentCell();
             var columns = get(parentCell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
@@ -232,7 +237,7 @@ Ui.initialize = function () {
         } else if (movingArg) {
             setMouseCoords();
 
-            var parentCell = get($project, Project.cell);
+            var parentCell = Main.getParentCell();
             var columns = get(parentCell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
@@ -288,7 +293,7 @@ Ui.initialize = function () {
             selectedColumn = setAt(selectedColumn, $r, selectedCell);
             columns = setAt(columns, $c, selectedColumn);
             parentCell = set(parentCell, Cell.columns, columns);
-            $project = set($project, Project.cell, parentCell);
+            Main.updatePath(parentCell);
             Ui.draw();
         }
     });
@@ -334,7 +339,7 @@ var drawFullscreen = function () {
     $ctx.translate(centerX, centerY);
     $ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
 
-    var parentCell = get($project, Project.cell);
+    var parentCell = Main.getParentCell();
     var columns = get(parentCell, Cell.columns);
     var lenColumns = len(columns);
     if (lenColumns > 0) {
@@ -369,7 +374,7 @@ var drawGrid = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = get($project, Project.cell);
+        var parentCell = Main.getParentCell();
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {

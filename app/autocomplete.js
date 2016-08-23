@@ -33,8 +33,8 @@ var entries = [
 ];
 
 var actionEntries = [
-    'go into',
     'go up',
+    'go into',
     'delete row',
     'delete column',
     'delete right columns',
@@ -45,6 +45,7 @@ var actionEntries = [
     'insert column',
     'collapse',
 
+    'escape',
     'undo',
     'redo',
     'play',
@@ -113,7 +114,7 @@ var getSelectedCell = function () {
                        Cell.text, hash(result.text));
         }
     } else {
-        var parentCell = get($project, Project.cell);
+        var parentCell = Main.getParentCell();
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -222,7 +223,7 @@ var onKeyDown = function (e) {
         var keepCellSelected = e.shiftKey;
         selectMatch(keepCellSelected);
     } else if (e.keyCode === 27) { // escape
-        escape();
+        Autocomplete.performMatch('escape');
         Ui.draw();
     }
 };
@@ -239,8 +240,6 @@ var escape = function () {
 };
 
 var selectMatch = function (keepCellSelected) {
-    var selectedCell = getSelectedCell();
-
     var text = autocompleteInput.value;
     if (selectedMatchIndex >= matches.length) {
         var matchText = text;
@@ -248,11 +247,17 @@ var selectMatch = function (keepCellSelected) {
         var matchText = matches[selectedMatchIndex];
     }
 
+    Autocomplete.performMatch(matchText, keepCellSelected);
+};
+
+Autocomplete.performMatch = function (matchText, keepCellSelected) {
+    var selectedCell = getSelectedCell();
+
     if ($showResults) {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = get($project, Project.cell);
+        var parentCell = Main.getParentCell();
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -265,7 +270,7 @@ var selectMatch = function (keepCellSelected) {
     var isAction = actionEntriesMap[matchText];
 
     var originalText = val(get(selectedCell, Cell.text));
-    var makeCommit = true;
+    var makeCommit = !isAction;
     var keepCommandSelected = true;
 
     if (isAction) {
@@ -276,7 +281,6 @@ var selectMatch = function (keepCellSelected) {
                 $head = parent;
                 $project = get($head, Commit.tree);
             }
-            makeCommit = false;
             break;
 
         case 'redo':
@@ -288,7 +292,6 @@ var selectMatch = function (keepCellSelected) {
             }
             $head = childHead;
             $project = get($head, Commit.tree);
-            makeCommit = false;
             break;
 
         case 'play':
@@ -306,14 +309,17 @@ var selectMatch = function (keepCellSelected) {
         case 'fullscreen':
             escape();
             $fullscreen = true;
-            makeCommit = false;
+            keepCommandSelected = false;
+            break;
+
+        case 'escape':
+            escape();
             keepCommandSelected = false;
             break;
 
         case 'exit fullscreen':
             autocompleteInput.value = '';
             $fullscreen = false;
-            makeCommit = false;
             keepCommandSelected = false;
             break;
 
@@ -321,7 +327,6 @@ var selectMatch = function (keepCellSelected) {
             if ($listRepos) {
                 var result = $results[$c][$r];
                 if (!result.fullName) {
-                    makeCommit = false;
                     break;
                 }
                 var gitUrl = GitHub.baseGitUrl(window.sessionStorage.githubAccessToken) + '/' + result.fullName + '.git';
@@ -331,9 +336,27 @@ var selectMatch = function (keepCellSelected) {
                 $listRepos = false;
                 Main.initializeRepo();
                 return;
-            } else {
+            } else if ($showResults) {
                 // TODO
+            } else {
+                $path[$pathDepth] = $c;
+                $path[$pathDepth + 1] = $r;
+                $minC = $maxC = $c = 0;
+                $minR = $maxR = $r = 0;
+                $pathDepth += 2;
+                Autocomplete.setSelectedCell();
+                Ui.draw();
+                keepCommandSelected = false;
             }
+            break;
+
+        case 'go up':
+            if ($pathDepth > 0) {
+                $pathDepth -= 2;
+                $minC = $maxC = $c = $path[$pathDepth];
+                $minR = $maxR = $r = $path[$pathDepth + 1];
+            }
+            Ui.draw();
             break;
 
         case 'list repositories':
@@ -342,7 +365,6 @@ var selectMatch = function (keepCellSelected) {
             return Main.listRepos(null);
 
         case 'save':
-            makeCommit = false;
             Main.save();
             break;
 
@@ -353,7 +375,9 @@ var selectMatch = function (keepCellSelected) {
             var column = getAt(columns, $c);
             columns = insertAt(columns, $c, column);
             $c++;
+            $minC = $maxC = $c;
             Ui.moveAutocomplete();
+            makeCommit = true;
             break;
 
         case 'copy row':
@@ -368,7 +392,9 @@ var selectMatch = function (keepCellSelected) {
                 columns = setAt(columns, i, column);
             }
             $r++;
+            $minR = $maxR = $r;
             Ui.moveAutocomplete();
+            makeCommit = true;
             break;
 
         case 'insert column':
@@ -381,6 +407,7 @@ var selectMatch = function (keepCellSelected) {
                 cells = push(cells, $[Cell.zero]);
             }
             columns = insertAt(columns, $c, cells);
+            makeCommit = true;
             break;
 
         case 'insert row':
@@ -393,12 +420,14 @@ var selectMatch = function (keepCellSelected) {
                 column = insertAt(column, $r, $[Cell.zero]);
                 columns = setAt(columns, i, column);
             }
+            makeCommit = true;
             break;
 
         case 'delete column':
             if ($c < lenColumns) {
                 columns = deleteAt(columns, $c);
             }
+            makeCommit = true;
             break;
 
         case 'delete row':
@@ -412,12 +441,14 @@ var selectMatch = function (keepCellSelected) {
                 column = deleteAt(column, $r);
                 columns = setAt(columns, i, column);
             }
+            makeCommit = true;
             break;
 
         case 'delete right columns':
             if ($c < lenColumns - 1) {
                 columns = take(columns, $c + 1);
             }
+            makeCommit = true;
             break;
 
         case 'collapse':
@@ -449,6 +480,10 @@ var selectMatch = function (keepCellSelected) {
             var column = getAt(columns, $minC);
             column = setAt(column, $minR, cell);
             columns = setAt(columns, $minC, column);
+            makeCommit = true;
+
+            $c = $maxC = $minC;
+            $r = $maxR = $minR;
             break;
         }
 
@@ -537,7 +572,7 @@ var selectMatch = function (keepCellSelected) {
     if (makeCommit) {
         parentCell = set(parentCell, Cell.columns, columns);
         var oldProject = $project;
-        $project = set($project, Project.cell, parentCell);
+        Main.updatePath(parentCell);
 
         if ($project !== oldProject) {
             var now = Math.floor(+Date.now() / 1000);
