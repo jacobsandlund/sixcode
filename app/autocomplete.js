@@ -227,6 +227,10 @@ var onKeyDown = function (e) {
 var escape = function () {
     $c = -1;
     $r = -1;
+    $minC = -1;
+    $maxC = -1;
+    $minR = -1;
+    $maxR = -1;
     autocompleteInput.value = '';
     Autocomplete.setSelectedCell();
 };

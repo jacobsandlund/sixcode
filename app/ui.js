@@ -30,6 +30,7 @@ var mouseDown = false;
 var movingGrid = false;
 var movingArg = false;
 var movingArgIndex = -1;
+var selectingRange = false;
 
 var setMouseCoords = function () {
     var x = Math.round(($mouseX - xTranslation) / zoom);
@@ -65,6 +66,13 @@ var setMouseCoords = function () {
     }
 };
 
+var selectRange = function () {
+    $minC = Math.min(mouseC, $c);
+    $maxC = Math.max(mouseC, $c);
+    $minR = Math.min(mouseR, $r);
+    $maxR = Math.max(mouseR, $r);
+};
+
 Ui.initialize = function () {
     canvas = document.getElementById('canvas');
     canvas.width = window.devicePixelRatio * window.innerWidth;
@@ -82,16 +90,27 @@ Ui.initialize = function () {
     $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
-        if ($fullscreen || movingGrid || movingArg) {
+        if ($fullscreen || movingGrid || movingArg || selectingRange) {
             return;
         }
         e.preventDefault();
 
         setMouseCoords();
 
-        $c = mouseC;
-        $r = mouseR;
-        Autocomplete.setSelectedCell();
+        if (e.shiftKey) {
+            if ($c === -1) {
+                $c = mouseC;
+                $r = mouseR;
+                Autocomplete.setSelectedCell();
+            }
+            selectRange();
+        } else {
+            $c = mouseC;
+            $r = mouseR;
+            selectRange();
+
+            Autocomplete.setSelectedCell();
+        }
 
         Ui.draw();
     });
@@ -107,6 +126,10 @@ Ui.initialize = function () {
         setMouseCoords();
 
         if (!$showResults) {
+            if ($minC !== $maxC || $minR !== $maxR) {
+                return;
+            }
+
             var parentCell = get($project, Project.cell);
             var columns = get(parentCell, Cell.columns);
             var lenColumns = len(columns);
@@ -162,18 +185,23 @@ Ui.initialize = function () {
         setTimeout(function () {
             movingGrid = false;
             movingArg = false;
+            selectingRange = false;
             Ui.draw();
         });
     });
 
     canvas.addEventListener('mousemove', function (e) {
-        if (!movingGrid && !movingArg) {
+        if (!movingGrid && !movingArg && !selectingRange) {
             var moved = (
                 Math.abs(e.clientX - mouseXAtDown) > 2 ||
                 Math.abs(e.clientY - mouseYAtDown) > 2
             );
             if (mouseDown && moved) {
-                if (movingArgIndex >= 0) {
+                if (e.shiftKey) {
+                    selectingRange = true;
+                    $c = -1;
+                    $r = -1;
+                } else if (movingArgIndex >= 0) {
                     movingArg = true;
                 } else {
                     movingGrid = true;
@@ -190,7 +218,18 @@ Ui.initialize = function () {
         $mouseX = e.clientX;
         $mouseY = e.clientY;
 
-        if (movingArg) {
+        if (selectingRange) {
+            setMouseCoords();
+
+            if ($c === -1) {
+                $c = mouseC;
+                $r = mouseR;
+                Autocomplete.setSelectedCell();
+            }
+            selectRange();
+            Ui.draw();
+
+        } else if (movingArg) {
             setMouseCoords();
 
             var parentCell = get($project, Project.cell);
@@ -225,7 +264,7 @@ Ui.initialize = function () {
                 return;
             }
 
-			var i;
+            var i;
             for (i = 0; i < lenArgs; i++) {
                 var arg = getAt(args, i);
                 var argC = $c + val(get(arg, Cell.Arg.cDiff));
@@ -241,8 +280,8 @@ Ui.initialize = function () {
             var arg = getAt(args, movingArgIndex);
 
             arg = set(arg,
-                      Cell.Arg.cDiff, hash(cDiff),
-                      Cell.Arg.rDiff, hash(rDiff));
+                    Cell.Arg.cDiff, hash(cDiff),
+                    Cell.Arg.rDiff, hash(rDiff));
 
             args = setAt(args, movingArgIndex, arg);
             selectedCell = set(selectedCell, Cell.args, args);
@@ -376,6 +415,8 @@ var drawGrid = function () {
 
     var argRsForC = [-1, -1, -1, -1];
 
+    var selectingSingle = $minC === $maxC && $minR === $maxR;
+
     var c;
     for (c = minC; c <= maxC; c++) {
         var cells = getAt(columns, c);
@@ -396,7 +437,7 @@ var drawGrid = function () {
             var y = ySpacing * r + yHalfGap;
 
             var argIndex = argRsForC.indexOf(r);
-            if (argIndex >= 0) {
+            if (selectingSingle && argIndex >= 0) {
                 $ctx.save();
                 $ctx.strokeStyle = '#777';
                 $ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
@@ -411,13 +452,19 @@ var drawGrid = function () {
                 $ctx.strokeRect(x, y + 15, 146, 92);
 
                 $ctx.restore();
-            } else if (c === $c && r === $r) {
+            } else if ($minC <= c && c <= $maxC && $minR <= r && r <= $maxR) {
                 $ctx.save();
-                $ctx.strokeStyle = '#333';
                 $ctx.fillStyle = 'rgba(26, 138, 249, 0.2)';
-                $ctx.lineWidth = 4;
 
-                $ctx.strokeRect(x - 1, y + 14, 148, 94);
+                if (c === $c && r === $r) {
+                    $ctx.strokeStyle = '#333';
+                    $ctx.lineWidth = 4;
+                    $ctx.strokeRect(x - 1, y + 14, 148, 94);
+                } else {
+                    $ctx.strokeStyle = '#777';
+                    $ctx.strokeRect(x, y + 15, 146, 92);
+                }
+
                 $ctx.fillRect(x - 8, y + 9, 162, 104);
 
                 $ctx.restore();
