@@ -43,6 +43,7 @@ var actionEntries = [
     'copy over right cols',
     'insert row',
     'insert column',
+    'collapse',
 
     'undo',
     'redo',
@@ -418,6 +419,37 @@ var selectMatch = function (keepCellSelected) {
                 columns = take(columns, $c + 1);
             }
             break;
+
+        case 'collapse':
+            var childColumns = ArrayTree.$zeros[0];
+            var c;
+            for (c = $minC; c <= $maxC; c++) {
+                var r;
+                var column = getAt(columns, c);
+                var childColumn = ArrayTree.$zeros[0];
+                for (r = $minR; r <= $maxR; r++) {
+                    var cell = getAt(column, r);
+                    childColumn = push(childColumn, cell);
+                }
+                childColumns = push(childColumns, childColumn);
+            }
+
+            for (c = $maxC; c > $minC; c--) {
+                columns = deleteAt(columns, c);
+            }
+            lenColumns -= $maxC - $minC;
+            for (c = 0; c < lenColumns; c++) {
+                var column = getAt(columns, c);
+                for (r = $maxR; r > $minR; r--) {
+                    column = deleteAt(column, r);
+                }
+                columns = setAt(columns, c, column);
+            }
+            var cell = set($[Cell.zero], Cell.columns, childColumns);
+            var column = getAt(columns, $minC);
+            column = setAt(column, $minR, cell);
+            columns = setAt(columns, $minC, column);
+            break;
         }
 
     } else if (matchText === originalText && originalText !== '') {
@@ -526,6 +558,7 @@ var selectMatch = function (keepCellSelected) {
     } else {
         if (!keepCellSelected) {
             $r++;
+            $minR = $maxR = $r;
         }
         Autocomplete.setSelectedCell();
     }

@@ -127,6 +127,14 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
             return 0;
         }
         return val(getAt(mouseYs, c));
+
+    default:
+        var childColumns = get(cell, Cell.columns);
+        if (len(childColumns) === 0) {
+            return '';
+        }
+        var lastRow = len(getAt(childColumns, 0)) - 1;
+        return Evaluate.evaluate(cell, childColumns, 0, lastRow);
     }
 
     return text;
