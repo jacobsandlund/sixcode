@@ -13,7 +13,7 @@ Scope.create = function () {
 };
 
 Scope.load = function (scope, project) {
-    var cell = get($project, Project.cell);
+    var cell = get(project, Project.cell);
     var scopes = [scope];
     while (scope.parent) {
         scope = scope.parent;

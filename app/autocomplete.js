@@ -316,7 +316,8 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             var parent = get($head, Commit.parent);
             if (parent) {
                 $head = parent;
-                Scope.load($scope, get($head, Commit.tree));
+                $project = get($head, Commit.tree);
+                $scope = Scope.load($scope, $project);
             }
             break;
 
@@ -328,7 +329,8 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                 head = get(head, Commit.parent);
             }
             $head = childHead;
-            Scope.load($scope, get($head, Commit.tree));
+            $project = get($head, Commit.tree);
+            $scope = Scope.load($scope, $project);
             break;
 
         case 'play':
