@@ -244,8 +244,7 @@ Main.tick = function (now) {
     Input.capture();
     Ui.draw();
 
-    var parentCell = Main.getParentCell();
-    var columns = get(parentCell, Cell.columns);
+    var columns = get($scope.cell, Cell.columns);
 
     $playFrame++;
     if ($playFrame >= len(columns)) {

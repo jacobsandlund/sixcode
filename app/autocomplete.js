@@ -667,6 +667,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             if (newRow && lenColumns === 1) {
                 var selectedColumn = getAt(columns, 0);
                 selectedColumn = push(selectedColumn, selectedCell);
+                columns = setAt(columns, $c, selectedColumn);
                 lenCells++;
             } else {
                 if (newRow) {
@@ -678,17 +679,16 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                     }
                     lenCells++;
                 }
-            }
 
-
-            var c;
-            for (c = $minC; c <= $maxC; c++) {
-                var column = getAt(columns, c);
-                var r;
-                for (r = $minR; r <= $maxR; r++) {
-                    column = setAt(column, r, selectedCell);
+                var c;
+                for (c = $minC; c <= $maxC; c++) {
+                    var column = getAt(columns, c);
+                    var r;
+                    for (r = $minR; r <= $maxR; r++) {
+                        column = setAt(column, r, selectedCell);
+                    }
+                    columns = setAt(columns, c, column);
                 }
-                columns = setAt(columns, c, column);
             }
         }
     }
