@@ -42,8 +42,7 @@ var setMouseCoords = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = Main.getParentCell();
-        var columns = get(parentCell, Cell.columns);
+        var columns = get($scope.cell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
             var lenCells = len(getAt(columns, 0));
@@ -135,8 +134,7 @@ Ui.initialize = function () {
                 return;
             }
 
-            var parentCell = Main.getParentCell();
-            var columns = get(parentCell, Cell.columns);
+            var columns = get($scope.cell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
                 var lenCells = len(getAt(columns, 0));
@@ -237,7 +235,7 @@ Ui.initialize = function () {
         } else if (movingArg) {
             setMouseCoords();
 
-            var parentCell = Main.getParentCell();
+            var parentCell = $scope.cell;
             var columns = get(parentCell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
@@ -293,7 +291,7 @@ Ui.initialize = function () {
             selectedColumn = setAt(selectedColumn, $r, selectedCell);
             columns = setAt(columns, $c, selectedColumn);
             parentCell = set(parentCell, Cell.columns, columns);
-            Main.updatePath(parentCell);
+            Main.update(parentCell);
             Ui.draw();
         }
     });
@@ -339,8 +337,7 @@ var drawFullscreen = function () {
     $ctx.translate(centerX, centerY);
     $ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
 
-    var parentCell = Main.getParentCell();
-    var columns = get(parentCell, Cell.columns);
+    var columns = get($scope.cell, Cell.columns);
     var lenColumns = len(columns);
     if (lenColumns > 0) {
         var lenCells = len(getAt(columns, 0));
@@ -358,7 +355,7 @@ var drawFullscreen = function () {
     $ctx.fillStyle = '#492e85';
 
     if (c >= 0 && c < lenColumns) {
-        Evaluate.evaluate(parentCell, columns, c, r);
+        Evaluate.evaluate($scope, columns, c, r);
     }
 };
 
@@ -374,8 +371,7 @@ var drawGrid = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = Main.getParentCell();
-        var columns = get(parentCell, Cell.columns);
+        var columns = get($scope.cell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
             var lenCells = len(getAt(columns, 0));
@@ -497,7 +493,7 @@ var drawGrid = function () {
                 $ctx.font = '180px monospace';
                 $ctx.fillStyle = '#492e85';
 
-                var result = Evaluate.evaluate(parentCell, columns, c, r);
+                var result = Evaluate.evaluate($scope, columns, c, r);
                 if (typeof result === 'number') {
                     $ctx.fillText('' + result, 0, 50, 1440);
                 }

@@ -4,11 +4,10 @@ global.Main = {};
 
 global.$head = 0;
 global.$redoHead = 0;
-global.$project = 0;
 global.$r = 0;
 global.$c = 0;
-global.$path = null;
-global.$pathDepth = 0;
+global.$project = 0;
+global.$scope = null;
 global.$minR = -1;
 global.$maxR = -1;
 global.$minC = -1;
@@ -109,8 +108,7 @@ var postGitHubInit = function () {
     Ui.initialize();
     Autocomplete.initialize();
 
-    $path = new Uint32Array(100);
-    $pathDepth = 0;
+    $scope = Scope.create();
 
     if (window.sessionStorage.gitUrl) {
         Main.initializeRepo();
@@ -185,6 +183,7 @@ Main.initializeRepo = function () {
                 $head = remoteCommit;
                 $redoHead = $head;
                 $project = get($head, Commit.tree);
+                $scope = Scope.load($scope, $project);
                 firstDraw();
             });
         }
@@ -193,6 +192,7 @@ Main.initializeRepo = function () {
 
 Main.initializeNewRepo = function () {
     $project = $[Project.zero];
+    $scope = Scope.load($scope, $project);
 
     var userName = window.sessionStorage.gitUserName;
     var userEmail = window.sessionStorage.gitUserEmail;
@@ -271,44 +271,9 @@ Main.tick = function (now) {
     window.requestAnimationFrame(Main.tick);
 };
 
-Main.getParentCell = function () {
-    var cell = get($project, Project.cell);
-    var i;
-    for (i = 0; i < $pathDepth; i += 2) {
-        var columns = get(cell, Cell.columns);
-        var column = getAt(columns, $path[i]);
-        cell = getAt(column, $path[i + 1]);
-    }
-
-    return cell;
-};
-
-Main.updatePath = function (bottomCell) {
-    if ($pathDepth === 0) {
-        var topCell = bottomCell;
-    } else {
-        var topCell = get($project, Project.cell);
-        topCell = updatePathPart(0, topCell, bottomCell);
-    }
-    $project = set($project, Project.cell, topCell);
-};
-
-var updatePathPart = function (depth, cell, bottomCell) {
-    var columns = get(cell, Cell.columns);
-    var column = getAt(columns, $path[depth]);
-    var nextDepth = depth + 2;
-    if (nextDepth === $pathDepth) {
-        var childCell = bottomCell;
-    } else {
-        var childCell = getAt(column, $path[depth + 1]);
-        childCell = updatePathPart(nextDepth, childCell, bottomCell);
-    }
-
-    column = setAt(column, $path[depth + 1], childCell);
-    columns = setAt(columns, $path[depth], column);
-    cell = set(cell, Cell.columns, columns);
-
-    return cell;
+Main.update = function (parentCell) {
+    var topScope = Scope.update($scope, parentCell);
+    $project = set($project, Project.cell, topScope.cell);
 };
 
 })();

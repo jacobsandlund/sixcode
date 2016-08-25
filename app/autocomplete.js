@@ -114,8 +114,7 @@ var getSelectedCell = function () {
                        Cell.text, hash(result.text));
         }
     } else {
-        var parentCell = Main.getParentCell();
-        var columns = get(parentCell, Cell.columns);
+        var columns = get($scope.cell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
             var lenCells = len(getAt(columns, 0));
@@ -257,7 +256,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var parentCell = Main.getParentCell();
+        var parentCell = $scope.cell;
         var columns = get(parentCell, Cell.columns);
         var lenColumns = len(columns);
         if (lenColumns > 0) {
@@ -279,7 +278,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             var parent = get($head, Commit.parent);
             if (parent) {
                 $head = parent;
-                $project = get($head, Commit.tree);
+                Scope.load($scope, get($head, Commit.tree));
             }
             break;
 
@@ -291,7 +290,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                 head = get(head, Commit.parent);
             }
             $head = childHead;
-            $project = get($head, Commit.tree);
+            Scope.load($scope, get($head, Commit.tree));
             break;
 
         case 'play':
@@ -339,11 +338,9 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             } else if ($showResults) {
                 // TODO
             } else {
-                $path[$pathDepth] = $c;
-                $path[$pathDepth + 1] = $r;
+                $scope = Scope.goInto($scope, selectedCell, $c, $r);
                 $minC = $maxC = $c = 0;
                 $minR = $maxR = $r = 0;
-                $pathDepth += 2;
                 Autocomplete.setSelectedCell();
                 Ui.draw();
                 keepCommandSelected = false;
@@ -351,10 +348,10 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             break;
 
         case 'go up':
-            if ($pathDepth > 0) {
-                $pathDepth -= 2;
-                $minC = $maxC = $c = $path[$pathDepth];
-                $minR = $maxR = $r = $path[$pathDepth + 1];
+            if ($scope.parent) {
+                $minC = $maxC = $c = $scope.c;
+                $minR = $maxR = $r = $scope.r;
+                $scope = $scope.parent;
             }
             Ui.draw();
             break;
@@ -571,13 +568,13 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
 
     if (makeCommit) {
         parentCell = set(parentCell, Cell.columns, columns);
-        var oldProject = $project;
-        Main.updatePath(parentCell);
+        var oldProject = $scope.project;
+        Main.update(parentCell);
 
-        if ($project !== oldProject) {
+        if ($scope.project !== oldProject) {
             var now = Math.floor(+Date.now() / 1000);
             $head = createCommit($head,
-                                 Commit.tree, $project,
+                                 Commit.tree, $scope.project,
                                  Commit.parent, $head,
                                  Commit.committerTime, now);
             $redoHead = $head;

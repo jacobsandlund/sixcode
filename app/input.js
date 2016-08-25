@@ -16,7 +16,7 @@ Input.initialize = function () {
 };
 
 Input.capture = function () {
-    var parentCell = Main.getParentCell();
+    var parentCell = $scope.cells[scope.index];
     var input = get(parentCell, Cell.input);
     var mouseXs = get(input, Input.mouseXs);
     var mouseYs = get(input, Input.mouseYs);
@@ -45,7 +45,7 @@ Input.capture = function () {
                 Input.mouseXs, mouseXs,
                 Input.mouseYs, mouseYs);
     parentCell = set(parentCell, Cell.input, input);
-    Main.updatePath(parentCell);
+    Main.update(parentCell);
 };
 
 })();

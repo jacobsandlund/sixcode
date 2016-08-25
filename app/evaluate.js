@@ -4,7 +4,7 @@ global.Evaluate = {};
 
 var images = [];
 
-Evaluate.evaluate = function (parentCell, columns, c, r) {
+Evaluate.evaluate = function (scope, columns, c, r) {
     var cells = getAt(columns, c);
     var cell = getAt(cells, r);
     var text = val(get(cell, Cell.text));
@@ -18,7 +18,7 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         var arg = getAt(args, i);
         var argC = c + val(get(arg, Cell.Arg.cDiff));
         var argR = r + val(get(arg, Cell.Arg.rDiff));
-        return Evaluate.evaluate(parentCell, columns, argC, argR);
+        return Evaluate.evaluate(scope, columns, argC, argR);
     };
 
     switch (text) {
@@ -113,7 +113,7 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         break;
 
     case 'mouse x':
-        var input = get(parentCell, Cell.input);
+        var input = get(scope.cell, Cell.input);
         var mouseXs = get(input, Input.mouseXs);
         if (c >= len(mouseXs)) {
             return 0;
@@ -121,7 +121,7 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
         return val(getAt(mouseXs, c));
 
     case 'mouse y':
-        var input = get(parentCell, Cell.input);
+        var input = get(scope.cell, Cell.input);
         var mouseYs = get(input, Input.mouseYs);
         if (c >= len(mouseYs)) {
             return 0;
@@ -134,7 +134,8 @@ Evaluate.evaluate = function (parentCell, columns, c, r) {
             return '';
         }
         var lastRow = len(getAt(childColumns, 0)) - 1;
-        return Evaluate.evaluate(cell, childColumns, 0, lastRow);
+        var childScope = Scope.goInto(scope, cell, c, r);
+        return Evaluate.evaluate(childScope, childColumns, 0, lastRow);
     }
 
     return text;
