@@ -57,17 +57,24 @@ Scope.goInto = function (parentScope, cell, c, r) {
 
 Scope.update = function (scope, bottomCell) {
     var cell = bottomCell;
-    scope.cell = cell;
-    while (scope.parent) {
+    while (true) {
+        scope.cell = cell;
+        var text = val(get(cell, Cell.text));
+        if (text !== '') {
+            Autocomplete.registerEntry(text, cell);
+        }
+        if (!scope.parent) {
+            break;
+        }
         var columns = scope.columns;
         var column = getAt(columns, scope.c);
         column = setAt(column, scope.r, cell);
         columns = scope.columns = setAt(columns, scope.c, column);
         scope = scope.parent;
-        cell = scope.cell = set(scope.cell, Cell.columns, columns);
+        cell = set(scope.cell, Cell.columns, columns);
     }
 
-    return scope;
+    $project = set($project, Project.cell, cell);
 };
 
 })();

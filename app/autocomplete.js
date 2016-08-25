@@ -9,7 +9,7 @@ var autocompleteResults;
 var matches;
 var selectedMatchIndex = 0;
 
-var entries = [
+var basicEntries = [
     '',
     '+',
     '-',
@@ -78,11 +78,12 @@ var numArgsTable = {
     'color': 2,
 };
 
-entries = actionEntries.concat(entries);
+var entries = actionEntries.concat(basicEntries);
 var actionEntriesMap = {};
 actionEntries.forEach(function (entry) {
     actionEntriesMap[entry] = true;
 });
+var entriesMap = {};
 
 Autocomplete.initialize = function () {
     autocompleteContainer = document.getElementById('autocomplete-container');
@@ -94,6 +95,29 @@ Autocomplete.initialize = function () {
     autocompleteInput.addEventListener('keydown', onKeyDown);
 
     matches = [];
+
+    var basicArgs = [];
+    basicArgs[0] = ArrayTree.$zeros[0];
+    var oneUp = set($[Cell.Arg.zero], Cell.Arg.rDiff, Constants.$negative[1]);
+    var twoUp = set($[Cell.Arg.zero], Cell.Arg.rDiff, Constants.$negative[2]);
+    basicArgs[1] = push(ArrayTree.$zeros[0], oneUp);
+    basicArgs[2] = push(push(ArrayTree.$zeros[0], twoUp), oneUp);
+    var i;
+    for (i = 0; i < basicEntries.length; i++) {
+        var entry = basicEntries[i];
+        var args = basicArgs[numArgsTable[entry]];
+        var cell = set($[Cell.zero],
+                       Cell.text, hash(entry),
+                       Cell.args, args);
+        entriesMap[entry] = cell;
+    }
+};
+
+Autocomplete.registerEntry = function (text, cell) {
+    if (!entriesMap[text]) {
+        entries.push(text);
+    }
+    entriesMap[text] = cell;
 };
 
 Autocomplete.show = function () {
@@ -162,15 +186,26 @@ var updateMatches = function () {
         matches = [];
     } else {
         matches = [];
+        var perfectMatch = false;
         var i;
         for (i = 0; i < entries.length; i++) {
             var entry = entries[i];
             if (entry.indexOf(text) === 0) {
+                if (entry === text) {
+                    perfectMatch = true;
+                }
                 matches.push(entry);
                 if (matches.length === 6) {
                     break;
                 }
             }
+        }
+
+        if (!perfectMatch) {
+            if (matches.length === 6) {
+                matches.pop();
+            }
+            matches.push(text);
         }
     }
 
@@ -553,19 +588,16 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
         makeCommit = false;  // do nothing
     } else {
 
-        var numArgs = numArgsTable[matchText];
-        var args = ArrayTree.$zeros[0];
-        var i;
-        for (i = 0; i < numArgs; i++) {
-            var arg = set($[Cell.Arg.zero],
-                          Cell.Arg.cDiff, Constants.$positive[0],
-                          Cell.Arg.rDiff, Constants.$negative[numArgs - i]);
-            args = push(args, arg);
-        }
+        var entryCell = entriesMap[matchText];
 
-        selectedCell = set(selectedCell,
-                           Cell.text, hash(matchText),
-                           Cell.args, args);
+        if (entryCell) {
+            selectedCell = entryCell;
+        } else {
+            selectedCell = set(selectedCell, Cell.text, hash(matchText));
+            if (matchText !== '' && isNaN(+matchText)) {
+                Autocomplete.registerEntry(matchText, selectedCell);
+            }
+        }
 
         var newColumn = $c === lenColumns;
         var newRow = $r === lenCells;
@@ -633,13 +665,13 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
 
     if (makeCommit) {
         parentCell = set(parentCell, Cell.columns, columns);
-        var oldProject = $scope.project;
-        Main.update(parentCell);
+        var oldProject = $project;
+        Scope.update($scope, parentCell);
 
-        if ($scope.project !== oldProject) {
+        if ($project !== oldProject) {
             var now = Math.floor(+Date.now() / 1000);
             $head = createCommit($head,
-                                 Commit.tree, $scope.project,
+                                 Commit.tree, $project,
                                  Commit.parent, $head,
                                  Commit.committerTime, now);
             $redoHead = $head;

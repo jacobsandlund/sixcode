@@ -325,7 +325,7 @@ Ui.initialize = function () {
             selectedColumn = setAt(selectedColumn, $r, selectedCell);
             columns = setAt(columns, $c, selectedColumn);
             parentCell = set(parentCell, Cell.columns, columns);
-            Main.update(parentCell);
+            Scope.update($scope, parentCell);
             Ui.draw();
         }
     });

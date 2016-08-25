@@ -271,9 +271,4 @@ Main.tick = function (now) {
     window.requestAnimationFrame(Main.tick);
 };
 
-Main.update = function (parentCell) {
-    var topScope = Scope.update($scope, parentCell);
-    $project = set($project, Project.cell, topScope.cell);
-};
-
 })();

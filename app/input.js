@@ -45,7 +45,7 @@ Input.capture = function () {
                 Input.mouseXs, mouseXs,
                 Input.mouseYs, mouseYs);
     parentCell = set(parentCell, Cell.input, input);
-    Main.update(parentCell);
+    Scope.update($scope, parentCell);
 };
 
 })();
