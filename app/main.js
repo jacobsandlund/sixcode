@@ -201,7 +201,7 @@ Main.initializeNewRepo = function () {
     var user = set($[Commit.User.zero],
                     Commit.User.name, hash(userName),
                     Commit.User.email, hash(userEmail),
-                    Commit.User.timezoneOffset, hash(timezoneOffset));
+                    Commit.User.timezoneOffset, Constants.integer(timezoneOffset));
 
     var info = set($[Commit.Info.zero],
                     Commit.Info.author, user,

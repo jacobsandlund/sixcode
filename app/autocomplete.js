@@ -338,6 +338,9 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             } else if ($showResults) {
                 // TODO
             } else {
+                if (len(get(selectedCell, Cell.columns)) === 0) {
+                    break;
+                }
                 $scope = Scope.goInto($scope, selectedCell, $c, $r);
                 $minC = $maxC = $c = 0;
                 $minR = $maxR = $r = 0;
@@ -515,7 +518,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             var i;
             for (i = 0; i < argCs.length; i++) {
                 if (parentArgs[i] >= 0) {
-                    var arg = set($[Cell.Arg.zero], Cell.Arg.parentArg, hash(parentArgs[i]));
+                    var arg = set($[Cell.Arg.zero], Cell.Arg.parentArg, Constants.$positive[parentArgs[i]]);
                 } else {
                     if (argCs[i] > $maxC) {
                         var cDiff = argCs[i] - $maxC;
@@ -528,8 +531,8 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                         var rDiff = argRs[i] - $minR;
                     }
                     var arg = set($[Cell.Arg.zero],
-                                  Cell.Arg.cDiff, hash(cDiff),
-                                  Cell.Arg.rDiff, hash(rDiff));
+                                  Cell.Arg.cDiff, Constants.integer(cDiff),
+                                  Cell.Arg.rDiff, Constants.integer(rDiff));
                 }
                 args = push(args, arg);
             }

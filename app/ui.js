@@ -12,12 +12,13 @@ global.$mouseX = 0;
 global.$mouseY = 0;
 var mouseC = 0;
 var mouseR = 0;
+var mouseArg = -1;
 
 var zoom = 1;
 
 var xSpacing = 160;
 var ySpacing = 112;
-var argSpacing = ySpacing + 40;
+var argGap = 40;
 Ui.ySpacing = ySpacing;
 
 var xHalfGap = 5;
@@ -37,7 +38,15 @@ var setMouseCoords = function () {
     var x = Math.round(($mouseX - xTranslation) / zoom);
     var y = Math.round(($mouseY - yTranslation) / zoom);
     mouseC = Math.floor(x / xSpacing);
-    mouseR = Math.floor(y / ySpacing);
+    if (mouseC === 0 && y < -argGap) {
+        mouseR = 0;
+        var inverseArg = Math.floor((y + argGap) / ySpacing);
+        mouseArg = len(get($scope.cell, Cell.args)) + inverseArg;
+        return;
+    } else {
+        mouseR = Math.floor(y / ySpacing);
+        mouseArg = -1;
+    }
 
     if ($showResults) {
         var lenColumns = $results.length;
@@ -159,12 +168,22 @@ Ui.initialize = function () {
             var i;
             for (i = 0; i < lenArgs; i++) {
                 var arg = getAt(args, i);
-                var argC = $c + val(get(arg, Cell.Arg.cDiff));
-                var argR = $r + val(get(arg, Cell.Arg.rDiff));
+                var parentArg = val(get(arg, Cell.Arg.parentArg));
+                if (parentArg >= 0) {
+                    if (mouseArg === parentArg) {
+                        movingArgIndex = i;
+                        Ui.draw();
+                        break;
+                    }
+                } else {
+                    var argC = $c + val(get(arg, Cell.Arg.cDiff));
+                    var argR = $r + val(get(arg, Cell.Arg.rDiff));
 
-                if (mouseC === argC && mouseR === argR) {
-                    movingArgIndex = i;
-                    Ui.draw();
+                    if (mouseC === argC && mouseR === argR) {
+                        movingArgIndex = i;
+                        Ui.draw();
+                        break;
+                    }
                 }
             }
         }
@@ -263,28 +282,43 @@ Ui.initialize = function () {
                 return;
             }
 
-            if (mouseC > $c || (mouseC === $c && mouseR >= $r)) {
+            if (mouseArg === -1 && (mouseC > $c || (mouseC === $c && mouseR >= $r))) {
                 return;
             }
 
             var i;
             for (i = 0; i < lenArgs; i++) {
                 var arg = getAt(args, i);
-                var argC = $c + val(get(arg, Cell.Arg.cDiff));
-                var argR = $r + val(get(arg, Cell.Arg.rDiff));
-                if (mouseC === argC && mouseR === argR) {
-                    return;
+                var parentArg = val(get(arg, Cell.Arg.parentArg));
+                if (mouseArg >= 0) {
+                    if (mouseArg === parentArg) {
+                        return;
+                    }
+                } else {
+                    var argC = $c + val(get(arg, Cell.Arg.cDiff));
+                    var argR = $r + val(get(arg, Cell.Arg.rDiff));
+                    if (parentArg === -1 && mouseC === argC && mouseR === argR) {
+                        return;
+                    }
                 }
             }
 
-            var cDiff = mouseC - $c;
-            var rDiff = mouseR - $r;
-
             var arg = getAt(args, movingArgIndex);
 
-            arg = set(arg,
-                    Cell.Arg.cDiff, hash(cDiff),
-                    Cell.Arg.rDiff, hash(rDiff));
+            if (mouseArg >= 0) {
+                arg = set(arg,
+                          Cell.Arg.parentArg, Constants.$positive[mouseArg],
+                          Cell.Arg.cDiff, Constants.$positive[0],
+                          Cell.Arg.rDiff, Constants.$positive[0]);
+            } else {
+                var cDiff = mouseC - $c;
+                var rDiff = mouseR - $r;
+
+                arg = set(arg,
+                          Cell.Arg.parentArg, Constants.$negative[1],
+                          Cell.Arg.cDiff, Constants.integer(cDiff),
+                          Cell.Arg.rDiff, Constants.integer(rDiff));
+            }
 
             args = setAt(args, movingArgIndex, arg);
             selectedCell = set(selectedCell, Cell.args, args);
@@ -381,7 +415,7 @@ var drawGrid = function () {
     }
 
     $ctx.font = '32px monospace';
-    $ctx.fillText($title, 0, lenParentArgs * -argSpacing - 20);
+    $ctx.fillText($title, 0, lenParentArgs * -ySpacing - argGap - 20);
     $ctx.font = '12px monospace';
 
     var selectedCell = null;
@@ -394,14 +428,23 @@ var drawGrid = function () {
 
     var argCs = [];
     var argRs = [];
+    var selectedParentArgs = [];
     if (selectedCell) {
         var args = get(selectedCell, Cell.args);
         var lenArgs = len(args);
         var i;
         for (i = 0; i < lenArgs; i++) {
             var arg = getAt(args, i);
-            argCs[i] = $c + val(get(arg, Cell.Arg.cDiff));
-            argRs[i] = $r + val(get(arg, Cell.Arg.rDiff));
+            var parentArgIndex = val(get(arg, Cell.Arg.parentArg));
+            if (parentArgIndex >= 0) {
+                selectedParentArgs[i] = parentArgIndex;
+                argCs[i] = -1;
+                argRs[i] = -1;
+            } else {
+                selectedParentArgs[i] = -1;
+                argCs[i] = $c + val(get(arg, Cell.Arg.cDiff));
+                argRs[i] = $r + val(get(arg, Cell.Arg.rDiff));
+            }
         }
     }
 
@@ -432,8 +475,8 @@ var drawGrid = function () {
         var argR = $scope.r + val(get(arg, Cell.Arg.rDiff));
         var column = getAt($scope.columns, argC);
         var cell = getAt(column, argR);
-        var argIndex = -1;  // TODO
-        var y = (lenParentArgs - i) * -argSpacing - yHalfGap;
+        var argIndex = selectedParentArgs.indexOf(i);
+        var y = (lenParentArgs - i) * -ySpacing - argGap - yHalfGap;
         if (selectingSingle && argIndex >= 0) {
             $ctx.save();
             $ctx.strokeStyle = '#777';
