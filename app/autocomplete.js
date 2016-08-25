@@ -493,9 +493,14 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
 
         case 'clear':
             selectedCell = $[Cell.zero];
-            var selectedColumn = getAt(columns, $c);
-            selectedColumn = setAt(selectedColumn, $r, selectedCell);
-            columns = setAt(columns, $c, selectedColumn);
+            var c;
+            for (c = $minC; c <= $maxC; c++) {
+                var column = getAt(columns, c);
+                for (r = $minR; r <= $maxR; r++) {
+                    column = setAt(column, r, selectedCell);
+                }
+                columns = setAt(columns, c, column);
+            }
             makeCommit = true;
             matchText = '';
             break;
@@ -642,6 +647,9 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                     Ui.draw();
                 });
                 return;
+            } else {
+                // TODO: renames?
+                return;
             }
 
         } else {
@@ -670,12 +678,18 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                     }
                     lenCells++;
                 }
-
-                var selectedColumn = getAt(columns, $c);
-                selectedColumn = setAt(selectedColumn, $r, selectedCell);
             }
 
-            columns = setAt(columns, $c, selectedColumn);
+
+            var c;
+            for (c = $minC; c <= $maxC; c++) {
+                var column = getAt(columns, c);
+                var r;
+                for (r = $minR; r <= $maxR; r++) {
+                    column = setAt(column, r, selectedCell);
+                }
+                columns = setAt(columns, c, column);
+            }
         }
     }
 
