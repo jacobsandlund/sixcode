@@ -16,6 +16,7 @@ var basicEntries = [
     '*',
     '/',
     '^',
+    '=',
 
     'square',
     'circle',
@@ -45,6 +46,7 @@ var actionEntries = [
     'insert column',
     'collapse',
 
+    'clear',
     'escape',
     'undo',
     'redo',
@@ -62,6 +64,7 @@ var numArgsTable = {
     '*': 2,
     '/': 2,
     '^': 2,
+    '=': 1,
 
     'square': 0,
     'circle': 0,
@@ -486,6 +489,15 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             makeCommit = true;
             break;
 
+        case 'clear':
+            selectedCell = $[Cell.zero];
+            var selectedColumn = getAt(columns, $c);
+            selectedColumn = setAt(selectedColumn, $r, selectedCell);
+            columns = setAt(columns, $c, selectedColumn);
+            makeCommit = true;
+            matchText = '';
+            break;
+
         case 'collapse':
             var argCs = [];
             var argRs = [];
@@ -591,7 +603,9 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
         var entryCell = entriesMap[matchText];
 
         if (entryCell) {
-            selectedCell = entryCell;
+            if (matchText !== '' || originalText !== '') {
+                selectedCell = entryCell;
+            }
         } else {
             selectedCell = set(selectedCell, Cell.text, hash(matchText));
             if (matchText !== '' && isNaN(+matchText)) {

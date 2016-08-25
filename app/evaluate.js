@@ -41,6 +41,8 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         return argResult(0) / argResult(1);
     case '^':
         return Math.pow(argResult(0), argResult(1));
+    case '=':
+        return argResult(0);
     case 'square':
         $ctx.fillRect(-50, -50, 100, 100);
         break;
