@@ -34,4 +34,12 @@ Constants.initialize = function (minNumber, maxPositive) {
     }
 };
 
+Constants.integer = function (integer) {
+    if (integer >= 0) {
+        return Constants.$positive[integer];
+    } else {
+        return Constants.$negative[-integer];
+    }
+};
+
 })();

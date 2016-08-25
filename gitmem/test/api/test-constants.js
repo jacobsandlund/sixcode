@@ -76,3 +76,12 @@ log(Constants.$negative[6], hash(-6));
 //=> 280 280
 log(val(Constants.$negative[6]));
 //=> -6
+
+log(hexHash($table.hashes8, Constants.integer(10)));
+//=> 9a037142aa3c1b4c490e1a38251620f113465330
+log(val(Constants.integer(10)));
+//=> 10
+log(hexHash($table.hashes8, Constants.integer(-6)));
+//=> 52e1a7f43a2a66ac9a451b07aca4c54c6ebb44d8
+log(val(Constants.integer(-6)));
+//=> -6
