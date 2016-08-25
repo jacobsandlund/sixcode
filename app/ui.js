@@ -17,6 +17,7 @@ var zoom = 1;
 
 var xSpacing = 160;
 var ySpacing = 112;
+var argSpacing = ySpacing + 40;
 Ui.ySpacing = ySpacing;
 
 var xHalfGap = 5;
@@ -89,7 +90,6 @@ Ui.initialize = function () {
     $ctx.font = '12px monospace';
 
     canvas.addEventListener('click', function (e) {
-        console.log('click');
         if ($fullscreen || movingGrid || movingArg || selectingRange) {
             return;
         }
@@ -363,13 +363,10 @@ var drawGrid = function () {
     $ctx.translate(xTranslation, yTranslation);
     $ctx.scale(zoom, zoom);
 
-    $ctx.font = '32px monospace';
-    $ctx.fillText($title, 0, -20);
-    $ctx.font = '12px monospace';
-
     if ($showResults) {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
+        var lenParentArgs = 0;
     } else {
         var columns = get($scope.cell, Cell.columns);
         var lenColumns = len(columns);
@@ -378,7 +375,14 @@ var drawGrid = function () {
         } else {
             var lenCells = 0;
         }
+
+        var parentArgs = get($scope.cell, Cell.args);
+        var lenParentArgs = len(parentArgs);
     }
+
+    $ctx.font = '32px monospace';
+    $ctx.fillText($title, 0, lenParentArgs * -argSpacing - 20);
+    $ctx.font = '12px monospace';
 
     var selectedCell = null;
     if (!$showResults && $c >= 0 && $c < lenColumns) {
@@ -417,6 +421,65 @@ var drawGrid = function () {
     var argRsForC = [-1, -1, -1, -1];
 
     var selectingSingle = $minC === $maxC && $minR === $maxR;
+
+    //////////////// parentArgs
+
+    var i;
+    var x = xHalfGap;
+    for (i = 0; i < lenParentArgs; i++) {
+        var arg = getAt(parentArgs, i);
+        var argC = $scope.c + val(get(arg, Cell.Arg.cDiff));
+        var argR = $scope.r + val(get(arg, Cell.Arg.rDiff));
+        var column = getAt($scope.columns, argC);
+        var cell = getAt(column, argR);
+        var argIndex = -1;  // TODO
+        var y = (lenParentArgs - i) * -argSpacing - yHalfGap;
+        if (selectingSingle && argIndex >= 0) {
+            $ctx.save();
+            $ctx.strokeStyle = '#777';
+            $ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+
+            $ctx.fillRect(x - 8, y + 9, 162, 104);
+
+            if (argIndex === movingArgIndex) {
+                $ctx.lineDashOffset = 2.0;
+                $ctx.setLineDash([16, 4]);
+            }
+
+            $ctx.strokeRect(x, y + 15, 146, 92);
+
+            $ctx.restore();
+        } else {
+            $ctx.strokeRect(x, y + 15, 146, 92);  // 144 by 90 internal area
+        }
+
+        var text = val(get(cell, Cell.text));
+
+        // draw result
+        $ctx.save();
+
+        $ctx.beginPath();
+        $ctx.rect(x + 1, y + 16, 144, 90);
+        $ctx.clip();
+
+        $ctx.translate(x + 73, y + 61);
+        $ctx.scale(0.1, 0.1);
+
+        $ctx.textAlign = 'center';
+        $ctx.font = '180px monospace';
+        $ctx.fillStyle = '#492e85';
+
+        var result = Evaluate.evaluate($scope.parent, $scope.columns, argC, argR);
+        if (typeof result === 'number') {
+            $ctx.fillText('' + result, 0, 50, 1440);
+        }
+
+        $ctx.restore();
+
+        $ctx.fillText(text, x + 2, y + 11);
+    }
+
+    /////////////// grid
 
     var c;
     for (c = minC; c <= maxC; c++) {

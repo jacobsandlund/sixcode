@@ -16,9 +16,18 @@ Evaluate.evaluate = function (scope, columns, c, r) {
     var lenArgs = len(args);
     var argResult = function (i) {
         var arg = getAt(args, i);
-        var argC = c + val(get(arg, Cell.Arg.cDiff));
-        var argR = r + val(get(arg, Cell.Arg.rDiff));
-        return Evaluate.evaluate(scope, columns, argC, argR);
+        var parentArgIndex = val(get(arg, Cell.Arg.parentArg));
+        if (parentArgIndex >= 0) {
+            var parentArgs = get(scope.cell, Cell.args);
+            arg = getAt(parentArgs, parentArgIndex);
+            var argC = scope.c + val(get(arg, Cell.Arg.cDiff));
+            var argR = scope.r + val(get(arg, Cell.Arg.rDiff));
+            return Evaluate.evaluate(scope.parent, scope.columns, argC, argR);
+        } else {
+            var argC = c + val(get(arg, Cell.Arg.cDiff));
+            var argR = r + val(get(arg, Cell.Arg.rDiff));
+            return Evaluate.evaluate(scope, columns, argC, argR);
+        }
     };
 
     switch (text) {

@@ -449,6 +449,9 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             break;
 
         case 'collapse':
+            var argCs = [];
+            var argRs = [];
+            var parentArgs = [];
             var childColumns = ArrayTree.$zeros[0];
             var c;
             for (c = $minC; c <= $maxC; c++) {
@@ -457,6 +460,40 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                 var childColumn = ArrayTree.$zeros[0];
                 for (r = $minR; r <= $maxR; r++) {
                     var cell = getAt(column, r);
+                    var args = get(cell, Cell.args);
+                    var lenArgs = len(args);
+                    var i;
+                    var changedArgs = false;
+                    for (i = 0; i < lenArgs; i++) {
+                        var arg = getAt(args, i);
+                        var argC = c + val(get(arg, Cell.Arg.cDiff));
+                        var argR = r + val(get(arg, Cell.Arg.rDiff));
+                        var parentArg = val(get(arg, Cell.Arg.parentArg));
+                        if (parentArg >= 0 || argC < $minC || argC > $maxC || argR < $minR || argR > $maxR) {
+                            var j;
+                            var argIndex = -1;
+                            for (j = 0; j < argCs.length; j++) {
+                                if (parentArgs[j] === parentArg && argCs[j] === argC && argRs[j] === argR) {
+                                    argIndex = j;
+                                    break;
+                                }
+                            }
+                            if (argIndex === -1) {
+                                argIndex = argCs.length;
+                                argCs.push(argC);
+                                argRs.push(argR);
+                                parentArgs.push(parentArg);
+                            }
+
+                            arg = set(arg, Cell.Arg.parentArg, Constants.$positive[argIndex]);
+                            args = setAt(args, i, arg);
+                            changedArgs = true;
+                        }
+                    }
+
+                    if (changedArgs) {
+                        cell = set(cell, Cell.args, args);
+                    }
                     childColumn = push(childColumn, cell);
                 }
                 childColumns = push(childColumns, childColumn);
@@ -473,7 +510,32 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                 }
                 columns = setAt(columns, c, column);
             }
-            var cell = set($[Cell.zero], Cell.columns, childColumns);
+
+            var args = ArrayTree.$zeros[0];
+            var i;
+            for (i = 0; i < argCs.length; i++) {
+                if (parentArgs[i] >= 0) {
+                    var arg = set($[Cell.Arg.zero], Cell.Arg.parentArg, hash(parentArgs[i]));
+                } else {
+                    if (argCs[i] > $maxC) {
+                        var cDiff = argCs[i] - $maxC;
+                    } else {
+                        var cDiff = argCs[i] - $minC;
+                    }
+                    if (argRs[i] > $maxR) {
+                        var rDiff = argRs[i] - $maxR;
+                    } else {
+                        var rDiff = argRs[i] - $minR;
+                    }
+                    var arg = set($[Cell.Arg.zero],
+                                  Cell.Arg.cDiff, hash(cDiff),
+                                  Cell.Arg.rDiff, hash(rDiff));
+                }
+                args = push(args, arg);
+            }
+            var cell = set($[Cell.zero],
+                           Cell.columns, childColumns,
+                           Cell.args, args);
             var column = getAt(columns, $minC);
             column = setAt(column, $minR, cell);
             columns = setAt(columns, $minC, column);

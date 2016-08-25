@@ -8,8 +8,8 @@ Cell.input   = 2
 Cell.text    = 3;
 
 Cell.Arg = {};
-Cell.Arg.parent = 0;
-Cell.Arg.cDiff = 1;
+Cell.Arg.cDiff = 0;
+Cell.Arg.parentArg = 1;
 Cell.Arg.rDiff = 2;
 
 Cell.zero = 0;
@@ -18,7 +18,7 @@ Cell.Arg.zero = 0;
 Cell.initialize = function () {
     Cell.Arg.zero = $.nextIndex++;
     $[Cell.Arg.zero] = createZero({
-        parent: Constants.$positive[0],
+        parentArg: Constants.$negative[1],
         cDiff:  Constants.$positive[0],
         rDiff:  Constants.$positive[0],
     });
