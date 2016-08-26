@@ -139,10 +139,6 @@ Ui.initialize = function () {
         setMouseCoords();
 
         if (!$showResults) {
-            if ($minC !== $maxC || $minR !== $maxR) {
-                return;
-            }
-
             var columns = get($scope.cell, Cell.columns);
             var lenColumns = len(columns);
             if (lenColumns > 0) {
@@ -303,27 +299,36 @@ Ui.initialize = function () {
                 }
             }
 
-            var arg = getAt(args, movingArgIndex);
-
             if (mouseArg >= 0) {
-                arg = set(arg,
-                          Cell.Arg.parentArg, Constants.$positive[mouseArg],
-                          Cell.Arg.cDiff, Constants.$positive[0],
-                          Cell.Arg.rDiff, Constants.$positive[0]);
+                var parentArg = Constants.$positive[mouseArg];
+                var cDiff = Constants.$positive[0];
+                var rDiff = Constants.$positive[0];
             } else {
-                var cDiff = mouseC - $c;
-                var rDiff = mouseR - $r;
+                var parentArg = Constants.$negative[1];
+                var cDiff = Constants.integer(mouseC - $c);
+                var rDiff = Constants.integer(mouseR - $r);
+            }
+            var arg = set($[Cell.Arg.zero],
+                          Cell.Arg.parentArg, parentArg,
+                          Cell.Arg.cDiff, cDiff,
+                          Cell.Arg.rDiff, rDiff);
 
-                arg = set(arg,
-                          Cell.Arg.parentArg, Constants.$negative[1],
-                          Cell.Arg.cDiff, Constants.integer(cDiff),
-                          Cell.Arg.rDiff, Constants.integer(rDiff));
+            var c;
+            for (c = $minC; c <= $maxC; c++) {
+                var column = getAt(columns, c);
+                var r;
+                for (r = $minR; r <= $maxR; r++) {
+                    var cell = getAt(column, r);
+                    var args = get(cell, Cell.args);
+                    if (movingArgIndex < len(args)) {
+                        args = setAt(args, movingArgIndex, arg);
+                        cell = set(cell, Cell.args, args);
+                        column = setAt(column, r, cell);
+                    }
+                }
+                columns = setAt(columns, c, column);
             }
 
-            args = setAt(args, movingArgIndex, arg);
-            selectedCell = set(selectedCell, Cell.args, args);
-            selectedColumn = setAt(selectedColumn, $r, selectedCell);
-            columns = setAt(columns, $c, selectedColumn);
             parentCell = set(parentCell, Cell.columns, columns);
             Scope.update($scope, parentCell);
             Ui.draw();
@@ -463,8 +468,6 @@ var drawGrid = function () {
 
     var argRsForC = [-1, -1, -1, -1];
 
-    var selectingSingle = $minC === $maxC && $minR === $maxR;
-
     //////////////// parentArgs
 
     var i;
@@ -477,7 +480,7 @@ var drawGrid = function () {
         var cell = getAt(column, argR);
         var argIndex = selectedParentArgs.indexOf(i);
         var y = (lenParentArgs - i) * -ySpacing - argGap - yHalfGap;
-        if (selectingSingle && argIndex >= 0) {
+        if (argIndex >= 0) {
             $ctx.save();
             $ctx.strokeStyle = '#777';
             $ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
@@ -544,12 +547,19 @@ var drawGrid = function () {
             var y = ySpacing * r + yHalfGap;
 
             var argIndex = argRsForC.indexOf(r);
-            if (selectingSingle && argIndex >= 0) {
+            var withinBounds = $minC <= c && c <= $maxC && $minR <= r && r <= $maxR;
+            if (argIndex >= 0) {
                 $ctx.save();
                 $ctx.strokeStyle = '#777';
                 $ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
 
-                $ctx.fillRect(x - 8, y + 9, 162, 104);
+                if (withinBounds) {
+                    $ctx.fillRect(x - 8, y + 9, 162, 52);
+                    $ctx.fillStyle = 'rgba(26, 138, 249, 0.2)';
+                    $ctx.fillRect(x - 8, y + 9 + 52, 162, 52);
+                } else {
+                    $ctx.fillRect(x - 8, y + 9, 162, 104);
+                }
 
                 if (argIndex === movingArgIndex) {
                     $ctx.lineDashOffset = 2.0;
@@ -559,7 +569,7 @@ var drawGrid = function () {
                 $ctx.strokeRect(x, y + 15, 146, 92);
 
                 $ctx.restore();
-            } else if ($minC <= c && c <= $maxC && $minR <= r && r <= $maxR) {
+            } else if (withinBounds) {
                 $ctx.save();
                 $ctx.fillStyle = 'rgba(26, 138, 249, 0.2)';
 

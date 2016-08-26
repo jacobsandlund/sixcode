@@ -19,7 +19,9 @@ global.set = function (pointer) {
 
     for (i = 1; i < arguments.length; i += 2) {
         var childIndex = arguments[i];
-        if (childIndex >= numChildren) {
+        if (typeof childIndex === 'undefined') {
+            throw new Error('Trying to set undefined child');
+        } else if (childIndex >= numChildren) {
             throw new Error('Trying to set child ' + childIndex + ' out of ' + numChildren);
         }
         newPointers[childIndex] = arguments[i + 1];
