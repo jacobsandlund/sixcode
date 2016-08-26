@@ -43,6 +43,24 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         return Math.pow(argResult(0), argResult(1));
     case '=':
         return argResult(0);
+    case 'is <':
+        return +(argResult(0) < argResult(1));
+    case 'is <=':
+        return +(argResult(0) <= argResult(1));
+    case 'is =':
+        return +(argResult(0) == argResult(1));
+    case 'is >=':
+        return +(argResult(0) >= argResult(1));
+    case 'is >':
+        return +(argResult(0) > argResult(1));
+    case 'and':
+        return +(argResult(0) && argResult(1));
+    case 'or':
+        return +(argResult(0) || argResult(1));
+    case 'not':
+        return +!argResult(0);
+    case 'choose':
+        return argResult(+argResult(2));
     case 'square':
         $ctx.fillRect(-50, -50, 100, 100);
         break;

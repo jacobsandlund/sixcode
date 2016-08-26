@@ -18,6 +18,16 @@ var basicEntries = [
     '^',
     '=',
 
+    'is =',
+    'is <',
+    'is >',
+    'is <=',
+    'is >=',
+    'and',
+    'or',
+    'not',
+    'choose',
+
     'square',
     'circle',
     'image',
@@ -64,6 +74,16 @@ var numArgsTable = {
     '^': 2,
     '=': 1,
 
+    'is <': 2,
+    'is <=': 2,
+    'is =': 2,
+    'is >=': 2,
+    'is >': 2,
+    'and': 2,
+    'or': 2,
+    'not': 1,
+    'choose': 3,
+
     'square': 0,
     'circle': 0,
     'image': 1,
@@ -97,12 +117,14 @@ Autocomplete.initialize = function () {
 
     matches = [];
 
-    var basicArgs = [];
-    basicArgs[0] = ArrayTree.$zeros[0];
     var oneUp = set($[Cell.Arg.zero], Cell.Arg.rDiff, Constants.$negative[1]);
     var twoUp = set($[Cell.Arg.zero], Cell.Arg.rDiff, Constants.$negative[2]);
+    var threeUp = set($[Cell.Arg.zero], Cell.Arg.rDiff, Constants.$negative[3]);
+    var basicArgs = [];
+    basicArgs[0] = ArrayTree.$zeros[0];
     basicArgs[1] = push(ArrayTree.$zeros[0], oneUp);
     basicArgs[2] = push(push(ArrayTree.$zeros[0], twoUp), oneUp);
+    basicArgs[3] = push(push(push(ArrayTree.$zeros[0], threeUp), twoUp), oneUp);
     var i;
     for (i = 0; i < basicEntries.length; i++) {
         var entry = basicEntries[i];
