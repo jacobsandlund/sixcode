@@ -36,12 +36,10 @@ var basicEntries = [
 var actionEntries = [
     'go up',
     'go into',
-    'delete row',
-    'delete column',
-    'delete right columns',
-    'copy column',
-    'copy row',
-    'copy over right cols',
+    'delete rows',
+    'delete columns',
+    'copy columns',
+    'copy rows',
     'insert row',
     'insert column',
     'collapse',
@@ -408,31 +406,43 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             Main.save();
             break;
 
-        case 'copy column':
-            if ($c === lenColumns) {
-                break;
+        case 'copy columns':
+            var maxC = Math.min($maxC, lenColumns - 1);
+            var insertC = maxC + 1;
+            var c;
+            for (c = $minC; c <= maxC; c++) {
+                var column = getAt(columns, c);
+                columns = insertAt(columns, insertC, column);
+                insertC++;
             }
-            var column = getAt(columns, $c);
-            columns = insertAt(columns, $c, column);
-            $c++;
-            $minC = $maxC = $c;
+
+            var numCopied = maxC - $minC + 1;
+            $c += numCopied;
+            $minC += numCopied;
+            $maxC += numCopied;
             Ui.moveAutocomplete();
             makeCommit = true;
             break;
 
-        case 'copy row':
-            if ($r === lenCells) {
-                break;
+        case 'copy rows':
+            var maxR = Math.min($maxR, lenCells - 1);
+            var c;
+            for (c = 0; c < lenColumns; c++) {
+                var column = getAt(columns, c);
+                var insertR = maxR + 1;
+                var r;
+                for (r = $minR; r <= maxR; r++) {
+                    var cell = getAt(column, r);
+                    column = insertAt(column, insertR, cell);
+                    insertR++;
+                }
+                columns = setAt(columns, c, column);
             }
-            var i;
-            for (i = 0; i < lenColumns; i++) {
-                var column = getAt(columns, i);
-                var cell = getAt(column, $r);
-                column = insertAt(column, $r, cell);
-                columns = setAt(columns, i, column);
-            }
-            $r++;
-            $minR = $maxR = $r;
+
+            var numCopied = maxR - $minR + 1;
+            $r += numCopied;
+            $maxR += numCopied;
+            $minR += numCopied;
             Ui.moveAutocomplete();
             makeCommit = true;
             break;
@@ -463,30 +473,23 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             makeCommit = true;
             break;
 
-        case 'delete column':
-            if ($c < lenColumns) {
-                columns = deleteAt(columns, $c);
+        case 'delete columns':
+            var c = Math.min($maxC, lenColumns - 1);
+            for (; c >= $minC; c--) {
+                columns = deleteAt(columns, c);
             }
             makeCommit = true;
             break;
 
-        case 'delete row':
-            if ($r === lenCells) {
-                break;
-            }
-
-            var i;
-            for (i = 0; i < lenColumns; i++) {
-                var column = getAt(columns, i);
-                column = deleteAt(column, $r);
-                columns = setAt(columns, i, column);
-            }
-            makeCommit = true;
-            break;
-
-        case 'delete right columns':
-            if ($c < lenColumns - 1) {
-                columns = take(columns, $c + 1);
+        case 'delete rows':
+            var c;
+            for (c = 0; c < lenColumns; c++) {
+                var column = getAt(columns, c);
+                var r = Math.min($maxR, lenCells - 1);
+                for (; r >= $minR; r--) {
+                    column = deleteAt(column, r);
+                }
+                columns = setAt(columns, c, column);
             }
             makeCommit = true;
             break;
