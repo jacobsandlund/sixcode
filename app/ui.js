@@ -54,10 +54,9 @@ var setMouseCoords = function () {
         var lenColumns = $results.length;
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
-        var columns = get($scope.cell, Cell.columns);
-        var lenColumns = len(columns);
+        var lenColumns = len($scope.columns);
         if (lenColumns > 0) {
-            var lenCells = len(getAt(columns, 0));
+            var lenCells = len(getAt($scope.columns, 0));
         } else {
             var lenCells = 0;
         }
@@ -156,7 +155,7 @@ Ui.initialize = function () {
         setMouseCoords();
 
         if (!$showResults) {
-            var columns = get($scope.cell, Cell.columns);
+            var columns = $scope.columns;
             var lenColumns = len(columns);
             if (lenColumns > 0) {
                 var lenCells = len(getAt(columns, 0));
@@ -268,7 +267,7 @@ Ui.initialize = function () {
             setMouseCoords();
 
             var parentCell = $scope.cell;
-            var columns = get(parentCell, Cell.columns);
+            var columns = $scope.columns;
             var lenColumns = len(columns);
             if (lenColumns > 0) {
                 var lenCells = len(getAt(columns, 0));
@@ -410,7 +409,7 @@ Ui.drawPlayPreview = function () {
     $ctx.textAlign = 'center';
     $ctx.font = '180px monospace';
 
-    var result = Evaluate.evaluate($playScope, $playColumns, $playC, $playR);
+    var result = Evaluate.evaluate($playScope, $playC, $playR);
     if (typeof result === 'number') {
         $ctx.fillText('' + result, 0, 50, 1440);
     }
@@ -432,10 +431,9 @@ var drawFullscreen = function () {
 
     if ($playScope === null) {
         var scope = $scope;
-        var columns = get(scope.cell, Cell.columns);
-        var lenColumns = len(columns);
+        var lenColumns = len($scope.columns);
         if (lenColumns > 0) {
-            var lenCells = len(getAt(columns, 0));
+            var lenCells = len(getAt($scope.columns, 0));
         } else {
             var lenCells = 0;
         }
@@ -444,7 +442,6 @@ var drawFullscreen = function () {
         var evaluate = c >= 0 && c < lenColumns;
     } else {
         var scope = $playScope;
-        var columns = $playColumns;
         var c = $playC;
         var r = $playR;
         var evaluate = true;
@@ -455,7 +452,7 @@ var drawFullscreen = function () {
     $ctx.font = '180px monospace';
 
     if (evaluate) {
-        var result = Evaluate.evaluate(scope, columns, c, r);
+        var result = Evaluate.evaluate(scope, c, r);
         if (typeof result === 'number') {
             $ctx.fillText('' + result, 0, 50, 1440);
         }
@@ -472,7 +469,7 @@ var drawGrid = function () {
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
         var lenParentArgs = 0;
     } else {
-        var columns = get($scope.cell, Cell.columns);
+        var columns = $scope.columns;
         var lenColumns = len(columns);
         if (lenColumns > 0) {
             var lenCells = len(getAt(columns, 0));
@@ -541,7 +538,7 @@ var drawGrid = function () {
         var arg = getAt(parentArgs, i);
         var argC = $scope.c + val(get(arg, Cell.Arg.cDiff));
         var argR = $scope.r + val(get(arg, Cell.Arg.rDiff));
-        var column = getAt($scope.columns, argC);
+        var column = getAt($scope.parent.columns, argC);
         var cell = getAt(column, argR);
         var argIndex = selectedParentArgs.indexOf(i);
         var y = (lenParentArgs - i) * -ySpacing - argGap - yHalfGap;
@@ -580,7 +577,7 @@ var drawGrid = function () {
         $ctx.font = '180px monospace';
         $ctx.fillStyle = '#492e85';
 
-        var result = Evaluate.evaluate($scope.parent, $scope.columns, argC, argR);
+        var result = Evaluate.evaluate($scope.parent, argC, argR);
         if (typeof result === 'number') {
             $ctx.fillText('' + result, 0, 50, 1440);
         }
@@ -674,7 +671,7 @@ var drawGrid = function () {
                 $ctx.font = '180px monospace';
                 $ctx.fillStyle = '#492e85';
 
-                var result = Evaluate.evaluate($scope, columns, c, r);
+                var result = Evaluate.evaluate($scope, c, r);
                 if (typeof result === 'number') {
                     $ctx.fillText('' + result, 0, 50, 1440);
                 }

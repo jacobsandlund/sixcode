@@ -6,22 +6,26 @@ var images = [];
 
 Evaluate.stop = {};
 
-Evaluate.evaluate = function (scope, columns, c, r) {
+Evaluate.evaluate = function (scope, c, r) {
+    var columns = scope.columns;
     var lenColumns = len(columns);
     if (c === lenColumns) {
         if (lenColumns <= 1) {
             return Evaluate.stop;
         } else {
-            var newColumns = push(columns, getAt(columns, c - 1));
-            scope.cell = set(scope.cell, Cell.columns, newColumns);
+            columns = push(columns, getAt(columns, c - 1));
+            scope.cell = set(scope.cell, Cell.columns, columns);
             Scope.update(scope, scope.cell);
-            if (columns === $playColumns) {
-                $playColumns = newColumns;
-            }
-            columns = newColumns;
+            lenColumns++;
         }
     }
+    if (c < 0 || c >= lenColumns) {
+        return null;
+    }
     var cells = getAt(columns, c);
+    if (r < 0 || r >= len(cells)) {
+        return null;
+    }
     var cell = getAt(cells, r);
     var text = val(get(cell, Cell.text));
     if (!isNaN(+text) && text !== '') {
@@ -38,11 +42,11 @@ Evaluate.evaluate = function (scope, columns, c, r) {
             arg = getAt(parentArgs, parentArgIndex);
             var argC = scope.c + val(get(arg, Cell.Arg.cDiff));
             var argR = scope.r + val(get(arg, Cell.Arg.rDiff));
-            return Evaluate.evaluate(scope.parent, scope.columns, argC, argR);
+            return Evaluate.evaluate(scope.parent, argC, argR);
         } else {
             var argC = c + val(get(arg, Cell.Arg.cDiff));
             var argR = r + val(get(arg, Cell.Arg.rDiff));
-            return Evaluate.evaluate(scope, columns, argC, argR);
+            return Evaluate.evaluate(scope, argC, argR);
         }
     };
 
@@ -77,7 +81,12 @@ Evaluate.evaluate = function (scope, columns, c, r) {
     case 'not':
         return +!argResult(0);
     case 'choose':
-        return argResult(+argResult(2));
+        var choose = +argResult(2);
+        if (choose > 0) {
+            return argResult(0);
+        } else {
+            return argResult(1);
+        }
 
     case 'square':
         $ctx.fillRect(-50, -50, 100, 100);
@@ -189,7 +198,7 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         var lastResult = null;
         while (result !== Evaluate.stop) {
             lastResult = result;
-            result = Evaluate.evaluate(childScope, childColumns, c, lastRow);
+            result = Evaluate.evaluate(childScope, c, lastRow);
             c++;
             if (c >= 1000000) {
                 throw new Error('Infinite loop');

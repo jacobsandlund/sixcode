@@ -15,7 +15,6 @@ global.$maxC = -1;
 global.$playScope = null;
 global.$playC = 0;
 global.$playR = 0;
-global.$playColumns = 0;
 global.$nextTickTime = 0;
 global.$fullscreen = false;
 
@@ -285,15 +284,13 @@ var evalAndDraw = function () {
         } else {
             $playC = $playScope.c;
             $playR = $playScope.r;
-            $playColumns = $playScope.columns;
             $playScope = $playScope.parent;
-            if ($playC < len($playColumns)) {
-                var playColumn = getAt($playColumns, $playC);
+            if ($playC < len($playScope.columns)) {
+                var playColumn = getAt($playScope.columns, $playC);
                 var playCell = getAt(playColumn, $playR);
                 var childColumns = get(playCell, Cell.columns);
                 if (len(childColumns) >= 1) {
                     $playScope = Scope.goInto($playScope, playCell, $playC, $playR);
-                    $playColumns = childColumns;
                     $playC = 0;
                     $playR = len(getAt(childColumns, 0)) - 1;
                 }

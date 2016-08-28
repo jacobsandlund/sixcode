@@ -168,16 +168,15 @@ var getSelectedCell = function () {
                        Cell.text, hash(result.text));
         }
     } else {
-        var columns = get($scope.cell, Cell.columns);
-        var lenColumns = len(columns);
+        var lenColumns = len($scope.columns);
         if (lenColumns > 0) {
-            var lenCells = len(getAt(columns, 0));
+            var lenCells = len(getAt($scope.columns, 0));
         } else {
             var lenCells = 0;
         }
 
         if ($c >= 0 && $c < lenColumns) {
-            var selectedColumn = getAt(columns, $c);
+            var selectedColumn = getAt($scope.columns, $c);
             if ($r >= 0 && $r < len(selectedColumn)) {
                 return getAt(selectedColumn, $r);
             }
@@ -322,7 +321,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
         var lenCells = lenColumns > 0 ? $results[0].length : 0;
     } else {
         var parentCell = $scope.cell;
-        var columns = get(parentCell, Cell.columns);
+        var columns = $scope.columns;
         var lenColumns = len(columns);
         if (lenColumns > 0) {
             var lenCells = len(getAt(columns, 0));
@@ -366,7 +365,6 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             }
             $nextTickTime = 0;
             $playScope = $scope;
-            $playColumns = columns;
             $playC = 0;
             $playR = lenCells - 1;
 

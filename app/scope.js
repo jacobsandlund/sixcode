@@ -20,11 +20,14 @@ Scope.load = function (scope, project) {
         scopes.push(scope);
     }
 
+    var topScope = scopes[scopes.length - 1];
+    topScope.cell = cell;
+    var columns = get(cell, Cell.columns);
+    topScope.columns = columns;
     scopes[scopes.length - 1].cell = cell;
 
     var i;
     for (i = scopes.length - 2; i >= 0; i--) {
-        var columns = getAt(cell, Cell.columns);
         scope = scopes[i];
         if (scope.c >= len(columns)) {
             return scopes[i + 1];
@@ -34,7 +37,7 @@ Scope.load = function (scope, project) {
             return scopes[i + 1];
         }
         var cell = getAt(column, scope.r);
-        var columns = get(cell, Cell.columns);
+        columns = get(cell, Cell.columns);
         scope.cell = cell;
         scope.columns = columns;
     }
@@ -43,22 +46,21 @@ Scope.load = function (scope, project) {
 };
 
 Scope.goInto = function (parentScope, cell, c, r) {
-    var parentCell = parentScope.cell;
-    var columns = getAt(parentCell, Cell.columns);
-
     var scope = Scope.create();
     scope.parent = parentScope;
     scope.c = c;
     scope.r = r;
     scope.cell = cell;
-    scope.columns = columns;
+    scope.columns = get(cell, Cell.columns);
     return scope;
 };
 
 Scope.update = function (scope, bottomCell) {
     var cell = bottomCell;
+    var columns = get(cell, Cell.columns);
     while (true) {
         scope.cell = cell;
+        scope.columns = columns;
         var text = val(get(cell, Cell.text));
         if (text !== '') {
             Autocomplete.registerEntry(text, cell);
@@ -66,10 +68,10 @@ Scope.update = function (scope, bottomCell) {
         if (!scope.parent) {
             break;
         }
-        var columns = scope.columns;
+        columns = scope.parent.columns;
         var column = getAt(columns, scope.c);
         column = setAt(column, scope.r, cell);
-        columns = scope.columns = setAt(columns, scope.c, column);
+        columns = setAt(columns, scope.c, column);
         scope = scope.parent;
         cell = set(scope.cell, Cell.columns, columns);
     }
