@@ -3,10 +3,12 @@ global.Ui = {};
 (function () {
 
 var canvas;
+var playPreviewCanvas;
 var autocompleteContainer;
 var autocompleteInput;
 
 global.$ctx = null;
+var playPreviewCtx = null;
 
 global.$mouseX = 0;
 global.$mouseY = 0;
@@ -89,6 +91,12 @@ Ui.initialize = function () {
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
 
+    playPreviewCanvas = document.getElementById('play-preview-canvas');
+    playPreviewCanvas.width = window.devicePixelRatio * 320;
+    playPreviewCanvas.height = window.devicePixelRatio * 200;
+    playPreviewCanvas.style.width = '320px';
+    playPreviewCanvas.style.height = '200px';
+
     autocompleteContainer = document.getElementById('autocomplete-container');
     autocompleteInput = document.getElementById('autocomplete-input');
 
@@ -97,6 +105,15 @@ Ui.initialize = function () {
 
     $ctx = canvas.getContext('2d');
     $ctx.font = '12px monospace';
+
+    playPreviewCtx = playPreviewCanvas.getContext('2d');
+    playPreviewCtx.font = '12px monospace';
+
+    document.addEventListener('keydown', function (e) {
+        if (e.keyCode === 27) { // escape
+            Main.stopPlaying();
+        }
+    });
 
     canvas.addEventListener('click', function (e) {
         if ($fullscreen || movingGrid || movingArg || selectingRange) {
@@ -360,15 +377,52 @@ Ui.draw = function () {
     $ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
     if ($fullscreen) {
-        drawFullscreen();
+        var ret = drawFullscreen();
     } else {
-        drawGrid();
+        var ret = drawGrid();
     }
 
     $ctx.restore();
 
     console.timeEnd('UI.draw');
-}
+
+    return ret;
+};
+
+Ui.drawPlayPreview = function () {
+    console.time('UI.drawPlayPreview');
+
+    var mainCtx = $ctx;
+    $ctx = playPreviewCtx;
+
+    $ctx.save();
+    $ctx.clearRect(0, 0, playPreviewCanvas.width, playPreviewCanvas.height);
+    $ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+
+    var width = playPreviewCanvas.width / window.devicePixelRatio;
+    var height = playPreviewCanvas.height / window.devicePixelRatio;
+    var centerX = Math.floor(width / 2);
+    var centerY = Math.floor(height / 2);
+    $ctx.translate(centerX, centerY);
+    $ctx.scale(width / 1440, height / 900);
+    $ctx.fillStyle = '#492e85';
+    $ctx.textAlign = 'center';
+    $ctx.font = '180px monospace';
+
+    var result = Evaluate.evaluate($playScope, $playColumns, $playC, $playR);
+    if (typeof result === 'number') {
+        $ctx.fillText('' + result, 0, 50, 1440);
+    }
+
+    $ctx.restore();
+
+    $ctx = mainCtx;
+
+    console.timeEnd('UI.drawPlayPreview');
+
+    return result;
+};
 
 var drawFullscreen = function () {
     var centerX = Math.floor(window.innerWidth / 2);
@@ -376,25 +430,36 @@ var drawFullscreen = function () {
     $ctx.translate(centerX, centerY);
     $ctx.scale(window.innerWidth / 1440, window.innerHeight / 900);
 
-    var columns = get($scope.cell, Cell.columns);
-    var lenColumns = len(columns);
-    if (lenColumns > 0) {
-        var lenCells = len(getAt(columns, 0));
-    } else {
-        var lenCells = 0;
-    }
-
-    if ($playFrame === -1) {
+    if ($playScope === null) {
+        var scope = $scope;
+        var columns = get(scope.cell, Cell.columns);
+        var lenColumns = len(columns);
+        if (lenColumns > 0) {
+            var lenCells = len(getAt(columns, 0));
+        } else {
+            var lenCells = 0;
+        }
         var c = lenColumns - 1;
+        var r = lenCells - 1;
+        var evaluate = c >= 0 && c < lenColumns;
     } else {
-        var c = $playFrame;
+        var scope = $playScope;
+        var columns = $playColumns;
+        var c = $playC;
+        var r = $playR;
+        var evaluate = true;
     }
-    var r = lenCells - 1;
 
     $ctx.fillStyle = '#492e85';
+    $ctx.textAlign = 'center';
+    $ctx.font = '180px monospace';
 
-    if (c >= 0 && c < lenColumns) {
-        Evaluate.evaluate($scope, columns, c, r);
+    if (evaluate) {
+        var result = Evaluate.evaluate(scope, columns, c, r);
+        if (typeof result === 'number') {
+            $ctx.fillText('' + result, 0, 50, 1440);
+        }
+        return result;
     }
 };
 

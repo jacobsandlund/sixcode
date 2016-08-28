@@ -12,7 +12,10 @@ global.$minR = -1;
 global.$maxR = -1;
 global.$minC = -1;
 global.$maxC = -1;
-global.$playFrame = -1;
+global.$playScope = null;
+global.$playC = 0;
+global.$playR = 0;
+global.$playColumns = 0;
 global.$nextTickTime = 0;
 global.$fullscreen = false;
 
@@ -231,7 +234,7 @@ Main.save = function () {
 };
 
 Main.tick = function (now) {
-    if ($playFrame < 0) {
+    if ($playScope === null) {
         return;
     }
 
@@ -242,32 +245,62 @@ Main.tick = function (now) {
     }
 
     Input.capture();
-    Ui.draw();
-
-    var columns = get($scope.cell, Cell.columns);
-
-    $playFrame++;
-    if ($playFrame >= len(columns)) {
-        $playFrame = -1;
-        var oldProject = get($head, Commit.tree);
-
-        if ($project !== oldProject) {
-            var now = Math.floor(+Date.now() / 1000);
-            $head = createCommit($head,
-                                 Commit.tree, $project,
-                                 Commit.parent, $head,
-                                 Commit.committerTime, now);
-            $redoHead = $head;
-        }
-        Autocomplete.show();
-        return;
-    }
+    evalAndDraw();
 
     if (!$nextTickTime) {
         $nextTickTime = now;
     }
     $nextTickTime += 33.3333333;
     window.requestAnimationFrame(Main.tick);
+};
+
+Main.stopPlaying = function () {
+    $playScope = null;
+    var oldProject = get($head, Commit.tree);
+
+    if ($project !== oldProject) {
+        var now = Math.floor(+Date.now() / 1000);
+        $head = createCommit($head,
+                             Commit.tree, $project,
+                             Commit.parent, $head,
+                             Commit.committerTime, now);
+        $redoHead = $head;
+    }
+    Autocomplete.show();
+    Ui.draw();
+};
+
+var evalAndDraw = function () {
+    if ($fullscreen) {
+        var result = Ui.draw();
+    } else {
+        var result = Ui.drawPlayPreview();
+        Ui.draw();
+    }
+    $playC++;
+
+    if (result === Evaluate.stop) {
+        if ($playScope === $scope) {
+            Main.stopPlaying();
+        } else {
+            $playC = $playScope.c;
+            $playR = $playScope.r;
+            $playColumns = $playScope.columns;
+            $playScope = $playScope.parent;
+            if ($playC < len($playColumns)) {
+                var playColumn = getAt($playColumns, $playC);
+                var playCell = getAt(playColumn, $playR);
+                var childColumns = get(playCell, Cell.columns);
+                if (len(childColumns) >= 1) {
+                    $playScope = Scope.goInto($playScope, playCell, $playC, $playR);
+                    $playColumns = childColumns;
+                    $playC = 0;
+                    $playR = len(getAt(childColumns, 0)) - 1;
+                }
+            }
+            evalAndDraw();
+        }
+    }
 };
 
 })();

@@ -2,6 +2,7 @@
 global.Autocomplete = {};
 (function () {
 
+var playPreviewCanvas;
 var autocompleteContainer;
 var autocompleteInput;
 var autocompleteOriginal;
@@ -27,6 +28,8 @@ var basicEntries = [
     'or',
     'not',
     'choose',
+
+    'stop',
 
     'square',
     'circle',
@@ -97,6 +100,8 @@ var numArgsTable = {
     'rotate': 2,
     'combine': 2,
     'color': 2,
+
+    'stop': 0,
 };
 
 var entries = actionEntries.concat(basicEntries);
@@ -107,6 +112,7 @@ actionEntries.forEach(function (entry) {
 var entriesMap = {};
 
 Autocomplete.initialize = function () {
+    playPreviewCanvas = document.getElementById('play-preview-canvas');
     autocompleteContainer = document.getElementById('autocomplete-container');
     autocompleteInput = document.getElementById('autocomplete-input');
     autocompleteResults = document.getElementById('autocomplete-results');
@@ -144,6 +150,7 @@ Autocomplete.registerEntry = function (text, cell) {
 };
 
 Autocomplete.show = function () {
+    playPreviewCanvas.style.display = 'none';
     autocompleteContainer.style.display = 'block';
     document.body.style.cursor = null;
     autocompleteInput.focus();
@@ -358,8 +365,14 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
                 break;
             }
             $nextTickTime = 0;
-            $playFrame = 0;
+            $playScope = $scope;
+            $playColumns = columns;
+            $playC = 0;
+            $playR = lenCells - 1;
 
+            if (!$fullscreen) {
+                playPreviewCanvas.style.display = 'block';
+            }
             autocompleteContainer.style.display = 'none';
             document.body.style.cursor = 'none';
             window.requestAnimationFrame(Main.tick);

@@ -4,7 +4,23 @@ global.Evaluate = {};
 
 var images = [];
 
+Evaluate.stop = {};
+
 Evaluate.evaluate = function (scope, columns, c, r) {
+    var lenColumns = len(columns);
+    if (c === lenColumns) {
+        if (lenColumns <= 1) {
+            return Evaluate.stop;
+        } else {
+            var newColumns = push(columns, getAt(columns, c - 1));
+            scope.cell = set(scope.cell, Cell.columns, newColumns);
+            Scope.update(scope, scope.cell);
+            if (columns === $playColumns) {
+                $playColumns = newColumns;
+            }
+            columns = newColumns;
+        }
+    }
     var cells = getAt(columns, c);
     var cell = getAt(cells, r);
     var text = val(get(cell, Cell.text));
@@ -43,6 +59,7 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         return Math.pow(argResult(0), argResult(1));
     case '=':
         return argResult(0);
+
     case 'is <':
         return +(argResult(0) < argResult(1));
     case 'is <=':
@@ -61,14 +78,15 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         return +!argResult(0);
     case 'choose':
         return argResult(+argResult(2));
+
     case 'square':
         $ctx.fillRect(-50, -50, 100, 100);
-        break;
+        return null;
     case 'circle':
         $ctx.beginPath();
         $ctx.arc(0, 0, 50, 0, 2 * Math.PI);
         $ctx.fill();
-        break;
+        return null;
     case 'image':
         var src = argResult(0);
         var image;
@@ -86,61 +104,60 @@ Evaluate.evaluate = function (scope, columns, c, r) {
             image.addEventListener('load', Ui.draw);
             images.push(image);
         }
-        break;
+        return src;
     case 'scale':
         var scaleBy = argResult(1);
         $ctx.save();
         $ctx.scale(scaleBy, scaleBy);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'scale x':
         var scaleBy = argResult(1);
         $ctx.save();
         $ctx.scale(scaleBy, 1);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'scale y':
         var scaleBy = argResult(1);
         $ctx.save();
         $ctx.scale(1, scaleBy);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'move x':
         var moveBy = argResult(1);
         $ctx.save();
         $ctx.translate(moveBy, 0);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'move y':
         var moveBy = argResult(1);
         $ctx.save();
         $ctx.translate(0, moveBy);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'combine':
         argResult(0);
         argResult(1);
-        break;
+        return null;
     case 'rotate':
         var rotateBy = argResult(1);
         $ctx.save();
         $ctx.rotate(rotateBy * Math.PI / 180);
         argResult(0);
         $ctx.restore();
-        break;
+        return null;
     case 'color':
         var color = argResult(1);
         $ctx.save();
         $ctx.fillStyle = color;
         argResult(0);
         $ctx.restore();
-        break;
-
+        return null;
     case 'mouse x':
         var input = get(scope.cell, Cell.input);
         var mouseXs = get(input, Input.mouseXs);
@@ -157,6 +174,9 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         }
         return val(getAt(mouseYs, c));
 
+    case 'stop':
+        return Evaluate.stop;
+
     default:
         var childColumns = get(cell, Cell.columns);
         if (len(childColumns) === 0) {
@@ -164,7 +184,18 @@ Evaluate.evaluate = function (scope, columns, c, r) {
         }
         var lastRow = len(getAt(childColumns, 0)) - 1;
         var childScope = Scope.goInto(scope, cell, c, r);
-        return Evaluate.evaluate(childScope, childColumns, 0, lastRow);
+        c = 0;
+        var result = null;
+        var lastResult = null;
+        while (result !== Evaluate.stop) {
+            lastResult = result;
+            result = Evaluate.evaluate(childScope, childColumns, c, lastRow);
+            c++;
+            if (c >= 1000000) {
+                throw new Error('Infinite loop');
+            }
+        }
+        return lastResult;
     }
 
     return text;

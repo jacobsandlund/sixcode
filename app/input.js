@@ -24,22 +24,22 @@ Input.capture = function () {
     var lenMouseYs = len(mouseYs);
     var i;
 
-    if ($playFrame >= lenMouseXs) {
-        for (i = lenMouseXs; i <= $playFrame; i++) {
+    if ($playC >= lenMouseXs) {
+        for (i = lenMouseXs; i <= $playC; i++) {
             mouseXs = push(mouseXs, Constants.$positive[0]);
         }
     }
 
-    if ($playFrame >= lenMouseYs) {
-        for (i = lenMouseYs; i <= $playFrame; i++) {
+    if ($playC >= lenMouseYs) {
+        for (i = lenMouseYs; i <= $playC; i++) {
             mouseYs = push(mouseYs, Constants.$positive[0]);
         }
     }
 
     var scaledX = Math.floor($mouseX / window.innerWidth * 1440) - 720;
     var scaledY = Math.floor($mouseY / window.innerHeight * 900) - 450;
-    mouseXs = setAt(mouseXs, $playFrame, Constants.integer(scaledX));
-    mouseYs = setAt(mouseYs, $playFrame, Constants.integer(scaledY));
+    mouseXs = setAt(mouseXs, $playC, Constants.integer(scaledX));
+    mouseYs = setAt(mouseYs, $playC, Constants.integer(scaledY));
 
     input = set(input,
                 Input.mouseXs, mouseXs,

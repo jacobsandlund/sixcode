@@ -5,6 +5,16 @@ html, body {
   overflow: hidden;
 }
 
+#play-preview-canvas {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  pointer-events: none;
+  display: none;
+  border: solid 2px #ccc;
+  background-color: white;
+}
+
 #autocomplete-container {
   width: 304px;
   position: fixed;
