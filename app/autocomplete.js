@@ -41,6 +41,7 @@ var basicEntries = [
     'move y',
     'mouse x',
     'mouse y',
+    'mouse down',
     'rotate',
     'combine',
     'color',
@@ -58,7 +59,6 @@ var actionEntries = [
     'collapse',
 
     'clear',
-    'escape',
     'undo',
     'redo',
     'play',
@@ -66,6 +66,7 @@ var actionEntries = [
     'exit fullscreen',
     'save',
     'list repositories',
+    'escape',
 ];
 
 var numArgsTable = {
@@ -97,6 +98,7 @@ var numArgsTable = {
     'move y': 2,
     'mouse x': 0,
     'mouse y': 0,
+    'mouse down': 0,
     'rotate': 2,
     'combine': 2,
     'color': 2,

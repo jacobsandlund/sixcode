@@ -10,6 +10,7 @@ var autocompleteInput;
 global.$ctx = null;
 var playPreviewCtx = null;
 
+global.$mouseDown = 0;
 global.$mouseX = 0;
 global.$mouseY = 0;
 var mouseC = 0;
@@ -30,7 +31,6 @@ var yTranslation = 0;
 var mouseXAtDown = 0;
 var mouseYAtDown = 0;
 
-var mouseDown = false;
 var movingGrid = false;
 var movingArg = false;
 var movingArgIndex = -1;
@@ -146,11 +146,11 @@ Ui.initialize = function () {
 
     canvas.addEventListener('mousedown', function (e) {
         e.preventDefault();
+        $mouseDown = true;
         $mouseX = e.clientX;
         $mouseY = e.clientY;
         mouseXAtDown = $mouseX;
         mouseYAtDown = $mouseY;
-        mouseDown = true;
 
         setMouseCoords();
 
@@ -202,7 +202,7 @@ Ui.initialize = function () {
     });
 
     canvas.addEventListener('mouseup', function (e) {
-        mouseDown = false;
+        $mouseDown = false;
         var oldProject = get($head, Commit.tree);
 
         if ($project !== oldProject) {
@@ -230,7 +230,7 @@ Ui.initialize = function () {
                 Math.abs(e.clientX - mouseXAtDown) > 2 ||
                 Math.abs(e.clientY - mouseYAtDown) > 2
             );
-            if (mouseDown && moved) {
+            if ($mouseDown && moved) {
                 if (e.shiftKey) {
                     selectingRange = true;
                     $c = -1;

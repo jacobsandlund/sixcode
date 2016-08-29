@@ -167,6 +167,14 @@ Evaluate.evaluate = function (scope, c, r) {
         argResult(0);
         $ctx.restore();
         return null;
+    case 'mouse down':
+        var input = get(scope.cell, Cell.input);
+        var mouseDowns = get(input, Input.mouseDowns);
+        if (c >= len(mouseDowns)) {
+            return 0;
+        }
+        return val(getAt(mouseDowns, c));
+
     case 'mouse x':
         var input = get(scope.cell, Cell.input);
         var mouseXs = get(input, Input.mouseXs);
