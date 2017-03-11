@@ -81,11 +81,11 @@ Evaluate.evaluate = function (scope, c, r) {
     case 'not':
         return +!argResult(0);
     case 'choose':
-        var choose = +argResult(2);
+        var choose = +argResult(1);
         if (choose > 0) {
             return argResult(0);
         } else {
-            return argResult(1);
+            return argResult(2);
         }
 
     case 'square':
@@ -196,14 +196,31 @@ Evaluate.evaluate = function (scope, c, r) {
 
     default:
         var childColumns = get(cell, Cell.columns);
-        if (len(childColumns) === 0) {
+        var lenChildColumns = len(childColumns);
+        if (lenChildColumns === 0) {
             return '';
         }
         var lastRow = len(getAt(childColumns, 0)) - 1;
         var childScope = Scope.goInto(scope, cell, c, r);
-        c = 0;
+
         var result = null;
         var lastResult = null;
+        for (c = 0; c < lenChildColumns; c++) {
+            lastResult = result;
+            result = Evaluate.evaluate(childScope, c, lastRow);
+            if (result === Evaluate.stop) {
+                return lastResult;
+            }
+        }
+
+        if (lenChildColumns === 1) {
+            return result;
+        }
+
+        if (usesInputs(cell)) {
+            return result;
+        }
+
         while (result !== Evaluate.stop) {
             lastResult = result;
             result = Evaluate.evaluate(childScope, c, lastRow);
@@ -216,6 +233,37 @@ Evaluate.evaluate = function (scope, c, r) {
     }
 
     return text;
+};
+
+var usesInputs = function (cell) {
+    var columns = get(cell, Cell.columns);
+    var lenColumns = len(columns);
+    var lastColumn = 0;
+    var c;
+    for (c = 0; c < lenColumns; c++) {
+        var column = getAt(columns, c);
+        if (column === lastColumn) {
+            continue;
+        }
+
+        var lenCells = len(column);
+        var r;
+        for (r = 0; r < lenCells; r++) {
+            var childCell = getAt(column, r);
+
+            var text = val(get(childCell, Cell.text));
+            if (Autocomplete.inputEntriesMap[text]) {
+                return true;
+            }
+
+            if (usesInputs(childCell)) {
+                return true;
+            }
+        }
+        lastColumn = column;
+    }
+
+    return false;
 };
 
 })();

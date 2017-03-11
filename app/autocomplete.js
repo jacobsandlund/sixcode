@@ -39,13 +39,18 @@ var basicEntries = [
     'scale y',
     'move x',
     'move y',
-    'mouse x',
-    'mouse y',
-    'mouse down',
     'rotate',
     'combine',
     'color',
 ];
+
+var inputEnties = [
+    'mouse x',
+    'mouse y',
+    'mouse down',
+];
+
+basicEntries = basicEntries.concat(inputEnties);
 
 var actionEntries = [
     'go up',
@@ -112,6 +117,11 @@ actionEntries.forEach(function (entry) {
     actionEntriesMap[entry] = true;
 });
 var entriesMap = {};
+
+Autocomplete.inputEntriesMap = {};
+inputEnties.forEach(function (entry) {
+    Autocomplete.inputEntriesMap[entry] = true;
+});
 
 Autocomplete.initialize = function () {
     playPreviewCanvas = document.getElementById('play-preview-canvas');
@@ -365,10 +375,7 @@ Autocomplete.performMatch = function (matchText, keepCellSelected) {
             if (lenColumns === 0) {
                 break;
             }
-            $nextTickTime = 0;
-            $playScope = $scope;
-            $playC = 0;
-            $playR = lenCells - 1;
+            Main.startPlaying();
 
             if (!$fullscreen) {
                 playPreviewCanvas.style.display = 'block';

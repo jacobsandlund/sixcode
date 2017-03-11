@@ -269,6 +269,28 @@ Main.stopPlaying = function () {
     Ui.draw();
 };
 
+Main.startPlaying = function () {
+    $nextTickTime = 0;
+    $playScope = $scope;
+    $playC = 0;
+    $playR = len(getAt($playScope.columns, 0)) - 1;
+    descendScope();
+};
+
+var descendScope = function () {
+    if ($playC < len($playScope.columns)) {
+        var playColumn = getAt($playScope.columns, $playC);
+        var playCell = getAt(playColumn, $playR);
+        var childColumns = get(playCell, Cell.columns);
+        if (len(childColumns) >= 1) {
+            $playScope = Scope.goInto($playScope, playCell, $playC, $playR);
+            $playC = 0;
+            $playR = len(getAt(childColumns, 0)) - 1;
+            descendScope();
+        }
+    }
+};
+
 var evalAndDraw = function () {
     if ($fullscreen) {
         var result = Ui.draw();
@@ -285,16 +307,7 @@ var evalAndDraw = function () {
             $playC = $playScope.c;
             $playR = $playScope.r;
             $playScope = $playScope.parent;
-            if ($playC < len($playScope.columns)) {
-                var playColumn = getAt($playScope.columns, $playC);
-                var playCell = getAt(playColumn, $playR);
-                var childColumns = get(playCell, Cell.columns);
-                if (len(childColumns) >= 1) {
-                    $playScope = Scope.goInto($playScope, playCell, $playC, $playR);
-                    $playC = 0;
-                    $playR = len(getAt(childColumns, 0)) - 1;
-                }
-            }
+            descendScope();
             evalAndDraw();
         }
     }
