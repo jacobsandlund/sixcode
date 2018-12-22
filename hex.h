@@ -1,0 +1,25 @@
+#ifndef __HEX_H__
+#define __HEX_H__
+
+#include "sixcode.h"
+
+typedef struct {
+	i32 q;
+	i32 r;
+} Hex;
+
+typedef struct {
+	f64 q;
+	f64 r;
+} FloatHex;
+
+i32 hex_s(Hex h);
+i8 hex_equal(Hex a, Hex b);
+Hex hex_add(Hex a, Hex b);
+Hex hex_subtract(Hex a, Hex b);
+Hex hex_neighbor(Hex h, u8 direction);
+f64 hex_distance(Hex a, Hex b);
+FloatHex hex_lerp(Hex a, Hex b, f64 t);
+Hex hex_round(FloatHex fh);
+
+#endif // __HEX_H__

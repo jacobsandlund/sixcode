@@ -1,1 +1,0 @@
-node --experimental-modules 2> >(grep -v 'ExperimentalWarning: The ESM module loader is experimental.') "$@"

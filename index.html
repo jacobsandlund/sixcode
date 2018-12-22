@@ -10,6 +10,18 @@
 </head>
 <body>
   <canvas id="canvas"></canvas>
+  <script type="text/javascript">
+    var Module = {
+        preRun: [],
+        postRun: [],
+        print: (text) => console.log(text),
+        printErr: (text) => console.error(text),
+    };
+    document.querySelector("#canvas").addEventListener("click", () => {
+      Module._myFunction();
+    });
+  </script>
   <script type="module" src="index.mjs"></script>
+  <script async type="text/javascript" src="hello.js"></script>
 </body>
 </html>
