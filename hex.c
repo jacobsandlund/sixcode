@@ -8,7 +8,7 @@ i32 hex_s(Hex h)
 	return -h.q - h.r;
 }
 
-i8 hex_equal(Hex a, Hex b)
+u8 hex_equal(Hex a, Hex b)
 {
 	return a.q == b.q && a.r == b.r;
 }

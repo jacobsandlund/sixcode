@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+nginx -c /sixcode/development/nginx.conf
+node development/server.js

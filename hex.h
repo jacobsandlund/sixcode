@@ -14,7 +14,7 @@ typedef struct {
 } FloatHex;
 
 i32 hex_s(Hex h);
-i8 hex_equal(Hex a, Hex b);
+u8 hex_equal(Hex a, Hex b);
 Hex hex_add(Hex a, Hex b);
 Hex hex_subtract(Hex a, Hex b);
 Hex hex_neighbor(Hex h, u8 direction);

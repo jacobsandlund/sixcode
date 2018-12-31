@@ -45,14 +45,29 @@ typedef struct {
 	int sentinel;
 } TestCase;
 
+#ifdef __MACH__
+
 #define TEST(test_name) \
 void test_case_fn_##test_name(); \
 static TestCase test_case_##test_name \
-__attribute((used, section("data,test_cases"))) = { \
+__attribute((used, section("__DATA,test_cases"))) = { \
 	.fn = test_case_fn_##test_name, \
 	.sentinel = TEST_CASE_SENTINEL, \
 }; \
 void test_case_fn_##test_name()
+
+#else
+
+#define TEST(test_name) \
+void test_case_fn_##test_name(); \
+static TestCase test_case_##test_name \
+__attribute((used, section("test_cases"))) = { \
+	.fn = test_case_fn_##test_name, \
+	.sentinel = TEST_CASE_SENTINEL, \
+}; \
+void test_case_fn_##test_name()
+
+#endif
 
 TEST(start)
 {
@@ -158,9 +173,9 @@ FileInfo *get_file_info(const char *filename)
 
 void log_to_file(const char *filename, int line, const char *format, ...)
 {
-	char output_buffer[MAX_OUTPUT_LEN];
+	static char output_buffer[MAX_OUTPUT_LEN];
 	va_list argptr;
-	size_t output_len;
+	int output_len;
 	LineData output_line_data;
 	int num_lines;
 	size_t output_lines_len;

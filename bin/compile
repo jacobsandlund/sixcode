@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -ex
+clang -std=gnu11 -lm -Werror -Wall -Wextra "$@"
