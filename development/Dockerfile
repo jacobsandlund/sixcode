@@ -20,4 +20,4 @@ RUN mkdir -p /run/nginx
 EXPOSE 8080
 
 ENTRYPOINT ["development/entrypoint.sh"]
-CMD ["bin/start-server"]
+CMD ["./sixc", "start-server"]

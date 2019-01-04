@@ -13,7 +13,7 @@ static const Hex EMPTY_GROUP_MAX = {
 	.r = I32_MIN,
 };
 
-Group *group_init(Hex capacity_min, Hex capacity_max)
+Group *group_create(Hex capacity_min, Hex capacity_max)
 {
 	Group *g = malloc(sizeof *g);
 	u32 r_spacing = capacity_max.q - capacity_min.q + 1;
@@ -29,6 +29,12 @@ Group *group_init(Hex capacity_min, Hex capacity_max)
 	g->data = calloc(capacity, sizeof *g->data);
 
 	return g;
+}
+
+void group_destroy(Group *g)
+{
+	free(g->data);
+	free(g);
 }
 
 void *group_get(Group *g, Hex h)
@@ -184,7 +190,7 @@ u32 group_set(Group *g, Hex h, void *datum)
 
 	r_spacing = capacity_max.q - capacity_min.q + 1;
 	capacity = (capacity_max.r - capacity_min.r + 1) * r_spacing;
-	data = malloc(capacity * sizeof *data);
+	data = calloc(capacity, sizeof *data);
 
 	for (i32 r = min.r; r <= max.r; ++r) {
 		i32 r_diff = r - capacity_min.r;
@@ -195,6 +201,8 @@ u32 group_set(Group *g, Hex h, void *datum)
 			data[q + i_offset] = old_data[q + old_i_offset];
 		}
 	}
+
+	free(old_data);
 
 	q_diff_cap_min = h.q - capacity_min.q;
 	r_diff_cap_min = h.r - capacity_min.r;

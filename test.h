@@ -96,12 +96,26 @@ static int num_files;
 static const char *LOG_PREFIX = "\t//=>";
 #define LOG_PREFIX_LEN 5
 
+void free_line_data(LineData line_data)
+{
+	if (line_data.num_lines > 0) {
+		free(line_data.lines[0]);
+		free(line_data.lines);
+	}
+}
+
 void split_lines(LineData *line_data, char *contents, int len)
 {
 	char **lines;
 	char *line;
 	char *rest_contents;
 	int num_lines = 0;
+
+	if (len == 0) {
+		line_data->num_lines = 0;
+		line_data->lines = NULL;
+		return;
+	}
 
 	for (int i = 0; i < len; ++i) {
 		if (contents[i] == '\n') {
@@ -179,8 +193,8 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 	LineData output_line_data;
 	int num_lines;
 	size_t output_lines_len;
-	char *results_content;
-	Results *results;
+	char *result_content;
+	Results *result;
 	char **result_lines;
 	FileInfo *file_info = get_file_info(filename);
 
@@ -197,7 +211,7 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 		output_len = MAX_OUTPUT_LEN - 1;
 	}
 
-	split_lines(&output_line_data, strdup(output_buffer), output_len);
+	split_lines(&output_line_data, output_buffer, output_len);
 
 	num_lines = output_line_data.num_lines;
 
@@ -208,26 +222,28 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 	// This is an approximation, which includes prefix plus ending newline per line.
 	output_lines_len = output_len + num_lines * (LOG_PREFIX_LEN + 2) + 1;
 
-	results_content = malloc(output_lines_len * sizeof *results_content);
-	results = &file_info->results[file_info->num_results];
-	results->line_data.num_lines = num_lines;
-	result_lines = results->line_data.lines = malloc(num_lines * sizeof *result_lines);
-	results->line = line - 1;
+	result_content = malloc(output_lines_len * sizeof *result_content);
+	result = &file_info->results[file_info->num_results];
+	result->line_data.num_lines = num_lines;
+	result_lines = result->line_data.lines = malloc(num_lines * sizeof *result_lines);
+	result->line = line - 1;
 
 	for (int i = 0; i < num_lines; ++i) {
 		size_t line_len = strlen(output_line_data.lines[i]);
-		result_lines[i] = strcpy(results_content, LOG_PREFIX);
-		results_content += LOG_PREFIX_LEN;
+		result_lines[i] = strcpy(result_content, LOG_PREFIX);
+		result_content += LOG_PREFIX_LEN;
 
 		if (line_len > 0) {
-			results_content[0] = ' ';
-			strcpy(&results_content[1], output_line_data.lines[i]);
-			results_content += line_len + 1;
+			result_content[0] = ' ';
+			strcpy(&result_content[1], output_line_data.lines[i]);
+			result_content += line_len + 1;
 		}
 
-		results_content[0] = '\0';
-		++results_content;
+		result_content[0] = '\0';
+		++result_content;
 	}
+
+	free_line_data(output_line_data);
 
 	++file_info->num_results;
 }
@@ -325,6 +341,18 @@ int main()
 				return 1;
 			}
 		}
+
+		free(contents_new);
+		free(lines_new);
+
+		for (int r = 0; r < num_results; ++r) {
+			Results *result = &results[r];
+			free_line_data(result->line_data);
+		}
+
+		free(file_info->results);
+		free_line_data(file_info->line_data);
+		free(file_info->contents);
 	}
 }
 

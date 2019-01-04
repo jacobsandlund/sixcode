@@ -6,7 +6,6 @@
 
 typedef struct {
 	i32 d;
-	f64 f;
 } TestData;
 
 i8 test_compare_data(void *a_, void *b_)
@@ -16,11 +15,11 @@ i8 test_compare_data(void *a_, void *b_)
 	return a->d == b->d ? 0 : 1;
 }
 
-TEST(group_init)
+TEST(group_create_and_destroy)
 {
 	Hex capacity_min = {.q = 1, .r = 1};
 	Hex capacity_max = {.q = 8, .r = 4};
-	Group *g = group_init(capacity_min, capacity_max);
+	Group *g = group_create(capacity_min, capacity_max);
 
 	_d(g->count);
 	//=> 0
@@ -40,17 +39,19 @@ TEST(group_init)
 	//=> 0
 	_d(g->data[g->capacity - 1]);
 	//=> 0
+
+	group_destroy(g);
 }
 
 TEST(group_get)
 {
 	Hex h2;
 	TestData *result;
-	TestData td = {.d = 42, .f = 3.141};
+	TestData td = {.d = 42};
 	Hex h1 = {.q = 1, .r = 3};
 	Hex capacity_min = {.q = -4, .r = 2};
 	Hex capacity_max = {.q = 7, .r = 3};
-	Group *g = group_init(capacity_min, capacity_max);
+	Group *g = group_create(capacity_min, capacity_max);
 	i32 i = (h1.q - capacity_min.q) + g->r_spacing * (h1.r - capacity_min.r);
 
 	_d(g->r_spacing);
@@ -71,8 +72,6 @@ TEST(group_get)
 
 	_d(result->d);
 	//=> 42
-	_g(result->f);
-	//=> 3.141
 
 	h2.q = capacity_min.q - 1; h2.r = capacity_min.r;
 	_d(group_get(g, h2) == NULL);
@@ -93,6 +92,8 @@ TEST(group_get)
 	g->data[h2.q - capacity_min.q] = (void *) &td;
 	_d(group_get(g, h2) == NULL);
 	//=> 1
+
+	group_destroy(g);
 }
 
 TEST(group_distance)
@@ -143,7 +144,7 @@ TEST(group_set)
 	Hex h2 = {.q = 1, .r = 0};
 	Hex capacity_min = {.q = -2, .r = -1};
 	Hex capacity_max = {.q = 0, .r = 1};
-	Group *g = group_init(capacity_min, capacity_max);
+	Group *g = group_create(capacity_min, capacity_max);
 
 	_hx(g->min);
 	//=> -2, -1
@@ -219,7 +220,8 @@ TEST(group_set)
 	// Min/max/count get set correctly when count = 0, and expanding
 	h2.q = -1; h2.r = -1;
 	capacity_min.r = 0;
-	g = group_init(capacity_min, capacity_max);
+	group_destroy(g);
+	g = group_create(capacity_min, capacity_max);
 	_d(group_set(g, h2, &td2));
 	//=> 3
 	_hx(g->min);
@@ -228,6 +230,8 @@ TEST(group_set)
 	//=> -1, -1
 	_d(g->count);
 	//=> 1
+
+	group_destroy(g);
 }
 
 TEST(group_remove)
@@ -238,7 +242,7 @@ TEST(group_remove)
 	Hex h3 = {.q = 0, .r = 0};
 	Hex capacity_min = {.q = -2, .r = -1};
 	Hex capacity_max = {.q = 0, .r = 1};
-	Group *g = group_init(capacity_min, capacity_max);
+	Group *g = group_create(capacity_min, capacity_max);
 
 	_d(g->count);
 	//=> 0
@@ -302,6 +306,8 @@ TEST(group_remove)
 	//=> 0, 1
 	_hx(g->max);
 	//=> 0, 1
+
+	group_destroy(g);
 }
 
 TEST(group_equal)
@@ -313,8 +319,8 @@ TEST(group_equal)
 	Hex a_capacity_min = {.q = -2, .r = -1};
 	Hex b_capacity_min = {.q = -5, .r = 0};
 	Hex capacity_max = {.q = 2, .r = 1};
-	Group *a = group_init(a_capacity_min, capacity_max);
-	Group *b = group_init(b_capacity_min, capacity_max);
+	Group *a = group_create(a_capacity_min, capacity_max);
+	Group *b = group_create(b_capacity_min, capacity_max);
 
 	_hx(a->min);
 	//=> -2, -1
@@ -367,4 +373,7 @@ TEST(group_equal)
 	// Different NULL or != NULL
 	_d(group_equal(a, b, &test_compare_data));
 	//=> 0
+
+	group_destroy(a);
+	group_destroy(b);
 }

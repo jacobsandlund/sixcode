@@ -1,5 +1,3 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -e
 
 bin/compile "$@" && ./a.out && rm a.out

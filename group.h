@@ -24,7 +24,8 @@ typedef i8 (*GroupCompare)(void *a, void *b);
 
 typedef void (*GroupEach)(Hex h, void *datum);
 
-Group *group_init(Hex capacity_min, Hex capacity_max);
+Group *group_create(Hex capacity_min, Hex capacity_max);
+void group_destroy(Group *g);
 void *group_get(Group *g, Hex h);
 u32 group_distance(Group *g, Hex h);
 

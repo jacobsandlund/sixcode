@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+usage() {
+    echo "Usage: sixc [<options>*] <command> [<args>*]"
+    echo
+    echo "Commands:"
+    echo "    docker-run         Run the development docker file"
+    echo "    docker-build       Build the development docker image"
+    echo "    docker-exec <cmd>  Execute the command in docker container"
+    echo "    test [<file>]      Test all files (or specified file)"
+    echo "    valgrind [<file>]  Run files (or file) through Valgrind"
+    echo "    compile <file>     Compile file"
+    echo "    run <file>         Compile and then run file"
+    echo "    start-server       Start the development server"
+}
+
+if [ "$#" -eq 0 ]; then
+    usage
+    exit
+fi
+
+command="$1"
+shift
+
+case $command in
+h|-h|help|--help)
+    usage
+    exit
+    ;;
+esac
+
+if [ -f "$command" ]; then
+    executable="$command"
+else
+    executable="bin/$command"
+    if [ ! -f "$executable" ]; then
+        echo "Command not found: $command"
+        usage
+        exit 1
+    fi
+fi
+
+# /.dockerenv is only on docker
+if [[ $executable == bin/docker-* ]] || [ -f /.dockerenv ]; then
+    eval $executable "$@"
+else
+    docker exec -it sixcode $executable "$@"
+fi

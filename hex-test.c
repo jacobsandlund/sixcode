@@ -15,7 +15,7 @@ TEST(frac_hex)
 {
 	FloatHex fh = {.q = 1.001, .r = 2.98};
 	_fh(fh);
-	//=> 1.001, 2.98
+	//=> 1.00099, 2.97999
 }
 
 TEST(hex_s)

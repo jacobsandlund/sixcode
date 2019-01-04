@@ -1,15 +1,8 @@
-#!/bin/bash
+#!/bin/bash -e
 
-set -e
-
-if [ -f /.dockerenv ]; then
-    # inside docker
-    if [ "$#" -eq 1 ]; then
-        bin/run $1 && git diff --exit-code -- $1
-    else
-        find . -name '*-test.c' | xargs -n 1 bin/run
-        git diff --exit-code -- *-test.c
-    fi
+if [ "$#" -eq 1 ]; then
+    bin/run $1 && git diff --exit-code -- $1
 else
-    bin/docker-exec bin/test $@
+    find . -name '*-test.c' | xargs -n 1 bin/run
+    git diff --exit-code -- *-test.c
 fi

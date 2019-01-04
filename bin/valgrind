@@ -1,0 +1,27 @@
+#!/bin/bash -e
+
+valgrind_single() {
+    last_arg="${@: -1}"
+    options_length=$(($#-1))
+    options=${@:1:$options_length}
+
+    bin/compile "$last_arg"
+    valgrind --suppressions=development/valgrind-suppressions.supp $options ./a.out
+    rm a.out
+}
+
+last_arg="${@: -1}"
+
+if [ "$#" -eq 0 ] || [ ! -f $last_arg ]; then
+    for test_file in $(find . -name '*-test.c'); do
+        output_file="valgrind-output/$test_file.txt"
+        echo ./sixc valgrind "$@" $test_file > $output_file
+        echo >> $output_file
+        valgrind_single --log-fd=1 "$@" $test_file |
+            cut -d' ' -f 2- >> $output_file
+    done
+
+    git diff --exit-code -- valgrind-output/
+else
+    valgrind_single "$@"
+fi
