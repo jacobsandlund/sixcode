@@ -3,6 +3,8 @@
 #include <math.h>
 #include "hex.h"
 
+const Hex hex_zero = {.q = 0, .r = 0};
+
 i32 hex_s(Hex h)
 {
 	return -h.q - h.r;
@@ -19,7 +21,7 @@ Hex hex_add(Hex a, Hex b)
 	return h;
 }
 
-Hex hex_subtract(Hex a, Hex b)
+Hex hex_sub(Hex a, Hex b)
 {
 	Hex h = {.q = a.q - b.q, .r = a.r - b.r};
 	return h;

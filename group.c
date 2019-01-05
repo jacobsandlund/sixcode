@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include "group.h"
 
@@ -41,16 +42,13 @@ void *group_get(Group *g, Hex h)
 {
 	Hex min = g->min;
 	Hex max = g->max;
-	i32 q_diff_min = h.q - min.q;
-	i32 q_diff_max = max.q - h.q;
-	i32 r_diff_min = h.r - min.r;
-	i32 r_diff_max = max.r - h.r;
+	Hex diff_min = hex_sub(h, min);
+	Hex diff_max = hex_sub(max, h);
 
-	if (q_diff_min >= 0 && q_diff_max >= 0 && r_diff_min >= 0 && r_diff_max >= 0) {
+	if (diff_min.q >= 0 && diff_min.r >= 0 && diff_max.q >= 0 && diff_max.r >= 0) {
 		Hex capacity_min = g->capacity_min;
-		i32 q_diff_cap_min = h.q - capacity_min.q;
-		i32 r_diff_cap_min = h.r - capacity_min.r;
-		i32 i = q_diff_cap_min + r_diff_cap_min * g->r_spacing;
+		Hex diff_cap_min = hex_sub(h, capacity_min);
+		i32 i = diff_cap_min.q + diff_cap_min.r * g->r_spacing;
 		return g->data[i];
 	} else {
 		return NULL;
@@ -61,42 +59,40 @@ u32 group_distance(Group *g, Hex h)
 {
 	Hex min = g->min;
 	Hex max = g->max;
-	i32 q_diff_min = min.q - h.q;
-	i32 q_diff_max = h.q - max.q;
-	i32 r_diff_min = min.r - h.r;
-	i32 r_diff_max = h.r - max.r;
+	Hex diff_min = hex_sub(min, h);
+	Hex diff_max = hex_sub(h, max);
 
-	if (q_diff_min > 0) {
-		if (r_diff_min > q_diff_min) {
-			return r_diff_min;
-		} else if (r_diff_max > q_diff_min) {
-			return r_diff_max;
+	if (diff_min.q > 0) {
+		if (diff_min.r > diff_min.q) {
+			return diff_min.r;
+		} else if (diff_max.r > diff_min.q) {
+			return diff_max.r;
 		} else {
-			return q_diff_min;
+			return diff_min.q;
 		}
-	} else if (q_diff_max > 0) {
-		if (r_diff_min > q_diff_max) {
-			return r_diff_min;
-		} else if (r_diff_max > q_diff_max) {
-			return r_diff_max;
+	} else if (diff_max.q > 0) {
+		if (diff_min.r > diff_max.q) {
+			return diff_min.r;
+		} else if (diff_max.r > diff_max.q) {
+			return diff_max.r;
 		} else {
-			return q_diff_max;
+			return diff_max.q;
 		}
-	} else if (r_diff_min > 0) {
-		if (q_diff_min > r_diff_min) {
-			return q_diff_min;
-		} else if (q_diff_max > r_diff_min) {
-			return q_diff_max;
+	} else if (diff_min.r > 0) {
+		if (diff_min.q > diff_min.r) {
+			return diff_min.q;
+		} else if (diff_max.q > diff_min.r) {
+			return diff_max.q;
 		} else {
-			return r_diff_min;
+			return diff_min.r;
 		}
-	} else if (r_diff_max > 0) {
-		if (q_diff_min > r_diff_max) {
-			return q_diff_min;
-		} else if (q_diff_max > r_diff_max) {
-			return q_diff_max;
+	} else if (diff_max.r > 0) {
+		if (diff_min.q > diff_max.r) {
+			return diff_min.q;
+		} else if (diff_max.q > diff_max.r) {
+			return diff_max.q;
 		} else {
-			return r_diff_max;
+			return diff_max.r;
 		}
 	} else {
 		return 0;
@@ -110,18 +106,15 @@ u32 group_set(Group *g, Hex h, void *datum)
 	Hex min = g->min;
 	Hex max = g->max;
 	Hex capacity_min = g->capacity_min;
+	Hex diff_min = hex_sub(h, min);
+	Hex diff_max = hex_sub(max, h);
+	Hex diff_cap_min = hex_sub(h, capacity_min);
 	u32 r_spacing = g->r_spacing;
-	i32 q_diff_min = h.q - min.q;
-	i32 q_diff_max = max.q - h.q;
-	i32 r_diff_min = h.r - min.r;
-	i32 r_diff_max = max.r - h.r;
-	i32 q_diff_cap_min = h.q - capacity_min.q;
-	i32 r_diff_cap_min = h.r - capacity_min.r;
-	i32 i = q_diff_cap_min + r_diff_cap_min * r_spacing;
+	i32 i = diff_cap_min.q + diff_cap_min.r * r_spacing;
 
 	assert(datum != NULL);
 
-	if (q_diff_min >= 0 && q_diff_max >= 0 && r_diff_min >= 0 && r_diff_max >= 0) {
+	if (diff_min.q >= 0 && diff_min.r >= 0 && diff_max.q >= 0 && diff_max.r >= 0) {
 		if (g->count == 0) {
 			g->min = h;
 			g->max = h;
@@ -138,24 +131,23 @@ u32 group_set(Group *g, Hex h, void *datum)
 		g->min = h;
 		g->max = h;
 	} else {
-		if (q_diff_min < 0) {
-			g->min.q += q_diff_min;
-		} else if (q_diff_max < 0) {
-			g->max.q -= q_diff_max;
+		if (diff_min.q < 0) {
+			g->min.q += diff_min.q;
+		} else if (diff_max.q < 0) {
+			g->max.q -= diff_max.q;
 		}
 
-		if (r_diff_min < 0) {
-			g->min.r += r_diff_min;
-		} else if (r_diff_max < 0) {
-			g->max.r -= r_diff_max;
+		if (diff_min.r < 0) {
+			g->min.r += diff_min.r;
+		} else if (diff_max.r < 0) {
+			g->max.r -= diff_max.r;
 		}
 	}
 
 	Hex capacity_max = g->capacity_max;
-	i32 q_diff_cap_max = capacity_max.q - h.q;
-	i32 r_diff_cap_max = capacity_max.r - h.r;
+	Hex diff_cap_max = hex_sub(capacity_max, h);
 
-	if (q_diff_cap_min >= 0 && q_diff_cap_max >= 0 && r_diff_cap_min >= 0 && r_diff_cap_max >= 0) {
+	if (diff_cap_min.q >= 0 && diff_cap_min.r >= 0 && diff_cap_max.q >= 0 && diff_cap_max.r >= 0) {
 		old_data[i] = datum;
 		++g->count;
 		return 0;
@@ -168,22 +160,22 @@ u32 group_set(Group *g, Hex h, void *datum)
 	Hex old_capacity_min = capacity_min;
 	u32 old_r_spacing = r_spacing;
 
-	if (q_diff_cap_min < 0) {
-		capacity_min.q += q_diff_cap_min;
+	if (diff_cap_min.q < 0) {
+		capacity_min.q += diff_cap_min.q;
 		diff = capacity_max.q - capacity_min.q + 1;
 		capacity_min.q -= (i32) round(diff * GROUP_CAPACITY_GROWTH_FACTOR);
-	} else if (q_diff_cap_max < 0) {
-		capacity_max.q -= q_diff_cap_max;
+	} else if (diff_cap_max.q < 0) {
+		capacity_max.q -= diff_cap_max.q;
 		diff = capacity_max.q - capacity_min.q + 1;
 		capacity_max.q += (i32) round(diff * GROUP_CAPACITY_GROWTH_FACTOR);
 	}
 
-	if (r_diff_cap_min < 0) {
-		capacity_min.r += r_diff_cap_min;
+	if (diff_cap_min.r < 0) {
+		capacity_min.r += diff_cap_min.r;
 		diff = capacity_max.r - capacity_min.r + 1;
 		capacity_min.r -= (i32) round(diff * GROUP_CAPACITY_GROWTH_FACTOR);
-	} else if (r_diff_cap_max < 0) {
-		capacity_max.r -= r_diff_cap_max;
+	} else if (diff_cap_max.r < 0) {
+		capacity_max.r -= diff_cap_max.r;
 		diff = capacity_max.r - capacity_min.r + 1;
 		capacity_max.r += (i32) round(diff * GROUP_CAPACITY_GROWTH_FACTOR);
 	}
@@ -197,6 +189,7 @@ u32 group_set(Group *g, Hex h, void *datum)
 		i32 i_offset = r_diff * r_spacing - capacity_min.q;
 		i32 old_r_diff = min.r - old_capacity_min.r;
 		i32 old_i_offset = old_r_diff * old_r_spacing - old_capacity_min.q;
+
 		for (i32 q = min.q; q <= max.q; ++q) {
 			data[q + i_offset] = old_data[q + old_i_offset];
 		}
@@ -204,9 +197,8 @@ u32 group_set(Group *g, Hex h, void *datum)
 
 	free(old_data);
 
-	q_diff_cap_min = h.q - capacity_min.q;
-	r_diff_cap_min = h.r - capacity_min.r;
-	i = q_diff_cap_min + r_diff_cap_min * r_spacing;
+	diff_cap_min = hex_sub(h, capacity_min);
+	i = diff_cap_min.q + diff_cap_min.r * r_spacing;
 	data[i] = datum;
 	++g->count;
 	g->data = data;
@@ -221,31 +213,26 @@ u32 group_set(Group *g, Hex h, void *datum)
 // Returns 1 if item existed and was removed, 0 if not
 u8 group_remove(Group *g, Hex h)
 {
-	Hex new_min = EMPTY_GROUP_MIN;
-	Hex new_max = EMPTY_GROUP_MAX;
 	void **data = g->data;
 	Hex min = g->min;
 	Hex max = g->max;
 	Hex capacity_min = g->capacity_min;
+	Hex diff_min = hex_sub(h, min);
+	Hex diff_max = hex_sub(max, h);
+	Hex diff_cap_min = hex_sub(h, capacity_min);
 	u32 count = g->count;
 	u32 r_spacing = g->r_spacing;
-	i32 q_diff_min = h.q - min.q;
-	i32 q_diff_max = max.q - h.q;
-	i32 r_diff_min = h.r - min.r;
-	i32 r_diff_max = max.r - h.r;
-	i32 q_diff_cap_min = h.q - capacity_min.q;
-	i32 r_diff_cap_min = h.r - capacity_min.r;
-	i32 h_i = q_diff_cap_min + r_diff_cap_min * r_spacing;
+	i32 i = diff_cap_min.q + diff_cap_min.r * r_spacing;
 
 	if (
 		count == 0 ||
-		q_diff_min < 0 || q_diff_max < 0 || r_diff_min < 0 || r_diff_max < 0 ||
-		data[h_i] == NULL
+		diff_min.q < 0 || diff_min.r < 0 || diff_max.q < 0 || diff_max.r < 0 ||
+		data[i] == NULL
 	) {
 		return 0;
 	}
 
-	data[h_i] = NULL;
+	data[i] = NULL;
 	g->count = --count;
 
 	if (count == 0) {
@@ -254,10 +241,14 @@ u8 group_remove(Group *g, Hex h)
 		return 1;
 	}
 
-	if (q_diff_min == 0 || q_diff_max == 0 || r_diff_min == 0 || r_diff_max == 0) {
+	if (diff_min.q == 0 || diff_min.r == 0 || diff_max.q == 0 || diff_min.r == 0) {
+		Hex new_min = EMPTY_GROUP_MIN;
+		Hex new_max = EMPTY_GROUP_MAX;
+
 		for (i32 r = min.r; r <= max.r; ++r) {
 			i32 r_diff = r - capacity_min.r;
 			i32 i_offset = r_diff * r_spacing - capacity_min.q;
+
 			for (i32 q = min.q; q <= max.q; ++q) {
 				if (data[q + i_offset] != NULL) {
 					new_max.r = r;
@@ -281,19 +272,37 @@ u8 group_remove(Group *g, Hex h)
 	return 1;
 }
 
+void group_move(Group *g, Hex move_by)
+{
+	i32 q = move_by.q;
+	i32 r = move_by.r;
+
+	g->min.q += q;
+	g->min.r += r;
+	g->max.q += q;
+	g->max.r += r;
+	g->capacity_min.q += q;
+	g->capacity_min.r += r;
+	g->capacity_max.q += q;
+	g->capacity_max.r += r;
+}
+
 u8 group_equal(Group *a, Group *b, GroupCompare compare_fn)
 {
+	u32 a_count = a->count;
+	u32 b_count = b->count;
 	Hex a_min = a->min;
 	Hex b_min = b->min;
-	Hex a_max = a->max;
-	Hex b_max = b->max;
+	Hex a_max_diff = hex_sub(a->max, a_min);
+	Hex b_max_diff = hex_sub(b->max, b_min);
+
+	if (a_count == 0 && b_count == 0) {
+		return 1;
+	}
 
 	if (
 		a->count != b->count ||
-		a_min.q != b_min.q ||
-		a_min.r != b_min.r ||
-		a_max.q != b_max.q ||
-		a_max.r != b_max.r
+		!hex_equal(a_max_diff, b_max_diff)
 	) {
 		return 0;
 	}
@@ -305,14 +314,16 @@ u8 group_equal(Group *a, Group *b, GroupCompare compare_fn)
 	void **a_data = a->data;
 	void **b_data = b->data;
 
-	for (i32 r = a_min.r; r <= a_max.r; ++r) {
-		i32 a_r_diff = r - a_capacity_min.r;
-		i32 b_r_diff = r - b_capacity_min.r;
-		i32 a_i_offset = a_r_diff * a_r_spacing - a_capacity_min.q;
-		i32 b_i_offset = b_r_diff * b_r_spacing - b_capacity_min.q;
-		for (i32 q = a_min.q; q <= a_max.q; ++q) {
+	for (i32 r = 0; r <= a_max_diff.r; ++r) {
+		i32 a_r_diff = r + a_min.r - a_capacity_min.r;
+		i32 b_r_diff = r + b_min.r - b_capacity_min.r;
+		i32 a_i_offset = a_r_diff * a_r_spacing + a_min.q - a_capacity_min.q;
+		i32 b_i_offset = b_r_diff * b_r_spacing + b_min.q - b_capacity_min.q;
+
+		for (i32 q = 0; q <= a_max_diff.q; ++q) {
 			void *a = a_data[q + a_i_offset];
 			void *b = b_data[q + b_i_offset];
+
 			if (a != NULL && b != NULL) {
 				if (compare_fn(a, b) != 0) {
 					return 0;
@@ -324,4 +335,26 @@ u8 group_equal(Group *a, Group *b, GroupCompare compare_fn)
 	}
 
 	return 1;
+}
+
+void group_each(Group *g, void *context, GroupEach each_fn)
+{
+	void **data = g->data;
+	Hex min = g->min;
+	Hex max = g->max;
+	Hex capacity_min = g->capacity_min;
+	u32 r_spacing = g->r_spacing;
+
+	for (i32 r = min.r; r <= max.r; ++r) {
+		i32 r_diff = r - capacity_min.r;
+		i32 i_offset = r_diff * r_spacing - capacity_min.q;
+
+		for (i32 q = min.q; q <= max.q; ++q) {
+			void *datum = data[q + i_offset];
+			if (datum != NULL) {
+				Hex h = {.q = q, .r = r};
+				each_fn(context, h, datum);
+			}
+		}
+	}
 }

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "test.h"
 #include "group.c"
+#include "hex.c"
 
 #define _hx(h) _dd(h.q, h.r)
 
@@ -310,35 +311,66 @@ TEST(group_remove)
 	group_destroy(g);
 }
 
+TEST(group_move)
+{
+	TestData td = {.d = 1};
+	Hex capacity_min = {.q = -2, .r = 5};
+	Hex capacity_max = {.q = 4, .r = 8};
+	Hex h = {.q = 3, .r = 6};
+	Hex move_by = {.q = -2, .r = -4};
+	Group *g = group_create(capacity_min, capacity_max);
+
+	group_set(g, h, &td);
+
+	_hx(g->min);
+	//=> 3, 6
+	_hx(g->max);
+	//=> 3, 6
+
+	group_move(g, move_by);
+
+	_hx(g->min);
+	//=> 1, 2
+	_hx(g->max);
+	//=> 1, 2
+	_hx(g->capacity_min);
+	//=> -4, 1
+	_hx(g->capacity_max);
+	//=> 2, 4
+
+	_d(group_get(g, h) == NULL);
+	//=> 1
+
+	h.q += move_by.q;
+	h.r += move_by.r;
+	_d(group_get(g, h) == &td);
+	//=> 1
+
+	group_destroy(g);
+}
+
 TEST(group_equal)
 {
 	TestData td1 = {.d = 42};
 	TestData td2 = {.d = -1234};
 	Hex h1 = {.q = -1, .r = -1};
 	Hex h2 = {.q = 1, .r = 1};
+	Hex h3 = {.q = 3, .r = -1};
+	Hex move_by = {.q = 4, .r = -2};
 	Hex a_capacity_min = {.q = -2, .r = -1};
 	Hex b_capacity_min = {.q = -5, .r = 0};
 	Hex capacity_max = {.q = 2, .r = 1};
 	Group *a = group_create(a_capacity_min, capacity_max);
 	Group *b = group_create(b_capacity_min, capacity_max);
 
-	_hx(a->min);
-	//=> -2, -1
-	_hx(b->min);
-	//=> -5, 0
-
-	// Different min/max
+	// Empty groups
 	_d(group_equal(a, b, test_compare_data));
-	//=> 0
+	//=> 1
 
 	group_set(a, h1, &td1);
 	group_set(b, h1, &td1);
 
-	_hx(a->min);
-	//=> -1, -1
-	_hx(b->min);
-	//=> -1, -1
-
+	// Equal (count = 1)
 	_d(group_equal(a, b, test_compare_data));
 	//=> 1
 
@@ -350,9 +382,26 @@ TEST(group_equal)
 
 	group_set(b, h2, &td2);
 
+	// Equal (count = 2)
 	_d(group_equal(a, b, &test_compare_data));
 	//=> 1
 
+	group_move(b, move_by);
+
+	// Equal regardless of translation
+	_d(group_equal(a, b, &test_compare_data));
+	//=> 1
+
+	group_move(b, hex_sub(hex_zero, move_by));
+
+	group_remove(b, h2);
+	group_set(b, h3, &td2);
+
+	// Different size (max - min)
+	_d(group_equal(a, b, &test_compare_data));
+	//=> 0
+
+	group_remove(b, h3);
 	group_set(b, h2, &td1);
 
 	// Different value
@@ -361,7 +410,7 @@ TEST(group_equal)
 
 	group_remove(b, h1);
 	group_remove(b, h2);
-	h1.q = 1;
+	h1.q = 1;  // swap h1, h2
 	h2.q = -1;
 	group_set(b, h1, &td1);
 	group_set(b, h2, &td2);
@@ -376,4 +425,34 @@ TEST(group_equal)
 
 	group_destroy(a);
 	group_destroy(b);
+}
+
+void test_group_each_fn(void *context, Hex h, void *datum)
+{
+	Group *result_g = (Group *) context;
+
+	group_set(result_g, h, datum);
+}
+
+TEST(group_each)
+{
+	TestData td1 = {.d = 42};
+	TestData td2 = {.d = -1234};
+	Hex h1 = {.q = -1, .r = -1};
+	Hex h2 = {.q = 1, .r = 1};
+	Group *g = group_create(h1, h2);
+	Group *result_g = group_create(hex_zero, hex_zero);
+	
+	group_set(g, h1, &td1);
+	group_set(g, h2, &td2);
+
+	group_each(g, result_g, test_group_each_fn);
+
+	_d(group_get(result_g, h1) == &td1);
+	//=> 1
+	_d(group_get(result_g, h2) == &td2);
+	//=> 1
+
+	group_destroy(g);
+	group_destroy(result_g);
 }

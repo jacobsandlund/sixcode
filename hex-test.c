@@ -11,11 +11,17 @@ TEST(hex)
 	//=> 1, 2
 }
 
+TEST(hex_zero)
+{
+	_hx(hex_zero);
+	//=> 0, 0
+}
+
 TEST(frac_hex)
 {
 	FloatHex fh = {.q = 1.001, .r = 2.98};
 	_fh(fh);
-	//=> 1.00099, 2.97999
+	//=> 1.001, 2.98
 }
 
 TEST(hex_s)
@@ -50,11 +56,11 @@ TEST(hex_add)
 	//=> 4, -10
 }
 
-TEST(hex_subtract)
+TEST(hex_sub)
 {
 	Hex a = {.q = 1, .r = -3};
 	Hex b = {.q = 3, .r = -7};
-	_hx(hex_subtract(a, b));
+	_hx(hex_sub(a, b));
 	//=> -2, 4
 }
 
@@ -80,10 +86,9 @@ TEST(hex_distance)
 {
 	Hex a = {.q = 3, .r = -7};
 	Hex b = {.q = -1, .r = -4};
-	Hex zero = {.q = 0, .r = 0};
 	_g(hex_distance(a, b));
 	//=> 4
-	_g(hex_distance(hex_subtract(a, b), zero));
+	_g(hex_distance(hex_sub(a, b), hex_zero));
 	//=> 4
 }	
 

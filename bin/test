@@ -3,6 +3,9 @@
 if [ "$#" -eq 1 ]; then
     bin/run $1 && git diff --exit-code -- $1
 else
-    find . -name '*-test.c' | xargs -n 1 bin/run
+    for test_file in $(find . -name '*-test.c'); do
+        echo ./sixc run $test_file
+        bin/run $test_file
+    done
     git diff --exit-code -- *-test.c
 fi

@@ -10,9 +10,9 @@ If you are using Vim, the following `.vimrc` lines add a keyboard shortcut (`<le
 
 ``` vim
 " Sixcode configs:
-command -nargs=0 RunSixcode execute 'silent !./sixc run % || read -n1 -r -p "... Press any key to continue"' | redraw!
+command -nargs=0 RunSixcode execute 'silent !./sixc run % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
 nnoremap <leader>r :w<CR>:RunSixcode<CR>:e!<CR>
 
-command -nargs=0 GitDiff execute 'silent !git --no-pager diff --exit-code -- % || read -n1 -r -p "... Press any key to continue"' | redraw!
+command -nargs=0 GitDiff execute 'silent !git --no-pager diff --exit-code -- % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
 nnoremap <leader>d :w<CR>:GitDiff<CR>
 ```

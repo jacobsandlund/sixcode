@@ -22,7 +22,7 @@ typedef struct {
 //    1: a > b
 typedef i8 (*GroupCompare)(void *a, void *b);
 
-typedef void (*GroupEach)(Hex h, void *datum);
+typedef void (*GroupEach)(void *context, Hex h, void *datum);
 
 Group *group_create(Hex capacity_min, Hex capacity_max);
 void group_destroy(Group *g);
@@ -35,9 +35,11 @@ u32 group_set(Group *g, Hex h, void *datum);
 // Returns 1 if item existed and was removed, 0 if not
 u8 group_remove(Group *g, Hex h);
 
+void group_move(Group *g, Hex move_by);
+
 // Returns 1 if equal, 0 if not
 u8 group_equal(Group *a, Group *b, GroupCompare compare_fn);
 
-void group_each(Group *a, GroupEach each_fn);
+void group_each(Group *g, void *context, GroupEach each_fn);
 
 #endif // __GROUP_H__
