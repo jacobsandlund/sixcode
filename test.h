@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "valgrind.h"
 
 #define _(...) log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)
@@ -327,7 +328,7 @@ int main()
 
 		contents_new[j] = '\0';
 
-		if (strcmp(file_info->contents, contents_new) != 0) {
+		if (strcmp(file_info->contents, contents_new) != 0 && !RUNNING_ON_VALGRIND) {
 			const char *filename = file_info->name;
 			FILE *file = fopen(filename, "w");
 
@@ -339,6 +340,10 @@ int main()
 			if (fputs(contents_new, file) == EOF) {
 				fprintf(stderr, "Error writing file: %s - %s\n", filename, strerror(errno));
 				return 1;
+			}
+
+			if (fclose(file) != 0) {
+				fprintf(stderr, "Error closing file: %s - %s\n", filename, strerror(errno));
 			}
 		}
 
