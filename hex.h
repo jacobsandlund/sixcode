@@ -20,7 +20,7 @@ u8 hex_equal(Hex a, Hex b);
 Hex hex_add(Hex a, Hex b);
 Hex hex_sub(Hex a, Hex b);
 Hex hex_neighbor(Hex h, u8 direction);
-f64 hex_distance(Hex a, Hex b);
+u32 hex_distance(Hex a, Hex b);
 FloatHex hex_lerp(Hex a, Hex b, f64 t);
 Hex hex_round(FloatHex fh);
 

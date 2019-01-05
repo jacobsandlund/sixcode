@@ -42,9 +42,9 @@ Hex hex_neighbor(Hex h, u8 direction)
 	return hex_add(h, directions[direction]);
 }
 
-f64 hex_distance(Hex a, Hex b)
+u32 hex_distance(Hex a, Hex b)
 {
-	return (f64) (abs(a.q - b.q) + abs(a.r - b.r) + abs(-a.q - a.r + b.q + b.r)) / 2.0;
+	return (u32) (abs(a.q - b.q) + abs(a.r - b.r) + abs(-a.q - a.r + b.q + b.r)) / 2;
 }
 
 FloatHex hex_lerp(Hex a, Hex b, f64 t)

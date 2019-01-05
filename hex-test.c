@@ -86,10 +86,13 @@ TEST(hex_distance)
 {
 	Hex a = {.q = 3, .r = -7};
 	Hex b = {.q = -1, .r = -4};
-	_g(hex_distance(a, b));
+	Hex c = {.q = 2, .r = 4};
+	_d(hex_distance(a, b));
 	//=> 4
-	_g(hex_distance(hex_sub(a, b), hex_zero));
+	_d(hex_distance(hex_sub(a, b), hex_zero));
 	//=> 4
+	_d(hex_distance(a, c));
+	//=> 11
 }	
 
 TEST(hex_lerp)
