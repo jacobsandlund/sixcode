@@ -3,7 +3,7 @@
 #include <math.h>
 #include "hex.h"
 
-const Hex hex_zero = {.q = 0, .r = 0};
+const Hex HEX_ZERO = {.q = 0, .r = 0};
 
 i32 hex_s(Hex h)
 {
@@ -44,7 +44,7 @@ Hex hex_neighbor(Hex h, u8 direction)
 
 u32 hex_distance(Hex a, Hex b)
 {
-	return (u32) (abs(a.q - b.q) + abs(a.r - b.r) + abs(-a.q - a.r + b.q + b.r)) / 2;
+	return (u32) (abs(a.q - b.q) + abs(a.r - b.r) + abs(hex_s(a) - hex_s(b))) / 2;
 }
 
 FloatHex hex_lerp(Hex a, Hex b, f64 t)

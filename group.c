@@ -2,15 +2,18 @@
 #include <stdlib.h>
 #include "group.h"
 
-Group *group_create(u32 capacity)
+Group *group_create(u32 cluster_capacity)
 {
 	Group *g = malloc(sizeof *g);
 
-	assert(capacity > 0);
+	assert(cluster_capacity > 0);
 
-	g->count = 0;
-	g->capacity = capacity;
-	g->clusters = calloc(capacity, sizeof *g->clusters);
+	g->cluster_count = 0;
+	g->cluster_capacity = cluster_capacity;
+	g->clusters = calloc(cluster_capacity, sizeof *g->clusters);
+
+	// TODO
+	g->clusters[0] = cluster_create(AREA_ZERO);
 
 	return g;
 }
@@ -21,55 +24,58 @@ void group_destroy(Group *g)
 	free(g);
 }
 
-void group_add_cluster(Group *g, Cluster *c)
+void *group_get(Group *g, Hex h)
 {
-	u32 count = g->count;
-	u32 capacity = g->capacity;
-	Cluster **clusters = g->clusters;
-
-	if (count + 1 > capacity) {
-		Cluster **new_clusters;
-		capacity *= 2;
-		new_clusters = malloc(capacity * sizeof *new_clusters);
-
-		for (u32 i = 0; i < count; ++i) {
-			new_clusters[i] = clusters[i];
-		}
-
-		free(clusters);
-		clusters = g->clusters = new_clusters;
-		g->capacity = capacity;
-	}
-
-	clusters[count] = c;
-	g->count = count + 1;
+	return cluster_get(g->clusters[0], h);
 }
 
-Cluster *group_nearest_cluster(Group *g, Hex h)
+void group_set(Group *g, Hex h, void *datum)
 {
-	Cluster **clusters = g->clusters;
-	u32 count = g->count;
-	u32 shortest_distance = I32_MAX;
-	Cluster *nearest_cluster = NULL;
+	cluster_set(g->clusters[0], h, datum);
+}
 
-	for (u32 i = 0; i < count; ++i) {
-		Cluster *c = clusters[i];
-		u32 distance = cluster_distance(c, h);
-		if (distance < shortest_distance) {
-			shortest_distance = distance;
-			nearest_cluster = c;
+u8 group_remove(Group *g, Hex h)
+{
+	return cluster_remove(g->clusters[0], h);
+}
+
+u32 group_hex_count(Group *g)
+{
+	Area a = g->clusters[0]->area;
+	Area capacity_area = g->clusters[0]->capacity_area;
+	void **data = g->clusters[0]->data;
+	u32 hex_count = 0;
+
+	for (i32 r = a.min.r; r <= a.max.r; ++r) {
+		for (i32 q = a.min.q; q <= a.max.q; ++q) {
+			Hex h = {.q = q, .r = r};
+			i32 i = area_index(capacity_area, h);
+			void *datum = data[i];
+
+			if (datum != NULL) {
+				++hex_count;
+			}
 		}
 	}
 
-	return nearest_cluster;
+	return hex_count;
 }
 
-void group_each_cluster(Group *g, void *context, GroupEach each_fn)
+void group_each(Group *g, void *context, GroupEach each_fn)
 {
-	Cluster **clusters = g->clusters;
-	u32 count = g->count;
+	Area a = g->clusters[0]->area;
+	Area capacity_area = g->clusters[0]->capacity_area;
+	void **data = g->clusters[0]->data;
 
-	for (u32 i = 0; i < count; ++i) {
-		each_fn(context, clusters[i]);
+	for (i32 r = a.min.r; r <= a.max.r; ++r) {
+		for (i32 q = a.min.q; q <= a.max.q; ++q) {
+			Hex h = {.q = q, .r = r};
+			i32 i = area_index(capacity_area, h);
+			void *datum = data[i];
+
+			if (datum != NULL) {
+				each_fn(context, h, datum);
+			}
+		}
 	}
 }

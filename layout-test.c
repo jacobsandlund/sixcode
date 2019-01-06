@@ -50,36 +50,32 @@ TEST(layout_flat)
 	//=> 0
 }
 
-TEST(layout)
+TEST(layout_create)
 {
-	Point size = {.x = 15, .y = 20};
+	f64 scale = 20.0;
 	Point origin = {.x = 100, .y = 250};
-	Layout l = {
-		.orientation = LAYOUT_POINTY,
-		.size = size,
-		.origin = origin,
-	};
+	Layout *l = layout_create(LAYOUT_POINTY, scale, origin);
 
-	_g(l.orientation.start_angle);
+	_g(l->orientation.start_angle);
 	//=> 0.5
-	_f(l.orientation.f[0]);
+	_f(l->orientation.f[0]);
 	//=> 1.732051
-	_pt(l.size);
-	//=> 15, 20
-	_pt(l.origin);
+	_g(l->scale);
+	//=> 20
+	_pt(l->origin);
 	//=> 100, 250
 }
 
 TEST(layout_hex_to_point)
 {
-	Point size = {.x = 10, .y = 20};
+	f64 scale = 10;
 	Point origin = {.x = 100, .y = 200};
-	Layout l = {.orientation = LAYOUT_POINTY, .size = size, .origin = origin};
+	Layout l = {.orientation = LAYOUT_POINTY, .scale = scale, .origin = origin};
 	Hex h = {.q = 3, .r = 4};
 	Point p = layout_hex_to_point(&l, h);
 
 	_pt(p);
-	//=> 186.603, 320
+	//=> 186.603, 260
 	_("%.14f", p.x);
 	//=> 186.60254037844385
 
@@ -93,56 +89,67 @@ TEST(layout_hex_to_point)
 	//=> 320.000000
 }
 
-TEST(layout_point_to_hex)
+TEST(layout_point_to_float_hex)
 {
-	Point size = {.x = 10, .y = 20};
+	f64 scale = 10;
 	Point origin = {.x = 100, .y = 200};
-	Layout l = {.orientation = LAYOUT_POINTY, .size = size, .origin = origin};
+	Layout l = {.orientation = LAYOUT_POINTY, .scale = scale, .origin = origin};
 	Point p = {.x = 186.6, .y = 320};
-	FloatHex fh = layout_point_to_hex(&l, p);
+	FloatHex fh = layout_point_to_float_hex(&l, p);
 
 	_gg(fh.q, fh.r);
-	//=> 2.99985, 4
+	//=> 0.999853, 8
 
 	_hx(hex_round(fh));
-	//=> 3, 4
+	//=> 1, 8
+}
+
+TEST(layout_point_to_hex)
+{
+	f64 scale = 10;
+	Point origin = {.x = 100, .y = 200};
+	Layout l = {.orientation = LAYOUT_POINTY, .scale = scale, .origin = origin};
+	Point p = {.x = 186.6, .y = 320};
+
+	_hx(layout_point_to_hex(&l, p));
+	//=> 1, 8
 }
 
 TEST(point_to_hex_roundtrips)
 {
-	Point size = {.x = 10, .y = 15};
+	f64 scale = 10;
 	Point origin = {.x = 35, .y = 71};
-	Layout pointy = {.orientation = LAYOUT_POINTY, .size = size, .origin = origin};
-	Layout flat = {.orientation = LAYOUT_FLAT, .size = size, .origin = origin};
+	Layout pointy = {.orientation = LAYOUT_POINTY, .scale = scale, .origin = origin};
+	Layout flat = {.orientation = LAYOUT_FLAT, .scale = scale, .origin = origin};
 	Hex h = {.q = 3, .r = 4};
 
-	_d(hex_equal(hex_round(layout_point_to_hex(&pointy, layout_hex_to_point(&pointy, h))), h));
+	_d(hex_equal(layout_point_to_hex(&pointy, layout_hex_to_point(&pointy, h)), h));
 	//=> 1
 
-	_d(hex_equal(hex_round(layout_point_to_hex(&flat, layout_hex_to_point(&flat, h))), h));
+	_d(hex_equal(layout_point_to_hex(&flat, layout_hex_to_point(&flat, h)), h));
 	//=> 1
 }
 
 TEST(layout_hex_corners)
 {
 	Point corners[6];
-	Point size = {.x = 10, .y = 20};
+	f64 scale = 10;
 	Point origin = {.x = 100, .y = 200};
-	Layout l = {.orientation = LAYOUT_POINTY, .size = size, .origin = origin};
+	Layout l = {.orientation = LAYOUT_POINTY, .scale = scale, .origin = origin};
 	Hex h = {.q = 3, .r = 4};
 
 	_pt(layout_hex_corners(corners, &l, h)[0]);
-	//=> 195.263, 330
+	//=> 195.263, 265
 	_pt(corners[0]);
-	//=> 195.263, 330
+	//=> 195.263, 265
 	_pt(corners[1]);
-	//=> 195.263, 310
+	//=> 195.263, 255
 	_pt(corners[2]);
-	//=> 186.603, 300
+	//=> 186.603, 250
 	_pt(corners[3]);
-	//=> 177.942, 310
+	//=> 177.942, 255
 	_pt(corners[4]);
-	//=> 177.942, 330
+	//=> 177.942, 265
 	_pt(corners[5]);
-	//=> 186.603, 340
+	//=> 186.603, 270
 }

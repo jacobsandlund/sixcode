@@ -13,7 +13,7 @@ typedef struct {
 	f64 r;
 } FloatHex;
 
-extern const Hex hex_zero;
+extern const Hex HEX_ZERO;
 
 i32 hex_s(Hex h);
 u8 hex_equal(Hex a, Hex b);

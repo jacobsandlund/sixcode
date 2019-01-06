@@ -13,7 +13,7 @@ TEST(hex)
 
 TEST(hex_zero)
 {
-	_hx(hex_zero);
+	_hx(HEX_ZERO);
 	//=> 0, 0
 }
 
@@ -89,7 +89,7 @@ TEST(hex_distance)
 	Hex c = {.q = 2, .r = 4};
 	_d(hex_distance(a, b));
 	//=> 4
-	_d(hex_distance(hex_sub(a, b), hex_zero));
+	_d(hex_distance(hex_sub(a, b), HEX_ZERO));
 	//=> 4
 	_d(hex_distance(a, c));
 	//=> 11
