@@ -29,11 +29,10 @@ static void mesh_generate_each_hex(void *context, Hex h, void *datum) {
 	m->point_count += 6;
 }
 
-u32 mesh_generate_hexes(Mesh *m, Layout *l, Group *g)
+u32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
 	MeshEachHexContext c = {.m = m, .l = l};
-	u32 hex_count = group_hex_count(g);
-	u32 point_count = hex_count * 6;
+	u32 point_count = g->data_count * 6;
 
 	if (point_count > m->point_count) {
 		free(m->points);
@@ -43,7 +42,7 @@ u32 mesh_generate_hexes(Mesh *m, Layout *l, Group *g)
 
 	m->point_count = 0;
 
-	group_each(g, &c, mesh_generate_each_hex);
+	grid_each(g, &c, mesh_generate_each_hex);
 
 	return point_count;
 }

@@ -2,9 +2,8 @@
 #include "mesh.c"
 #include "point.c"
 #include "layout.c"
-#include "group.c"
-#include "area.c"
-#include "cluster.c"
+#include "grid.c"
+#include "quad.c"
 #include "hex.c"
 
 TEST(mesh_create)

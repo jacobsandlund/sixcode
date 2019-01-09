@@ -1,11 +1,3 @@
 #!/bin/bash -e
 
-if [ "$#" -eq 1 ]; then
-    bin/run $1 && git diff --exit-code -- $1
-else
-    for test_file in $(find . -name '*-test.c'); do
-        echo ./sixc run $test_file
-        bin/run $test_file
-    done
-    git diff --exit-code -- *-test.c
-fi
+docker exec -it sixcode bin/test "$@"

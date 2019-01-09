@@ -16,9 +16,9 @@ EXPORT_JS void js_layout_set_origin(Layout *l, f64 origin_x, f64 origin_y) {
 }
 
 
-EXPORT_JS Group *js_group_create(u32 cluster_capacity)
+EXPORT_JS Grid *js_grid_create()
 {
-	return group_create(cluster_capacity);
+	return grid_create(QUAD_ZERO);
 }
 
 
@@ -32,13 +32,13 @@ EXPORT_JS Point *js_mesh_points(Mesh *m)
 	return m->points;
 }
 
-EXPORT_JS u32 js_mesh_generate_hexes(Mesh *m, Layout *l, Group *g)
+EXPORT_JS u32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
 	return mesh_generate_hexes(m, l, g);
 }
 
 
-EXPORT_JS void js_core_toggle_hex_at_point(Layout *l, Group *g, f64 point_x, f64 point_y)
+EXPORT_JS void js_core_toggle_hex_at_point(Layout *l, Grid *g, f64 point_x, f64 point_y)
 {
 	Point p = {.x = point_x, .y = point_y};
 	core_toggle_hex_at_point(l, g, p);

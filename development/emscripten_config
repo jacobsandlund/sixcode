@@ -1,0 +1,10 @@
+EMSCRIPTEN_ROOT = '/emscripten/emscripten'
+LLVM_ROOT = '/usr/local/bin'
+BINARYEN_ROOT = '/usr/local'
+NODE_JS = '/usr/bin/nodejs'
+SPIDERMONKEY_ENGINE = ''
+V8_ENGINE = ''
+JAVA = 'java'
+TEMP_DIR = '/tmp'
+COMPILER_ENGINE = NODE_JS
+JS_ENGINES = [NODE_JS]

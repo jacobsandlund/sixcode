@@ -1,2 +1,0 @@
-./sixc valgrind ./group-test.c
-

@@ -3,20 +3,14 @@ let ctx = canvas.getContext('2d');
 
 const SCALE = 20;
 
-//let l = layout.create(
-//    layout.Pointy,
-//    point.create(20, 20),
-//    point.create(0, 0),
-//);
-
-let l;
-let g;
-let m;
+let layout;
+let grid;
+let mesh;
 
 function core_initialized() {
-    l = Module._js_layout_create(SCALE, 0, 0);
-    g = Module._js_group_create(1);
-    m = Module._js_mesh_create(60);
+    layout = Module._js_layout_create(SCALE, 0, 0);
+    grid = Module._js_grid_create(1);
+    mesh = Module._js_mesh_create(60);
 
     resize();
 }
@@ -45,9 +39,9 @@ function draw() {
     ctx.fillStyle = 'rgb(' + 244 + ',' + 244 + ',' + 255 + ')';
     ctx.strokeStyle = 'rgb(' + 190 + ',' + 190 + ',' + 190 + ')';
 
-    let point_count = Module._js_mesh_generate_hexes(m, l, g);
+    let point_count = Module._js_mesh_generate_hexes(mesh, layout, grid);
     console.log(point_count);
-    let points = Module._js_mesh_points(m);
+    let points = Module._js_mesh_points(mesh);
 
     for (let p = 0; p < point_count; p += 6) {
         ctx.beginPath();
@@ -63,23 +57,6 @@ function draw() {
         ctx.fill();
     }
 
-//    for (let h of hexes) {
-//        layout.hexCorners(corners, l, h);
-//
-//        let corner = corners[0];
-//        ctx.beginPath();
-//        ctx.moveTo(corner.x, corner.y);
-//
-//        for (let i = 1; i < 6; i++) {
-//            corner = corners[i];
-//            ctx.lineTo(corner.x, corner.y);
-//        }
-//
-//        ctx.closePath();
-//        ctx.stroke();
-//        ctx.fill();
-//    }
-
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');
 }
@@ -88,7 +65,7 @@ function click(e) {
     let x = e.clientX * window.devicePixelRatio;
     let y = e.clientY * window.devicePixelRatio;
 
-    Module._js_core_toggle_hex_at_point(l, g, x, y);
+    Module._js_core_toggle_hex_at_point(layout, grid, x, y);
 
     draw();
 }

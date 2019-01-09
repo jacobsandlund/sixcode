@@ -4,7 +4,7 @@
 #include "sixcode.h"
 #include "point.h"
 #include "layout.h"
-#include "group.h"
+#include "grid.h"
 
 typedef struct {
 	Point *points;
@@ -13,6 +13,6 @@ typedef struct {
 } Mesh;
 
 Mesh *mesh_create(u32 point_capacity);
-u32 mesh_generate_hexes(Mesh *m, Layout *l, Group *g);
+u32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g);
 
 #endif // __MESH_H__

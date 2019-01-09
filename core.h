@@ -5,10 +5,10 @@
 #include "hex.h"
 #include "point.h"
 #include "layout.h"
-#include "cluster.h"
-#include "group.h"
+#include "grid.h"
+#include "quad.h"
 #include "mesh.h"
 
-void core_toggle_hex_at_point(Layout *l, Group *g, Point p);
+void core_toggle_hex_at_point(Layout *l, Grid *g, Point p);
 
 #endif // __CORE_H__

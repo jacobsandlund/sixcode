@@ -1,4 +1,4 @@
-./sixc valgrind ./cluster-test.c
+bin/valgrind ./grid-test.c
 
 Memcheck, a memory error detector
 Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
@@ -7,12 +7,12 @@ Command: ./a.out
 
 
 HEAP SUMMARY:
-    in use at exit: 48 bytes in 1 blocks
-  total heap usage: 272 allocs, 271 frees, 37,769 bytes allocated
+    in use at exit: 624 bytes in 5 blocks
+  total heap usage: 292 allocs, 287 frees, 40,827 bytes allocated
 
 LEAK SUMMARY:
-   definitely lost: 0 bytes in 0 blocks
-   indirectly lost: 0 bytes in 0 blocks
+   definitely lost: 96 bytes in 2 blocks
+   indirectly lost: 480 bytes in 2 blocks
      possibly lost: 0 bytes in 0 blocks
    still reachable: 48 bytes in 1 blocks
         suppressed: 0 bytes in 0 blocks
