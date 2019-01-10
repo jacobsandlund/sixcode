@@ -1,3 +1,4 @@
 node_modules/
 web/core.js
 web/core.wasm
+*.o

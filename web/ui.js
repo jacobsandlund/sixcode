@@ -9,7 +9,7 @@ let mesh;
 
 function core_initialized() {
     layout = Module._js_layout_create(SCALE, 0, 0);
-    grid = Module._js_grid_create(1);
+    grid = Module._js_grid_create();
     mesh = Module._js_mesh_create(60);
 
     resize();
@@ -39,18 +39,19 @@ function draw() {
     ctx.fillStyle = 'rgb(' + 244 + ',' + 244 + ',' + 255 + ')';
     ctx.strokeStyle = 'rgb(' + 190 + ',' + 190 + ',' + 190 + ')';
 
-    let point_count = Module._js_mesh_generate_hexes(mesh, layout, grid);
-    console.log(point_count);
+    let hex_count = Module._js_mesh_generate_hexes(mesh, layout, grid);
     let points = Module._js_mesh_points(mesh);
+    let ptr = points / 8;
 
-    for (let p = 0; p < point_count; p += 6) {
+    for (let h = 0; h < hex_count; ++h) {
         ctx.beginPath();
-        let ptr = (points + (p * 16)) / 8;
         ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
         for (let i = 1; i < 6; ++i) {
-            let ptr = (points + (p + i) * 16) / 8;
+            ptr += 2;
             ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
         }
+
+        ptr += 2;
 
         ctx.closePath();
         ctx.stroke();

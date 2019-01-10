@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 #include "layout.h"
 
 #define SQRT_3 1.7320508075688772
@@ -44,6 +45,11 @@ Layout *layout_create(Orientation orientation, f64 scale, Point origin)
 	l->origin = origin;
 
 	return l;
+}
+
+void layout_destroy(Layout *l)
+{
+	free(l);
 }
 
 Point layout_hex_to_point(Layout *l, Hex h)

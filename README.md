@@ -13,6 +13,6 @@ If you are using Vim, the following `.vimrc` lines add a keyboard shortcut (`<le
 command -nargs=0 RunSixcode execute 'silent !bin/run % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
 nnoremap <leader>r :w<CR>:RunSixcode<CR>:e!<CR>
 
-command -nargs=0 GitAddPatch execute 'silent !git add --patch -- %' | redraw!
+command -nargs=0 GitAddPatch execute 'silent !git add --intent-to-add -- % && git add --patch -- %' | redraw!
 nnoremap <leader>a :w<CR>:GitAddPatch<CR>
 ```

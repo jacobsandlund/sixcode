@@ -2,13 +2,8 @@
 #include "quad.c"
 #include "hex.c"
 
+#define _hx(h) _dd(h.q, h.r)
 #define _qd(qd) _("(%d, %d), (%d, %d)\n", qd.min.q, qd.min.r, qd.max.q, qd.max.r);
-
-TEST(quad_zero)
-{
-	_qd(QUAD_ZERO);
-	//=> (0, 0), (0, 0)
-}
 
 TEST(quad_contains)
 {
@@ -86,46 +81,6 @@ TEST(quad_on_edge)
 }
 
 
-TEST(quad_distance)
-{
-	Quad qd = {
-		.min = {.q = -4, .r = 2},
-		.max = {.q = 7, .r = 3},
-	};
-	Hex h = {.q = -4, .r = 3};
-
-	_d(quad_distance(qd, h));
-	//=> 0
-
-	h.q = -5;
-	_d(quad_distance(qd, h));
-	//=> 1
-
-	h.q = 11;
-	_d(quad_distance(qd, h));
-	//=> 4
-
-	h.q = 0; h.r = -1;
-	_d(quad_distance(qd, h));
-	//=> 3
-
-	h.r = 8;
-	_d(quad_distance(qd, h));
-	//=> 5
-
-	h.q = -5; h.r = -1;
-	_d(quad_distance(qd, h));
-	//=> 3
-
-	h.q = 11; h.r = -1;
-	_d(quad_distance(qd, h));
-	//=> 4
-
-	h.q = 11; h.r = 8;
-	_d(quad_distance(qd, h));
-	//=> 5
-}
-
 TEST(quad_index)
 {
 	Quad qd = {
@@ -162,6 +117,43 @@ TEST(quad_capacity)
 	//=> 1
 }
 
+TEST(quad_size)
+{
+       Quad qd = {
+               .min = {.q = -4, .r = 2},
+               .max = {.q = 7, .r = 3},
+       };
+
+       _hx(quad_size(qd));
+	//=> 12, 2
+       //=> 12, 2
+}
+
+TEST(quad_empty)
+{
+	Quad qd = {
+		.min = {.q = 0, .r = 0},
+		.max = {.q = 1, .r = 1},
+	};
+
+	_qd(QUAD_EMPTY);
+	//=> (1073741824, 1073741824), (-1073741824, -1073741824)
+
+	_d(quad_empty(qd));
+	//=> 0
+	_d(quad_empty(QUAD_EMPTY));
+	//=> 1
+
+	qd.max.q = -1;
+	_d(quad_empty(qd));
+	//=> 1
+
+	qd.max.q = 1;
+	qd.max.r = -1;
+	_d(quad_empty(qd));
+	//=> 1
+}
+
 TEST(quad_expand)
 {
 	Quad qd = {
@@ -174,15 +166,34 @@ TEST(quad_expand)
 	_qd(qd);
 	//=> (0, 0), (2, 1)
 
-	_qd(quad_expand(qd, h1, 0.0));
+	_qd(quad_expand(qd, h1));
 	//=> (-1, 0), (2, 1)
-	_qd(quad_expand(qd, h1, 0.2));
-	//=> (-2, 0), (2, 1)
-
-	_qd(quad_expand(qd, h2, 0.0));
+	_qd(quad_expand(qd, h2));
 	//=> (0, 0), (9, 2)
-	_qd(quad_expand(qd, h2, 0.06));
-	//=> (0, 0), (10, 2)
+
+	_qd(quad_expand(QUAD_EMPTY, h1));
+	//=> (-1, 0), (-1, 0)
+}
+
+TEST(quad_capacity_quad)
+{
+	Quad qd = {
+		.min = {.q = -2, .r = 3},
+		.max = {.q = 4, .r = 5},
+	};
+	Hex extra_capacity = {.q = 2, .r = 1};
+
+	_hx(quad_size(qd));
+	//=> 7, 3
+
+	_qd(quad_capacity_quad(qd, extra_capacity, 0.0));
+	//=> (-4, 2), (6, 6)
+
+	_g(quad_size(qd).q * 0.3);
+	//=> 2.1
+
+	_qd(quad_capacity_quad(qd, extra_capacity, 0.3));
+	//=> (-6, 1), (8, 7)
 }
 
 TEST(quad_move)
@@ -195,31 +206,4 @@ TEST(quad_move)
 
 	_qd(quad_move(qd, move_by));
 	//=> (-1, 7), (1, 8)
-}
-
-TEST(quad_equal)
-{
-	Quad qd = {
-		.min = {.q = -2, .r = 2},
-		.max = {.q = 3, .r = 4},
-	};
-	Quad b = {
-		.min = {.q = -8, .r = 0},
-		.max = {.q = 9, .r = 4},
-	};
-
-	_d(quad_equal(qd, b));
-	//=> 0
-
-	b.min = qd.min;
-	_d(quad_equal(qd, b));
-	//=> 0
-
-	b.max = qd.max;
-	_d(quad_equal(qd, b));
-	//=> 1
-
-	b.min.q = -8;
-	_d(quad_equal(qd, b));
-	//=> 0
 }

@@ -1,4 +1,4 @@
-bin/valgrind point-test.c
+bin/valgrind interface-js-test.c
 
 Memcheck, a memory error detector
 Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
@@ -8,7 +8,7 @@ Command: ./a.out
 
 HEAP SUMMARY:
     in use at exit: 48 bytes in 1 blocks
-  total heap usage: 13 allocs, 12 frees, 5,629 bytes allocated
+  total heap usage: 64 allocs, 63 frees, 14,183 bytes allocated
 
 LEAK SUMMARY:
    definitely lost: 0 bytes in 0 blocks

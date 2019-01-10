@@ -12,11 +12,20 @@ valgrind_single() {
 }
 
 if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-    for test_file in $(find . -name '*-test.c'); do
+    for test_file in *-test.c; do
         output_file="valgrind-output/$test_file.txt"
-        echo bin/valgrind "$@" $test_file > $output_file
+        echo bin/valgrind "$@" $test_file | tee $output_file
         echo >> $output_file
         valgrind_single "$@" $test_file >> $output_file
+    done
+
+    for output_file in valgrind-output/*; do
+        echo "Checking $output_file"
+        if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
+            echo
+            echo '!! NOT CLEAN'
+            exit 1
+        fi
     done
 
     git diff --exit-code valgrind-output/

@@ -21,6 +21,7 @@ extern const Orientation LAYOUT_POINTY;
 extern const Orientation LAYOUT_FLAT;
 
 Layout *layout_create(Orientation orientation, f64 scale, Point origin);
+void layout_destroy(Layout *l);
 Point layout_hex_to_point(Layout *l, Hex h);
 FloatHex layout_point_to_float_hex(Layout *l, Point p);
 Hex layout_point_to_hex(Layout *l, Point p);

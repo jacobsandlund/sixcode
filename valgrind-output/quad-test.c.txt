@@ -1,4 +1,4 @@
-bin/valgrind ./quad-test.c
+bin/valgrind quad-test.c
 
 Memcheck, a memory error detector
 Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
@@ -8,7 +8,7 @@ Command: ./a.out
 
 HEAP SUMMARY:
     in use at exit: 48 bytes in 1 blocks
-  total heap usage: 165 allocs, 164 frees, 24,345 bytes allocated
+  total heap usage: 149 allocs, 148 frees, 23,509 bytes allocated
 
 LEAK SUMMARY:
    definitely lost: 0 bytes in 0 blocks

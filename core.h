@@ -6,6 +6,7 @@
 #include "point.h"
 #include "layout.h"
 #include "grid.h"
+#include "bit-array.h"
 #include "quad.h"
 #include "mesh.h"
 

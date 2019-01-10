@@ -1,48 +1,54 @@
 #include <stdlib.h>
 #include "mesh.h"
 
-Mesh *mesh_create(u32 point_capacity)
+Mesh *mesh_create(u32 hex_capacity)
 {
 	Mesh *m = malloc(sizeof *m);
 
-	m->points = malloc(point_capacity * sizeof *m->points);
-	m->point_count = 0;
-	m->point_capacity = point_capacity;
+	m->points = malloc(hex_capacity * 6 * sizeof *m->points);
+	m->hex_count = 0;
+	m->hex_capacity = hex_capacity;
 
 	return m;
+}
+
+void mesh_destroy(Mesh *m)
+{
+	free(m->points);
+	free(m);
 }
 
 typedef struct {
 	Mesh *m;
 	Layout *l;
-} MeshEachHexContext;
+} MeshEachContext;
 
-static void mesh_generate_each_hex(void *context, Hex h, void *datum) {
-	MeshEachHexContext *c = (MeshEachHexContext *) context;
+static void mesh_generate_each(void *context, Hex h, void *datum) {
+	MeshEachContext *c = (MeshEachContext *) context;
 	Mesh *m = c->m;
 	Layout *l = c->l;
 
 	(void) datum;
 
-	layout_hex_corners(&m->points[m->point_count], l, h);
+	Point *corners = &m->points[m->hex_count * 6];
+	layout_hex_corners(corners, l, h);
 
-	m->point_count += 6;
+	++m->hex_count;
 }
 
 u32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
-	MeshEachHexContext c = {.m = m, .l = l};
-	u32 point_count = g->data_count * 6;
+	MeshEachContext c = {.m = m, .l = l};
 
-	if (point_count > m->point_count) {
+	if (g->set_count > m->hex_capacity) {
 		free(m->points);
-		m->points = malloc(point_count * sizeof *m->points);
-		m->point_capacity = point_count;
+		m->points = malloc(g->set_count * 6 * sizeof *m->points);
+		m->hex_capacity = g->set_count;
 	}
 
-	m->point_count = 0;
+	m->hex_count = 0;
 
-	grid_each(g, &c, mesh_generate_each_hex);
+	grid_each(g, &c, mesh_generate_each);
 
-	return point_count;
+	return m->hex_count;
 }

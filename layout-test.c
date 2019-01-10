@@ -50,7 +50,7 @@ TEST(layout_flat)
 	//=> 0
 }
 
-TEST(layout_create)
+TEST(layout_create_and_destroy)
 {
 	f64 scale = 20.0;
 	Point origin = {.x = 100, .y = 250};
@@ -64,6 +64,8 @@ TEST(layout_create)
 	//=> 20
 	_pt(l->origin);
 	//=> 100, 250
+
+	layout_destroy(l);
 }
 
 TEST(layout_hex_to_point)
