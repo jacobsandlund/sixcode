@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "bit-array.h"
 
-BitArray *bit_array_create(u32 capacity)
+BitArray *bit_array_create(i32 capacity)
 {
 	BitArray *b = calloc(capacity / 64 + 1, sizeof *b);
 	return b;
@@ -12,7 +12,7 @@ void bit_array_destroy(BitArray *b)
 	free(b);
 }
 
-u8 bit_array_has(BitArray *b, i32 i)
+i8 bit_array_has(BitArray *b, i32 i)
 {
 	u64 bit = (u64) 1 << (i % 64);
 	return (b[i / 64] & bit) != 0;

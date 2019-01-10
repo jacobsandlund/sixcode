@@ -6,7 +6,7 @@ valgrind_single() {
     options=${@:1:$options_length}
 
     bin/compile $test_file
-    valgrind --suppressions=development/valgrind-suppressions.supp --log-fd=1 $options ./a.out |
+    valgrind --log-fd=1 $options ./a.out |
         cut -d' ' -f 2-
     rm a.out
 }

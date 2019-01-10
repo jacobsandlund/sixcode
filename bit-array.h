@@ -5,9 +5,9 @@
 
 typedef u64 BitArray;
 
-BitArray *bit_array_create(u32 capacity);
+BitArray *bit_array_create(i32 capacity);
 void bit_array_destroy(BitArray *b);
-u8 bit_array_has(BitArray *b, i32 i);
+i8 bit_array_has(BitArray *b, i32 i);
 void bit_array_set(BitArray *b, i32 i);
 void bit_array_clear(BitArray *b, i32 i);
 i32 bit_array_count_has(BitArray *b, i32 capacity);

@@ -3,6 +3,8 @@
 echo "Usage: bin/<command> [<args>*]"
 echo
 echo "Commands:"
+echo "    bin/all                Make, test, and run valgrind"
+echo "    bin/make               Make core.js/wasm with emscripten"
 echo "    bin/docker-run         Run the development docker file"
 echo "    bin/docker-build       Build the development docker image"
 echo "    bin/docker-exec <cmd>  Execute the command in docker container"

@@ -10,7 +10,7 @@ i32 hex_s(Hex h)
 	return -h.q - h.r;
 }
 
-u8 hex_equal(Hex a, Hex b)
+i8 hex_equal(Hex a, Hex b)
 {
 	return a.q == b.q && a.r == b.r;
 }
@@ -36,9 +36,9 @@ Hex directions[] = {
 	{.q = 0, .r = 1},
 };
 
-Hex hex_neighbor(Hex h, u8 direction)
+Hex hex_neighbor(Hex h, i8 direction)
 {
-	assert(direction < 6);
+	assert(direction < 6 && direction >= 0);
 	return hex_add(h, directions[direction]);
 }
 

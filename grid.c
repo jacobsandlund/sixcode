@@ -44,7 +44,7 @@ void *grid_get(Grid *g, Hex h)
 	}
 }
 
-u8 grid_has(Grid *g, Hex h)
+i8 grid_has(Grid *g, Hex h)
 {
 	return quad_contains(g->quad, h) &&
 		bit_array_has(g->set, quad_index(g->capacity_quad, h));
@@ -85,7 +85,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 	}
 
 	Quad new_capacity_quad = quad_capacity_quad(g->quad, g->extra_capacity, g->extra_capacity_growth_factor);
-	u32 new_capacity = quad_capacity(new_capacity_quad);
+	i32 new_capacity = quad_capacity(new_capacity_quad);
 	BitArray *set = bit_array_create(new_capacity);
 	BitArray *old_set = g->set;
 
@@ -126,7 +126,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 }
 
 // Returns 1 if item existed and was removed, 0 if not
-u8 grid_remove(Grid *g, Hex h)
+i8 grid_remove(Grid *g, Hex h)
 {
 	if (g->set_count == 0 || !quad_contains(g->quad, h)) {
 		return 0;

@@ -8,13 +8,13 @@ const Quad QUAD_EMPTY = {
 	.max = {.q = -QUAD_OUT_OF_BOUNDS, .r = -QUAD_OUT_OF_BOUNDS},
 };
 
-u8 quad_contains(Quad qd, Hex h)
+i8 quad_contains(Quad qd, Hex h)
 {
 	return  qd.min.q <= h.q && h.q <= qd.max.q &&
 		qd.min.r <= h.r && h.r <= qd.max.r;
 }
 
-u8 quad_on_edge(Quad qd, Hex h)
+i8 quad_on_edge(Quad qd, Hex h)
 {
 	return h.q == qd.min.q || h.q == qd.max.q || h.r == qd.min.r || h.r == qd.max.r;
 }

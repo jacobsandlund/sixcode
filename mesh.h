@@ -9,12 +9,12 @@
 
 typedef struct {
 	Point *points;
-	u32 hex_count;
-	u32 hex_capacity;
+	i32 hex_count;
+	i32 hex_capacity;
 } Mesh;
 
-Mesh *mesh_create(u32 hex_capacity);
+Mesh *mesh_create(i32 hex_capacity);
 void mesh_destroy(Mesh *m);
-u32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g);
+i32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g);
 
 #endif // __MESH_H__

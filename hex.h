@@ -16,10 +16,10 @@ typedef struct {
 extern const Hex HEX_ZERO;
 
 i32 hex_s(Hex h);
-u8 hex_equal(Hex a, Hex b);
+i8 hex_equal(Hex a, Hex b);
 Hex hex_add(Hex a, Hex b);
 Hex hex_sub(Hex a, Hex b);
-Hex hex_neighbor(Hex h, u8 direction);
+Hex hex_neighbor(Hex h, i8 direction);
 u32 hex_distance(Hex a, Hex b);
 FloatHex hex_lerp(Hex a, Hex b, f64 t);
 Hex hex_round(FloatHex fh);

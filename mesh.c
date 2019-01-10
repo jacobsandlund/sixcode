@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "mesh.h"
 
-Mesh *mesh_create(u32 hex_capacity)
+Mesh *mesh_create(i32 hex_capacity)
 {
 	Mesh *m = malloc(sizeof *m);
 
@@ -36,7 +36,7 @@ static void mesh_generate_each(void *context, Hex h, void *datum) {
 	++m->hex_count;
 }
 
-u32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
+i32 mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
 	MeshEachContext c = {.m = m, .l = l};
 

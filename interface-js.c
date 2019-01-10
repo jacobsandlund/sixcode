@@ -24,7 +24,7 @@ EXPORT_JS Grid *js_grid_create()
 }
 
 
-EXPORT_JS Mesh *js_mesh_create(u32 hex_capacity)
+EXPORT_JS Mesh *js_mesh_create(i32 hex_capacity)
 {
 	return mesh_create(hex_capacity);
 }
@@ -34,7 +34,7 @@ EXPORT_JS Point *js_mesh_points(Mesh *m)
 	return m->points;
 }
 
-EXPORT_JS u32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
+EXPORT_JS i32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
 	return mesh_generate_hexes(m, l, g);
 }

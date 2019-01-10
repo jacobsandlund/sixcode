@@ -11,8 +11,8 @@ typedef struct {
 
 extern const Quad QUAD_EMPTY;
 
-u8 quad_contains(Quad qd, Hex h);
-u8 quad_on_edge(Quad qd, Hex h);
+i8 quad_contains(Quad qd, Hex h);
+i8 quad_on_edge(Quad qd, Hex h);
 i32 quad_index(Quad qd, Hex h);
 i32 quad_capacity(Quad qd);
 Hex quad_size(Quad qd);
