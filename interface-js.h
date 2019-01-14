@@ -20,7 +20,10 @@ EXPORT_JS Grid *js_grid_create();
 EXPORT_JS Mesh *js_mesh_create(i32 hex_capacity);
 EXPORT_JS Point *js_mesh_points(Mesh *m);
 EXPORT_JS i32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g);
+EXPORT_JS StyledMesh *js_styled_mesh_create(i32 hex_capacity, i32 style_count);
+EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm);
 
 EXPORT_JS void js_core_toggle_hex_at_point(Layout *l, Grid *g, f64 point_x, f64 point_y);
+EXPORT_JS i32 js_core_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g);
 
 #endif // __INTERFACE_JS_H__

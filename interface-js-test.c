@@ -70,7 +70,7 @@ TEST(js_grid_create)
 	Grid *g = js_grid_create();
 	
 	_d(g->with_data);
-	//=> 0
+	//=> 1
 	_hx(g->extra_capacity);
 	//=> 0, 0
 	_g(g->extra_capacity_growth_factor);

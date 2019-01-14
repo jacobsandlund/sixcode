@@ -28,7 +28,7 @@ EXPORT_JS void js_layout_resize_viewport(Layout *l, f64 width, f64 height)
 
 EXPORT_JS Grid *js_grid_create()
 {
-	return grid_create(HEX_ZERO, 0.0, GRID_NO_DATA);
+	return grid_create(HEX_ZERO, 0.0, GRID_WITH_DATA);
 }
 
 
@@ -44,7 +44,19 @@ EXPORT_JS Point *js_mesh_points(Mesh *m)
 
 EXPORT_JS i32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 {
-	return mesh_generate_hexes(m, l, g);
+	mesh_clear(m);
+	mesh_add_hexes(m, l, g);
+	return m->hex_count;
+}
+
+EXPORT_JS StyledMesh *js_styled_mesh_create(i32 hex_capacity, i32 style_count)
+{
+	return styled_mesh_create(hex_capacity, style_count);
+}
+
+EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm)
+{
+	return sm->hex_style_indices;
 }
 
 
@@ -52,6 +64,12 @@ EXPORT_JS void js_core_toggle_hex_at_point(Layout *l, Grid *g, f64 point_x, f64 
 {
 	Point p = {.x = point_x, .y = point_y};
 	core_toggle_hex_at_point(l, g, p);
+}
+
+EXPORT_JS i32 js_core_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g)
+{
+	core_styled_mesh_generate_hexes(sm, l, g);
+	return sm->mesh.hex_count;
 }
 
 

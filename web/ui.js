@@ -3,12 +3,16 @@ let ctx = canvas.getContext('2d');
 
 const SCALE_LEVELS = [
     8.0,
-    16.0,   // * 2
+    11.0,   // * Math.SQRT2
+    16.0,
+    23.0,
     32.0,
+    45.0,
     64.0,
-    110.0,  // * (Average 2 and Math.SQRT2)
+    91.0,
+    128.0,
     181.0,
-    256.0,  // * Math.SQRT2
+    256.0,
     362.0,
     512.0,
     724.0,
@@ -17,6 +21,20 @@ const SCALE_LEVELS = [
     2048.0,
     2896.0,
     4096.0,
+];
+
+const FILL_STYLES = [
+    'rgb(244,244,255)',
+    'rgb(255,0,0)',
+    'rgb(0,255,0)',
+    'rgb(0,0,255)',
+];
+
+const STROKE_STYLES = [
+    'rgb(190,190,190)',
+    'rgb(190,190,190)',
+    'rgb(190,190,190)',
+    'rgb(190,190,190)',
 ];
 
 let layout;
@@ -31,7 +49,7 @@ function core_initialized() {
     let scale = SCALE_LEVELS[scaleLevel];
     layout = Module._js_layout_create(canvas.width, canvas.height, 0, 0, scale);
     grid = Module._js_grid_create();
-    mesh = Module._js_mesh_create(60);
+    mesh = Module._js_styled_mesh_create(60, FILL_STYLES.length);
 
     draw();
 }
@@ -40,14 +58,17 @@ function draw() {
     let startTime = performance.now();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgb(' + 244 + ',' + 244 + ',' + 255 + ')';
-    ctx.strokeStyle = 'rgb(' + 190 + ',' + 190 + ',' + 190 + ')';
 
-    let hex_count = Module._js_mesh_generate_hexes(mesh, layout, grid);
-    let points = Module._js_mesh_points(mesh);
-    let ptr = points / 8;
+    let hex_count = Module._js_core_styled_mesh_generate_hexes(mesh, layout, grid);
+    let points = Module._js_mesh_points(mesh) / 8;
+    let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
+    let ptr = points;
 
     for (let h = 0; h < hex_count; ++h) {
+        let styleIndex = Module.HEAP32[style_indices + h];
+        ctx.fillStyle = FILL_STYLES[styleIndex];
+        ctx.strokeStyle = STROKE_STYLES[styleIndex];
+
         ctx.beginPath();
         ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
         for (let i = 1; i < 6; ++i) {
@@ -84,7 +105,7 @@ function resize() {
 }
 
 const CHANGE_SCALE_TIMEOUT = 100;
-const WHEEL_DELTA_THRESHOLD = 400;
+const WHEEL_DELTA_THRESHOLD = 200;
 const FIRST_TIME_WHEEL_DELTA_THRESHOLD = 8;
 
 let wheelDeltaY = 0.0;
@@ -151,7 +172,7 @@ function mouseDown(e) {
     lastMouseX = e.clientX * window.devicePixelRatio;
     lastMouseY = e.clientY * window.devicePixelRatio;
     isMouseDown = true;
-    mouseDownTime = performance.now();
+    mouseDownTime = Date.now();
 }
 
 function mouseUp(e) {
@@ -180,7 +201,7 @@ function mouseMove(e) {
         deltaY = lastMouseY - mouseY;
 
         if (
-            performance.now() - mouseDownTime > 100 ||
+            Date.now() - mouseDownTime > 100 ||
             deltaX * deltaX + deltaY * deltaY >= 30 * dpr * dpr
         ) {
             draggingMouse = true;

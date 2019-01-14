@@ -23,8 +23,8 @@ TEST(bit_array_has_and_set)
 	bit_array_set(b, 0);
 	bit_array_set(b, 63);
 
-	_("%ld\n", b[0]);
-	//=> -9223372036854775807
+	_("%llu\n", b[0]);
+	//=> 9223372036854775809
 
 	_d(bit_array_has(b, 0));
 	//=> 1

@@ -39,11 +39,14 @@ RUN apt-get update && apt-get install -y curl gnupg2 && \
         && \
     apt-get autoremove -y
 
-RUN apt-get install -y \
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
+    apt-get install -y \
         bash \
         binutils \
         less \
-        libc6-dev \
+        libc6-dbg:i386 \
+        libc6-dev-i386 \
         libgcc-6-dev \
         make \
         man-db \
@@ -53,9 +56,11 @@ RUN apt-get install -y \
 
 COPY development/emscripten_config /root/.emscripten
 
-COPY *.c *.h ./
+COPY *.c *.h development/Makefile ./
 
-RUN /emscripten/emscripten/emcc interface-js.c -o core.js && rm *
+RUN mkdir web/ && \
+    /emscripten/emscripten/emmake make && \
+    rm *.c *.h Makefile && rm -r web
 
 EXPOSE 8080
 

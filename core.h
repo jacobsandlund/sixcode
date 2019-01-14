@@ -11,5 +11,6 @@
 #include "mesh.h"
 
 void core_toggle_hex_at_point(Layout *l, Grid *g, Point p);
+void core_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g);
 
 #endif // __CORE_H__
