@@ -2,6 +2,7 @@
   "name": "sixcode",
   "private": true,
   "dependencies": {
-    "koa": "^2.6.2"
+    "koa": "^2.6.2",
+    "koa-send": "^5.0.0"
   }
 }

@@ -1,7 +1,7 @@
 EMSCRIPTEN_ROOT = '/emscripten/emscripten'
 LLVM_ROOT = '/usr/local/bin'
 BINARYEN_ROOT = '/usr/local'
-NODE_JS = '/usr/bin/nodejs'
+NODE_JS = '/usr/bin/node'
 SPIDERMONKEY_ENGINE = ''
 V8_ENGINE = ''
 JAVA = 'java'

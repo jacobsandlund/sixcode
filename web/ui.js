@@ -2,8 +2,12 @@ let canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
 const SCALE_LEVELS = [
+    1.0,
+    2.0,
+    4.0,
+    6.0,
     8.0,
-    11.0,   // * Math.SQRT2
+    11.0,
     16.0,
     23.0,
     32.0,
@@ -44,6 +48,12 @@ let mesh;
 let scaleLevel = SCALE_LEVELS.indexOf(32.0);
 
 function core_initialized() {
+    window.addEventListener('resize', resize);
+    canvas.addEventListener('wheel', wheel, {passive: true});
+    canvas.addEventListener('mousedown', mouseDown);
+    window.addEventListener('mousemove', mouseMove);
+    window.addEventListener('mouseup', mouseUp);
+
     resizeUi();
 
     let scale = SCALE_LEVELS[scaleLevel];
@@ -217,8 +227,6 @@ function mouseMove(e) {
     }
 }
 
-window.addEventListener('resize', resize);
-canvas.addEventListener('wheel', wheel, {passive: true});
-canvas.addEventListener('mousedown', mouseDown);
-window.addEventListener('mousemove', mouseMove);
-window.addEventListener('mouseup', mouseUp);
+if (isCoreInitialized) {
+    core_initialized();
+}

@@ -17,8 +17,14 @@
         print: (text) => console.log(text),
         printErr: (text) => console.error(text),
     };
+
+    var isCoreInitialized = false;
+
+    function core_initialized() {
+        isCoreInitialized = true;
+    }
   </script>
-  <script type="text/javascript" src="ui.js"></script>
   <script async type="text/javascript" src="core.js"></script>
+  <script async type="text/javascript" src="ui.js"></script>
 </body>
 </html>
