@@ -13,9 +13,10 @@ TEST(core_toggle_hex_at_point)
 {
 	Hex h;
 	Grid *g = grid_create(HEX_ZERO, 0.0, GRID_NO_DATA);
+	Point viewport_size = {.x = 1000, .y = 600};
+	Point translation = {.x = -100, .y = -250};
 	f64 scale = 20.0;
-	Point origin = {.x = 100, .y = 250};
-	Layout *l = layout_create(LAYOUT_POINTY, scale, origin);
+	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
 	Point p = {.x = 53.0, .y = 127.0};
 
 	h = layout_point_to_hex(l, p);

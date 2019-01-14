@@ -14,29 +14,55 @@
 
 TEST(js_layout_create)
 {
-	Layout *l = js_layout_create(10.0, 100.0, 200.0);
+	f64 width = 1000.0;
+	f64 height = 600.0;
+	f64 translation_x = 100;
+	f64 translation_y = 250;
+	f64 scale = 20.0;
+	Layout *l = js_layout_create(width, height, translation_x, translation_y, scale);
+
+	_pt(l->viewport_size);
+	//=> 1000, 600
+	_pt(l->translation);
+	//=> 100, 250
 	_g(l->scale);
-	//=> 10
-	_pt(l->origin);
-	//=> 100, 200
+	//=> 20
 
 	layout_destroy(l);
 }
 
-TEST(js_layout_set_scale)
+TEST(js_layout_translate_by_delta)
 {
-	Layout l;
-	js_layout_set_scale(&l, 35.5);
-	_g(l.scale);
-	//=> 35.5
+	Layout l = {.translation = {.x = 500.0, .y = 700.0}};
+	js_layout_translate_by_delta(&l, -400.0, 375.2);
+	_pt(l.translation);
+	//=> 100, 1075.2
 }
 
-TEST(js_layout_set_origin)
+TEST(js_layout_zoom_at_point)
+{
+	f64 width = 1000.0;
+	f64 height = 600.0;
+	f64 scale = 20.0;
+	Layout *l = js_layout_create(width, height, 0.0, 0.0, scale);
+	f64 x = 300.0;
+	f64 y = 400.0;
+
+	js_layout_zoom_at_point(l, x, y, 30.0);
+	_pt(l->translation);
+	//=> 150, 200
+	_g(l->scale);
+	//=> 30
+
+	layout_destroy(l);
+}
+
+TEST(js_layout_resize_viewport)
 {
 	Layout l;
-	js_layout_set_origin(&l, -400.0, 375.2);
-	_pt(l.origin);
-	//=> -400, 375.2
+	js_layout_resize_viewport(&l, 1440, 1080);
+	_pt(l.viewport_size);
+	//=> 1440, 1080
 }
 
 TEST(js_grid_create)
@@ -70,17 +96,19 @@ TEST(js_core_toggle_hex_at_point)
 {
 	Hex h;
 	Grid *g = js_grid_create();
+	f64 width = 1000.0;
+	f64 height = 600.0;
+	f64 translation_x = 100;
+	f64 translation_y = 250;
 	f64 scale = 20.0;
-	f64 origin_x = 100;
-	f64 origin_y = 250;
-	Layout *l = js_layout_create(scale, origin_x, origin_y);
+	Layout *l = js_layout_create(width, height, translation_x, translation_y, scale);
 	f64 x = 53.0;
 	f64 y = 127.0;
 	Point p = {.x = x, .y = y};
 
 	h = layout_point_to_hex(l, p);
 	_hx(h);
-	//=> 1, -4
+	//=> -2, 13
 
 	js_core_toggle_hex_at_point(l, g, x, y);
 

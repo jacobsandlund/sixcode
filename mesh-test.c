@@ -28,9 +28,10 @@ TEST(mesh_generate_hexes)
 	Hex h1 = {.q = 1, .r = 2};
 	Hex h2 = {.q = 3, .r = -1};
 	Grid *g = grid_create(HEX_ZERO, 0.0, GRID_NO_DATA);
+	Point viewport_size = {.x = 1000, .y = 600};
+	Point translation = {.x = -100, .y = -250};
 	f64 scale = 20.0;
-	Point origin = {.x = 100, .y = 250};
-	Layout *l = layout_create(LAYOUT_POINTY, scale, origin);
+	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
 	Mesh *m = mesh_create(1);
 
 	grid_add(g, h1, NULL);

@@ -36,13 +36,14 @@ const Orientation LAYOUT_FLAT = {
 	.start_angle = 0.0,
 };
 
-Layout *layout_create(Orientation orientation, f64 scale, Point origin)
+Layout *layout_create(Orientation orientation, Point viewport_size, Point translation, f64 scale)
 {
 	Layout *l = malloc(sizeof *l);
 
 	l->orientation = orientation;
+	l->viewport_size = viewport_size;
 	l->scale = scale;
-	l->origin = origin;
+	l->translation = translation;
 
 	return l;
 }
@@ -52,14 +53,23 @@ void layout_destroy(Layout *l)
 	free(l);
 }
 
+void layout_zoom_at_point(Layout *l, Point p, f64 new_scale)
+{
+	Point translation = l->translation;
+	f64 scale_factor = (new_scale - l->scale) / l->scale;
+	l->translation.x += (p.x + translation.x) * scale_factor;
+	l->translation.y += (p.y + translation.y) * scale_factor;
+	l->scale = new_scale;
+}
+
 Point layout_hex_to_point(Layout *l, Hex h)
 {
 	f64 *f = l->orientation.f;
 	f64 scale = l->scale;
-	Point origin = l->origin;
+	Point translation = l->translation;
 	Point p = {
-		.x = (f[0] * h.q + f[1] * h.r) * scale + origin.x,
-		.y = (f[2] * h.q + f[3] * h.r) * scale + origin.y,
+		.x = (f[0] * h.q + f[1] * h.r) * scale - translation.x,
+		.y = (f[2] * h.q + f[3] * h.r) * scale - translation.y,
 	};
 	return p;
 }
@@ -68,9 +78,9 @@ FloatHex layout_point_to_float_hex(Layout *l, Point p)
 {
 	f64 *b = l->orientation.b;
 	f64 scale = l->scale;
-	Point origin = l->origin;
-	f64 x = (p.x - origin.x) / scale;
-	f64 y = (p.y - origin.y) / scale;
+	Point translation = l->translation;
+	f64 x = (p.x + translation.x) / scale;
+	f64 y = (p.y + translation.y) / scale;
 	FloatHex h = {
 		.q = b[0] * x + b[1] * y,
 		.r = b[2] * x + b[3] * y,

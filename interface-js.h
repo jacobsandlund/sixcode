@@ -10,9 +10,10 @@
 	#define EXPORT_JS
 #endif
 
-EXPORT_JS Layout *js_layout_create(f64 scale, f64 origin_x, f64 origin_y);
-EXPORT_JS void js_layout_set_scale(Layout *l, f64 scale);
-EXPORT_JS void js_layout_set_origin(Layout *l, f64 origin_x, f64 origin_y);
+EXPORT_JS Layout *js_layout_create(f64 width, f64 height, f64 translation_x, f64 translation_y, f64 scale);
+EXPORT_JS void js_layout_translate_by_delta(Layout *l, f64 delta_x, f64 delta_y);
+EXPORT_JS void js_layout_zoom_at_point(Layout *l, f64 x, f64 y, f64 new_scale);
+EXPORT_JS void js_layout_resize_viewport(Layout *l, f64 width, f64 height);
 
 EXPORT_JS Grid *js_grid_create();
 

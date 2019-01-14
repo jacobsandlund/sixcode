@@ -1,20 +1,28 @@
 #include "interface-js.h"
 
-EXPORT_JS Layout *js_layout_create(f64 scale, f64 origin_x, f64 origin_y)
+EXPORT_JS Layout *js_layout_create(f64 width, f64 height, f64 translation_x, f64 translation_y, f64 scale)
 {
-	Point origin = {.x = origin_x, .y = origin_y};
-	return layout_create(LAYOUT_POINTY, scale, origin);
+	Point viewport_size = {.x = width, .y = height};
+	Point translation = {.x = translation_x, .y = translation_y};
+	return layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
 }
 
-EXPORT_JS void js_layout_set_scale(Layout *l, f64 scale)
+EXPORT_JS void js_layout_translate_by_delta(Layout *l, f64 delta_x, f64 delta_y)
 {
-	l->scale = scale;
+	l->translation.x += delta_x;
+	l->translation.y += delta_y;
 }
 
-EXPORT_JS void js_layout_set_origin(Layout *l, f64 origin_x, f64 origin_y)
+EXPORT_JS void js_layout_zoom_at_point(Layout *l, f64 x, f64 y, f64 new_scale)
 {
-	Point origin = {.x = origin_x, .y = origin_y};
-	l->origin = origin;
+	Point p = {.x = x, .y = y};
+	layout_zoom_at_point(l, p, new_scale);
+}
+
+EXPORT_JS void js_layout_resize_viewport(Layout *l, f64 width, f64 height)
+{
+	l->viewport_size.x = width;
+	l->viewport_size.y = height;
 }
 
 

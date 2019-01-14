@@ -13,15 +13,18 @@ typedef struct {
 
 typedef struct {
 	Orientation orientation;
+	Point viewport_size;
+	Point translation;
 	f64 scale;
-	Point origin;
 } Layout;
 
 extern const Orientation LAYOUT_POINTY;
 extern const Orientation LAYOUT_FLAT;
 
-Layout *layout_create(Orientation orientation, f64 scale, Point origin);
+Layout *layout_create(Orientation orientation, Point viewport_size, Point origin, f64 scale);
 void layout_destroy(Layout *l);
+void layout_zoom_at_point(Layout *l, Point p, f64 new_scale);
+void layout_resize(Layout *l, Point viewport_size);
 Point layout_hex_to_point(Layout *l, Hex h);
 FloatHex layout_point_to_float_hex(Layout *l, Point p);
 Hex layout_point_to_hex(Layout *l, Point p);
