@@ -198,11 +198,11 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 
 		while (q <= quad.max.q) {
 			i32 i = q + i_offset;
-			i32 i_div_32 = i / 32;
-			u32 set_bits = set[i_div_32];
+			i32 i_div_64 = i / 64;
+			u64 set_bits = set[i_div_64];
 
 			if (set_bits) {
-				u32 bit = 1 << (i % 32);
+				u64 bit = (u64) 1 << (i % 64);
 
 				if ((set_bits & bit) != 0) {
 					Hex h = {.q = q, .r = r};
@@ -212,7 +212,7 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 
 				++q;
 			} else {
-				q = (i_div_32 + 1) * 32 - i_offset;
+				q = (i_div_64 + 1) * 64 - i_offset;
 			}
 		}
 	}

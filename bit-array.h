@@ -3,7 +3,7 @@
 
 #include "sixcode.h"
 
-typedef u32 BitArray;
+typedef u64 BitArray;
 
 BitArray *bit_array_create(i32 capacity);
 void bit_array_destroy(BitArray *b);
