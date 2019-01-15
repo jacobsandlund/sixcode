@@ -2,8 +2,13 @@ let canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
 const SCALE_LEVELS = [
+    0.3,
+    0.5,
+    0.75,
     1.0,
+    1.5,
     2.0,
+    3.0,
     4.0,
     6.0,
     8.0,
@@ -27,6 +32,9 @@ const SCALE_LEVELS = [
     4096.0,
 ];
 
+const TINY_SCALE_LEVEL = SCALE_LEVELS.indexOf(0.5);
+const SMALL_SCALE_LEVEL = SCALE_LEVELS.indexOf(2.0);
+
 const FILL_STYLES = [
     'rgb(244,244,255)',
     'rgb(255,0,0)',
@@ -40,6 +48,9 @@ const STROKE_STYLES = [
     'rgb(190,190,190)',
     'rgb(190,190,190)',
 ];
+
+const HEX_POINT_SCALE_FACTOR = Math.sqrt(3);
+const HEX_TINY_POINT_STYLE = 'rgb(85,85,85)';
 
 let layout;
 let grid;
@@ -69,30 +80,53 @@ function draw() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let hex_count = Module._js_core_styled_mesh_generate_hexes(mesh, layout, grid);
-    let points = Module._js_mesh_points(mesh) / 8;
-    let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
-    let ptr = points;
+    if (scaleLevel <= TINY_SCALE_LEVEL) {
+        ctx.fillStyle = HEX_TINY_POINT_STYLE;
 
-    for (let h = 0; h < hex_count; ++h) {
-        let styleIndex = Module.HEAP32[style_indices + h];
-        ctx.fillStyle = FILL_STYLES[styleIndex];
-        //ctx.strokeStyle = STROKE_STYLES[styleIndex];
+        let hex_count = Module._js_mesh_generate_points_at_hexes(mesh, layout, grid);
+        let points = Module._js_mesh_points(mesh) / 8;
+        let scale = SCALE_LEVELS[scaleLevel] * HEX_POINT_SCALE_FACTOR;
 
-        ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], 1, 1);
-        ptr += 12;
-        //ctx.beginPath();
-        //ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-        //for (let i = 1; i < 6; ++i) {
-        //    ptr += 2;
-        //    ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-        //}
+        for (let h = 0; h < hex_count; ++h) {
+            let ptr = points + h * 2;
+            ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], scale, scale);
+        }
+    } else if (scaleLevel <= SMALL_SCALE_LEVEL) {
+        let hex_count = Module._js_styled_mesh_generate_points_at_hexes(mesh, layout, grid);
+        let points = Module._js_mesh_points(mesh) / 8;
+        let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
+        let scale = SCALE_LEVELS[scaleLevel] * HEX_POINT_SCALE_FACTOR;
 
-        //ptr += 2;
+        for (let h = 0; h < hex_count; ++h) {
+            let styleIndex = Module.HEAP32[style_indices + h];
+            ctx.fillStyle = FILL_STYLES[styleIndex];
+            let ptr = points + h * 2;
+            ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], scale, scale);
+        }
+    } else {
+        let hex_count = Module._js_styled_mesh_generate_hexes(mesh, layout, grid);
+        let points = Module._js_mesh_points(mesh) / 8;
+        let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
+        let ptr = points;
 
-        //ctx.closePath();
-        //ctx.stroke();
-        //ctx.fill();
+        for (let h = 0; h < hex_count; ++h) {
+            let styleIndex = Module.HEAP32[style_indices + h];
+            ctx.fillStyle = FILL_STYLES[styleIndex];
+            ctx.strokeStyle = STROKE_STYLES[styleIndex];
+
+            ctx.beginPath();
+            ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
+            for (let i = 1; i < 6; ++i) {
+                ptr += 2;
+                ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
+            }
+
+            ptr += 2;
+
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
+        }
     }
 
     let endTime = performance.now();

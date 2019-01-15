@@ -57,7 +57,7 @@ i8 grid_has(Grid *g, Hex h)
 		bit_array_has(g->set, quad_index(g->capacity_quad, h));
 }
 
-void grid_add_each_fn(void *context, Hex h, void *datum)
+static void grid_add_each_fn(void *context, Hex h, void *data)
 {
 	GridAddEachContext *c = context;
 	Grid *g = c->g;
@@ -66,11 +66,11 @@ void grid_add_each_fn(void *context, Hex h, void *datum)
 	bit_array_copy_set(c->new_set, i, g->set, old_i);
 
 	if (g->with_data) {
-		c->new_data[i] = datum;
+		c->new_data[i] = data;
 	}
 }
 
-void grid_add(Grid *g, Hex h, void *datum)
+void grid_add(Grid *g, Hex h, void *data)
 {
 	if (quad_contains(g->quad, h)) {
 		i32 i = quad_index(g->capacity_quad, h);
@@ -81,7 +81,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 		}
 
 		if (g->with_data) {
-			g->data[i] = datum;
+			g->data[i] = data;
 		}
 
 		return;
@@ -97,7 +97,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 		++g->set_count;
 
 		if (g->with_data) {
-			g->data[i] = datum;
+			g->data[i] = data;
 		}
 
 		return;
@@ -112,7 +112,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 	};
 
 	if (g->with_data) {
-		ctx.new_data = calloc(new_capacity, sizeof *ctx.new_data);
+		ctx.new_data = calloc(new_capacity, sizeof *g->data);
 	}
 
 	grid_each(g, g->quad, &ctx, grid_add_each_fn);
@@ -125,7 +125,7 @@ void grid_add(Grid *g, Hex h, void *datum)
 
 	if (g->with_data) {
 		free(g->data);
-		ctx.new_data[i] = datum;
+		ctx.new_data[i] = data;
 		g->data = ctx.new_data;
 	}
 
@@ -134,10 +134,10 @@ void grid_add(Grid *g, Hex h, void *datum)
 	g->capacity_quad = new_capacity_quad;
 }
 
-void grid_remove_each_fn(void *context, Hex h, void *datum)
+static void grid_remove_each_fn(void *context, Hex h, void *data)
 {
 	Grid *g = context;
-	(void) datum;
+	(void) data;
 
 	g->quad = quad_expand(g->quad, h);
 }
@@ -206,8 +206,8 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 
 				if ((set_bits & bit) != 0) {
 					Hex h = {.q = q, .r = r};
-					void *datum = g->with_data ? g->data[i] : NULL;
-					each_fn(context, h, datum);
+					void *data = g->with_data ? g->data[i] : NULL;
+					each_fn(context, h, data);
 				}
 
 				++q;

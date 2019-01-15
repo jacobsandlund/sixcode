@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "mesh.h"
 
+#define MESH_HEX_POINT_SCALE_FACTOR 0.8660254037844386
+
 typedef struct {
 	Mesh *m;
 	Layout *l;
@@ -14,10 +16,11 @@ typedef struct {
 } StyledMeshEachContext;
 
 
-static void mesh_init(Mesh *m, i32 hex_capacity)
+static void mesh_init(Mesh *m, i32 hex_capacity, i32 points_per_hex)
 {
-	m->points = malloc(hex_capacity * 6 * sizeof *m->points);
+	m->points = malloc(hex_capacity * points_per_hex * sizeof *m->points);
 	m->hex_capacity = hex_capacity;
+	m->points_per_hex = points_per_hex;
 	mesh_clear(m);
 }
 
@@ -26,11 +29,11 @@ void mesh_clear(Mesh *m)
 	m->hex_count = 0;
 }
 
-Mesh *mesh_create(i32 hex_capacity)
+Mesh *mesh_create(i32 hex_capacity, i32 points_per_hex)
 {
 	Mesh *m = malloc(sizeof *m);
 
-	mesh_init(m, hex_capacity);
+	mesh_init(m, hex_capacity, points_per_hex);
 
 	return m;
 }
@@ -41,17 +44,25 @@ void mesh_destroy(Mesh *m)
 	free(m);
 }
 
-void mesh_expand_hex_capacity(Mesh *m, i32 need_capacity)
+void mesh_ensure_hex_capacity(Mesh *m, i32 need_capacity, i32 points_per_hex)
 {
-	Point *points;
-	i32 point_count = m->hex_count * 6;
+	i32 current_capacity = m->hex_capacity * m->points_per_hex;
+	i32 need_point_capacity = need_capacity * points_per_hex;
+	i32 point_count = m->hex_count * m->points_per_hex;
+
+	m->points_per_hex = points_per_hex;
+
+	if (current_capacity >= need_point_capacity) {
+		return;
+	}
+
 	i32 hex_capacity = m->hex_capacity;
 
 	while (hex_capacity < need_capacity) {
 		hex_capacity *= 2;
 	}
 
-	points = malloc(hex_capacity * 6 * sizeof *m->points);
+	Point *points = malloc(hex_capacity * points_per_hex * sizeof *m->points);
 
 	for (i32 i = 0; i < point_count; ++i) {
 		points[i] = m->points[i];
@@ -70,10 +81,10 @@ static void mesh_generate_hex(Mesh *m, Layout *l, Hex h)
 	++m->hex_count;
 }
 
-static void mesh_generate_each(void *context, Hex h, void *datum)
+static void mesh_add_hexes_each_fn(void *context, Hex h, void *data)
 {
-	MeshEachContext *c = (MeshEachContext *) context;
-	(void) datum;
+	MeshEachContext *c = context;
+	(void) data;
 
 	mesh_generate_hex(c->m, c->l, h);
 }
@@ -81,20 +92,42 @@ static void mesh_generate_each(void *context, Hex h, void *datum)
 void mesh_add_hexes(Mesh *m, Layout *l, Grid *g)
 {
 	MeshEachContext c = {.m = m, .l = l};
-	i32 need_capacity = g->set_count + m->hex_count;
 
-	if (need_capacity > m->hex_capacity) {
-		mesh_expand_hex_capacity(m, need_capacity);
-	}
-
-	grid_each(g, g->quad, &c, mesh_generate_each);
+	mesh_ensure_hex_capacity(m, g->set_count + m->hex_count, 6);
+	grid_each(g, g->quad, &c, mesh_add_hexes_each_fn);
 }
 
-StyledMesh *styled_mesh_create(i32 hex_capacity, i32 style_count)
+static void mesh_generate_point_at_hex(Mesh *m, Layout *l, Hex h)
+{
+	f64 scale_factor = l->scale * MESH_HEX_POINT_SCALE_FACTOR;
+	Point p = layout_hex_to_point(l, h);
+	p.x -= scale_factor;
+	p.y -= scale_factor;
+	m->points[m->hex_count] = p;
+	++m->hex_count;
+}
+
+static void mesh_add_points_at_hexes_each_fn(void *context, Hex h, void *data)
+{
+	MeshEachContext *c = context;
+	(void) data;
+
+	mesh_generate_point_at_hex(c->m, c->l, h);
+}
+
+void mesh_add_points_at_hexes(Mesh *m, Layout *l, Grid *g)
+{
+	MeshEachContext c = {.m = m, .l = l};
+
+	mesh_ensure_hex_capacity(m, g->set_count + m->hex_count, 1);
+	grid_each(g, g->quad, &c, mesh_add_points_at_hexes_each_fn);
+}
+
+StyledMesh *styled_mesh_create(i32 hex_capacity, i32 points_per_hex, i32 style_count)
 {
 	StyledMesh *sm = malloc(sizeof *sm);
 
-	mesh_init((Mesh *) sm, hex_capacity);
+	mesh_init((Mesh *) sm, hex_capacity, points_per_hex);
 
 	sm->hex_style_indices = malloc(hex_capacity * sizeof *sm->hex_style_indices);
 	sm->hex_count_for_style = malloc(style_count * sizeof *sm->hex_count_for_style);
@@ -123,12 +156,12 @@ void styled_mesh_clear(StyledMesh *sm)
 	}
 }
 
-void styled_mesh_expand_hex_capacity(StyledMesh *sm, i32 need_capacity)
+void styled_mesh_ensure_hex_capacity(StyledMesh *sm, i32 need_capacity, i32 points_per_hex)
 {
 	Mesh *m = &sm->mesh;
-	i32 old_hex_capacity = m->hex_capacity;
 
-	mesh_expand_hex_capacity(m, need_capacity);
+	i32 old_hex_capacity = m->hex_capacity;
+	mesh_ensure_hex_capacity(m, need_capacity, points_per_hex);
 
 	if (m->hex_capacity != old_hex_capacity) {
 		i32 hex_count = m->hex_count;
@@ -144,12 +177,12 @@ void styled_mesh_expand_hex_capacity(StyledMesh *sm, i32 need_capacity)
 	}
 }
 
-static void styled_mesh_generate_each(void *context, Hex h, void *datum) {
-	StyledMeshEachContext *c = (StyledMeshEachContext *) context;
+static void styled_mesh_add_hexes_each_fn(void *context, Hex h, void *data) {
+	StyledMeshEachContext *c = context;
 	StyledMesh *sm = c->sm;
 	Mesh *m = &sm->mesh;
 
-	i32 style = c->style_fn(c->style_context, h, datum);
+	i32 style = c->style_fn(c->style_context, h, data);
 
 	sm->hex_style_indices[m->hex_count] = style;
 	++sm->hex_count_for_style[style];
@@ -166,11 +199,34 @@ void styled_mesh_add_hexes(StyledMesh *sm, Layout *l, Grid *g, void *style_conte
 		.style_fn = style_fn,
 	};
 	Mesh *m = &sm->mesh;
-	i32 need_capacity = g->set_count + m->hex_count;
 
-	if (need_capacity > m->hex_capacity) {
-		styled_mesh_expand_hex_capacity(sm, need_capacity);
-	}
+	styled_mesh_ensure_hex_capacity(sm, g->set_count + m->hex_count, 6);
+	grid_each(g, g->quad, &c, styled_mesh_add_hexes_each_fn);
+}
 
-	grid_each(g, g->quad, &c, styled_mesh_generate_each);
+static void styled_mesh_add_points_at_hexes_each_fn(void *context, Hex h, void *data) {
+	StyledMeshEachContext *c = context;
+	StyledMesh *sm = c->sm;
+	Mesh *m = &sm->mesh;
+
+	i32 style = c->style_fn(c->style_context, h, data);
+
+	sm->hex_style_indices[m->hex_count] = style;
+	++sm->hex_count_for_style[style];
+
+	mesh_generate_point_at_hex(m, c->l, h);
+}
+
+void styled_mesh_add_points_at_hexes(StyledMesh *sm, Layout *l, Grid *g, void *style_context, StyledMeshStyle style_fn)
+{
+	StyledMeshEachContext c = {
+		.sm = sm,
+		.l = l,
+		.style_context = style_context,
+		.style_fn = style_fn,
+	};
+	Mesh *m = &sm->mesh;
+
+	styled_mesh_ensure_hex_capacity(sm, g->set_count + m->hex_count, 1);
+	grid_each(g, g->quad, &c, styled_mesh_add_points_at_hexes_each_fn);
 }

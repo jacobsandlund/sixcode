@@ -20,12 +20,12 @@ void core_toggle_hex_at_point(Layout *l, Grid *g, Point p)
 	}
 }
 
-static i32 core_styled_mesh_style_fn(void *context, Hex h, void *datum)
+i32 core_styled_mesh_style_fn(void *context, Hex h, void *data)
 {
 	(void) context;
 	(void) h;
 
-	return (i32) datum;
+	return (i32) data;
 }
 
 void core_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g)

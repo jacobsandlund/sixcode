@@ -34,7 +34,7 @@ EXPORT_JS Grid *js_grid_create()
 
 EXPORT_JS Mesh *js_mesh_create(i32 hex_capacity)
 {
-	return mesh_create(hex_capacity);
+	return mesh_create(hex_capacity, 6);
 }
 
 EXPORT_JS Point *js_mesh_points(Mesh *m)
@@ -49,9 +49,16 @@ EXPORT_JS i32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g)
 	return m->hex_count;
 }
 
+EXPORT_JS i32 js_mesh_generate_points_at_hexes(Mesh *m, Layout *l, Grid *g)
+{
+	mesh_clear(m);
+	mesh_add_points_at_hexes(m, l, g);
+	return m->hex_count;
+}
+
 EXPORT_JS StyledMesh *js_styled_mesh_create(i32 hex_capacity, i32 style_count)
 {
-	return styled_mesh_create(hex_capacity, style_count);
+	return styled_mesh_create(hex_capacity, 6, style_count);
 }
 
 EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm)
@@ -59,17 +66,25 @@ EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm)
 	return sm->hex_style_indices;
 }
 
+EXPORT_JS i32 js_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g)
+{
+	styled_mesh_clear(sm);
+	styled_mesh_add_hexes(sm, l, g, NULL, core_styled_mesh_style_fn);
+	return sm->mesh.hex_count;
+}
+
+EXPORT_JS i32 js_styled_mesh_generate_points_at_hexes(StyledMesh *sm, Layout *l, Grid *g)
+{
+	styled_mesh_clear(sm);
+	styled_mesh_add_points_at_hexes(sm, l, g, NULL, core_styled_mesh_style_fn);
+	return sm->mesh.hex_count;
+}
+
 
 EXPORT_JS void js_core_toggle_hex_at_point(Layout *l, Grid *g, f64 point_x, f64 point_y)
 {
 	Point p = {.x = point_x, .y = point_y};
 	core_toggle_hex_at_point(l, g, p);
-}
-
-EXPORT_JS i32 js_core_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g)
-{
-	core_styled_mesh_generate_hexes(sm, l, g);
-	return sm->mesh.hex_count;
 }
 
 

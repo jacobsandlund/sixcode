@@ -11,7 +11,7 @@
 
 TEST(mesh_create_and_destroy)
 {
-	Mesh *m = mesh_create(32);
+	Mesh *m = mesh_create(32, 6);
 
 	_d(m->points != NULL);
 	//=> 1
@@ -33,9 +33,9 @@ TEST(mesh_clear)
 	//=> 0
 }
 
-TEST(mesh_expand_hex_capacity)
+TEST(mesh_ensure_hex_capacity)
 {
-	Mesh *m = mesh_create(4);
+	Mesh *m = mesh_create(4, 6);
 
 	_d(m->hex_capacity);
 	//=> 4
@@ -44,19 +44,25 @@ TEST(mesh_expand_hex_capacity)
 	m->points[5].x = 100.0;
 	m->points[5].y = 463.7;
 
-	mesh_expand_hex_capacity(m, 7);
+	mesh_ensure_hex_capacity(m, 7, 6);
 
 	_d(m->hex_capacity);
 	//=> 8
 	_pt(m->points[5]);
 	//=> 100, 463.7
 
-	mesh_expand_hex_capacity(m, 23);
+	// No new capacity needed
+	mesh_ensure_hex_capacity(m, 8, 6);
+
+	// Switch points per hex
+	mesh_ensure_hex_capacity(m, 60, 1);
 
 	_d(m->hex_capacity);
-	//=> 32
+	//=> 64
 	_pt(m->points[5]);
 	//=> 100, 463.7
+	_d(m->points_per_hex);
+	//=> 1
 
 	mesh_destroy(m);
 }
@@ -70,7 +76,7 @@ TEST(mesh_add_hexes)
 	Point translation = {.x = -100, .y = -250};
 	f64 scale = 20.0;
 	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
-	Mesh *m = mesh_create(1);
+	Mesh *m = mesh_create(1, 6);
 
 	grid_add(g, h1, NULL);
 
@@ -122,9 +128,43 @@ TEST(mesh_add_hexes)
 	mesh_destroy(m);
 }
 
+TEST(mesh_add_points_at_hexes)
+{
+	Hex h1 = {.q = 1, .r = 2};
+	Hex h2 = {.q = 3, .r = -1};
+	Grid *g = grid_create(HEX_ZERO, 0.0, GRID_NO_DATA);
+	Point viewport_size = {.x = 1000, .y = 600};
+	Point translation = {.x = -100, .y = -250};
+	f64 scale = 20.0;
+	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
+	i32 points_per_hex = 2;
+	Mesh *m = mesh_create(1, points_per_hex);
+
+	grid_add(g, h1, NULL);
+	grid_add(g, h2, NULL);
+
+	mesh_add_points_at_hexes(m, l, g);
+
+	_d(m->hex_count);
+	//=> 2
+	_d(m->hex_capacity);
+	//=> 1
+	_d(m->points_per_hex);
+	//=> 1
+
+	_pt(m->points[0]);
+	//=> 169.282, 202.679
+	_pt(m->points[1]);
+	//=> 151.962, 292.679
+
+	grid_destroy(g);
+	layout_destroy(l);
+	mesh_destroy(m);
+}
+
 TEST(styled_mesh_create_and_destroy)
 {
-	StyledMesh *sm = styled_mesh_create(32, 4);
+	StyledMesh *sm = styled_mesh_create(32, 6, 4);
 	Mesh *m = &sm->mesh;
 
 	_d(m->points != NULL);
@@ -147,7 +187,7 @@ TEST(styled_mesh_create_and_destroy)
 
 TEST(styled_mesh_clear)
 {
-	StyledMesh *sm = styled_mesh_create(32, 4);
+	StyledMesh *sm = styled_mesh_create(32, 6, 4);
 	Mesh *m = &sm->mesh;
 
 	m->hex_count = 30;
@@ -169,9 +209,9 @@ TEST(styled_mesh_clear)
 	styled_mesh_destroy(sm);
 }
 
-TEST(styled_mesh_expand_hex_capacity)
+TEST(styled_mesh_ensure_hex_capacity)
 {
-	StyledMesh *sm = styled_mesh_create(4, 33);
+	StyledMesh *sm = styled_mesh_create(4, 6, 33);
 	Mesh *m = &sm->mesh;
 
 	_d(m->hex_capacity);
@@ -182,7 +222,7 @@ TEST(styled_mesh_expand_hex_capacity)
 	m->points[5].y = 463.7;
 	sm->hex_style_indices[1] = 29;
 
-	styled_mesh_expand_hex_capacity(sm, 7);
+	styled_mesh_ensure_hex_capacity(sm, 7, 6);
 
 	_d(m->hex_capacity);
 	//=> 8
@@ -191,10 +231,10 @@ TEST(styled_mesh_expand_hex_capacity)
 	_d(sm->hex_style_indices[1]);
 	//=> 29
 
-	mesh_expand_hex_capacity(m, 23);
+	mesh_ensure_hex_capacity(m, 60, 1);
 
 	_d(m->hex_capacity);
-	//=> 32
+	//=> 64
 	_pt(m->points[5]);
 	//=> 100, 463.7
 	_d(sm->hex_style_indices[1]);
@@ -203,11 +243,11 @@ TEST(styled_mesh_expand_hex_capacity)
 	styled_mesh_destroy(sm);
 }
 
-static i32 test_styled_mesh_add_hexes_style_fn(void *context, Hex h, void *datum)
+static i32 test_styled_mesh_style_fn(void *context, Hex h, void *data)
 {
 	(void) h;
 
-	return (i32) context + (i32) datum;
+	return (i32) context + (i32) data;
 }
 
 TEST(styled_mesh_add_hexes)
@@ -222,12 +262,12 @@ TEST(styled_mesh_add_hexes)
 	i32 hex_capacity = 1;
 	i32 style_count = 6;
 	i32 style_context = 3;
-	StyledMesh *sm = styled_mesh_create(hex_capacity, style_count);
+	StyledMesh *sm = styled_mesh_create(hex_capacity, 6, style_count);
 	Mesh *m = &sm->mesh;
 
 	grid_add(g, h1, (void *) 1);
 
-	styled_mesh_add_hexes(sm, l, g, (void *) style_context, test_styled_mesh_add_hexes_style_fn);
+	styled_mesh_add_hexes(sm, l, g, (void *) style_context, test_styled_mesh_style_fn);
 
 	_d(m->hex_count);
 	//=> 1
@@ -246,7 +286,7 @@ TEST(styled_mesh_add_hexes)
 	grid_add(g, h2, (void *) 2);
 
 	// Expand hex capacity
-	styled_mesh_add_hexes(sm, l, g, (void *) style_context, test_styled_mesh_add_hexes_style_fn);
+	styled_mesh_add_hexes(sm, l, g, (void *) style_context, test_styled_mesh_style_fn);
 
 	_d(m->hex_count);
 	//=> 2
@@ -272,4 +312,45 @@ TEST(styled_mesh_add_hexes)
 	styled_mesh_destroy(sm);
 	grid_destroy(g);
 	layout_destroy(l);
+}
+
+TEST(styled_mesh_add_points_at_hexes)
+{
+	Hex h1 = {.q = 1, .r = 2};
+	Hex h2 = {.q = 3, .r = -1};
+	Grid *g = grid_create(HEX_ZERO, 0.0, GRID_NO_DATA);
+	Point viewport_size = {.x = 1000, .y = 600};
+	Point translation = {.x = -100, .y = -250};
+	f64 scale = 20.0;
+	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
+	i32 style_count = 6;
+	i32 style_context = 3;
+	i32 points_per_hex = 2;
+	StyledMesh *sm = styled_mesh_create(1, points_per_hex, style_count);
+	Mesh *m = &sm->mesh;
+
+	grid_add(g, h1, (void *) 1);
+	grid_add(g, h2, (void *) 2);
+
+	styled_mesh_add_points_at_hexes(sm, l, g, (void *) style_context, test_styled_mesh_style_fn);
+
+	_d(m->hex_count);
+	//=> 2
+	_d(m->hex_capacity);
+	//=> 1
+	_d(m->points_per_hex);
+	//=> 1
+
+	_pt(m->points[0]);
+	//=> 169.282, 202.679
+	_pt(m->points[1]);
+	//=> 151.962, 292.679
+	_d(sm->hex_style_indices[0]);
+	//=> 3
+	_d(sm->hex_style_indices[1]);
+	//=> 3
+
+	grid_destroy(g);
+	layout_destroy(l);
+	styled_mesh_destroy(sm);
 }

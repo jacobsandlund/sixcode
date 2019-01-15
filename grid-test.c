@@ -293,13 +293,13 @@ typedef struct {
 	i32 each_called_count_with_data;
 } TestGridEachContext;
 
-static void test_grid_each_fn(void *context, Hex h, void *datum)
+static void test_grid_each_fn(void *context, Hex h, void *data)
 {
-	TestGridEachContext *c = (TestGridEachContext *) context;
-	grid_add(c->result_g, h, datum);
+	TestGridEachContext *c = context;
+	grid_add(c->result_g, h, data);
 	++c->each_called_count;
 
-	if (datum != NULL) {
+	if (data != NULL) {
 		++c->each_called_count_with_data;
 	}
 }

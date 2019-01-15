@@ -20,14 +20,14 @@ typedef struct {
 #define GRID_WITH_DATA 1
 #define GRID_NO_DATA 0
 
-typedef void (*GridEach)(void *context, Hex h, void *datum);
+typedef void (*GridEach)(void *context, Hex h, void *data);
 
 Grid *grid_create(Hex extra_capacity, f64 extra_capacity_growth_factor, i8 with_data);
 void grid_destroy(Grid *g);
 void grid_clear(Grid *g);
 void *grid_get(Grid *g, Hex h);
 i8 grid_has(Grid *g, Hex h);
-void grid_add(Grid *g, Hex h, void *datum);
+void grid_add(Grid *g, Hex h, void *data);
 
 // Returns 1 if item existed and was removed, 0 if not
 i8 grid_remove(Grid *g, Hex h);

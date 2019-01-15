@@ -33,7 +33,7 @@ TEST(bit_array_has_and_set)
 
 	bit_array_set(b, 64);
 	bit_array_set(b, 235);
-	bit_array_set(b, 329);
+	bit_array_set(b, 319);
 
 	_d(bit_array_has(b, 31));
 	//=> 1
@@ -41,19 +41,19 @@ TEST(bit_array_has_and_set)
 	//=> 1
 	_d(bit_array_has(b, 235));
 	//=> 1
-	_d(bit_array_has(b, 329));
+	_d(bit_array_has(b, 319));
 	//=> 1
 
-	_d(bit_array_has(b, 62));
+	_d(bit_array_has(b, 30));
 	//=> 0
-	_d(bit_array_has(b, 65));
+	_d(bit_array_has(b, 32));
 	//=> 0
 	_d(bit_array_has(b, 234));
 	//=> 0
 	_d(bit_array_has(b, 236));
 	//=> 0
-	_d(bit_array_has(b, 638));
-	//=> 0
+	_d(bit_array_has(b, 319));
+	//=> 1
 
 	bit_array_destroy(b);
 }
