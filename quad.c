@@ -22,9 +22,10 @@ i8 quad_on_edge(Quad qd, Hex h)
 i32 quad_index(Quad qd, Hex h)
 {
 	// Hex diff_min = hex_sub(h, qd.min);
-	Hex diff_min = {.q = h.q - qd.min.q, .r = h.r - qd.min.r};
+	i32 diff_min_q = h.q - qd.min.q;
+	i32 diff_min_r = h.r - qd.min.r;
 	u32 r_spacing = qd.max.q - qd.min.q + 1;
-	return diff_min.q + diff_min.r * r_spacing;
+	return diff_min_q + diff_min_r * r_spacing;
 }
 
 i32 quad_capacity(Quad qd)

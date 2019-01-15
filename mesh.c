@@ -49,14 +49,14 @@ void mesh_ensure_hex_capacity(Mesh *m, i32 need_capacity, i32 points_per_hex)
 	i32 current_capacity = m->hex_capacity * m->points_per_hex;
 	i32 need_point_capacity = need_capacity * points_per_hex;
 	i32 point_count = m->hex_count * m->points_per_hex;
+	i32 hex_capacity = m->hex_capacity;
 
 	m->points_per_hex = points_per_hex;
+	m->hex_capacity = need_capacity;
 
 	if (current_capacity >= need_point_capacity) {
 		return;
 	}
-
-	i32 hex_capacity = m->hex_capacity;
 
 	while (hex_capacity < need_capacity) {
 		hex_capacity *= 2;

@@ -44,21 +44,32 @@ TEST(mesh_ensure_hex_capacity)
 	m->points[5].x = 100.0;
 	m->points[5].y = 463.7;
 
-	mesh_ensure_hex_capacity(m, 7, 6);
+	mesh_ensure_hex_capacity(m, 3, 6);
 
 	_d(m->hex_capacity);
-	//=> 8
+	//=> 3
+	_d(m->points_per_hex);
+	//=> 6
 	_pt(m->points[5]);
 	//=> 100, 463.7
 
-	// No new capacity needed
-	mesh_ensure_hex_capacity(m, 8, 6);
+	// No new capacity needed, but switch points per hex
+	m->hex_count = 2;
+	mesh_ensure_hex_capacity(m, 12, 2);
 
-	// Switch points per hex
+	_pt(m->points[5]);
+	//=> 100, 463.7
+
+	_d(m->hex_capacity);
+	//=> 12
+	_d(m->points_per_hex);
+	//=> 2
+
+	m->hex_count = 6;
 	mesh_ensure_hex_capacity(m, 60, 1);
 
 	_d(m->hex_capacity);
-	//=> 64
+	//=> 96
 	_pt(m->points[5]);
 	//=> 100, 463.7
 	_d(m->points_per_hex);
@@ -148,7 +159,7 @@ TEST(mesh_add_points_at_hexes)
 	_d(m->hex_count);
 	//=> 2
 	_d(m->hex_capacity);
-	//=> 1
+	//=> 2
 	_d(m->points_per_hex);
 	//=> 1
 
@@ -337,7 +348,7 @@ TEST(styled_mesh_add_points_at_hexes)
 	_d(m->hex_count);
 	//=> 2
 	_d(m->hex_capacity);
-	//=> 1
+	//=> 2
 	_d(m->points_per_hex);
 	//=> 1
 

@@ -8,7 +8,7 @@ Command: ./a.out
 
 HEAP SUMMARY:
     in use at exit: 24 bytes in 1 blocks
-  total heap usage: 300 allocs, 299 frees, 44,295 bytes allocated
+  total heap usage: 360 allocs, 359 frees, 50,203 bytes allocated
 
 LEAK SUMMARY:
    definitely lost: 0 bytes in 0 blocks

@@ -46,19 +46,6 @@ typedef struct {
 	int sentinel;
 } TestCase;
 
-#ifdef __MACH__
-
-#define TEST(test_name) \
-void test_case_fn_##test_name(); \
-static TestCase test_case_##test_name \
-__attribute((used, section("__DATA,test_cases"))) = { \
-	.fn = test_case_fn_##test_name, \
-	.sentinel = TEST_CASE_SENTINEL, \
-}; \
-void test_case_fn_##test_name()
-
-#else
-
 #define TEST(test_name) \
 void test_case_fn_##test_name(); \
 static TestCase test_case_##test_name \
@@ -67,8 +54,6 @@ __attribute((used, section("test_cases"))) = { \
 	.sentinel = TEST_CASE_SENTINEL, \
 }; \
 void test_case_fn_##test_name()
-
-#endif
 
 TEST(start)
 {
@@ -94,6 +79,7 @@ typedef struct {
 
 static FileInfo *all_file_info[MAX_FILES];
 static int num_files;
+static int is_focus_on = 0;
 static const char *LOG_PREFIX = "\t//=>";
 #define LOG_PREFIX_LEN 5
 
@@ -102,6 +88,27 @@ void free_line_data(LineData line_data)
 	if (line_data.num_lines > 0) {
 		free(line_data.lines[0]);
 		free(line_data.lines);
+	}
+}
+
+void TFOCUS()
+{
+	is_focus_on = 1;
+}
+
+void TFOCUS_OFF()
+{
+	is_focus_on = 0;
+}
+
+void tprintf(const char *format, ...)
+{
+	va_list argptr;
+
+	if (is_focus_on) {
+		va_start(argptr, format);
+		vprintf(format, argptr);
+		va_end(argptr);
 	}
 }
 
@@ -253,6 +260,7 @@ int main()
 {
 	for (TestCase *test_case = &test_case_start; test_case->sentinel == TEST_CASE_SENTINEL; ++test_case) {
 		test_case->fn();
+		is_focus_on = 0;
 	}
 
 	for (int f = 0; f < num_files; ++f) {
