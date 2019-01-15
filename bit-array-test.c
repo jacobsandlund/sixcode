@@ -7,7 +7,7 @@ TEST(bit_array_create_and_destroy)
 
 	_d(b[0]);
 	//=> 0
-	_d(b[123 / 64]);
+	_d(b[123 / 32]);
 	//=> 0
 
 	bit_array_destroy(b);
@@ -15,33 +15,33 @@ TEST(bit_array_create_and_destroy)
 
 TEST(bit_array_has_and_set)
 {
-	BitArray b[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	BitArray *b = bit_array_create(320);
 
 	_d(bit_array_has(b, 0));
 	//=> 0
 
 	bit_array_set(b, 0);
-	bit_array_set(b, 63);
+	bit_array_set(b, 31);
 
-	_("%llu\n", b[0]);
-	//=> 9223372036854775809
+	_("%u\n", b[0]);
+	//=> 2147483649
 
 	_d(bit_array_has(b, 0));
 	//=> 1
-	_d(bit_array_has(b, 63));
+	_d(bit_array_has(b, 31));
 	//=> 1
 
 	bit_array_set(b, 64);
 	bit_array_set(b, 235);
-	bit_array_set(b, 639);
+	bit_array_set(b, 329);
 
-	_d(bit_array_has(b, 63));
+	_d(bit_array_has(b, 31));
 	//=> 1
 	_d(bit_array_has(b, 64));
 	//=> 1
 	_d(bit_array_has(b, 235));
 	//=> 1
-	_d(bit_array_has(b, 639));
+	_d(bit_array_has(b, 329));
 	//=> 1
 
 	_d(bit_array_has(b, 62));
@@ -54,11 +54,13 @@ TEST(bit_array_has_and_set)
 	//=> 0
 	_d(bit_array_has(b, 638));
 	//=> 0
+
+	bit_array_destroy(b);
 }
 
 TEST(bit_array_clear)
 {
-	BitArray b[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	BitArray *b = bit_array_create(320);
 
 	// Set 7
 	bit_array_set(b, 62);
@@ -66,16 +68,16 @@ TEST(bit_array_clear)
 	bit_array_set(b, 64);
 	bit_array_set(b, 65);
 	bit_array_set(b, 235);
-	bit_array_set(b, 638);
-	bit_array_set(b, 639);
+	bit_array_set(b, 318);
+	bit_array_set(b, 319);
 
 	// Clear 4
 	bit_array_clear(b, 63);
 	bit_array_clear(b, 64);
 	bit_array_clear(b, 235);
-	bit_array_clear(b, 638);
+	bit_array_clear(b, 318);
 
-	_d(bit_array_count_has(b, 640));
+	_d(bit_array_count_has(b, 320));
 	//=> 3
 
 	_d(bit_array_has(b, 62));
@@ -88,10 +90,12 @@ TEST(bit_array_clear)
 	//=> 1
 	_d(bit_array_has(b, 235));
 	//=> 0
-	_d(bit_array_has(b, 638));
+	_d(bit_array_has(b, 318));
 	//=> 0
-	_d(bit_array_has(b, 639));
+	_d(bit_array_has(b, 319));
 	//=> 1
+
+	bit_array_destroy(b);
 }
 
 TEST(bit_array_count_has)
@@ -109,8 +113,8 @@ TEST(bit_array_count_has)
 
 TEST(bit_array_copy_set)
 {
-	BitArray a[] = {0, 0};
-	BitArray b[] = {0, 0, 0, 0};
+	BitArray a[] = {0, 0, 0};
+	BitArray *b = bit_array_create(320);
 
 	bit_array_set(a, 0);
 	bit_array_set(a, 5);
@@ -142,4 +146,6 @@ TEST(bit_array_copy_set)
 	// Don't clear even if src does not have bit set
 	_d(bit_array_has(b, 33));
 	//=> 1
+
+	bit_array_destroy(b);
 }

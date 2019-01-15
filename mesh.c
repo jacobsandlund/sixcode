@@ -87,7 +87,7 @@ void mesh_add_hexes(Mesh *m, Layout *l, Grid *g)
 		mesh_expand_hex_capacity(m, need_capacity);
 	}
 
-	grid_each(g, &c, mesh_generate_each);
+	grid_each(g, g->quad, &c, mesh_generate_each);
 }
 
 StyledMesh *styled_mesh_create(i32 hex_capacity, i32 style_count)
@@ -172,5 +172,5 @@ void styled_mesh_add_hexes(StyledMesh *sm, Layout *l, Grid *g, void *style_conte
 		styled_mesh_expand_hex_capacity(sm, need_capacity);
 	}
 
-	grid_each(g, &c, styled_mesh_generate_each);
+	grid_each(g, g->quad, &c, styled_mesh_generate_each);
 }

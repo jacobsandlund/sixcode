@@ -6,6 +6,10 @@
     body {
       margin: 0;
     }
+    pre.error {
+      margin: 40px;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -22,6 +26,10 @@
 
     function core_initialized() {
         isCoreInitialized = true;
+    }
+
+    function displayError(error) {
+        document.body.innerHTML = '<pre class="error">' + error + '</pre>';
     }
   </script>
   <script async type="text/javascript" src="core.js"></script>

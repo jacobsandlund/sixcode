@@ -322,7 +322,7 @@ TEST(grid_each)
 	grid_add(g, h2, &td);
 	grid_add(g, h3, &td);
 
-	grid_each(g, &context, test_grid_each_fn);
+	grid_each(g, g->quad, &context, test_grid_each_fn);
 
 	_d(context.each_called_count);
 	//=> 3
@@ -353,7 +353,7 @@ TEST(grid_each_no_data)
 	grid_add(g, h1, NULL);
 	grid_add(g, h2, NULL);
 
-	grid_each(g, &context, test_grid_each_fn);
+	grid_each(g, g->quad, &context, test_grid_each_fn);
 
 	_d(context.each_called_count);
 	//=> 2

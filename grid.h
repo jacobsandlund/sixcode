@@ -33,6 +33,6 @@ void grid_add(Grid *g, Hex h, void *datum);
 i8 grid_remove(Grid *g, Hex h);
 
 void grid_move(Grid *g, Hex move_by);
-void grid_each(Grid *g, void *context, GridEach each_fn);
+void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn);
 
 #endif // __GRID_H__

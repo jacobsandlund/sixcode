@@ -3,6 +3,13 @@
 #include <stdlib.h>
 #include "grid.h"
 
+typedef struct {
+	Quad new_capacity_quad;
+	Grid *g;
+	BitArray *new_set;
+	void **new_data;
+} GridAddEachContext;
+
 Grid *grid_create(Hex extra_capacity, f64 extra_capacity_growth_factor, i8 with_data)
 {
 	Grid *g = malloc(sizeof *g);
@@ -50,13 +57,23 @@ i8 grid_has(Grid *g, Hex h)
 		bit_array_has(g->set, quad_index(g->capacity_quad, h));
 }
 
+void grid_add_each_fn(void *context, Hex h, void *datum)
+{
+	GridAddEachContext *c = context;
+	Grid *g = c->g;
+	i32 i = quad_index(c->new_capacity_quad, h);
+	i32 old_i = quad_index(g->capacity_quad, h);
+	bit_array_copy_set(c->new_set, i, g->set, old_i);
+
+	if (g->with_data) {
+		c->new_data[i] = datum;
+	}
+}
+
 void grid_add(Grid *g, Hex h, void *datum)
 {
-	Quad quad = g->quad;
-	Quad capacity_quad = g->capacity_quad;
-
-	if (quad_contains(quad, h)) {
-		i32 i = quad_index(capacity_quad, h);
+	if (quad_contains(g->quad, h)) {
+		i32 i = quad_index(g->capacity_quad, h);
 
 		if (!bit_array_has(g->set, i)) {
 			bit_array_set(g->set, i);
@@ -70,10 +87,12 @@ void grid_add(Grid *g, Hex h, void *datum)
 		return;
 	}
 
-	g->quad = quad_expand(g->quad, h);
+	Quad new_quad = quad_expand(g->quad, h);
 
-	if (quad_contains(capacity_quad, h)) {
-		i32 i = quad_index(capacity_quad, h);
+	if (quad_contains(g->capacity_quad, h)) {
+		g->quad = new_quad;
+
+		i32 i = quad_index(g->capacity_quad, h);
 		bit_array_set(g->set, i);
 		++g->set_count;
 
@@ -84,45 +103,43 @@ void grid_add(Grid *g, Hex h, void *datum)
 		return;
 	}
 
-	Quad new_capacity_quad = quad_capacity_quad(g->quad, g->extra_capacity, g->extra_capacity_growth_factor);
+	Quad new_capacity_quad = quad_capacity_quad(new_quad, g->extra_capacity, g->extra_capacity_growth_factor);
 	i32 new_capacity = quad_capacity(new_capacity_quad);
-	BitArray *set = bit_array_create(new_capacity);
-	BitArray *old_set = g->set;
-
-	for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
-		for (i32 q = quad.min.q; q <= quad.max.q; ++q) {
-			Hex h = {.q = q, .r = r};
-			i32 i = quad_index(new_capacity_quad, h);
-			i32 old_i = quad_index(capacity_quad, h);
-			bit_array_copy_set(set, i, old_set, old_i);
-		}
-	}
-
-	bit_array_destroy(old_set);
-
-	i32 i = quad_index(new_capacity_quad, h);
-	bit_array_set(set, i);
-	++g->set_count;
-	g->set = set;
-	g->capacity_quad = new_capacity_quad;
+	GridAddEachContext ctx = {
+		.new_capacity_quad = new_capacity_quad,
+		.g = g,
+		.new_set = bit_array_create(new_capacity),
+	};
 
 	if (g->with_data) {
-		void **data = calloc(new_capacity, sizeof *data);
-		void **old_data = g->data;
-
-		for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
-			for (i32 q = quad.min.q; q <= quad.max.q; ++q) {
-				Hex h = {.q = q, .r = r};
-				i32 i = quad_index(new_capacity_quad, h);
-				i32 old_i = quad_index(capacity_quad, h);
-				data[i] = old_data[old_i];
-			}
-		}
-
-		free(old_data);
-		g->data = data;
-		data[i] = datum;
+		ctx.new_data = calloc(new_capacity, sizeof *ctx.new_data);
 	}
+
+	grid_each(g, g->quad, &ctx, grid_add_each_fn);
+
+	bit_array_destroy(g->set);
+
+	i32 i = quad_index(new_capacity_quad, h);
+	bit_array_set(ctx.new_set, i);
+	++g->set_count;
+
+	if (g->with_data) {
+		free(g->data);
+		ctx.new_data[i] = datum;
+		g->data = ctx.new_data;
+	}
+
+	g->set = ctx.new_set;
+	g->quad = new_quad;
+	g->capacity_quad = new_capacity_quad;
+}
+
+void grid_remove_each_fn(void *context, Hex h, void *datum)
+{
+	Grid *g = context;
+	(void) datum;
+
+	g->quad = quad_expand(g->quad, h);
 }
 
 // Returns 1 if item existed and was removed, 0 if not
@@ -152,20 +169,10 @@ i8 grid_remove(Grid *g, Hex h)
 	Quad quad = g->quad;
 
 	if (quad_on_edge(quad, h)) {
-		Quad new_quad = QUAD_EMPTY;
+		Quad old_quad = g->quad;
+		g->quad = QUAD_EMPTY;
 
-		for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
-			for (i32 q = quad.min.q; q <= quad.max.q; ++q) {
-				Hex h = {.q = q, .r = r};
-				i32 i = quad_index(g->capacity_quad, h);
-
-				if (bit_array_has(g->set, i)) {
-					new_quad = quad_expand(new_quad, h);
-				}
-			}
-		}
-
-		g->quad = new_quad;
+		grid_each(g, old_quad, g, grid_remove_each_fn);
 	}
 
 	return 1;
@@ -177,18 +184,35 @@ void grid_move(Grid *g, Hex move_by)
 	g->capacity_quad = quad_move(g->capacity_quad, move_by);
 }
 
-void grid_each(Grid *g, void *context, GridEach each_fn)
+void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 {
-	Quad quad = g->quad;
+	BitArray *set = g->set;
+	Quad cap_quad = g->capacity_quad;
+	i32 r_spacing = cap_quad.max.q - cap_quad.min.q + 1;
 
 	for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
-		for (i32 q = quad.min.q; q <= quad.max.q; ++q) {
-			Hex h = {.q = q, .r = r};
-			i32 i = quad_index(g->capacity_quad, h);
-			void *datum = g->with_data ? g->data[i] : NULL;
+		i32 diff_min_r = r - cap_quad.min.r;
+		i32 i_offset = diff_min_r * r_spacing - cap_quad.min.q;
 
-			if (bit_array_has(g->set, i)) {
-				each_fn(context, h, datum);
+		i32 q = quad.min.q;
+
+		while (q <= quad.max.q) {
+			i32 i = q + i_offset;
+			i32 i_div_32 = i / 32;
+			u32 set_bits = set[i_div_32];
+
+			if (set_bits) {
+				u32 bit = 1 << (i % 32);
+
+				if ((set_bits & bit) != 0) {
+					Hex h = {.q = q, .r = r};
+					void *datum = g->with_data ? g->data[i] : NULL;
+					each_fn(context, h, datum);
+				}
+
+				++q;
+			} else {
+				q = (i_div_32 + 1) * 32 - i_offset;
 			}
 		}
 	}

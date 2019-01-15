@@ -77,20 +77,22 @@ function draw() {
     for (let h = 0; h < hex_count; ++h) {
         let styleIndex = Module.HEAP32[style_indices + h];
         ctx.fillStyle = FILL_STYLES[styleIndex];
-        ctx.strokeStyle = STROKE_STYLES[styleIndex];
+        //ctx.strokeStyle = STROKE_STYLES[styleIndex];
 
-        ctx.beginPath();
-        ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-        for (let i = 1; i < 6; ++i) {
-            ptr += 2;
-            ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-        }
+        ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], 1, 1);
+        ptr += 12;
+        //ctx.beginPath();
+        //ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
+        //for (let i = 1; i < 6; ++i) {
+        //    ptr += 2;
+        //    ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
+        //}
 
-        ptr += 2;
+        //ptr += 2;
 
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
+        //ctx.closePath();
+        //ctx.stroke();
+        //ctx.fill();
     }
 
     let endTime = performance.now();
@@ -187,10 +189,15 @@ function mouseDown(e) {
 
 function mouseUp(e) {
     if (!draggingMouse) {
+        let startTime = performance.now();
+
         let x = e.clientX * window.devicePixelRatio;
         let y = e.clientY * window.devicePixelRatio;
 
         Module._js_core_toggle_hex_at_point(layout, grid, x, y);
+
+        let endTime = performance.now();
+        console.log('click in ' + (endTime - startTime) + ' ms');
 
         draw();
     }

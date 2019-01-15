@@ -16,8 +16,7 @@ app.use(async ctx => {
         await execFile(EMMAKE, MAKE_ARGS);
     } catch (e) {
         console.error(e.message);
-        ctx.status = 500;
-        ctx.body = 'Make failed with: ' + e.message;
+        ctx.body = 'displayError(`' + e.message + '`);';
         return;
     }
 
