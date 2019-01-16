@@ -2,45 +2,16 @@
 #include <stdlib.h>
 #include "layout.h"
 
-#define SQRT_3 1.7320508075688772
+#define LAYOUT_C_TO_X 0.8660254037844386  // sqrt(3) / 2.0
+#define LAYOUT_X_TO_C 1.1547005383792517  // 2.0 / sqrt(3)
+#define LAYOUT_R_TO_Y 1.5                 // 3.0 / 2.0
+#define LAYOUT_Y_TO_R 0.6666666666666666  // 2.0 / 3.0
+#define LAYOUT_START_ANGLE 0.5
 
-const Orientation LAYOUT_POINTY = {
-	.f = {
-		SQRT_3,
-		SQRT_3 / 2.0,
-		0.0,
-		3.0 / 2.0,
-	},
-	.b = {
-		SQRT_3 / 3.0,
-		-1.0 / 3.0,
-		0.0,
-		2.0 / 3.0,
-	},
-	.start_angle = 0.5,
-};
-
-const Orientation LAYOUT_FLAT = {
-	.f = {
-		3.0 / 2.0,
-		0.0,
-		SQRT_3 / 2.0,
-		SQRT_3,
-	},
-	.b = {
-		2.0 / 3.0,
-		0.0,
-		-1.0 / 3.0,
-		SQRT_3 / 3.0,
-	},
-	.start_angle = 0.0,
-};
-
-Layout *layout_create(Orientation orientation, Point viewport_size, Point translation, f64 scale)
+Layout *layout_create(Point viewport_size, Point translation, f64 scale)
 {
 	Layout *l = malloc(sizeof *l);
 
-	l->orientation = orientation;
 	l->viewport_size = viewport_size;
 	l->scale = scale;
 	l->translation = translation;
@@ -64,26 +35,22 @@ void layout_zoom_at_point(Layout *l, Point p, f64 new_scale)
 
 Point layout_hex_to_point(Layout *l, Hex h)
 {
-	f64 *f = l->orientation.f;
 	f64 scale = l->scale;
 	Point translation = l->translation;
 	Point p = {
-		.x = (f[0] * h.q + f[1] * h.r) * scale - translation.x,
-		.y = (f[2] * h.q + f[3] * h.r) * scale - translation.y,
+		.x = h.c * LAYOUT_C_TO_X * scale - translation.x,
+		.y = h.r * LAYOUT_R_TO_Y * scale - translation.y,
 	};
 	return p;
 }
 
 FloatHex layout_point_to_float_hex(Layout *l, Point p)
 {
-	f64 *b = l->orientation.b;
 	f64 scale = l->scale;
 	Point translation = l->translation;
-	f64 x = (p.x + translation.x) / scale;
-	f64 y = (p.y + translation.y) / scale;
 	FloatHex h = {
-		.q = b[0] * x + b[1] * y,
-		.r = b[2] * x + b[3] * y,
+		.c = (p.x + translation.x) / scale * LAYOUT_X_TO_C,
+		.r = (p.y + translation.y) / scale * LAYOUT_Y_TO_R,
 	};
 	return h;
 }
@@ -97,10 +64,9 @@ Point *layout_hex_corners(Point *corners, Layout *l, Hex h)
 {
 	f64 scale = l->scale;
 	Point center = layout_hex_to_point(l, h);
-	f64 start_angle = l->orientation.start_angle;
 
 	for (i32 i = 0; i < 6; ++i) {
-		f64 angle = M_PI / 3.0 * (start_angle - i);
+		f64 angle = M_PI / 3.0 * (LAYOUT_START_ANGLE - i);
 		corners[i].x = scale * cos(angle) + center.x;
 		corners[i].y = scale * sin(angle) + center.y;
 	}

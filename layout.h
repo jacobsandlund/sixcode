@@ -6,22 +6,12 @@
 #include "hex.h"
 
 typedef struct {
-	f64 f[4];
-	f64 b[4];
-	f64 start_angle;
-} Orientation;
-
-typedef struct {
-	Orientation orientation;
 	Point viewport_size;
 	Point translation;
 	f64 scale;
 } Layout;
 
-extern const Orientation LAYOUT_POINTY;
-extern const Orientation LAYOUT_FLAT;
-
-Layout *layout_create(Orientation orientation, Point viewport_size, Point origin, f64 scale);
+Layout *layout_create(Point viewport_size, Point origin, f64 scale);
 void layout_destroy(Layout *l);
 void layout_zoom_at_point(Layout *l, Point p, f64 new_scale);
 void layout_resize(Layout *l, Point viewport_size);
