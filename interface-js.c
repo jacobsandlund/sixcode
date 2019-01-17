@@ -1,5 +1,7 @@
 #include "interface-js.h"
 
+#include "core.c"
+
 EXPORT_JS Layout *js_layout_create(f64 width, f64 height, f64 translation_x, f64 translation_y, f64 scale)
 {
 	Point viewport_size = {.x = width, .y = height};

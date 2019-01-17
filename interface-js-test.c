@@ -1,13 +1,5 @@
 #include "test.h"
 #include "interface-js.c"
-#include "core.c"
-#include "grid.c"
-#include "bit-array.c"
-#include "point.c"
-#include "hex.c"
-#include "layout.c"
-#include "quad.c"
-#include "mesh.c"
 
 #define _pt(p) _gg(p.x, p.y)
 #define _hx(h) _dd(h.c, h.r)
@@ -108,7 +100,7 @@ TEST(js_core_toggle_hex_at_point)
 	f64 y = 127.0;
 	Point p = {.x = x, .y = y};
 
-	h = layout_point_to_hex(l, p);
+	h = hex_round(layout_point_to_float_hex(l, p));
 	_hx(h);
 	//=> 9, 13
 

@@ -78,3 +78,9 @@ Hex hex_round(FloatHex fh)
 
 	return h;
 }
+
+FloatHex hex_to_float_hex(Hex h)
+{
+	FloatHex fh = {.c = h.c, .r = h.r};
+	return fh;
+}

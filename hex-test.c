@@ -139,3 +139,10 @@ TEST(hex_round)
 	_d(hex_equal(hex_round(closer_to_c), c));
 	//=> 1
 }
+
+TEST(hex_to_float_hex)
+{
+	Hex h = {.c = -3, .r = 7};
+	_fh(hex_to_float_hex(h));
+	//=> -3, 7
+}

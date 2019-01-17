@@ -1,7 +1,7 @@
 #include "test.h"
 #include "hex.c"
-#include "point.c"
 #include "layout.c"
+#include "point.c"
 
 #define _pt(p) _gg(p.x, p.y)
 #define _hx(h) _dd(h.c, h.r)
@@ -92,24 +92,14 @@ TEST(layout_point_to_float_hex)
 	//=> 3, 5
 }
 
-TEST(layout_point_to_hex)
-{
-	Point translation = {.x = -100, .y = -200};
-	Layout l = {.scale = 10, .translation = translation};
-	Point p = {.x = 125.981, .y = 275};
-
-	_hx(layout_point_to_hex(&l, p));
-	//=> 3, 5
-}
-
-TEST(point_to_hex_roundtrips)
+TEST(point_to_float_hex_roundtrips)
 {
 	f64 scale = 10;
 	Point translation = {.x = -35, .y = -71};
 	Layout l = {.scale = scale, .translation = translation};
 	Hex h = {.c = 3, .r = 5};
 
-	_d(hex_equal(layout_point_to_hex(&l, layout_hex_to_point(&l, h)), h));
+	_d(hex_equal(hex_round(layout_point_to_float_hex(&l, layout_hex_to_point(&l, h))), h));
 	//=> 1
 }
 

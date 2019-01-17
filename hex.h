@@ -22,5 +22,6 @@ Hex hex_neighbor(Hex h, i8 direction);
 i32 hex_distance(Hex a, Hex b);
 FloatHex hex_lerp(Hex a, Hex b, f64 t);
 Hex hex_round(FloatHex fh);
+FloatHex hex_to_float_hex(Hex h);
 
 #endif // __HEX_H__

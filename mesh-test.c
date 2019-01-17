@@ -1,10 +1,10 @@
 #include "test.h"
-#include "mesh.c"
-#include "hex.c"
-#include "point.c"
-#include "layout.c"
-#include "grid.c"
 #include "bit-array.c"
+#include "grid.c"
+#include "hex.c"
+#include "layout.c"
+#include "mesh.c"
+#include "point.c"
 #include "quad.c"
 
 #define _pt(p) _gg(p.x, p.y)
@@ -42,6 +42,8 @@ TEST(mesh_free_capacity)
 	//=> 1
 	_d(m->points == NULL);
 	//=> 1
+
+	mesh_destroy(m);
 }
 
 TEST(mesh_clear)
@@ -100,8 +102,6 @@ TEST(mesh_ensure_capacity)
 	m->hex_count = 6;
 	mesh_ensure_capacity(m, 90, 1);
 
-	_pt(m->points[5]);
-	//=> 0, 0
 	_d(m->point_capacity);
 	//=> 128
 	_d(m->hex_count);
@@ -288,8 +288,6 @@ TEST(styled_mesh_ensure_capacity)
 
 	_d(m->point_capacity);
 	//=> 128
-	_pt(m->points[5]);
-	//=> 0, 0
 	_d(m->hex_count);
 	//=> 0
 

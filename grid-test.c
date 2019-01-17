@@ -1,9 +1,9 @@
 #include <assert.h>
 #include "test.h"
+#include "bit-array.c"
 #include "grid.c"
 #include "hex.c"
 #include "quad.c"
-#include "bit-array.c"
 
 #define _hx(h) _dd(h.c, h.r)
 #define _qd(q) _("(%d, %d), (%d, %d)\n", q.min.c, q.min.r, q.max.c, q.max.r);

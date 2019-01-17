@@ -195,12 +195,15 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 
 	for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
 		i32 c_odd = r & 1;
+
 		i32 min_c = quad.min.c + (c_odd ^ min_c_odd);
 		i32 max_c = quad.max.c - (c_odd ^ max_c_odd);
 		i32 cap_min_c = cap_quad.min.c + (c_odd ^ cap_min_c_odd);
-		i32 cap_min_c_div_2 = cap_min_c >> 1;
+
 		i32 min_c_div_2 = min_c >> 1;
 		i32 max_c_div_2 = max_c >> 1;
+		i32 cap_min_c_div_2 = cap_min_c >> 1;
+
 		i32 diff_min_r = r - cap_quad.min.r;
 		i32 i_offset = diff_min_r * r_spacing - cap_min_c_div_2;
 
@@ -209,11 +212,11 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 		i32 i = min_i;
 
 		while (i <= max_i) {
-			i32 i_div_64 = i / 64;
+			i32 i_div_64 = i >> BIT_ARRAY_SHIFT;
 			u64 set_bits = set[i_div_64];
 
 			if (set_bits) {
-				u64 bit = (u64) 1 << (i % 64);
+				u64 bit = (u64) 1 << (i & BIT_ARRAY_MASK);
 
 				if ((set_bits & bit) != (u64) 0) {
 					i32 c_div_2 = i - i_offset;
@@ -225,7 +228,7 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 
 				++i;
 			} else {
-				i = (i_div_64 + 1) * 64;
+				i = (i_div_64 + 1) << BIT_ARRAY_SHIFT;
 			}
 		}
 	}

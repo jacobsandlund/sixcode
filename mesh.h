@@ -1,11 +1,11 @@
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include "sixcode.h"
-#include "point.h"
-#include "layout.h"
 #include "grid.h"
 #include "hex.h"
+#include "layout.h"
+#include "point.h"
+#include "sixcode.h"
 
 typedef struct {
 	Point *points;

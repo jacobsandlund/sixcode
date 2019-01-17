@@ -3,6 +3,9 @@
 
 #include "sixcode.h"
 
+#define BIT_ARRAY_SHIFT 6  // >> 6 is / 64
+#define BIT_ARRAY_MASK 63
+
 typedef u64 BitArray;
 
 BitArray *bit_array_create(i32 capacity);

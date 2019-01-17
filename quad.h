@@ -1,13 +1,18 @@
 #ifndef __QUAD_H__
 #define __QUAD_H__
 
-#include "sixcode.h"
 #include "hex.h"
+#include "sixcode.h"
 
 typedef struct {
 	Hex min;
 	Hex max;
 } Quad;
+
+typedef struct {
+	FloatHex min;
+	FloatHex max;
+} FloatQuad;
 
 extern const Quad QUAD_EMPTY;
 

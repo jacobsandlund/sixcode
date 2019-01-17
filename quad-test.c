@@ -1,6 +1,6 @@
 #include "test.h"
-#include "quad.c"
 #include "hex.c"
+#include "quad.c"
 
 #define _hx(h) _dd(h.c, h.r)
 #define _qd(q) _("(%d, %d), (%d, %d)\n", q.min.c, q.min.r, q.max.c, q.max.r);

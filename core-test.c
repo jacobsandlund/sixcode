@@ -1,12 +1,5 @@
 #include "test.h"
 #include "core.c"
-#include "grid.c"
-#include "bit-array.c"
-#include "point.c"
-#include "hex.c"
-#include "layout.c"
-#include "quad.c"
-#include "mesh.c"
 
 #define _hx(h) _dd(h.c, h.r)
 #define _pt(p) _gg(p.x, p.y)
@@ -21,7 +14,7 @@ TEST(core_toggle_hex_at_point)
 	Layout *l = layout_create(viewport_size, translation, scale);
 	Point p = {.x = 53.0, .y = 127.0};
 
-	h = layout_point_to_hex(l, p);
+	h = hex_round(layout_point_to_float_hex(l, p));
 	_hx(h);
 	//=> -2, -4
 

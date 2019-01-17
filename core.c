@@ -1,12 +1,21 @@
 #include "core.h"
 
+// Include all source code in single translation unit
+#include "bit-array.c"
+#include "grid.c"
+#include "hex.c"
+#include "layout.c"
+#include "mesh.c"
+#include "point.c"
+#include "quad.c"
+
 #define CORE_STYLE_COUNT 4
 
 static i32 core_style_index = 0;
 
 void core_toggle_hex_at_point(Layout *l, Grid *g, Point p)
 {
-	Hex h = layout_point_to_hex(l, p);
+	Hex h = hex_round(layout_point_to_float_hex(l, p));
 
 	if (grid_has(g, h)) {
 		grid_remove(g, h);

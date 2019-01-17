@@ -1,10 +1,10 @@
 #ifndef __GRID_H__
 #define __GRID_H__
 
-#include "sixcode.h"
+#include "bit-array.h"
 #include "hex.h"
 #include "quad.h"
-#include "bit-array.h"
+#include "sixcode.h"
 
 typedef struct {
 	Quad quad;

@@ -55,11 +55,6 @@ FloatHex layout_point_to_float_hex(Layout *l, Point p)
 	return h;
 }
 
-Hex layout_point_to_hex(Layout *l, Point p)
-{
-	return hex_round(layout_point_to_float_hex(l, p));
-}
-
 Point *layout_hex_corners(Point *corners, Layout *l, Hex h)
 {
 	f64 scale = l->scale;
