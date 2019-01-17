@@ -188,31 +188,44 @@ void grid_each(Grid *g, Quad quad, void *context, GridEach each_fn)
 {
 	BitArray *set = g->set;
 	Quad cap_quad = g->capacity_quad;
-	i32 r_spacing = cap_quad.max.q - cap_quad.min.q + 1;
+	i32 r_spacing = ((cap_quad.max.c - cap_quad.min.c) >> 1) + 1;
+	i32 min_c_odd = quad.min.c & 1;
+	i32 cap_min_c_odd = cap_quad.min.c & 1;
+	i32 max_c_odd = quad.max.c & 1;
 
 	for (i32 r = quad.min.r; r <= quad.max.r; ++r) {
+		i32 c_odd = r & 1;
+		i32 min_c = quad.min.c + (c_odd ^ min_c_odd);
+		i32 max_c = quad.max.c - (c_odd ^ max_c_odd);
+		i32 cap_min_c = cap_quad.min.c + (c_odd ^ cap_min_c_odd);
+		i32 cap_min_c_div_2 = cap_min_c >> 1;
+		i32 min_c_div_2 = min_c >> 1;
+		i32 max_c_div_2 = max_c >> 1;
 		i32 diff_min_r = r - cap_quad.min.r;
-		i32 i_offset = diff_min_r * r_spacing - cap_quad.min.q;
+		i32 i_offset = diff_min_r * r_spacing - cap_min_c_div_2;
 
-		i32 q = quad.min.q;
+		i32 min_i = min_c_div_2 + i_offset;
+		i32 max_i = max_c_div_2 + i_offset;
+		i32 i = min_i;
 
-		while (q <= quad.max.q) {
-			i32 i = q + i_offset;
+		while (i <= max_i) {
 			i32 i_div_64 = i / 64;
 			u64 set_bits = set[i_div_64];
 
 			if (set_bits) {
 				u64 bit = (u64) 1 << (i % 64);
 
-				if ((set_bits & bit) != 0) {
-					Hex h = {.q = q, .r = r};
+				if ((set_bits & bit) != (u64) 0) {
+					i32 c_div_2 = i - i_offset;
+					i32 c = c_div_2 * 2 + c_odd;
+					Hex h = {.c = c, .r = r};
 					void *data = g->with_data ? g->data[i] : NULL;
 					each_fn(context, h, data);
 				}
 
-				++q;
+				++i;
 			} else {
-				q = (i_div_64 + 1) * 64 - i_offset;
+				i = (i_div_64 + 1) * 64;
 			}
 		}
 	}

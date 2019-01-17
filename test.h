@@ -93,6 +93,7 @@ void free_line_data(LineData line_data)
 
 void TFOCUS()
 {
+	printf("======= Focusing test...\n");
 	is_focus_on = 1;
 }
 
@@ -101,13 +102,14 @@ void TFOCUS_OFF()
 	is_focus_on = 0;
 }
 
-void tprintf(const char *format, ...)
+void TPRINTF(const char *format, ...)
 {
 	va_list argptr;
 
 	if (is_focus_on) {
 		va_start(argptr, format);
 		vprintf(format, argptr);
+		printf("\n");
 		va_end(argptr);
 	}
 }

@@ -42,7 +42,7 @@ i32 hex_distance(Hex a, Hex b)
 	i32 dx = abs(a.c - b.c);
 	i32 dy = abs(a.r - b.r);
 	i32 dx_sub_dy = dx - dy;
-	return dx_sub_dy > 0 ? dy + dx_sub_dy / 2 : dy;
+	return dx_sub_dy > 0 ? dy + (dx_sub_dy >> 1) : dy;
 }
 
 FloatHex hex_lerp(Hex a, Hex b, f64 t)
@@ -58,7 +58,7 @@ Hex hex_round(FloatHex fh)
 {
 	Hex h;
 	f64 r = fh.r;
-	f64 q = (fh.c - fh.r) / 2;
+	f64 q = (fh.c - fh.r) / 2.0;
 	f64 s = -q - r;
 	i32 qi = lround(q);
 	i32 ri = lround(r);

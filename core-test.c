@@ -8,7 +8,7 @@
 #include "quad.c"
 #include "mesh.c"
 
-#define _hx(h) _dd(h.q, h.r)
+#define _hx(h) _dd(h.c, h.r)
 #define _pt(p) _gg(p.x, p.y)
 
 TEST(core_toggle_hex_at_point)
@@ -18,12 +18,12 @@ TEST(core_toggle_hex_at_point)
 	Point viewport_size = {.x = 1000, .y = 600};
 	Point translation = {.x = -100, .y = -250};
 	f64 scale = 20.0;
-	Layout *l = layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
+	Layout *l = layout_create(viewport_size, translation, scale);
 	Point p = {.x = 53.0, .y = 127.0};
 
 	h = layout_point_to_hex(l, p);
 	_hx(h);
-	//=> 1, -4
+	//=> -2, -4
 
 	core_toggle_hex_at_point(l, g, p);
 

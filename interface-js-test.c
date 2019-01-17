@@ -10,7 +10,7 @@
 #include "mesh.c"
 
 #define _pt(p) _gg(p.x, p.y)
-#define _hx(h) _dd(h.q, h.r)
+#define _hx(h) _dd(h.c, h.r)
 
 TEST(js_layout_create)
 {
@@ -81,10 +81,12 @@ TEST(js_grid_create)
 
 TEST(js_mesh_create_and_points)
 {
-	Mesh *m = js_mesh_create(7);
+	Mesh *m = js_mesh_create();
 
-	_d(m->hex_capacity);
-	//=> 7
+	_d(m->point_capacity);
+	//=> 0
+
+	mesh_ensure_capacity(m, 1, 6);
 
 	_d(js_mesh_points(m) == m->points);
 	//=> 1
@@ -108,7 +110,7 @@ TEST(js_core_toggle_hex_at_point)
 
 	h = layout_point_to_hex(l, p);
 	_hx(h);
-	//=> -2, 13
+	//=> 9, 13
 
 	js_core_toggle_hex_at_point(l, g, x, y);
 

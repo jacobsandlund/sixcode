@@ -11,6 +11,7 @@ typedef struct {
 	Quad capacity_quad;
 	Hex extra_capacity;
 	f64 extra_capacity_growth_factor;
+	i32 capacity;
 	i32 set_count;
 	BitArray *set;
 	void **data;
@@ -25,6 +26,7 @@ typedef void (*GridEach)(void *context, Hex h, void *data);
 Grid *grid_create(Hex extra_capacity, f64 extra_capacity_growth_factor, i8 with_data);
 void grid_destroy(Grid *g);
 void grid_clear(Grid *g);
+//void grid_ensure_capacity(Grid *g, Quad capacity_quad);
 void *grid_get(Grid *g, Hex h);
 i8 grid_has(Grid *g, Hex h);
 void grid_add(Grid *g, Hex h, void *data);

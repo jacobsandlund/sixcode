@@ -4,7 +4,7 @@ EXPORT_JS Layout *js_layout_create(f64 width, f64 height, f64 translation_x, f64
 {
 	Point viewport_size = {.x = width, .y = height};
 	Point translation = {.x = translation_x, .y = translation_y};
-	return layout_create(LAYOUT_POINTY, viewport_size, translation, scale);
+	return layout_create(viewport_size, translation, scale);
 }
 
 EXPORT_JS void js_layout_translate_by_delta(Layout *l, f64 delta_x, f64 delta_y)
@@ -32,9 +32,9 @@ EXPORT_JS Grid *js_grid_create()
 }
 
 
-EXPORT_JS Mesh *js_mesh_create(i32 hex_capacity)
+EXPORT_JS Mesh *js_mesh_create()
 {
-	return mesh_create(hex_capacity, 6);
+	return mesh_create();
 }
 
 EXPORT_JS Point *js_mesh_points(Mesh *m)
@@ -56,9 +56,9 @@ EXPORT_JS i32 js_mesh_generate_points_at_hexes(Mesh *m, Layout *l, Grid *g)
 	return m->hex_count;
 }
 
-EXPORT_JS StyledMesh *js_styled_mesh_create(i32 hex_capacity, i32 style_count)
+EXPORT_JS StyledMesh *js_styled_mesh_create(i32 style_count)
 {
-	return styled_mesh_create(hex_capacity, 6, style_count);
+	return styled_mesh_create(style_count);
 }
 
 EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm)

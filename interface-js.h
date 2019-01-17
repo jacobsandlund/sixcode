@@ -17,11 +17,11 @@ EXPORT_JS void js_layout_resize_viewport(Layout *l, f64 width, f64 height);
 
 EXPORT_JS Grid *js_grid_create();
 
-EXPORT_JS Mesh *js_mesh_create(i32 hex_capacity);
+EXPORT_JS Mesh *js_mesh_create();
 EXPORT_JS Point *js_mesh_points(Mesh *m);
 EXPORT_JS i32 js_mesh_generate_hexes(Mesh *m, Layout *l, Grid *g);
 EXPORT_JS i32 js_mesh_generate_points_at_hexes(Mesh *m, Layout *l, Grid *g);
-EXPORT_JS StyledMesh *js_styled_mesh_create(i32 hex_capacity, i32 style_count);
+EXPORT_JS StyledMesh *js_styled_mesh_create(i32 style_count);
 EXPORT_JS i32 *js_styled_mesh_hex_style_indices(StyledMesh *sm);
 EXPORT_JS i32 js_styled_mesh_generate_hexes(StyledMesh *sm, Layout *l, Grid *g);
 EXPORT_JS i32 js_styled_mesh_generate_points_at_hexes(StyledMesh *sm, Layout *l, Grid *g);

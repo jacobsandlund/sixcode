@@ -24,8 +24,8 @@ i32 quad_index(Quad q, Hex h)
 	// Hex diff_min = hex_sub(h, q.min);
 	i32 diff_min_c = h.c - q.min.c;
 	i32 diff_min_r = h.r - q.min.r;
-	i32 r_spacing = (q.max.c - q.min.c) / 2 + 1;
-	return diff_min_c / 2 + diff_min_r * r_spacing;
+	i32 r_spacing = ((q.max.c - q.min.c) >> 1) + 1;
+	return (diff_min_c >> 1) + diff_min_r * r_spacing;
 }
 
 i32 quad_capacity(Quad q)
