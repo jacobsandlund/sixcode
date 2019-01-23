@@ -1,6 +1,3 @@
-let canvas = document.getElementById('canvas');
-let ctx = canvas.getContext('2d');
-
 const SCALE_LEVELS = [
     0.3,
     0.5,
@@ -35,42 +32,41 @@ const SCALE_LEVELS = [
 const TINY_SCALE_LEVEL = SCALE_LEVELS.indexOf(0.5);
 const SMALL_SCALE_LEVEL = SCALE_LEVELS.indexOf(2.0);
 
-const FILL_STYLES = [
-    'rgb(244,244,255)',
-    'rgb(255,0,0)',
-    'rgb(0,255,0)',
-    'rgb(0,0,255)',
-];
-
-const STROKE_STYLES = [
-    'rgb(190,190,190)',
-    'rgb(190,190,190)',
-    'rgb(190,190,190)',
-    'rgb(190,190,190)',
-];
-
-const HEX_POINT_SCALE_FACTOR = Math.sqrt(3);
-const HEX_TINY_POINT_STYLE = 'rgb(85,85,85)';
-
-let layout;
+let canvas;
 let grid;
-let mesh;
+let ui;
+let view;
 
 let scaleLevel = SCALE_LEVELS.indexOf(32.0);
 
 function core_initialized() {
+    canvas = document.getElementById('canvas');
+    resizeUI();
+
+    grid = Module._web_grid_malloc();
+    Module._web_grid_initialize(grid, 0, 0, 63, 63);
+
+    let count = Math.round(64 * 64 / 2);
+
+    for (let i = 0; i < count; ++i) {
+        let c = Math.floor(Math.random() * 64);
+        let r = Math.floor(Math.random() * 64);
+        let style = Math.floor(Math.random() * 15) + 1;
+        Module._web_grid_set(grid, c, r, style);
+    }
+
+    let scale = SCALE_LEVELS[scaleLevel];
+    view = Module._web_view_malloc();
+    Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
+
+    ui = Module._web_ui_malloc();
+    Module._ui_initialize(ui, grid);
+
     window.addEventListener('resize', resize);
     canvas.addEventListener('wheel', wheel, {passive: true});
     canvas.addEventListener('mousedown', mouseDown);
     window.addEventListener('mousemove', mouseMove);
     window.addEventListener('mouseup', mouseUp);
-
-    resizeUi();
-
-    let scale = SCALE_LEVELS[scaleLevel];
-    layout = Module._js_layout_create(canvas.width, canvas.height, 0, 0, scale);
-    grid = Module._js_grid_create();
-    mesh = Module._js_styled_mesh_create(60, FILL_STYLES.length);
 
     draw();
 }
@@ -78,62 +74,14 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (scaleLevel <= TINY_SCALE_LEVEL) {
-        ctx.fillStyle = HEX_TINY_POINT_STYLE;
-
-        let hex_count = Module._js_mesh_generate_points_at_hexes(mesh, layout, grid);
-        let points = Module._js_mesh_points(mesh) / 8;
-        let scale = SCALE_LEVELS[scaleLevel] * HEX_POINT_SCALE_FACTOR;
-
-        for (let h = 0; h < hex_count; ++h) {
-            let ptr = points + h * 2;
-            ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], scale, scale);
-        }
-    } else if (scaleLevel <= SMALL_SCALE_LEVEL) {
-        let hex_count = Module._js_styled_mesh_generate_points_at_hexes(mesh, layout, grid);
-        let points = Module._js_mesh_points(mesh) / 8;
-        let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
-        let scale = SCALE_LEVELS[scaleLevel] * HEX_POINT_SCALE_FACTOR;
-
-        for (let h = 0; h < hex_count; ++h) {
-            let styleIndex = Module.HEAP32[style_indices + h];
-            ctx.fillStyle = FILL_STYLES[styleIndex];
-            let ptr = points + h * 2;
-            ctx.fillRect(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1], scale, scale);
-        }
-    } else {
-        let hex_count = Module._js_styled_mesh_generate_hexes(mesh, layout, grid);
-        let points = Module._js_mesh_points(mesh) / 8;
-        let style_indices = Module._js_styled_mesh_hex_style_indices(mesh) / 4;
-        let ptr = points;
-
-        for (let h = 0; h < hex_count; ++h) {
-            let styleIndex = Module.HEAP32[style_indices + h];
-            ctx.fillStyle = FILL_STYLES[styleIndex];
-            ctx.strokeStyle = STROKE_STYLES[styleIndex];
-
-            ctx.beginPath();
-            ctx.moveTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-            for (let i = 1; i < 6; ++i) {
-                ptr += 2;
-                ctx.lineTo(Module.HEAPF64[ptr], Module.HEAPF64[ptr + 1]);
-            }
-
-            ptr += 2;
-
-            ctx.closePath();
-            ctx.stroke();
-            ctx.fill();
-        }
-    }
+    Module._view_update_matrix(view);
+    Module._ui_draw(ui, view);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');
 }
 
-function resizeUi() {
+function resizeUI() {
     let newWidth = window.innerWidth * window.devicePixelRatio;
     let newHeight = window.innerHeight * window.devicePixelRatio;
     canvas.width = newWidth;
@@ -143,9 +91,9 @@ function resizeUi() {
 }
 
 function resize() {
-    resizeUi();
+    resizeUI();
 
-    Module._js_layout_resize_viewport(layout, canvas.width, canvas.height);
+    Module._web_view_resize(view, canvas.width, canvas.height);
 
     draw();
 }
@@ -190,10 +138,10 @@ function wheel(e) {
     if (newScaleLevel !== scaleLevel) {
         scaleLevel = newScaleLevel;
         let scale = SCALE_LEVELS[newScaleLevel];
-        let x = e.clientX * window.devicePixelRatio;
-        let y = e.clientY * window.devicePixelRatio;
+        let x = e.clientX;
+        let y = e.clientY;
 
-        Module._js_layout_zoom_at_point(layout, x, y, scale);
+        Module._web_view_zoom_at_point(view, x, y, scale);
 
         draw();
 
@@ -228,7 +176,7 @@ function mouseUp(e) {
         let x = e.clientX * window.devicePixelRatio;
         let y = e.clientY * window.devicePixelRatio;
 
-        Module._js_core_toggle_hex_at_point(layout, grid, x, y);
+        //Module._web_core_toggle_hex_at_point(layout, grid, x, y);
 
         let endTime = performance.now();
         console.log('click in ' + (endTime - startTime) + ' ms');
@@ -263,7 +211,8 @@ function mouseMove(e) {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
 
-        Module._js_layout_translate_by_delta(layout, deltaX, deltaY);
+        Module._web_view_translate_by_delta(view, deltaX, deltaY);
+
         draw();
     }
 }

@@ -1,42 +1,30 @@
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include "grid.h"
-#include "hex.h"
-#include "layout.h"
-#include "point.h"
+#include "matrix.h"
 #include "sixcode.h"
 
 typedef struct {
-	Point *points;
-	i32 point_capacity;
-	i32 hex_count;
-	i32 points_per_hex;
-} Mesh;
+	f32 x;
+	f32 y;
+	i8 c;
+	i8 r;
+	i8 c2;
+	i8 r2;
+} MeshVertex;
 
 typedef struct {
-	Mesh mesh;
-	i32 *hex_style_indices;
-	i32 *hex_count_for_style;
-	i32 style_count;
-} StyledMesh;
+	MeshVertex *vertices;
+	u16 *fill_indices;
+	u16 *stroke_indices;
+	i32 vertices_length;
+	i32 fill_indices_length;
+	i32 stroke_indices_length;
+} Mesh;
 
-typedef i32 (*StyledMeshStyle)(void *context, Hex h, void *data);
+extern const mat2 MESH_HEX_TO_POINT_MATRIX;
 
-Mesh *mesh_create();
-void mesh_destroy(Mesh *m);
-void mesh_free_capacity(Mesh *m);
-void mesh_clear(Mesh *m);
-void mesh_ensure_capacity(Mesh *m, i32 need_capacity, i32 points_per_hex);
-void mesh_add_hexes(Mesh *m, Layout *l, Grid *g);
-void mesh_add_points_at_hexes(Mesh *m, Layout *l, Grid *g);
-
-StyledMesh *styled_mesh_create(i32 style_count);
-void styled_mesh_destroy(StyledMesh *sm);
-void styled_mesh_free_capacity(StyledMesh *sm);
-void styled_mesh_clear(StyledMesh *sm);
-void styled_mesh_ensure_capacity(StyledMesh *sm, i32 need_capacity, i32 points_per_hex);
-void styled_mesh_add_hexes(StyledMesh *sm, Layout *l, Grid *g, void *style_context, StyledMeshStyle style_fn);
-void styled_mesh_add_points_at_hexes(StyledMesh *sm, Layout *l, Grid *g, void *style_context, StyledMeshStyle style_fn);
+void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows);
+void mesh_terminate(Mesh *m);
 
 #endif // __MESH_H__

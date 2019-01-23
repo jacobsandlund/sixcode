@@ -1,4 +1,4 @@
-bin/valgrind interface-js-test.c
+bin/valgrind js-test.c
 
 Memcheck, a memory error detector
 Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.

@@ -1,3 +1,4 @@
 #!/bin/bash -e
 
-clang $(grep '^CFLAGS' development/Makefile | sed 's/CFLAGS = //') "$@"
+CFLAGS="$(grep '^CFLAGS' development/Makefile | sed 's/CFLAGS = //')"
+clang $CFLAGS "$@"

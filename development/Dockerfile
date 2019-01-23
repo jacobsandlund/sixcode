@@ -48,6 +48,7 @@ RUN dpkg --add-architecture i386 && \
         libc6-dbg:i386 \
         libc6-dev-i386 \
         libgcc-6-dev \
+        libgles2-mesa-dev:i386 \
         make \
         man-db \
         nginx \

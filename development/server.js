@@ -16,7 +16,7 @@ app.use(async ctx => {
         await execFile(EMMAKE, MAKE_ARGS);
     } catch (e) {
         console.error(e.message);
-        ctx.body = 'displayError(`' + e.message + '`);';
+        ctx.body = 'displayError(`' + e.message.replace(/`/g, "'") + '`);';
         return;
     }
 
