@@ -40,7 +40,7 @@ let view;
 let scaleLevel = SCALE_LEVELS.indexOf(32.0);
 
 function core_initialized() {
-    canvas = document.getElementById('canvas');
+    canvas = Module['canvas'];
     resizeUI();
 
     grid = Module._web_grid_malloc();
@@ -60,7 +60,7 @@ function core_initialized() {
     Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
 
     ui = Module._web_ui_malloc();
-    Module._ui_initialize(ui, grid);
+    Module._web_ui_initialize(ui, grid);
 
     window.addEventListener('resize', resize);
     canvas.addEventListener('wheel', wheel, {passive: true});
@@ -74,8 +74,8 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._view_update_matrix(view);
-    Module._ui_draw(ui, view);
+    Module._web_view_update_matrix(view);
+    Module._web_ui_draw(ui, view);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');

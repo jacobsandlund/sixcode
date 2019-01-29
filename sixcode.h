@@ -21,12 +21,4 @@ typedef float f32;
 	#define NULL ((void*)0)
 #endif
 
-#ifdef __EMSCRIPTEN__
-	#include <emscripten/emscripten.h>
-	#define EXPORT_WEB EMSCRIPTEN_KEEPALIVE
-#else
-	#define EXPORT_WEB
-#endif
-
-
 #endif // __SIXCODE_H__

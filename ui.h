@@ -38,9 +38,9 @@ typedef struct {
 	Mesh hex_mesh;
 } Ui;
 
-EXPORT_WEB void ui_initialize(Ui *ui, Grid *g);
+void ui_initialize(Ui *ui, Grid *g);
 void ui_terminate(Ui *ui);
 void ui_print_gl_error(const char *filename, int line);
-EXPORT_WEB void ui_draw(Ui *ui, View *vw);
+void ui_draw(Ui *ui, View *vw);
 
 #endif // __UI_H__

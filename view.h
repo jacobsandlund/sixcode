@@ -16,7 +16,7 @@ void view_initialize(View *vw, vec2 viewport_size, vec2 translation, f32 scale);
 
 void view_zoom_at_point(View *vw, vec2 v, f32 new_scale);
 void view_resize(View *vw, vec2 viewport_size);
-EXPORT_WEB void view_update_matrix(View *vw);
+void view_update_matrix(View *vw);
 
 vec2 view_hex_to_point(View *vw, Hex h);
 FloatHex view_point_to_float_hex(View *vw, vec2 v);
