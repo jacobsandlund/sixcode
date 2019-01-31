@@ -17,6 +17,10 @@ typedef float f32;
 #define I32_MAX 2147483647
 #define I32_MIN -2147483648
 
+#ifndef SIXCODE_ERROR
+	#define SIXCODE_ERROR(...) fprintf(stderr, __VA_ARGS__)
+#endif
+
 #ifndef NULL
 	#define NULL ((void*)0)
 #endif

@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include "view.h"
 #include "grid.h"
+#include "sixcode.h"
 #include "quad.h"
 
 typedef struct {
@@ -36,11 +37,17 @@ typedef struct {
 	UiTextures textures;
 
 	Mesh hex_mesh;
+
+	u8 *styles_buffer;
+	i32 styles_buffer_capacity;
+	i32 styles_buffer_capacity_max;
 } Ui;
 
-void ui_initialize(Ui *ui, Grid *g);
+i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max);
 void ui_terminate(Ui *ui);
 void ui_print_gl_error(const char *filename, int line);
 void ui_draw(Ui *ui, View *vw);
+void ui_update_styles(Ui *ui, Grid *g);
+void ui_update_styles_in_quad(Ui *ui, Grid *g, Quad *quad);
 
 #endif // __UI_H__

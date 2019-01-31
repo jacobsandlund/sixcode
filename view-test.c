@@ -4,7 +4,6 @@
 #include "matrix.c"
 
 #define _v2(v) _gg(v.x, v.y)
-#define _hx(h) _dd(h.c, h.r)
 
 TEST(view_initialize)
 {
@@ -21,51 +20,10 @@ TEST(view_initialize)
 	//=> 100, 250
 	_g(vw->scale);
 	//=> 20
+	_gggg(vw->view_matrix.m[0][0], vw->view_matrix.m[0][1], vw->view_matrix.m[3][0], vw->view_matrix.m[3][3]);
+	//=> 0.001, 0, -0.01, 0.05
 
 	free(vw);
-}
-
-TEST(view_zoom_at_point)
-{
-	vec2 viewport_size = {1000, 600};
-	vec2 translation = {0, 0};
-	f32 scale = 20.0;
-
-	View *vw = malloc(sizeof *vw);
-	view_initialize(vw, viewport_size, translation, scale);
-
-	vec2 v = viewport_size;
-	view_zoom_at_point(vw, v, 30.0);
-	_v2(vw->translation);
-	//=> 500, 300
-	_g(vw->scale);
-	//=> 30
-
-	v = vw->translation;
-	view_zoom_at_point(vw, v, 10.0);
-	_v2(vw->translation);
-	//=> -166.667, -100
-	_g(vw->scale);
-	//=> 10
-
-	v.x = 300; v.y = 400;
-	view_zoom_at_point(vw, v, 10.0);
-	_v2(vw->translation);
-	//=> -166.667, -100
-	_g(vw->scale);
-	//=> 10
-
-	free(vw);
-}
-
-TEST(view_resize)
-{
-	View vw = {.viewport_size = {200, 100}};
-	vec2 v = {300, 400};
-	view_resize(&vw, v);
-
-	_v2(vw.viewport_size);
-	//=> 300, 400
 }
 
 TEST(view_update_matrix)
@@ -93,50 +51,72 @@ TEST(view_update_matrix)
 	free(vw);
 }
 
-TEST(view_hex_to_point)
+TEST(view_zoom_at_point)
 {
-	vec2 translation = {-100, -200};
-	View vw = {.scale = 10, .translation = translation};
-	Hex h = {.c = 3, .r = 5};
-	vec2 v = view_hex_to_point(&vw, h);
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {500, -2000};
+	f32 scale = 20.0;
 
-	_v2(v);
-	//=> 125.981, 275
-	_("%.14f", v.x);
-	//=> 125.98075866699219
+	View *vw = malloc(sizeof *vw);
+	view_initialize(vw, viewport_size, translation, scale);
 
-	f32 sqrt_3 = sqrt(3);
-	_f(sqrt_3 / 2.0 * 3);
-	//=> 2.598076
-	_f((sqrt_3 / 2.0 * 3) * 10 + 100);
-	//=> 125.980762
-	_f(3.0 / 2.0 * 5);
-	//=> 7.500000
-	_f((3.0 / 2.0 * 5) * 10 + 200);
-	//=> 275.000000
+	vec2 v = viewport_size;
+	view_zoom_at_point(vw, v, 30.0);
+	_v2(vw->translation);
+	//=> 1000, -2850
+	_g(vw->scale);
+	//=> 30
+	_gg(vw->view_matrix.m[3][0], vw->view_matrix.m[3][3]);
+	//=> -0.0666667, 0.0333333
+
+	v = (vec2) {300, 400};
+	view_zoom_at_point(vw, v, 10.0);
+	_v2(vw->translation);
+	//=> 466.667, -1016.67
+	_g(vw->scale);
+	//=> 10
+	_gg(vw->view_matrix.m[3][0], vw->view_matrix.m[3][3]);
+	//=> -0.0933333, 0.1
+
+	free(vw);
 }
 
-TEST(view_point_to_float_hex)
+TEST(view_resize)
 {
-	vec2 translation = {-100, -200};
-	View vw = {.scale = 10, .translation = translation};
-	vec2 v = {125.981, 275};
-	FloatHex fh = view_point_to_float_hex(&vw, v);
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {500, -2000};
+	f32 scale = 20.0;
+	vec2 v = {300, 400};
 
-	_gg(fh.c, fh.r);
-	//=> 3.00003, 5
+	View *vw = malloc(sizeof *vw);
+	view_initialize(vw, viewport_size, translation, scale);
 
-	_hx(hex_round(fh));
-	//=> 3, 5
+	view_resize(vw, v);
+
+	_v2(vw->viewport_size);
+	//=> 300, 400
+	_gggg(vw->view_matrix.m[0][0], vw->view_matrix.m[1][1], vw->view_matrix.m[3][0], vw->view_matrix.m[3][3]);
+	//=> 0.00333333, 0.0025, -0.166667, 0.05
+
+	free(vw);
 }
 
-TEST(point_to_float_hex_roundtrips)
+TEST(view_point_to_hex)
 {
-	f32 scale = 10;
-	vec2 translation = {-35, -71};
-	View vw = {.scale = scale, .translation = translation};
-	Hex h = {.c = 3, .r = 5};
+	View vw = {
+		.viewport_size = {1000, 600},
+		.translation = {-100, -200},
+		.scale = 10,
+	};
+	vec2 v1 = {125.981, 275};
+	vec2 v2 = {980.3, 540};
+	Hex h;
 
-	_d(hex_equal(hex_round(view_point_to_float_hex(&vw, view_hex_to_point(&vw, h))), h));
-	//=> 1
+	h = view_point_to_hex(&vw, v1);
+	_dd(h.c, h.r);
+	//=> -110, -30
+
+	h = view_point_to_hex(&vw, v2);
+	_dd(h.c, h.r);
+	//=> 87, 5
 }

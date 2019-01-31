@@ -1,8 +1,13 @@
 #include <stdio.h>
+#include <string.h>
 #include "ui.h"
 
 #define UI_HEX_MESH_SIZE 64
+#define UI_FILL_COLORS_COUNT 256
+#define UI_FILL_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
+#define UI_STYLES_BUFFER_CAPACITY_MIN 256
 
+// 0.001953125 = 0.5 / 256
 const char UI_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
 "attribute vec2 gridPosition;\n"
@@ -16,7 +21,7 @@ const char UI_VERTEX_SHADER_SOURCE[] =
 "\n"
 "void main() {\n"
 "	vec2 styleCoord = vec2(gridPosition.s / 64.0, gridPosition.t / 64.0);\n"
-"	float style = 16.0 * texture2D(gridStyles, styleCoord).a + 16.0 * 0.5 / 256.0;\n"
+"	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
@@ -28,7 +33,7 @@ const char UI_FRAGMENT_SHADER_SOURCE[] =
 "	gl_FragColor = color;\n"
 "}\n";
 
-const u8 UI_FILL_COLORS[] = {
+const u8 UI_FILL_COLORS[UI_FILL_COLOR_COMPONENTS_LENGTH] = {
       0,   0,   0,   0,  // Not present
     190, 190, 190, 255,
     255, 140, 140, 255,
@@ -57,22 +62,22 @@ void ui_print_gl_error(const char *filename, int line)
 	while ((error = glGetError()) != GL_NO_ERROR) {
 		switch (error) {
 		case GL_INVALID_ENUM:
-			fprintf(stderr, "%s:%d - An unacceptable value is specified for an enumerated argument.\n", filename, line);
+			SIXCODE_ERROR("%s:%d - An unacceptable value is specified for an enumerated argument.\n", filename, line);
 			break;
 		case GL_INVALID_VALUE:
-			fprintf(stderr, "%s:%d - A numeric argument is out of range.\n", filename, line);
+			SIXCODE_ERROR("%s:%d - A numeric argument is out of range.\n", filename, line);
 			break;
 		case GL_INVALID_OPERATION:
-			fprintf(stderr, "%s:%d - The specified operation is not allowed in the current state.\n", filename, line);
+			SIXCODE_ERROR("%s:%d - The specified operation is not allowed in the current state.\n", filename, line);
 			break;
 		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			fprintf(stderr, "%s:%d - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.\n", filename, line);
+			SIXCODE_ERROR("%s:%d - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.\n", filename, line);
 			break;
 		case GL_OUT_OF_MEMORY:
-			fprintf(stderr, "%s:%d - There is not enough memory left to execute the command.\n", filename, line);
+			SIXCODE_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
 			break;
 		default:
-			fprintf(stderr, "%s:%d - Unknown GL Error %d\n", filename, line, (i32) error);
+			SIXCODE_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (i32) error);
 			break;
 		}
 	}
@@ -99,10 +104,10 @@ static GLuint ui_load_shader(GLenum type, const char *shader_source)
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetShaderInfoLog(shader, info_log_length, NULL, info_log);
-			fprintf(stderr, "Error compiling shader:\n%s\n", info_log);
+			SIXCODE_ERROR("Error compiling shader:\n%s\n", info_log);
 			free(info_log);
 		} else {
-			fprintf(stderr, "Error compiling shader. Nothing in info log.\n");
+			SIXCODE_ERROR("Error compiling shader. Nothing in info log.\n");
 		}
 
 		ui_print_gl_error(__FILE__, __LINE__);
@@ -114,33 +119,28 @@ static GLuint ui_load_shader(GLenum type, const char *shader_source)
 	return shader;
 }
 
-void ui_initialize(Ui *ui, Grid *g)
+i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 {
-	////////////////////
-	// clear
-
-	ui->program = 0;
-	ui->buffers.hex_mesh_vertices = 0;
-	ui->buffers.hex_mesh_fill_indices = 0;
-	ui->buffers.hex_mesh_stroke_indices = 0;
-	ui->textures.fill_colors = 0;
-	ui->textures.grid_styles = 0;
-
 	////////////////////////
 	// load/create + attach
 
 	ui->vertex_shader = ui_load_shader(GL_VERTEX_SHADER, UI_VERTEX_SHADER_SOURCE);
 	ui->fragment_shader = ui_load_shader(GL_FRAGMENT_SHADER, UI_FRAGMENT_SHADER_SOURCE);
 	if (!ui->vertex_shader || !ui->fragment_shader) {
-		ui_terminate(ui);
-		return;
+		glDeleteShader(ui->vertex_shader);
+		glDeleteShader(ui->fragment_shader);
+
+		return 0;
 	}
 
 	ui->program = glCreateProgram();
 	if (!ui->program) {
 		ui_print_gl_error(__FILE__, __LINE__);
-		ui_terminate(ui);
-		return;
+		SIXCODE_ERROR("Error creating program.\n");
+		glDeleteShader(ui->vertex_shader);
+		glDeleteShader(ui->fragment_shader);
+
+		return 0;
 	}
 
 	glAttachShader(ui->program, ui->vertex_shader);
@@ -175,15 +175,21 @@ void ui_initialize(Ui *ui, Grid *g)
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetProgramInfoLog(ui->program, info_log_length, NULL, info_log);
-			fprintf(stderr, "Error linking program:\n%s\n", info_log);
+			SIXCODE_ERROR("Error linking program:\n%s\n", info_log);
 			free(info_log);
 		} else {
-			fprintf(stderr, "Error linking program. Nothing in info log.\n");
+			SIXCODE_ERROR("Error linking program. Nothing in info log.\n");
 		}
 
 		ui_print_gl_error(__FILE__, __LINE__);
-		ui_terminate(ui);
-		return;
+
+		glDetachShader(ui->program, ui->vertex_shader);
+		glDetachShader(ui->program, ui->fragment_shader);
+		glDeleteProgram(ui->program);
+		glDeleteShader(ui->vertex_shader);
+		glDeleteShader(ui->fragment_shader);
+
+		return 0;
 	}
 
 	glUseProgram(ui->program);
@@ -211,6 +217,8 @@ void ui_initialize(Ui *ui, Grid *g)
 			ui->hex_mesh.fill_indices,
 			GL_STATIC_DRAW);
 
+	glGenBuffers(1, &buf->hex_mesh_stroke_indices);
+	// TODO
 	
 	////////////////
 	// textures
@@ -227,14 +235,12 @@ void ui_initialize(Ui *ui, Grid *g)
 			GL_TEXTURE_2D,
 			0,
 			GL_RGBA,
-			16,
+			UI_FILL_COLORS_COUNT,
 			1,
 			0,
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			UI_FILL_COLORS);
-
-	Hex grid_size = quad_size(g->quad);
 
 	glGenTextures(1, &ui->textures.grid_styles);
 	glUniform1i(ui->locations.gridStyles, 1);
@@ -244,16 +250,19 @@ void ui_initialize(Ui *ui, Grid *g)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_ALPHA,
-			grid_size.c,
-			grid_size.r,
-			0,
-			GL_ALPHA,
-			GL_UNSIGNED_BYTE,
-			g->styles);
+
+
+	///////////////////////
+	// styles_buffer
+
+	if (styles_buffer_capacity_max < UI_STYLES_BUFFER_CAPACITY_MIN) {
+		styles_buffer_capacity_max = UI_STYLES_BUFFER_CAPACITY_MIN;
+	}
+	ui->styles_buffer = malloc(UI_STYLES_BUFFER_CAPACITY_MIN * sizeof *ui->styles_buffer);
+	ui->styles_buffer_capacity = UI_STYLES_BUFFER_CAPACITY_MIN;
+	ui->styles_buffer_capacity_max = styles_buffer_capacity_max;
+
+	return 1;
 }
 
 void ui_terminate(Ui *ui)
@@ -275,6 +284,8 @@ void ui_terminate(Ui *ui)
 
 	glDeleteTextures(1, &ui->textures.fill_colors);
 	glDeleteTextures(1, &ui->textures.grid_styles);
+
+	free(ui->styles_buffer);
 }
 
 void ui_draw(Ui *ui, View *vw)
@@ -317,4 +328,66 @@ void ui_draw(Ui *ui, View *vw)
 			ui->hex_mesh.fill_indices_length,
 			GL_UNSIGNED_SHORT,
 			0);
+}
+
+void ui_update_styles(Ui *ui, Grid *g)
+{
+	(void) ui;
+
+	glActiveTexture(GL_TEXTURE1);
+
+	glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_ALPHA,
+			g->storage_quad.size.c,
+			g->storage_quad.size.r,
+			0,
+			GL_ALPHA,
+			GL_UNSIGNED_BYTE,
+			g->styles);
+}
+
+void ui_update_styles_in_quad(Ui *ui, Grid *g, Quad *quad)
+{
+	StorageQuad sq;
+	storage_quad_from_quad(&sq, quad);
+	i32 need_capacity = storage_quad_capacity(&sq);
+
+	if (need_capacity > ui->styles_buffer_capacity) {
+		if (need_capacity > ui->styles_buffer_capacity_max) {
+			ui_update_styles(ui, g);
+
+			return;
+		}
+
+		free(ui->styles_buffer);
+
+		ui->styles_buffer = malloc(need_capacity * sizeof *ui->styles_buffer);
+		ui->styles_buffer_capacity = need_capacity;
+	}
+
+	Hex min = hex_sub(sq.min, g->storage_quad.min);
+	i32 storage_size_c = g->storage_quad.size.c;
+
+	for (i32 r = 0; r < sq.size.r; ++r) {
+		u8 *dest = &ui->styles_buffer[r * sq.size.c];
+		i32 src_i = (r + min.r) * storage_size_c + min.c;
+		const u8 *src = &g->styles[src_i];
+
+		memcpy(dest, src, sq.size.c);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+
+	glTexSubImage2D(
+			GL_TEXTURE_2D,
+			0,
+			min.c,
+			min.r,
+			sq.size.c,
+			sq.size.r,
+			GL_ALPHA,
+			GL_UNSIGNED_BYTE,
+			ui->styles_buffer);
 }

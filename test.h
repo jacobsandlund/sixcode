@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include "valgrind.h"
 
+#define SIXCODE_ERROR(...) sixcode_error_for_test(__VA_ARGS__)
+
 #define _(...) log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)
 #define _dd(...) _("%d, %d\n", __VA_ARGS__)
@@ -21,6 +23,11 @@
 #define _gg(...) _("%g, %g\n", __VA_ARGS__)
 #define _ggg(...) _("%g, %g, %g\n", __VA_ARGS__)
 #define _gggg(...) _("%g, %g, %g, %g\n", __VA_ARGS__)
+#define _s(...) _("%s\n", __VA_ARGS__)
+#define _TEST_SIXCODE_ERROR() { \
+	_s(test_sixcode_error); \
+	test_reset_sixcode_error(); \
+}
 
 #define MAX_FILE_LEN 1000000
 #define MAX_FILES 10000
@@ -67,6 +74,8 @@ typedef struct {
 	int num_results;
 } FileInfo;
 
+static char test_sixcode_error[MAX_OUTPUT_LEN];
+static int test_sixcode_error_i = 0;
 static FileInfo *all_file_info[MAX_FILES];
 static int num_files;
 static int is_focus_on = 0;
@@ -102,6 +111,31 @@ void TPRINTF(const char *format, ...)
 		printf("\n");
 		va_end(argptr);
 	}
+}
+
+void sixcode_error_for_test(const char *format, ...)
+{
+	va_list argptr;
+	va_start(argptr, format);
+
+	int size = MAX_OUTPUT_LEN - test_sixcode_error_i;
+
+	if (size > 0) {
+		int output_len = vsnprintf(
+				&test_sixcode_error[test_sixcode_error_i],
+				size,
+				format,
+				argptr);
+
+		test_sixcode_error_i += output_len;
+	}
+	va_end(argptr);
+}
+
+void test_reset_sixcode_error()
+{
+	test_sixcode_error_i = 0;
+	test_sixcode_error[0] = '\0';
 }
 
 void split_lines(LineData *line_data, char *contents, int len)

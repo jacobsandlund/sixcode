@@ -3,6 +3,8 @@
 #include "../core.h"
 #include "../core.c"
 
+#define WEB_UI_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
+
 
 //////////////////
 // View
@@ -24,6 +26,7 @@ EMSCRIPTEN_KEEPALIVE void web_view_translate_by_delta(View *vw, f32 delta_x, f32
 {
 	vw->translation.x += delta_x;
 	vw->translation.y += delta_y;
+	view_update_matrix(vw);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_point(View *vw, f32 x, f32 y, f32 new_scale)
@@ -38,11 +41,6 @@ EMSCRIPTEN_KEEPALIVE void web_view_resize(View *vw, f32 width, f32 height)
 	view_resize(vw, viewport_size);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_update_matrix(View *vw)
-{
-	view_update_matrix(vw);
-}
-
 
 ////////////////
 // Grid
@@ -53,13 +51,13 @@ EMSCRIPTEN_KEEPALIVE Grid *web_grid_malloc()
 	return g;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_grid_initialize(Grid *g, i32 min_c, i32 min_r, i32 max_c, i32 max_r)
+EMSCRIPTEN_KEEPALIVE void web_grid_initialize(Grid *g)
 {
 	Quad quad = {
-		{min_c, min_r},
-		{max_c, max_r},
+		{0, 0},
+		{127, 63},
 	};
-	grid_initialize(g, quad);
+	grid_initialize(g, &quad);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
@@ -78,14 +76,29 @@ EMSCRIPTEN_KEEPALIVE Ui *web_ui_malloc()
 	return ui;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_initialize(Ui *ui, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_ui_initialize(Ui *ui)
 {
-	ui_initialize(ui, g);
+	ui_initialize(ui, WEB_UI_STYLES_BUFFER_CAPACITY_MAX);
+}
+
+EMSCRIPTEN_KEEPALIVE void web_ui_update_styles(Ui *ui, Grid *g)
+{
+	ui_update_styles(ui, g);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_ui_draw(Ui *ui, View *vw)
 {
 	ui_draw(ui, vw);
+}
+
+
+//////////////////
+// Core
+
+EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, f32 x, f32 y)
+{
+	vec2 v = {x, y};
+	core_toggle_hex_at_point(ui, vw, g, v);
 }
 
 

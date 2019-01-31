@@ -5,9 +5,9 @@
 #define MESH_FILL_INDICES_PER_HEX 12
 #define MESH_VERTICES_PER_HEX 6
 
-const mat2 MESH_DOUBLED_HEX_TO_POINT_MATRIX = {{
+static const mat2 MESH_HEX_TO_POINT = {{
 	{0.8660254037844386,	0.0},	// sqrt(3) / 2.0
-	{0.0,			1.5},	// 3.0 / 2.0
+	{0.0,			-1.5},	// 3.0 / 2.0
 }};
 
 static vec2 mesh_hex_corner(i8 corner)
@@ -47,8 +47,8 @@ void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows)
 
 	for (i32 r = 0; r < num_rows; ++r) {
 		for (i32 c = 0; c < num_columns; ++c) {
-			vec2 doubled_hex = {c * 2 + (r & 1), r};
-			vec2 center = mat2_multiply_v(&MESH_DOUBLED_HEX_TO_POINT_MATRIX, doubled_hex);
+			vec2 h = {(c << 1) + (r & 1), r};
+			vec2 center = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
 
 			for (i32 i = 0; i < MESH_FILL_INDICES_PER_HEX; ++i) {
 				m->fill_indices[fi + i] = vi + fill_indices_single[i];

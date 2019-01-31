@@ -29,9 +29,6 @@ const SCALE_LEVELS = [
     4096.0,
 ];
 
-const TINY_SCALE_LEVEL = SCALE_LEVELS.indexOf(0.5);
-const SMALL_SCALE_LEVEL = SCALE_LEVELS.indexOf(2.0);
-
 let canvas;
 let grid;
 let ui;
@@ -44,13 +41,13 @@ function core_initialized() {
     resizeUI();
 
     grid = Module._web_grid_malloc();
-    Module._web_grid_initialize(grid, 0, 0, 63, 63);
+    Module._web_grid_initialize(grid);
 
     let count = Math.round(64 * 64 / 2);
 
     for (let i = 0; i < count; ++i) {
-        let c = Math.floor(Math.random() * 64);
         let r = Math.floor(Math.random() * 64);
+        let c = 2 * Math.floor(Math.random() * 64) + (r & 1);
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, c, r, style);
     }
@@ -60,7 +57,8 @@ function core_initialized() {
     Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
 
     ui = Module._web_ui_malloc();
-    Module._web_ui_initialize(ui, grid);
+    Module._web_ui_initialize(ui);
+    Module._web_ui_update_styles(ui, grid);
 
     window.addEventListener('resize', resize);
     canvas.addEventListener('wheel', wheel, {passive: true});
@@ -74,7 +72,6 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._web_view_update_matrix(view);
     Module._web_ui_draw(ui, view);
 
     let endTime = performance.now();
@@ -82,8 +79,9 @@ function draw() {
 }
 
 function resizeUI() {
-    let newWidth = window.innerWidth * window.devicePixelRatio;
-    let newHeight = window.innerHeight * window.devicePixelRatio;
+    let dpr = window.devicePixelRatio;
+    let newWidth = window.innerWidth * dpr;
+    let newHeight = window.innerHeight * dpr;
     canvas.width = newWidth;
     canvas.height = newHeight;
     canvas.style.width = window.innerWidth;
@@ -138,8 +136,9 @@ function wheel(e) {
     if (newScaleLevel !== scaleLevel) {
         scaleLevel = newScaleLevel;
         let scale = SCALE_LEVELS[newScaleLevel];
-        let x = e.clientX;
-        let y = e.clientY;
+        let dpr = window.devicePixelRatio;
+        let x = e.clientX * dpr;
+        let y = e.clientY * dpr;
 
         Module._web_view_zoom_at_point(view, x, y, scale);
 
@@ -163,8 +162,9 @@ let lastMouseX = 0.0;
 let lastMouseY = 0.0;
 
 function mouseDown(e) {
-    lastMouseX = e.clientX * window.devicePixelRatio;
-    lastMouseY = e.clientY * window.devicePixelRatio;
+    let dpr = window.devicePixelRatio;
+    lastMouseX = e.clientX * dpr;
+    lastMouseY = e.clientY * dpr;
     isMouseDown = true;
     mouseDownTime = Date.now();
 }
@@ -176,12 +176,10 @@ function mouseUp(e) {
         let x = e.clientX * window.devicePixelRatio;
         let y = e.clientY * window.devicePixelRatio;
 
-        //Module._web_core_toggle_hex_at_point(layout, grid, x, y);
+        Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
 
         let endTime = performance.now();
         console.log('click in ' + (endTime - startTime) + ' ms');
-
-        draw();
     }
 
     isMouseDown = false;

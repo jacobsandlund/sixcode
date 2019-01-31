@@ -11,4 +11,6 @@
 #include "ui.h"
 #include "view.h"
 
+void core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, vec2 v);
+
 #endif // __CORE_H__

@@ -22,8 +22,6 @@ typedef struct {
 	i32 stroke_indices_length;
 } Mesh;
 
-extern const mat2 MESH_HEX_TO_POINT_MATRIX;
-
 void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows);
 void mesh_terminate(Mesh *m);
 

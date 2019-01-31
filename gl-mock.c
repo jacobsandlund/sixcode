@@ -7,51 +7,52 @@
 #define GL_MOCK_MAX_NUM_TEXTURES 8
 
 typedef struct {
-	GLuint bound_buffers[2];
-	const GLvoid *buffer_data[2];
-
+	GLenum active_texture;
 	GLsizei viewport_width;
 	GLsizei viewport_height;
 	const GLfloat *uniform_matrix4_value;
 	GLsizei draw_elements_count;
 	GLsizei attib_pointer_stride;
 
-	GLenum active_texture;
-	i32 texture_width[GL_MOCK_MAX_NUM_TEXTURES];
-	i32 texture_height[GL_MOCK_MAX_NUM_TEXTURES];
-	const GLvoid *texture_data[GL_MOCK_MAX_NUM_TEXTURES];
+	i32 force_create_program_fail;
+	GLenum force_gl_error;
 
 	i32 buffer_i;
 	i32 program_i;
 	i32 shader_i;
 	i32 texture_i;
 	i32 uniform_i;
+
+	GLuint bound_buffers[2];
+	const GLvoid *buffer_data[2];
 	i32 buffers[GL_MOCK_MAX_NUM_BUFFERS];
+
 	i32 programs[GL_MOCK_MAX_NUM_PROGRAMS];
 	i32 program_link_status[GL_MOCK_MAX_NUM_PROGRAMS];
+
 	i32 shaders[GL_MOCK_MAX_NUM_SHADERS];
 	i32 shader_attachments[GL_MOCK_MAX_NUM_SHADERS];
 	i32 shader_compile_status[GL_MOCK_MAX_NUM_SHADERS];
+
 	i32 textures[GL_MOCK_MAX_NUM_TEXTURES];
+	i32 sub_texture_xoffset[GL_MOCK_MAX_NUM_TEXTURES];
+	i32 sub_texture_yoffset[GL_MOCK_MAX_NUM_TEXTURES];
+	i32 texture_width[GL_MOCK_MAX_NUM_TEXTURES];
+	i32 texture_height[GL_MOCK_MAX_NUM_TEXTURES];
+	const GLvoid *texture_data[GL_MOCK_MAX_NUM_TEXTURES];
 } GlMock;
 
 GlMock GL_MOCK = {};
 
 void gl_mock_initialize()
 {
+	GL_MOCK = (GlMock) {};
+
 	GL_MOCK.buffer_i = 1;
 	GL_MOCK.program_i = 1;
 	GL_MOCK.shader_i = 1;
 	GL_MOCK.texture_i = 1;
 	GL_MOCK.uniform_i = 1;
-
-	for (i32 i = 0; i < GL_MOCK_MAX_NUM_PROGRAMS; ++i) {
-		GL_MOCK.program_link_status[i] = 0;
-	}
-
-	for (i32 i = 0; i < GL_MOCK_MAX_NUM_SHADERS; ++i) {
-		GL_MOCK.shader_compile_status[i] = 0;
-	}
 }
 
 void glActiveTexture(GLenum texture)
@@ -115,8 +116,12 @@ void glCompileShader(GLuint shader)
 
 GLuint glCreateProgram()
 {
-	GL_MOCK.programs[GL_MOCK.program_i] = 1;
-	return GL_MOCK.program_i++;
+	if (GL_MOCK.force_create_program_fail) {
+		return 0;
+	} else {
+		GL_MOCK.programs[GL_MOCK.program_i] = 1;
+		return GL_MOCK.program_i++;
+	}
 }
 	
 GLuint glCreateShader()
@@ -182,7 +187,14 @@ void glGenTextures(GLsizei n, GLuint *textures)
 
 GLenum glGetError()
 {
-	return GL_NO_ERROR;
+	if (GL_MOCK.force_gl_error) {
+		GLenum error = GL_MOCK.force_gl_error;
+		GL_MOCK.force_gl_error = 0;
+
+		return error;
+	} else {
+		return GL_NO_ERROR;
+	}
 }
 
 void glGetProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog)
@@ -255,6 +267,21 @@ void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei widt
 	(void) type;
 
 	i32 texture_i = GL_MOCK.active_texture - GL_TEXTURE0;
+	GL_MOCK.texture_width[texture_i] = width;
+	GL_MOCK.texture_height[texture_i] = height;
+	GL_MOCK.texture_data[texture_i] = data;
+}
+
+void glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid * data)
+{
+	(void) target;
+	(void) level;
+	(void) format;
+	(void) type;
+
+	i32 texture_i = GL_MOCK.active_texture - GL_TEXTURE0;
+	GL_MOCK.sub_texture_xoffset[texture_i] = xoffset;
+	GL_MOCK.sub_texture_yoffset[texture_i] = yoffset;
 	GL_MOCK.texture_width[texture_i] = width;
 	GL_MOCK.texture_height[texture_i] = height;
 	GL_MOCK.texture_data[texture_i] = data;

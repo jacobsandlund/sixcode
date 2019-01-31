@@ -31,7 +31,7 @@ TEST(mesh)
 	//=> -0.866025, 0.5
 
 	_gg(m->vertices[12287].x, m->vertices[12287].y);
-	//=> 53.6936, 95
+	//=> 53.6936, -94
 
 	_ddd(m->fill_indices[0], m->fill_indices[1], m->fill_indices[2]);
 	//=> 0, 1, 2
