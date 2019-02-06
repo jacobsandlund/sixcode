@@ -3,6 +3,21 @@
 #include "quad.c"
 
 #define _hx(h) _dd(h.c, h.r)
+#define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
+
+TEST(quad_equals)
+{
+	Quad q1 = {{3, 4}, {60, 80}};
+	Quad q2 = {{3, 4}, {60, 1000}};
+	Quad q3 = {{-3, 4}, {60, 80}};
+
+	_d(quad_equals(&q1, &q1));
+	//=> 1
+	_d(quad_equals(&q1, &q2));
+	//=> 0
+	_d(quad_equals(&q1, &q3));
+	//=> 0
+}
 
 TEST(quad_contains)
 {
@@ -43,21 +58,78 @@ TEST(quad_contains_quad)
 	//=> 0
 }
 
-TEST(quad_is_simple)
+TEST(quad_expand_quad)
+{
+	Quad out_q;
+	Quad q = {{0, 0}, {127, 63}};
+
+	Hex h = {-1, 75};
+	quad_expand_quad(&out_q, &q, h);
+	_qd(out_q);
+	//=> (-1, 0), (127, 75)
+
+	h = (Hex) {253, -480};
+	quad_expand_quad(&q, &q, h);
+	_qd(q);
+	//=> (0, -480), (253, 63)
+}
+
+TEST(quad_block_align)
+{
+	Quad out_q;
+	Hex block_size = {128, 64};
+
+	Quad q = {{1, 0}, {48, 13}};
+	quad_block_align(&out_q, &q, block_size);
+	_qd(out_q);
+	//=> (0, 0), (127, 63)
+
+	q = (Quad) {{-150, -310}, {-60, -129}};
+	quad_block_align(&q, &q, block_size);
+	_qd(q);
+	//=> (-256, -320), (-1, -129)
+
+	q = (Quad) {{-240, -1}, {500, 1020}};
+	quad_block_align(&out_q, &q, block_size);
+	_qd(out_q);
+	//=> (-256, -64), (511, 1023)
+}
+
+TEST(quad_is_block_aligned)
 {
 	Quad q1 = {{0, 0}, {127, 63}};
-	Quad q2 = {{0, 0}, {7, 4}};	// even max.r
-	Quad q3 = {{-1, 0}, {5, 3}};	// odd min.c
-	Quad q4 = {{0, 0}, {5, 3}};	// even max.c / 2
+	Quad q2 = {{-256, 128}, {-1, 1023}};
+	Quad q3 = {{-240, 128}, {-1, 1023}};
+	Quad q4 = {{-256, 128}, {0, 1023}};
+	Quad q5 = {{-256, -63}, {-1, 1023}};
+	Hex block_size = {128, 64};
 
-	_d(quad_is_simple(&q1));
+	_d(quad_is_block_aligned(&q1, block_size));
 	//=> 1
-	_d(quad_is_simple(&q2));
+	_d(quad_is_block_aligned(&q2, block_size));
+	//=> 1
+	_d(quad_is_block_aligned(&q3, block_size));
 	//=> 0
-	_d(quad_is_simple(&q3));
+	_d(quad_is_block_aligned(&q4, block_size));
 	//=> 0
-	_d(quad_is_simple(&q4));
+	_d(quad_is_block_aligned(&q5, block_size));
 	//=> 0
+}
+
+TEST(quad_intersect)
+{
+	Quad out_q;
+	Quad a = {{-128, -256}, {255, 63}};
+	Quad b = {{0, -512}, {127, 127}};
+	Quad c = {{256, 128}, {511, 255}};
+
+	quad_intersect(&out_q, &a, &b);
+	_qd(out_q);
+	//=> (0, -256), (127, 63)
+
+	quad_intersect(&out_q, &a, &c);
+	_qd(out_q);
+	//=> (256, 128), (255, 63)
 }
 
 TEST(storage_quad_from_quad)

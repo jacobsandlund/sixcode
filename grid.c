@@ -1,34 +1,25 @@
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include "grid.h"
+
+const Hex GRID_BLOCK_SIZE = {GRID_BLOCK_SIZE_C, GRID_BLOCK_SIZE_R};
 
 void grid_initialize(Grid *g, Quad *quad)
 {
-	assert(quad_is_simple(quad));
+	assert(quad_is_block_aligned(quad, GRID_BLOCK_SIZE));
 	storage_quad_from_quad(&g->storage_quad, quad);
 	i32 capacity = storage_quad_capacity(&g->storage_quad);
 	g->quad = *quad;
-	g->set = calloc(bit_array_word_capacity(capacity), sizeof *g->set);
 	g->styles = calloc(capacity, sizeof *g->styles);
 }
 
 void grid_terminate(Grid *g)
 {
-	free(g->set);
 	free(g->styles);
 }
 
-//void grid_expand_quad(Grid *g, Quad *quad)
-//{
-//	assert(quad_is_simple(quad) && quad_contains_quad(quad, g-quad)));
-//	storage_quad_from_quad(&g->storage_quad, quad);
-//	i32 capacity = storage_quad_capacity(&g->storage_quad);
-//	g->quad = *quad;
-//	g->set = calloc(bit_array_word_capacity(capacity), sizeof *g->set);
-//	g->styles = calloc(capacity, sizeof *g->styles);
-//}
-//
 static i32 grid_index(Grid *g, Hex h)
 {
 	assert(quad_contains(&g->quad, h));
@@ -42,17 +33,10 @@ u8 grid_get(Grid *g, Hex h)
 	return g->styles[grid_index(g, h)];
 }
 
-i8 grid_has(Grid *g, Hex h)
-{
-	assert(quad_contains(&g->quad, h));
-	return bit_array_has(g->set, grid_index(g, h));
-}
-
 void grid_set(Grid *g, Hex h, u8 style)
 {
 	assert(quad_contains(&g->quad, h));
 	i32 i = grid_index(g, h);
-	bit_array_set(g->set, i);
 	g->styles[i] = style;
 }
 
@@ -60,43 +44,34 @@ void grid_clear(Grid *g, Hex h)
 {
 	assert(quad_contains(&g->quad, h));
 	i32 i = grid_index(g, h);
-	bit_array_clear(g->set, i);
 	g->styles[i] = 0;
 }
 
-void grid_each(Grid *g, Quad *quad, void *context, GridEach each_fn)
+void grid_expand_quad(Grid *g, Quad *quad)
 {
-	BitArray *set = g->set;
-	Quad *grid_quad = &g->quad;
-	i32 storage_size_c = g->storage_quad.size.c;
-	assert(quad_contains_quad(grid_quad, quad));
+	assert(quad_is_block_aligned(quad, GRID_BLOCK_SIZE) && quad_contains_quad(quad, &g->quad));
 
-	for (i32 r = quad->min.r; r <= quad->max.r; ++r) {
-		i32 diff_min_r = r - grid_quad->min.r;
-		i32 c_to_i_offset = diff_min_r * storage_size_c - grid_quad->min.c;
+	StorageQuad new_storage_quad;
+	storage_quad_from_quad(&new_storage_quad, quad);
 
-		i32 min_i = quad->min.c + c_to_i_offset;
-		i32 max_i = quad->max.c + c_to_i_offset;
-		i32 i = min_i;
+	i32 capacity = storage_quad_capacity(&new_storage_quad);
+	u8 *new_styles = calloc(capacity, sizeof *new_styles);
 
-		while (i <= max_i) {
-			i32 i_div_64 = i >> BIT_ARRAY_SHIFT;
-			u64 set_bits = set[i_div_64];
+	Hex min = hex_sub(g->storage_quad.min, new_storage_quad.min);
+	Hex old_size = g->storage_quad.size;
+	i32 new_size_c = new_storage_quad.size.c;
 
-			if (set_bits) {
-				u64 bit = (u64) 1 << (i & BIT_ARRAY_MASK);
+	for (i32 r = 0; r < old_size.r; ++r) {
+		i32 dest_i = (r + min.r) * new_size_c + min.c;
+		u8 *dest = &new_styles[dest_i];
+		const u8 *src = &g->styles[r * old_size.c];
 
-				if ((set_bits & bit) != (u64) 0) {
-					i32 c = i - c_to_i_offset;
-					Hex h = {.c = c, .r = r};
-					u8 style = g->styles[i];
-					each_fn(context, h, style);
-				}
-
-				++i;
-			} else {
-				i = (i_div_64 + 1) << BIT_ARRAY_SHIFT;
-			}
-		}
+		memcpy(dest, src, old_size.c);
 	}
+
+	g->quad = *quad;
+	g->storage_quad = new_storage_quad;
+
+	free(g->styles);
+	g->styles = new_styles;
 }

@@ -8,10 +8,17 @@
 #include "sixcode.h"
 #include "quad.h"
 
+#define UI_HEX_MESH_SIZE GRID_BLOCK_SIZE_R
+#define UI_MAX_TEXTURE_SIZE 4096
+
 typedef struct {
 	GLint position;
 	GLint gridPosition;
+
 	GLint viewMatrix;
+	GLint gridSize;
+	GLint gridPositionOffset;
+
 	GLint fillColors;
 	GLint gridStyles;
 } UiLocations;
@@ -38,6 +45,8 @@ typedef struct {
 
 	Mesh hex_mesh;
 
+	mat4 view_matrix;
+
 	u8 *styles_buffer;
 	i32 styles_buffer_capacity;
 	i32 styles_buffer_capacity_max;
@@ -46,7 +55,7 @@ typedef struct {
 i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max);
 void ui_terminate(Ui *ui);
 void ui_print_gl_error(const char *filename, int line);
-void ui_draw(Ui *ui, View *vw);
+void ui_draw(Ui *ui, View *vw, Grid *g);
 void ui_update_styles(Ui *ui, Grid *g);
 void ui_update_styles_in_quad(Ui *ui, Grid *g, Quad *quad);
 

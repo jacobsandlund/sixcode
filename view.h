@@ -4,18 +4,19 @@
 #include "hex.h"
 #include "matrix.h"
 #include "sixcode.h"
+#include "quad.h"
 
 typedef struct {
-	mat4 view_matrix;
 	vec2 viewport_size;
 	vec2 translation;
 	f32 scale;
 } View;
 
 void view_initialize(View *vw, vec2 viewport_size, vec2 translation, f32 scale);
-void view_update_matrix(View *vw);
 void view_zoom_at_point(View *vw, vec2 v, f32 new_scale);
 void view_resize(View *vw, vec2 viewport_size);
-Hex view_point_to_hex(View *vw, vec2 vec_hex);
+void view_translate(View *vw, vec2 delta);
+vec2 view_point_to_vec_hex(View *vw, vec2 v);
+void view_viewport_to_quad(View *vw, Quad *out_q);
 
 #endif // __VIEW_H__

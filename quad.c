@@ -1,6 +1,16 @@
 #include <math.h>
 #include "quad.h"
 
+i8 quad_equals(Quad *a, Quad *b)
+{
+	return (
+		a->min.c == b->min.c &&
+		a->min.r == b->min.r &&
+		a->max.c == b->max.c &&
+		a->max.r == b->max.r
+	);
+}
+
 i8 quad_contains(Quad *q, Hex h)
 {
 	return (
@@ -14,20 +24,40 @@ i8 quad_contains_quad(Quad *outer, Quad *inner)
 	return (
 		outer->min.c <= inner->min.c &&
 		outer->min.r <= inner->min.r &&
-		inner->max.c <= outer->max.c &&
-		inner->max.r <= outer->max.r
+		outer->max.c >= inner->max.c &&
+		outer->max.r >= inner->max.r
 	);
 }
 
-i8 quad_is_simple(Quad *q)
+void quad_expand_quad(Quad *out_q, Quad *q, Hex h)
 {
-	return (
-		!(q->min.c & 1) &&
-		!(q->min.r & 1) &&
-		(q->max.r & 1) &&
-		(q->max.c & 1) &&
-		(q->max.c & 2)
-	);
+	out_q->min.c = h.c < q->min.c ? h.c : q->min.c;
+	out_q->min.r = h.r < q->min.r ? h.r : q->min.r;
+	out_q->max.c = h.c > q->max.c ? h.c : q->max.c;
+	out_q->max.r = h.r > q->max.r ? h.r : q->max.r;
+}
+
+void quad_block_align(Quad *out_q, Quad *q, Hex block_size)
+{
+	out_q->min.c = q->min.c & ~(block_size.c - 1);
+	out_q->min.r = q->min.r & ~(block_size.r - 1);
+	out_q->max.c = q->max.c | (block_size.c - 1);
+	out_q->max.r = q->max.r | (block_size.r - 1);
+}
+
+i8 quad_is_block_aligned(Quad *q, Hex block_size)
+{
+	Quad aligned;
+	quad_block_align(&aligned, q, block_size);
+	return quad_equals(&aligned, q);
+}
+
+void quad_intersect(Quad *out_q, Quad *a, Quad *b)
+{
+	out_q->min.c = a->min.c > b->min.c ? a->min.c : b->min.c;
+	out_q->min.r = a->min.r > b->min.r ? a->min.r : b->min.r;
+	out_q->max.c = a->max.c < b->max.c ? a->max.c : b->max.c;
+	out_q->max.r = a->max.r < b->max.r ? a->max.r : b->max.r;
 }
 
 void storage_quad_from_quad(StorageQuad *sq, Quad *q)

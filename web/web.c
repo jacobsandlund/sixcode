@@ -22,13 +22,6 @@ EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, f32 width, f32 height, f
 	return view_initialize(vw, viewport_size, translation, scale);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_translate_by_delta(View *vw, f32 delta_x, f32 delta_y)
-{
-	vw->translation.x += delta_x;
-	vw->translation.y += delta_y;
-	view_update_matrix(vw);
-}
-
 EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_point(View *vw, f32 x, f32 y, f32 new_scale)
 {
 	vec2 v = {x, y};
@@ -41,6 +34,12 @@ EMSCRIPTEN_KEEPALIVE void web_view_resize(View *vw, f32 width, f32 height)
 	view_resize(vw, viewport_size);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_view_translate(View *vw, f32 delta_x, f32 delta_y)
+{
+	vec2 delta = {delta_x, delta_y};
+	view_translate(vw, delta);
+}
+
 
 ////////////////
 // Grid
@@ -49,15 +48,6 @@ EMSCRIPTEN_KEEPALIVE Grid *web_grid_malloc()
 {
 	Grid *g = malloc(sizeof *g);
 	return g;
-}
-
-EMSCRIPTEN_KEEPALIVE void web_grid_initialize(Grid *g)
-{
-	Quad quad = {
-		{0, 0},
-		{127, 63},
-	};
-	grid_initialize(g, &quad);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
@@ -86,14 +76,19 @@ EMSCRIPTEN_KEEPALIVE void web_ui_update_styles(Ui *ui, Grid *g)
 	ui_update_styles(ui, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_draw(Ui *ui, View *vw)
+EMSCRIPTEN_KEEPALIVE void web_ui_draw(Ui *ui, View *vw, Grid *g)
 {
-	ui_draw(ui, vw);
+	ui_draw(ui, vw, g);
 }
 
 
 //////////////////
 // Core
+
+EMSCRIPTEN_KEEPALIVE void web_core_grid_initialize(Grid *g)
+{
+	core_grid_initialize(g);
+}
 
 EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, f32 x, f32 y)
 {

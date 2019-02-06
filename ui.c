@@ -2,7 +2,6 @@
 #include <string.h>
 #include "ui.h"
 
-#define UI_HEX_MESH_SIZE 64
 #define UI_FILL_COLORS_COUNT 256
 #define UI_FILL_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
 #define UI_STYLES_BUFFER_CAPACITY_MIN 256
@@ -13,6 +12,8 @@ const char UI_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 gridPosition;\n"
 "\n"
 "uniform mat4 viewMatrix;\n"
+"uniform vec2 gridSize;\n"
+"uniform vec2 gridPositionOffset;\n"
 "\n"
 "uniform sampler2D fillColors;\n"
 "uniform sampler2D gridStyles;\n"
@@ -20,7 +21,7 @@ const char UI_VERTEX_SHADER_SOURCE[] =
 "varying lowp vec4 color;\n"
 "\n"
 "void main() {\n"
-"	vec2 styleCoord = vec2(gridPosition.s / 64.0, gridPosition.t / 64.0);\n"
+"	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
 "	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
@@ -159,6 +160,8 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 	glLinkProgram(ui->program);
 
 	loc->viewMatrix = glGetUniformLocation(ui->program, "viewMatrix");
+	loc->gridSize = glGetUniformLocation(ui->program, "gridSize");
+	loc->gridPositionOffset = glGetUniformLocation(ui->program, "gridPositionOffset");
 	loc->fillColors = glGetUniformLocation(ui->program, "fillColors");
 	loc->gridStyles = glGetUniformLocation(ui->program, "gridStyles");
 
@@ -224,7 +227,6 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 	// textures
 
 	glGenTextures(1, &ui->textures.fill_colors);
-	glUniform1i(ui->locations.fillColors, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui->textures.fill_colors);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -243,14 +245,12 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 			UI_FILL_COLORS);
 
 	glGenTextures(1, &ui->textures.grid_styles);
-	glUniform1i(ui->locations.gridStyles, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, ui->textures.grid_styles);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
 
 	///////////////////////
 	// styles_buffer
@@ -261,6 +261,16 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 	ui->styles_buffer = malloc(UI_STYLES_BUFFER_CAPACITY_MIN * sizeof *ui->styles_buffer);
 	ui->styles_buffer_capacity = UI_STYLES_BUFFER_CAPACITY_MIN;
 	ui->styles_buffer_capacity_max = styles_buffer_capacity_max;
+
+
+	///////////////////////
+	// view_matrix
+
+	for (i32 i = 0; i < 4; i++) {
+		for (i32 j = 0; j < 4; j++) {
+			ui->view_matrix.m[i][j] = 0.0f;
+		}
+	}
 
 	return 1;
 }
@@ -288,14 +298,20 @@ void ui_terminate(Ui *ui)
 	free(ui->styles_buffer);
 }
 
-void ui_draw(Ui *ui, View *vw)
+void ui_draw(Ui *ui, View *vw, Grid *g)
 {
+	/////////////////////
+	// Global state
+
 	glViewport(0, 0, vw->viewport_size.x, vw->viewport_size.y);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(ui->program);
+
+	/////////////////////
+	// Attributes
 
 	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.hex_mesh_vertices);
 
@@ -321,13 +337,84 @@ void ui_draw(Ui *ui, View *vw)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.hex_mesh_fill_indices);
 
-	glUniformMatrix4fv(ui->locations.viewMatrix, 1, GL_FALSE, (GLfloat*) &vw->view_matrix.m[0][0]);
+	///////////////////
+	// Uniforms
 
-	glDrawElements(
-			GL_TRIANGLES,
-			ui->hex_mesh.fill_indices_length,
-			GL_UNSIGNED_SHORT,
-			0);
+	glUniform2f(
+			ui->locations.gridSize,
+			(f32) g->storage_quad.size.c,
+			(f32) g->storage_quad.size.r);
+
+	//////////////////
+	// Textures
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ui->textures.fill_colors);
+	glUniform1i(ui->locations.fillColors, 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, ui->textures.grid_styles);
+	glUniform1i(ui->locations.gridStyles, 1);
+
+	//////////////////
+	// View matrix
+
+	f64 size_x = vw->viewport_size.x;
+	f64 size_y = vw->viewport_size.y;
+	f64 scale_inv = 1.0 / vw->scale;
+	f64 translation_x = -vw->translation.x * scale_inv * 2.0;
+	f64 translation_y = vw->translation.y * scale_inv * 2.0;
+
+	ui->view_matrix.m[0][0] = 1.0 / size_x;
+	ui->view_matrix.m[1][1] = 1.0 / size_y;
+	ui->view_matrix.m[3][3] = scale_inv;
+
+	//////////////////
+	// Quad
+
+	Quad q;
+	view_viewport_to_quad(vw, &q);
+	quad_block_align(&q, &q, GRID_BLOCK_SIZE);
+	quad_intersect(&q, &q, &g->quad);
+
+	StorageQuad sq;
+	storage_quad_from_quad(&sq, &q);
+
+	Hex sq_min_offset = hex_sub(sq.min, g->storage_quad.min);
+
+	//////////////////
+	// Draw
+
+	for (i32 r = 0; r < sq.size.r; r += UI_HEX_MESH_SIZE) {
+		for (i32 c = 0; c < sq.size.c; c += UI_HEX_MESH_SIZE) {
+			vec2 h = {
+				(c + sq.min.c) << 1,
+				r + sq.min.r,
+			};
+			vec2 v = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
+
+			ui->view_matrix.m[3][0] = (translation_x + v.x) / size_x;
+			ui->view_matrix.m[3][1] = (translation_y + v.y) / size_y;
+
+			glUniformMatrix4fv(
+					ui->locations.viewMatrix,
+					1,
+					GL_FALSE,
+					(GLfloat*) &ui->view_matrix.m[0][0]);
+
+			glUniform2f(
+					ui->locations.gridPositionOffset,
+					(f32) (c + sq_min_offset.c),
+					(f32) (r + sq_min_offset.r));
+
+			glDrawElements(
+					GL_TRIANGLES,
+					ui->hex_mesh.fill_indices_length,
+					GL_UNSIGNED_SHORT,
+					0);
+		}
+	}
+
 }
 
 void ui_update_styles(Ui *ui, Grid *g)

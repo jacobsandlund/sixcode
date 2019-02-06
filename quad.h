@@ -14,9 +14,13 @@ typedef struct {
 	Hex size;
 } StorageQuad;
 
+i8 quad_equals(Quad *a, Quad *b);
 i8 quad_contains(Quad *q, Hex h);
 i8 quad_contains_quad(Quad *outer, Quad *inner);
-i8 quad_is_simple(Quad *q);
+void quad_expand_quad(Quad *out_q, Quad *q, Hex h);
+void quad_block_align(Quad *out_q, Quad *q, Hex block_size);
+i8 quad_is_block_aligned(Quad *q, Hex block_size);
+void quad_intersect(Quad *out_q, Quad *a, Quad *b);
 
 void storage_quad_from_quad(StorageQuad *sq, Quad *q);
 i32 storage_quad_capacity(StorageQuad *sq);

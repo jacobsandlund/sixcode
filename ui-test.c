@@ -1,5 +1,4 @@
 #include "test.h"
-#include "bit-array.c"
 #include "gl-mock.c"
 #include "grid.c"
 #include "hex.c"
@@ -44,10 +43,14 @@ TEST(ui)
 	//=> 1
 	_d(ui->locations.viewMatrix);
 	//=> 1
-	_d(ui->locations.fillColors);
+	_d(ui->locations.gridSize);
 	//=> 2
-	_d(ui->locations.gridStyles);
+	_d(ui->locations.gridPositionOffset);
 	//=> 3
+	_d(ui->locations.fillColors);
+	//=> 4
+	_d(ui->locations.gridStyles);
+	//=> 5
 
 	/////////////////////
 	// compiled + linked
@@ -111,6 +114,12 @@ TEST(ui)
 	_d(ui->styles_buffer_capacity_max);
 	//=> 1024
 
+	///////////////////////
+	// view_matrix
+
+	_gggg(ui->view_matrix.m[0][0], ui->view_matrix.m[1][0], ui->view_matrix.m[2][3], ui->view_matrix.m[3][3]);
+	//=> 0, 0, 0, 0
+
 	////////////////////////////
 	// terminate
 
@@ -165,7 +174,7 @@ TEST(ui_initialize_pass_fail)
 	_d(ui_initialize(ui, 0));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
-	//=> ./ui.c:138 - The specified operation is not allowed in the current state.
+	//=> ./ui.c:139 - The specified operation is not allowed in the current state.
 	//=> Error creating program.
 	//=>
 
@@ -193,9 +202,9 @@ TEST(ui_initialize_pass_fail)
 TEST(ui_draw)
 {
 	vec2 viewport_size = {1000, 600};
-	vec2 translation = {100, 250};
+	vec2 translation = {100, 100};
 	f32 scale = 10.0;
-	Quad quad = {{0, 0}, {127, 63}};
+	Quad quad = {{-128, 0}, {255, 127}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -207,21 +216,60 @@ TEST(ui_draw)
 	ui_initialize(ui, 0);
 	ui_update_styles(ui, g);
 
-	ui_draw(ui, vw);
+	view_viewport_to_quad(vw, &quad);
+	_hx(quad.min);
+	//=> -93, -27
+	_hx(quad.max);
+	//=> 139, 54
+
+	ui_draw(ui, vw, g);
+
+	// Global state
 
 	_d(GL_MOCK.viewport_width);
 	//=> 1000
 	_d(GL_MOCK.viewport_height);
 	//=> 600
 
-	_d(GL_MOCK.attib_pointer_stride);
+	// Attributes
+
+	_d(GL_MOCK.bound_buffers[0] == ui->buffers.hex_mesh_vertices);
+	//=> 1
+	_d(GL_MOCK.bound_buffers[1] == ui->buffers.hex_mesh_fill_indices);
+	//=> 1
+	_d(GL_MOCK.attrib_pointer_offset);
+	//=> 8
+	_d(GL_MOCK.attrib_pointer_stride);
 	//=> 12
 
-	_d(GL_MOCK.uniform_matrix4_value == &vw->view_matrix.m[0][0]);
+	// Uniforms
+
+	_d(GL_MOCK.uniform_matrix4_value == &ui->view_matrix.m[0][0]);
 	//=> 1
 
+	// Textures
+
+	_d(GL_MOCK.bound_textures[0] == ui->textures.fill_colors);
+	//=> 1
+	_d(GL_MOCK.bound_textures[1] == ui->textures.grid_styles);
+	//=> 1
+
+	// Draw
+
 	_d(GL_MOCK.draw_elements_count);
-	//=> 49152
+	//=> 147456
+	_d(49152 * 3);  // Draw the three showing blocks
+	//=> 147456
+
+	mat4 *m = &ui->view_matrix;
+	_gggg(m->m[0][0], m->m[0][1], m->m[0][2], m->m[0][3]);
+	//=> 0.001, 0, 0, 0
+	_gggg(m->m[1][0], m->m[1][1], m->m[1][2], m->m[1][3]);
+	//=> 0, 0.00166667, 0, 0
+	_gggg(m->m[2][0], m->m[2][1], m->m[2][2], m->m[2][3]);
+	//=> 0, 0, 0, 0
+	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
+	//=> 0.0908512, 0.0333333, 0, 0.1
 
 	ui_terminate(ui);
 	grid_terminate(g);
@@ -260,7 +308,7 @@ TEST(ui_update_styles_in_quad)
 {
 	Quad quad;
 	StorageQuad sq;
-	Quad grid_quad = {{40, 10}, {167, 73}};
+	Quad grid_quad = {{0, 0}, {127, 63}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -275,33 +323,33 @@ TEST(ui_update_styles_in_quad)
 
 	ui_update_styles(ui, g);
 
-	quad = (Quad) {{60, 30}, {71, 69}};
+	// Under the current capacity
+	quad = (Quad) {{10, 20}, {31, 59}};
 	storage_quad_from_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
-	//=> 10, 20
+	//=> 5, 20
 	_hx(sq.size);
-	//=> 6, 40
+	//=> 11, 40
 	
-	// Under the current capacity
 	ui_update_styles_in_quad(ui, g, &quad);
 
 	_dd(GL_MOCK.sub_texture_xoffset[1], GL_MOCK.sub_texture_yoffset[1]);
-	//=> 10, 20
+	//=> 5, 20
 	_dd(GL_MOCK.texture_width[1], GL_MOCK.texture_height[1]);
-	//=> 6, 40
+	//=> 11, 40
 	_d(ui->styles_buffer_capacity);
-	//=> 256
+	//=> 440
 	_d(GL_MOCK.texture_data[1] == ui->styles_buffer);
 	//=> 1
 
-	quad = (Quad) {{50, 20}, {149, 69}};
+	// Under/equal the max capacity
+	quad = (Quad) {{10, 10}, {109, 59}};
 	storage_quad_from_quad(&sq, &quad);
 	_hx(sq.size);
 	//=> 50, 50
 	_d(storage_quad_capacity(&sq));
 	//=> 2500
 
-	// Under/equal the max capacity
 	ui_update_styles_in_quad(ui, g, &quad);
 
 	_d(ui->styles_buffer_capacity);
@@ -309,7 +357,8 @@ TEST(ui_update_styles_in_quad)
 	_dd(GL_MOCK.texture_width[1], GL_MOCK.texture_height[1]);
 	//=> 50, 50
 
-	quad = (Quad) {{50, 20}, {149, 70}};
+	// Over the max capacity
+	quad = (Quad) {{10, 10}, {109, 60}};
 	storage_quad_from_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
 	//=> 5, 10
@@ -318,7 +367,6 @@ TEST(ui_update_styles_in_quad)
 	_hx(g->storage_quad.size);
 	//=> 64, 64
 
-	// Over the max capacity
 	ui_update_styles_in_quad(ui, g, &quad);
 
 	_d(ui->styles_buffer_capacity);

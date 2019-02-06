@@ -12,7 +12,8 @@ typedef struct {
 	GLsizei viewport_height;
 	const GLfloat *uniform_matrix4_value;
 	GLsizei draw_elements_count;
-	GLsizei attib_pointer_stride;
+	GLsizei attrib_pointer_stride;
+	GLsizei attrib_pointer_offset;
 
 	i32 force_create_program_fail;
 	GLenum force_gl_error;
@@ -34,6 +35,7 @@ typedef struct {
 	i32 shader_attachments[GL_MOCK_MAX_NUM_SHADERS];
 	i32 shader_compile_status[GL_MOCK_MAX_NUM_SHADERS];
 
+	GLuint bound_textures[GL_MOCK_MAX_NUM_TEXTURES];
 	i32 textures[GL_MOCK_MAX_NUM_TEXTURES];
 	i32 sub_texture_xoffset[GL_MOCK_MAX_NUM_TEXTURES];
 	i32 sub_texture_yoffset[GL_MOCK_MAX_NUM_TEXTURES];
@@ -73,10 +75,15 @@ void glBindAttribLocation(GLuint program, GLuint index, const GLchar *name)
 	(void) name;
 }
 
+static i32 texture_i()
+{
+	return GL_MOCK.active_texture - GL_TEXTURE0;
+}
+
 void glBindTexture(GLenum target, GLuint texture)
 {
 	(void) target;
-	(void) texture;
+	GL_MOCK.bound_textures[texture_i()] = texture;
 }
 
 static i32 buffer_target_i(GLenum target)
@@ -163,7 +170,7 @@ void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indic
 	(void) mode;
 	(void) type;
 	(void) indices;
-	GL_MOCK.draw_elements_count = count;
+	GL_MOCK.draw_elements_count += count;
 }
 
 void glEnableVertexAttribArray(GLuint index)
@@ -266,10 +273,9 @@ void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei widt
 	(void) format;
 	(void) type;
 
-	i32 texture_i = GL_MOCK.active_texture - GL_TEXTURE0;
-	GL_MOCK.texture_width[texture_i] = width;
-	GL_MOCK.texture_height[texture_i] = height;
-	GL_MOCK.texture_data[texture_i] = data;
+	GL_MOCK.texture_width[texture_i()] = width;
+	GL_MOCK.texture_height[texture_i()] = height;
+	GL_MOCK.texture_data[texture_i()] = data;
 }
 
 void glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid * data)
@@ -298,6 +304,13 @@ void glUniform1i(GLint location, GLint v0)
 {
 	(void) location;
 	(void) v0;
+}
+
+void glUniform2f(GLint location, GLfloat v0, GLfloat v1)
+{
+	(void) location;
+	(void) v0;
+	(void) v1;
 }
 
 void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
@@ -329,7 +342,8 @@ void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean norm
 	(void) type;
 	(void) normalized;
 	(void) pointer;
-	GL_MOCK.attib_pointer_stride = stride;
+	GL_MOCK.attrib_pointer_stride = stride;
+	GL_MOCK.attrib_pointer_offset = (GLsizei) pointer;
 }
 
 void glViewport(GLint x, GLint y, GLsizei width, GLsizei height)

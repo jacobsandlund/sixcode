@@ -41,13 +41,13 @@ function core_initialized() {
     resizeUI();
 
     grid = Module._web_grid_malloc();
-    Module._web_grid_initialize(grid);
+    Module._web_core_grid_initialize(grid);
 
-    let count = Math.round(64 * 64 / 2);
+    let count = 6000000;
 
     for (let i = 0; i < count; ++i) {
-        let r = Math.floor(Math.random() * 64);
-        let c = 2 * Math.floor(Math.random() * 64) + (r & 1);
+        let r = Math.floor(Math.random() * 4096) - 4096/2;
+        let c = 2 * Math.floor(Math.random() * 4096) + (r & 1) - 4096;
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, c, r, style);
     }
@@ -72,7 +72,7 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._web_ui_draw(ui, view);
+    Module._web_ui_draw(ui, view, grid);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');
@@ -209,7 +209,7 @@ function mouseMove(e) {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
 
-        Module._web_view_translate_by_delta(view, deltaX, deltaY);
+        Module._web_view_translate(view, deltaX, deltaY);
 
         draw();
     }

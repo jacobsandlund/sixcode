@@ -2,39 +2,21 @@
 #include <stdlib.h>
 #include "view.h"
 
+#define VIEW_HEX_TOP_POINT_CUTOFF 0.3333333333333333
+#define VIEW_HEX_BOTTOM_POINT_CUTOFF 0.6666666666666666
+
 static const mat2 VIEW_POINT_TO_HEX = {{
 	{1.1547005383792517,	0.0},	// 2.0 / sqrt(3)
 	{0.0,			-0.6666666666666666},	// 2.0 / 3.0
 }};
+
+static const f64 VIEW_DOUBLE_EPSILON = 1e-9;
 
 void view_initialize(View *vw, vec2 viewport_size, vec2 translation, f32 scale)
 {
 	vw->viewport_size = viewport_size;
 	vw->scale = scale;
 	vw->translation = translation;
-
-	for (i32 i = 0; i < 4; i++) {
-		for (i32 j = 0; j < 4; j++) {
-			vw->view_matrix.m[i][j] = 0.0f;
-		}
-	}
-
-	view_update_matrix(vw);
-}
-
-void view_update_matrix(View *vw)
-{
-	f64 size_x = vw->viewport_size.x;
-	f64 size_y = vw->viewport_size.y;
-	f64 scale_inv = 1.0 / vw->scale;
-	f64 translation_x = vw->translation.x;
-	f64 translation_y = vw->translation.y;
-
-	vw->view_matrix.m[0][0] = 1.0 / size_x;
-	vw->view_matrix.m[1][1] = 1.0 / size_y;
-	vw->view_matrix.m[3][0] = -translation_x / size_x * scale_inv * 2.0;
-	vw->view_matrix.m[3][1] =  translation_y / size_y * scale_inv * 2.0;
-	vw->view_matrix.m[3][3] = scale_inv;
 }
 
 void view_zoom_at_point(View *vw, vec2 v, f32 new_scale)
@@ -48,17 +30,20 @@ void view_zoom_at_point(View *vw, vec2 v, f32 new_scale)
 	vw->translation.x += (f64) v_moved.x * scale_factor;
 	vw->translation.y += (f64) v_moved.y * scale_factor;
 	vw->scale = new_scale;
-
-	view_update_matrix(vw);
 }
 
 void view_resize(View *vw, vec2 viewport_size)
 {
 	vw->viewport_size = viewport_size;
-	view_update_matrix(vw);
 }
 
-Hex view_point_to_hex(View *vw, vec2 v)
+void view_translate(View *vw, vec2 delta)
+{
+	vw->translation.x += delta.x;
+	vw->translation.y += delta.y;
+}
+
+vec2 view_point_to_vec_hex(View *vw, vec2 v)
 {
 	vec2 v_moved = {
 		 v.x - vw->viewport_size.x / 2.0f + vw->translation.x,
@@ -69,5 +54,49 @@ Hex view_point_to_hex(View *vw, vec2 v)
 		(f64) v_moved.y / (f64) vw->scale * 2.0,
 	};
 
-	return hex_round(mat2_multiply_v(&VIEW_POINT_TO_HEX, v_scaled));
+	return mat2_multiply_v(&VIEW_POINT_TO_HEX, v_scaled);
+}
+
+void view_viewport_to_quad(View *vw, Quad *out_q)
+{
+	vec2 origin = {0, 0};
+	vec2 top_left = view_point_to_vec_hex(vw, origin);
+	vec2 bottom_right = view_point_to_vec_hex(vw, vw->viewport_size);
+
+	i32 top = floor(top_left.y);
+	i32 left = floor(top_left.x);
+	i32 bottom = floor(bottom_right.y);
+	i32 right = ceil((f64) bottom_right.x + VIEW_DOUBLE_EPSILON);
+
+	top += top_left.y - top > VIEW_HEX_BOTTOM_POINT_CUTOFF;
+	bottom += bottom_right.y - bottom > VIEW_HEX_TOP_POINT_CUTOFF;
+
+	out_q->min = (Hex) {left, top};
+	out_q->max = (Hex) {right, bottom};
+
+	if (right - left <= 2 || bottom - top <= 2) {
+		vec2 top_right = {bottom_right.x, top_left.y};
+		vec2 bottom_left = {top_left.x, bottom_right.y};
+
+		Hex top_left_hex = hex_round(top_left);
+		Hex top_right_hex = hex_round(top_right);
+		Hex bottom_left_hex = hex_round(bottom_left);
+		Hex bottom_right_hex = hex_round(bottom_right);
+
+		if (top_left_hex.c == top_right_hex.c) {
+			out_q->min.r = top_left_hex.r;
+		}
+
+		if (bottom_left_hex.c == bottom_right_hex.c) {
+			out_q->max.r = bottom_left_hex.r;
+		}
+
+		if (top_left_hex.r == bottom_left_hex.r) {
+			out_q->min.c = top_left_hex.c;
+		}
+
+		if (top_right_hex.r == bottom_right_hex.r) {
+			out_q->max.c = top_right_hex.c;
+		}
+	}
 }
