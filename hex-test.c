@@ -1,4 +1,3 @@
-#include <math.h>
 #include "test.h"
 #include "hex.c"
 

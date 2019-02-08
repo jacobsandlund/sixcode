@@ -5,28 +5,40 @@
 #include "mesh.h"
 #include "view.h"
 #include "grid.h"
+#include "shader.h"
 #include "sixcode.h"
 #include "quad.h"
 
-#define UI_HEX_MESH_SIZE GRID_BLOCK_SIZE_R
+#define UI_MESH_SIZE GRID_BLOCK_SIZE_R
 #define UI_MAX_TEXTURE_SIZE 4096
 
 typedef struct {
 	GLint position;
 	GLint gridPosition;
+} UiAttributes;
 
+typedef struct {
 	GLint viewMatrix;
 	GLint gridSize;
 	GLint gridPositionOffset;
 
 	GLint fillColors;
 	GLint gridStyles;
-} UiLocations;
+} UiFillUniforms;
 
 typedef struct {
-	GLuint hex_mesh_vertices;
-	GLuint hex_mesh_fill_indices;
-	GLuint hex_mesh_stroke_indices;
+	GLint viewMatrix;
+	GLint gridSize;
+	GLint gridPositionOffset;
+	GLint strokeColor;
+
+	GLint gridStyles;
+} UiStrokeUniforms;
+
+typedef struct {
+	GLuint vertices;
+	GLuint fill_indices;
+	GLuint stroke_indices;
 } UiBuffers;
 
 typedef struct {
@@ -35,17 +47,20 @@ typedef struct {
 } UiTextures;
 
 typedef struct {
-	GLuint vertex_shader;
-	GLuint fragment_shader;
-	GLuint program;
+	ShaderProgram fill_shader;
+	ShaderProgram stroke_shader;
 
-	UiLocations locations;
+	UiAttributes attributes;
+	UiFillUniforms fill_uniforms;
+	UiStrokeUniforms stroke_uniforms;
 	UiBuffers buffers;
 	UiTextures textures;
 
-	Mesh hex_mesh;
+	Mesh mesh;
 
 	mat4 view_matrix;
+	f64 translation_x;
+	f64 translation_y;
 
 	u8 *styles_buffer;
 	i32 styles_buffer_capacity;
@@ -54,8 +69,7 @@ typedef struct {
 
 i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max);
 void ui_terminate(Ui *ui);
-void ui_print_gl_error(const char *filename, int line);
-void ui_draw(Ui *ui, View *vw, Grid *g);
+void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad);
 void ui_update_styles(Ui *ui, Grid *g);
 void ui_update_styles_in_quad(Ui *ui, Grid *g, Quad *quad);
 

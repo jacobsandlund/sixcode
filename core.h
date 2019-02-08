@@ -2,11 +2,13 @@
 #define __CORE_H__
 
 #include "sixcode.h"
+#include "draw.h"
 #include "grid.h"
 #include "hex.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "quad.h"
+#include "shader.h"
 #include "ui.h"
 #include "view.h"
 

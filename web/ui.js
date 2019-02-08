@@ -43,11 +43,9 @@ function core_initialized() {
     grid = Module._web_grid_malloc();
     Module._web_core_grid_initialize(grid);
 
-    let count = 6000000;
-
-    for (let i = 0; i < count; ++i) {
-        let r = Math.floor(Math.random() * 4096) - 4096/2;
-        let c = 2 * Math.floor(Math.random() * 4096) + (r & 1) - 4096;
+    for (let i = 0; i < 512; ++i) {
+        let r = Math.floor(Math.random() * 64);
+        let c = 2 * Math.floor(Math.random() * 64) + (r & 1);
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, c, r, style);
     }
@@ -72,7 +70,7 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._web_ui_draw(ui, view, grid);
+    Module._web_draw(ui, view, grid);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');

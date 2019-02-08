@@ -2,11 +2,13 @@
 
 
 // Include all source code in single translation unit
+#include "draw.c"
 #include "grid.c"
 #include "hex.c"
 #include "matrix.c"
 #include "mesh.c"
 #include "quad.c"
+#include "shader.c"
 #include "ui.c"
 #include "view.c"
 
@@ -15,7 +17,7 @@
 
 void core_grid_initialize(Grid *g)
 {
-	Quad quad = {{-UI_MAX_TEXTURE_SIZE, -UI_MAX_TEXTURE_SIZE / 2}, {UI_MAX_TEXTURE_SIZE - 1, UI_MAX_TEXTURE_SIZE / 2 - 1}};
+	Quad quad = {{0, 0}, {0, 0}};
 	quad_block_align(&quad, &quad, GRID_BLOCK_SIZE);
 	grid_initialize(g, &quad);
 }
@@ -64,5 +66,5 @@ void core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, vec2 v)
 
 	Quad quad = {h, h};
 	ui_update_styles_in_quad(ui, g, &quad);
-	ui_draw(ui, vw, g);
+	draw(ui, vw, g);
 }

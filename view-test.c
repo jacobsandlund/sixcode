@@ -7,25 +7,6 @@
 #define _v2(v) _gg(v.x, v.y)
 #define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
 
-TEST(view_initialize)
-{
-	vec2 viewport_size = {1000, 600};
-	vec2 translation = {100, 250};
-	f32 scale = 20.0;
-
-	View *vw = malloc(sizeof *vw);
-	view_initialize(vw, viewport_size, translation, scale);
-
-	_v2(vw->viewport_size);
-	//=> 1000, 600
-	_v2(vw->translation);
-	//=> 100, 250
-	_g(vw->scale);
-	//=> 20
-
-	free(vw);
-}
-
 TEST(view_zoom_at_point)
 {
 	View vw = {

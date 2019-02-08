@@ -17,9 +17,9 @@ EMSCRIPTEN_KEEPALIVE View *web_view_malloc()
 
 EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, f32 width, f32 height, f32 translation_x, f32 translation_y, f32 scale)
 {
-	vec2 viewport_size = {width, height};
-	vec2 translation = {translation_x, translation_y};
-	return view_initialize(vw, viewport_size, translation, scale);
+	vw->viewport_size = (vec2) {width, height};
+	vw->translation = (vec2) {translation_x, translation_y};
+	vw->scale = scale;
 }
 
 EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_point(View *vw, f32 x, f32 y, f32 new_scale)
@@ -76,9 +76,13 @@ EMSCRIPTEN_KEEPALIVE void web_ui_update_styles(Ui *ui, Grid *g)
 	ui_update_styles(ui, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_draw(Ui *ui, View *vw, Grid *g)
+
+//////////////////
+// Draw
+
+EMSCRIPTEN_KEEPALIVE void web_draw(Ui *ui, View *vw, Grid *g)
 {
-	ui_draw(ui, vw, g);
+	draw(ui, vw, g);
 }
 
 

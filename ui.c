@@ -7,7 +7,7 @@
 #define UI_STYLES_BUFFER_CAPACITY_MIN 256
 
 // 0.001953125 = 0.5 / 256
-const char UI_VERTEX_SHADER_SOURCE[] =
+const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
 "attribute vec2 gridPosition;\n"
 "\n"
@@ -24,6 +24,26 @@ const char UI_VERTEX_SHADER_SOURCE[] =
 "	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
 "	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
+"	gl_Position = viewMatrix * position;\n"
+"}\n";
+
+const char UI_STROKE_VERTEX_SHADER_SOURCE[] =
+"attribute vec4 position;\n"
+"attribute vec2 gridPosition;\n"
+"\n"
+"uniform mat4 viewMatrix;\n"
+"uniform vec2 gridSize;\n"
+"uniform vec2 gridPositionOffset;\n"
+"uniform vec4 strokeColor;\n"
+"\n"
+"uniform sampler2D gridStyles;\n"
+"\n"
+"varying lowp vec4 color;\n"
+"\n"
+"void main() {\n"
+"	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
+"	float present = ceil(texture2D(gridStyles, styleCoord).a);\n"
+"	color = strokeColor * present;\n"
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
 
@@ -56,172 +76,136 @@ const u8 UI_FILL_COLORS[UI_FILL_COLOR_COMPONENTS_LENGTH] = {
     140, 190, 220, 255,
 };
 
-
-void ui_print_gl_error(const char *filename, int line)
-{
-	GLenum error;
-	while ((error = glGetError()) != GL_NO_ERROR) {
-		switch (error) {
-		case GL_INVALID_ENUM:
-			SIXCODE_ERROR("%s:%d - An unacceptable value is specified for an enumerated argument.\n", filename, line);
-			break;
-		case GL_INVALID_VALUE:
-			SIXCODE_ERROR("%s:%d - A numeric argument is out of range.\n", filename, line);
-			break;
-		case GL_INVALID_OPERATION:
-			SIXCODE_ERROR("%s:%d - The specified operation is not allowed in the current state.\n", filename, line);
-			break;
-		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			SIXCODE_ERROR("%s:%d - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.\n", filename, line);
-			break;
-		case GL_OUT_OF_MEMORY:
-			SIXCODE_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
-			break;
-		default:
-			SIXCODE_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (i32) error);
-			break;
-		}
-	}
-}
-
-static GLuint ui_load_shader(GLenum type, const char *shader_source)
-{
-	GLuint shader = glCreateShader(type);
-	if (!shader) {
-		ui_print_gl_error(__FILE__, __LINE__);
-		return 0;
-	}
-
-	glShaderSource(shader, 1, &shader_source, NULL);
-	glCompileShader(shader);
-
-	GLint compiled;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-
-	if (!compiled) {
-		GLint info_log_length = 0;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_log_length);
-
-		if (info_log_length > 1) {
-			char *info_log = malloc(info_log_length * sizeof *info_log);
-			glGetShaderInfoLog(shader, info_log_length, NULL, info_log);
-			SIXCODE_ERROR("Error compiling shader:\n%s\n", info_log);
-			free(info_log);
-		} else {
-			SIXCODE_ERROR("Error compiling shader. Nothing in info log.\n");
-		}
-
-		ui_print_gl_error(__FILE__, __LINE__);
-		glDeleteShader(shader);
-
-		return 0;
-	}
-
-	return shader;
-}
-
 i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 {
 	////////////////////////
-	// load/create + attach
+	// load/create
 
-	ui->vertex_shader = ui_load_shader(GL_VERTEX_SHADER, UI_VERTEX_SHADER_SOURCE);
-	ui->fragment_shader = ui_load_shader(GL_FRAGMENT_SHADER, UI_FRAGMENT_SHADER_SOURCE);
-	if (!ui->vertex_shader || !ui->fragment_shader) {
-		glDeleteShader(ui->vertex_shader);
-		glDeleteShader(ui->fragment_shader);
+	ui->fill_shader.vertex = shader_load(GL_VERTEX_SHADER, UI_FILL_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	ui->fill_shader.fragment = shader_load(GL_FRAGMENT_SHADER, UI_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	ui->stroke_shader.vertex = shader_load(GL_VERTEX_SHADER, UI_STROKE_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	ui->stroke_shader.fragment = ui->fill_shader.fragment;
 
-		return 0;
-	}
-
-	ui->program = glCreateProgram();
-	if (!ui->program) {
-		ui_print_gl_error(__FILE__, __LINE__);
-		SIXCODE_ERROR("Error creating program.\n");
-		glDeleteShader(ui->vertex_shader);
-		glDeleteShader(ui->fragment_shader);
+	if (
+		!shader_program_create(&ui->fill_shader, __FILE__, __LINE__) ||
+		!shader_program_create(&ui->stroke_shader, __FILE__, __LINE__)
+	) {
+		shader_program_delete_shaders(&ui->fill_shader);
+		shader_program_delete_shaders(&ui->stroke_shader);
 
 		return 0;
 	}
-
-	glAttachShader(ui->program, ui->vertex_shader);
-	glAttachShader(ui->program, ui->fragment_shader);
 
 	////////////////////
-	// locations
+	// attributes
 
-	UiLocations *loc = &ui->locations;
-	loc->position     = 0;
-	loc->gridPosition = 1;
+	ui->attributes.position     = 0;
+	ui->attributes.gridPosition = 1;
 
-	glBindAttribLocation(ui->program, loc->position, "position");
-	glBindAttribLocation(ui->program, loc->gridPosition, "gridPosition");
+	glBindAttribLocation(
+			ui->fill_shader.program,
+			ui->attributes.position,
+			"position");
 
-	glLinkProgram(ui->program);
+	glBindAttribLocation(
+			ui->fill_shader.program,
+			ui->attributes.gridPosition,
+			"gridPosition");
 
-	loc->viewMatrix = glGetUniformLocation(ui->program, "viewMatrix");
-	loc->gridSize = glGetUniformLocation(ui->program, "gridSize");
-	loc->gridPositionOffset = glGetUniformLocation(ui->program, "gridPositionOffset");
-	loc->fillColors = glGetUniformLocation(ui->program, "fillColors");
-	loc->gridStyles = glGetUniformLocation(ui->program, "gridStyles");
+	glBindAttribLocation(
+			ui->stroke_shader.program,
+			ui->attributes.position,
+			"position");
+
+	glBindAttribLocation(
+			ui->stroke_shader.program,
+			ui->attributes.gridPosition,
+			"gridPosition");
 
 	////////////////////
 	// link
 
-	GLint linked;
-	glGetProgramiv(ui->program, GL_LINK_STATUS, &linked);
-
-	if (!linked) {
-		GLint info_log_length = 0;
-		glGetProgramiv(ui->program, GL_INFO_LOG_LENGTH, &info_log_length);
-
-		if (info_log_length > 1) {
-			char *info_log = malloc(info_log_length * sizeof *info_log);
-			glGetProgramInfoLog(ui->program, info_log_length, NULL, info_log);
-			SIXCODE_ERROR("Error linking program:\n%s\n", info_log);
-			free(info_log);
-		} else {
-			SIXCODE_ERROR("Error linking program. Nothing in info log.\n");
-		}
-
-		ui_print_gl_error(__FILE__, __LINE__);
-
-		glDetachShader(ui->program, ui->vertex_shader);
-		glDetachShader(ui->program, ui->fragment_shader);
-		glDeleteProgram(ui->program);
-		glDeleteShader(ui->vertex_shader);
-		glDeleteShader(ui->fragment_shader);
+	if (
+		!shader_program_link(&ui->fill_shader, __FILE__, __LINE__) ||
+		!shader_program_link(&ui->stroke_shader, __FILE__, __LINE__)
+	) {
+		shader_program_delete_shaders(&ui->fill_shader);
+		shader_program_delete_shaders(&ui->stroke_shader);
 
 		return 0;
 	}
 
-	glUseProgram(ui->program);
+	////////////////////
+	// uniforms
+
+	ui->fill_uniforms.viewMatrix = glGetUniformLocation(
+			ui->fill_shader.program,
+			"viewMatrix");
+
+	ui->fill_uniforms.gridSize = glGetUniformLocation(
+			ui->fill_shader.program,
+			"gridSize");
+
+	ui->fill_uniforms.gridPositionOffset = glGetUniformLocation(
+			ui->fill_shader.program,
+			"gridPositionOffset");
+
+	ui->fill_uniforms.fillColors = glGetUniformLocation(
+			ui->fill_shader.program,
+			"fillColors");
+
+	ui->fill_uniforms.gridStyles = glGetUniformLocation(
+			ui->fill_shader.program,
+			"gridStyles");
+
+	ui->stroke_uniforms.viewMatrix = glGetUniformLocation(
+			ui->stroke_shader.program,
+			"viewMatrix");
+
+	ui->stroke_uniforms.gridSize = glGetUniformLocation(
+			ui->stroke_shader.program,
+			"gridSize");
+
+	ui->stroke_uniforms.gridPositionOffset = glGetUniformLocation(
+			ui->stroke_shader.program,
+			"gridPositionOffset");
+
+	ui->stroke_uniforms.strokeColor = glGetUniformLocation(
+			ui->stroke_shader.program,
+			"strokeColor");
+
+	ui->stroke_uniforms.gridStyles = glGetUniformLocation(
+			ui->stroke_shader.program,
+			"gridStyles");
 
 	//////////////////
 	// mesh + buffers
 
-	mesh_initialize(&ui->hex_mesh, UI_HEX_MESH_SIZE, UI_HEX_MESH_SIZE);
+	mesh_initialize(&ui->mesh, UI_MESH_SIZE, UI_MESH_SIZE);
 
-	UiBuffers *buf = &ui->buffers;
-
-	glGenBuffers(1, &buf->hex_mesh_vertices);
-	glBindBuffer(GL_ARRAY_BUFFER, buf->hex_mesh_vertices);
+	glGenBuffers(1, &ui->buffers.vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
 	glBufferData(
 			GL_ARRAY_BUFFER,
-			ui->hex_mesh.vertices_length * sizeof *ui->hex_mesh.vertices,
-			ui->hex_mesh.vertices,
+			ui->mesh.vertices_length * sizeof *ui->mesh.vertices,
+			ui->mesh.vertices,
 			GL_STATIC_DRAW);
 
-	glGenBuffers(1, &buf->hex_mesh_fill_indices);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->hex_mesh_fill_indices);
+	glGenBuffers(1, &ui->buffers.fill_indices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.fill_indices);
 	glBufferData(
 			GL_ELEMENT_ARRAY_BUFFER,
-			ui->hex_mesh.fill_indices_length * sizeof *ui->hex_mesh.fill_indices,
-			ui->hex_mesh.fill_indices,
+			ui->mesh.fill_indices_length * sizeof *ui->mesh.fill_indices,
+			ui->mesh.fill_indices,
 			GL_STATIC_DRAW);
 
-	glGenBuffers(1, &buf->hex_mesh_stroke_indices);
-	// TODO
+	glGenBuffers(1, &ui->buffers.stroke_indices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.stroke_indices);
+	glBufferData(
+			GL_ELEMENT_ARRAY_BUFFER,
+			ui->mesh.stroke_indices_length * sizeof *ui->mesh.stroke_indices,
+			ui->mesh.stroke_indices,
+			GL_STATIC_DRAW);
 	
 	////////////////
 	// textures
@@ -258,10 +242,10 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 	if (styles_buffer_capacity_max < UI_STYLES_BUFFER_CAPACITY_MIN) {
 		styles_buffer_capacity_max = UI_STYLES_BUFFER_CAPACITY_MIN;
 	}
+
 	ui->styles_buffer = malloc(UI_STYLES_BUFFER_CAPACITY_MIN * sizeof *ui->styles_buffer);
 	ui->styles_buffer_capacity = UI_STYLES_BUFFER_CAPACITY_MIN;
 	ui->styles_buffer_capacity_max = styles_buffer_capacity_max;
-
 
 	///////////////////////
 	// view_matrix
@@ -277,20 +261,17 @@ i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max)
 
 void ui_terminate(Ui *ui)
 {
-	if (ui->program) {
-		glDetachShader(ui->program, ui->vertex_shader);
-		glDetachShader(ui->program, ui->fragment_shader);
-		glDeleteProgram(ui->program);
-	}
+	shader_program_delete(&ui->fill_shader);
+	shader_program_delete(&ui->stroke_shader);
 
-	glDeleteShader(ui->vertex_shader);
-	glDeleteShader(ui->fragment_shader);
+	shader_program_delete_shaders(&ui->fill_shader);
+	shader_program_delete_shaders(&ui->stroke_shader);
 
-	mesh_terminate(&ui->hex_mesh);
+	mesh_terminate(&ui->mesh);
 
-	glDeleteBuffers(1, &ui->buffers.hex_mesh_vertices);
-	glDeleteBuffers(1, &ui->buffers.hex_mesh_fill_indices);
-	glDeleteBuffers(1, &ui->buffers.hex_mesh_stroke_indices);
+	glDeleteBuffers(1, &ui->buffers.vertices);
+	glDeleteBuffers(1, &ui->buffers.fill_indices);
+	glDeleteBuffers(1, &ui->buffers.stroke_indices);
 
 	glDeleteTextures(1, &ui->textures.fill_colors);
 	glDeleteTextures(1, &ui->textures.grid_styles);
@@ -298,118 +279,110 @@ void ui_terminate(Ui *ui)
 	free(ui->styles_buffer);
 }
 
-void ui_draw(Ui *ui, View *vw, Grid *g)
+static void ui_configure_attributes(Ui *ui)
 {
-	/////////////////////
-	// Global state
-
-	glViewport(0, 0, vw->viewport_size.x, vw->viewport_size.y);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glUseProgram(ui->program);
-
-	/////////////////////
-	// Attributes
-
-	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.hex_mesh_vertices);
-
 	glVertexAttribPointer(
-			ui->locations.position,
+			ui->attributes.position,
 			2,
 			GL_FLOAT,
 			GL_FALSE,
-			sizeof ui->hex_mesh.vertices[0],
+			sizeof ui->mesh.vertices[0],
 			0);
-	glEnableVertexAttribArray(ui->locations.position);
+	glEnableVertexAttribArray(ui->attributes.position);
 
-	glVertexAttrib4f(ui->locations.position, 0.0f, 0.0f, 0.0f, 1.0f);
+	glVertexAttrib4f(ui->attributes.position, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	glVertexAttribPointer(
-			ui->locations.gridPosition,
+			ui->attributes.gridPosition,
 			2,
 			GL_BYTE,
 			GL_FALSE,
-			sizeof ui->hex_mesh.vertices[0],
-			(GLvoid *) (2 * sizeof ui->hex_mesh.vertices[0].x));
-	glEnableVertexAttribArray(ui->locations.gridPosition);
+			sizeof ui->mesh.vertices[0],
+			(GLvoid *) (2 * sizeof ui->mesh.vertices[0].x));
+	glEnableVertexAttribArray(ui->attributes.gridPosition);
+}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.hex_mesh_fill_indices);
+static void ui_update_view_matrix(Ui *ui, View *vw)
+{
+	f64 scale_inv = 1.0 / vw->scale;
 
-	///////////////////
-	// Uniforms
+	ui->translation_x = -vw->translation.x * scale_inv * 2.0;
+	ui->translation_y = vw->translation.y * scale_inv * 2.0;
+
+	ui->view_matrix.m[0][0] = 1.0 / (f64) vw->viewport_size.x;
+	ui->view_matrix.m[1][1] = 1.0 / (f64) vw->viewport_size.y;
+	ui->view_matrix.m[3][3] = scale_inv;
+}
+
+static void ui_draw_storage_quad(StorageQuad *out_sq, Quad *viewport_quad, Quad *grid_quad)
+{
+	Quad block_quad;
+	quad_block_align(&block_quad, viewport_quad, GRID_BLOCK_SIZE);
+	quad_intersect(&block_quad, &block_quad, grid_quad);
+
+	storage_quad_from_quad(out_sq, &block_quad);
+}
+
+void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad)
+{
+	glUseProgram(ui->fill_shader.program);
+
+	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.fill_indices);
+
+	ui_configure_attributes(ui);
+	ui_update_view_matrix(ui, vw);
 
 	glUniform2f(
-			ui->locations.gridSize,
+			ui->fill_uniforms.gridSize,
 			(f32) g->storage_quad.size.c,
 			(f32) g->storage_quad.size.r);
 
-	//////////////////
-	// Textures
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui->textures.fill_colors);
-	glUniform1i(ui->locations.fillColors, 0);
+	glUniform1i(ui->fill_uniforms.fillColors, 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, ui->textures.grid_styles);
-	glUniform1i(ui->locations.gridStyles, 1);
-
-	//////////////////
-	// View matrix
-
-	f64 size_x = vw->viewport_size.x;
-	f64 size_y = vw->viewport_size.y;
-	f64 scale_inv = 1.0 / vw->scale;
-	f64 translation_x = -vw->translation.x * scale_inv * 2.0;
-	f64 translation_y = vw->translation.y * scale_inv * 2.0;
-
-	ui->view_matrix.m[0][0] = 1.0 / size_x;
-	ui->view_matrix.m[1][1] = 1.0 / size_y;
-	ui->view_matrix.m[3][3] = scale_inv;
-
-	//////////////////
-	// Quad
-
-	Quad q;
-	view_viewport_to_quad(vw, &q);
-	quad_block_align(&q, &q, GRID_BLOCK_SIZE);
-	quad_intersect(&q, &q, &g->quad);
-
-	StorageQuad sq;
-	storage_quad_from_quad(&sq, &q);
-
-	Hex sq_min_offset = hex_sub(sq.min, g->storage_quad.min);
+	glUniform1i(ui->fill_uniforms.gridStyles, 1);
 
 	//////////////////
 	// Draw
 
-	for (i32 r = 0; r < sq.size.r; r += UI_HEX_MESH_SIZE) {
-		for (i32 c = 0; c < sq.size.c; c += UI_HEX_MESH_SIZE) {
+	StorageQuad sq;
+	ui_draw_storage_quad(&sq, viewport_quad, &g->quad);
+	Hex sq_min_offset = hex_sub(sq.min, g->storage_quad.min);
+
+	f64 trans_x = ui->translation_x;
+	f64 trans_y = ui->translation_y;
+	f64 size_x = vw->viewport_size.x;
+	f64 size_y = vw->viewport_size.y;
+
+	for (i32 r = 0; r < sq.size.r; r += UI_MESH_SIZE) {
+		for (i32 c = 0; c < sq.size.c; c += UI_MESH_SIZE) {
 			vec2 h = {
 				(c + sq.min.c) << 1,
 				r + sq.min.r,
 			};
 			vec2 v = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
 
-			ui->view_matrix.m[3][0] = (translation_x + v.x) / size_x;
-			ui->view_matrix.m[3][1] = (translation_y + v.y) / size_y;
+			ui->view_matrix.m[3][0] = (trans_x + v.x) / size_x;
+			ui->view_matrix.m[3][1] = (trans_y + v.y) / size_y;
 
 			glUniformMatrix4fv(
-					ui->locations.viewMatrix,
+					ui->fill_uniforms.viewMatrix,
 					1,
 					GL_FALSE,
 					(GLfloat*) &ui->view_matrix.m[0][0]);
 
 			glUniform2f(
-					ui->locations.gridPositionOffset,
+					ui->fill_uniforms.gridPositionOffset,
 					(f32) (c + sq_min_offset.c),
 					(f32) (r + sq_min_offset.r));
 
 			glDrawElements(
 					GL_TRIANGLES,
-					ui->hex_mesh.fill_indices_length,
+					ui->mesh.fill_indices_length,
 					GL_UNSIGNED_SHORT,
 					0);
 		}

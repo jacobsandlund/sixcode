@@ -12,13 +12,6 @@ static const mat2 VIEW_POINT_TO_HEX = {{
 
 static const f64 VIEW_DOUBLE_EPSILON = 1e-9;
 
-void view_initialize(View *vw, vec2 viewport_size, vec2 translation, f32 scale)
-{
-	vw->viewport_size = viewport_size;
-	vw->scale = scale;
-	vw->translation = translation;
-}
-
 void view_zoom_at_point(View *vw, vec2 v, f32 new_scale)
 {
 	f64 scale_factor = (f64) (new_scale - vw->scale) / (f64) vw->scale;

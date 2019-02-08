@@ -12,7 +12,6 @@ typedef struct {
 	f32 scale;
 } View;
 
-void view_initialize(View *vw, vec2 viewport_size, vec2 translation, f32 scale);
 void view_zoom_at_point(View *vw, vec2 v, f32 new_scale);
 void view_resize(View *vw, vec2 viewport_size);
 void view_translate(View *vw, vec2 delta);
