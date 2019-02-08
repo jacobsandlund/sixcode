@@ -21,19 +21,10 @@ typedef struct {
 	GLint viewMatrix;
 	GLint gridSize;
 	GLint gridPositionOffset;
-
+	GLint strokeColor;
 	GLint fillColors;
 	GLint gridStyles;
-} UiFillUniforms;
-
-typedef struct {
-	GLint viewMatrix;
-	GLint gridSize;
-	GLint gridPositionOffset;
-	GLint strokeColor;
-
-	GLint gridStyles;
-} UiStrokeUniforms;
+} UiUniforms;
 
 typedef struct {
 	GLuint vertices;
@@ -51,16 +42,14 @@ typedef struct {
 	ShaderProgram stroke_shader;
 
 	UiAttributes attributes;
-	UiFillUniforms fill_uniforms;
-	UiStrokeUniforms stroke_uniforms;
+	UiUniforms fill_uniforms;
+	UiUniforms stroke_uniforms;
 	UiBuffers buffers;
 	UiTextures textures;
 
 	Mesh mesh;
 
 	mat4 view_matrix;
-	f64 translation_x;
-	f64 translation_y;
 
 	u8 *styles_buffer;
 	i32 styles_buffer_capacity;
@@ -70,6 +59,7 @@ typedef struct {
 i8 ui_initialize(Ui *ui, i32 styles_buffer_capacity_max);
 void ui_terminate(Ui *ui);
 void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad);
+void ui_draw_stroke(Ui *ui, View *vw, Grid *g, Quad *viewport_quad);
 void ui_update_styles(Ui *ui, Grid *g);
 void ui_update_styles_in_quad(Ui *ui, Grid *g, Quad *quad);
 

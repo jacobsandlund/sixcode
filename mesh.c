@@ -13,7 +13,7 @@ static const mat2 MESH_HEX_TO_POINT = {{
 
 static vec2 mesh_hex_corner(i8 corner)
 {
-	f64 angle = M_PI / 3.0 * (0.5 - corner);
+	f64 angle = M_PI / 3.0 * (0.5 + corner);
 	return (vec2) {cos(angle), sin(angle)};
 }
 

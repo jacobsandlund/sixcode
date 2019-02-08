@@ -17,7 +17,7 @@
 
 void core_grid_initialize(Grid *g)
 {
-	Quad quad = {{0, 0}, {0, 0}};
+	Quad quad = {{-UI_MAX_TEXTURE_SIZE, -UI_MAX_TEXTURE_SIZE / 2}, {UI_MAX_TEXTURE_SIZE - 1, UI_MAX_TEXTURE_SIZE / 2 - 1}};
 	quad_block_align(&quad, &quad, GRID_BLOCK_SIZE);
 	grid_initialize(g, &quad);
 }

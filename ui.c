@@ -304,14 +304,9 @@ static void ui_configure_attributes(Ui *ui)
 
 static void ui_update_view_matrix(Ui *ui, View *vw)
 {
-	f64 scale_inv = 1.0 / vw->scale;
-
-	ui->translation_x = -vw->translation.x * scale_inv * 2.0;
-	ui->translation_y = vw->translation.y * scale_inv * 2.0;
-
 	ui->view_matrix.m[0][0] = 1.0 / (f64) vw->viewport_size.x;
 	ui->view_matrix.m[1][1] = 1.0 / (f64) vw->viewport_size.y;
-	ui->view_matrix.m[3][3] = scale_inv;
+	ui->view_matrix.m[3][3] = 1.0 / (f64) vw->scale;
 }
 
 static void ui_draw_storage_quad(StorageQuad *out_sq, Quad *viewport_quad, Quad *grid_quad)
@@ -323,20 +318,72 @@ static void ui_draw_storage_quad(StorageQuad *out_sq, Quad *viewport_quad, Quad 
 	storage_quad_from_quad(out_sq, &block_quad);
 }
 
+static void ui_draw_elements(
+		Ui *ui,
+		View *vw,
+		Grid *g,
+		StorageQuad *sq,
+		UiUniforms *uniforms,
+		GLenum draw_mode,
+		GLsizei indices_length)
+{
+	glUniform2f(
+			uniforms->gridSize,
+			(f32) g->storage_quad.size.c,
+			(f32) g->storage_quad.size.r);
+
+	Hex sq_min = sq->min;
+	Hex sq_size = sq->size;
+	Hex sq_min_offset = hex_sub(sq_min, g->storage_quad.min);
+
+	f64 scale_inv = 1.0 / (f64) vw->scale;
+	f64 trans_x = -vw->translation.x * scale_inv * 2.0;
+	f64 trans_y = vw->translation.y * scale_inv * 2.0;
+	f64 size_x = vw->viewport_size.x;
+	f64 size_y = vw->viewport_size.y;
+
+	for (i32 r = 0; r < sq_size.r; r += UI_MESH_SIZE) {
+		for (i32 c = 0; c < sq_size.c; c += UI_MESH_SIZE) {
+			vec2 h = {
+				(c + sq_min.c) << 1,
+				r + sq_min.r,
+			};
+			vec2 v = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
+
+			ui->view_matrix.m[3][0] = (trans_x + v.x) / size_x;
+			ui->view_matrix.m[3][1] = (trans_y + v.y) / size_y;
+
+			glUniformMatrix4fv(
+					uniforms->viewMatrix,
+					1,
+					GL_FALSE,
+					(GLfloat*) &ui->view_matrix.m[0][0]);
+
+			glUniform2f(
+					uniforms->gridPositionOffset,
+					(f32) (c + sq_min_offset.c),
+					(f32) (r + sq_min_offset.r));
+
+			glDrawElements(
+					draw_mode,
+					indices_length,
+					GL_UNSIGNED_SHORT,
+					0);
+		}
+	}
+}
+
 void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad)
 {
 	glUseProgram(ui->fill_shader.program);
+
+	glDisable(GL_BLEND);
 
 	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.fill_indices);
 
 	ui_configure_attributes(ui);
 	ui_update_view_matrix(ui, vw);
-
-	glUniform2f(
-			ui->fill_uniforms.gridSize,
-			(f32) g->storage_quad.size.c,
-			(f32) g->storage_quad.size.r);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui->textures.fill_colors);
@@ -346,48 +393,54 @@ void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glBindTexture(GL_TEXTURE_2D, ui->textures.grid_styles);
 	glUniform1i(ui->fill_uniforms.gridStyles, 1);
 
-	//////////////////
-	// Draw
+	StorageQuad sq;
+	ui_draw_storage_quad(&sq, viewport_quad, &g->quad);
+
+	ui_draw_elements(
+			ui,
+			vw,
+			g,
+			&sq,
+			&ui->fill_uniforms,
+			GL_TRIANGLES,
+			ui->mesh.fill_indices_length);
+}
+
+void ui_draw_stroke(Ui *ui, View *vw, Grid *g, Quad *viewport_quad)
+{
+	glUseProgram(ui->stroke_shader.program);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui->buffers.stroke_indices);
+
+	ui_configure_attributes(ui);
+	ui_update_view_matrix(ui, vw);
+
+	glUniform4f(
+			ui->stroke_uniforms.strokeColor,
+			0.2,
+			0.2,
+			0.2,
+			1.0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ui->textures.grid_styles);
+	glUniform1i(ui->stroke_uniforms.gridStyles, 0);
 
 	StorageQuad sq;
 	ui_draw_storage_quad(&sq, viewport_quad, &g->quad);
-	Hex sq_min_offset = hex_sub(sq.min, g->storage_quad.min);
 
-	f64 trans_x = ui->translation_x;
-	f64 trans_y = ui->translation_y;
-	f64 size_x = vw->viewport_size.x;
-	f64 size_y = vw->viewport_size.y;
-
-	for (i32 r = 0; r < sq.size.r; r += UI_MESH_SIZE) {
-		for (i32 c = 0; c < sq.size.c; c += UI_MESH_SIZE) {
-			vec2 h = {
-				(c + sq.min.c) << 1,
-				r + sq.min.r,
-			};
-			vec2 v = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
-
-			ui->view_matrix.m[3][0] = (trans_x + v.x) / size_x;
-			ui->view_matrix.m[3][1] = (trans_y + v.y) / size_y;
-
-			glUniformMatrix4fv(
-					ui->fill_uniforms.viewMatrix,
-					1,
-					GL_FALSE,
-					(GLfloat*) &ui->view_matrix.m[0][0]);
-
-			glUniform2f(
-					ui->fill_uniforms.gridPositionOffset,
-					(f32) (c + sq_min_offset.c),
-					(f32) (r + sq_min_offset.r));
-
-			glDrawElements(
-					GL_TRIANGLES,
-					ui->mesh.fill_indices_length,
-					GL_UNSIGNED_SHORT,
-					0);
-		}
-	}
-
+	ui_draw_elements(
+			ui,
+			vw,
+			g,
+			&sq,
+			&ui->stroke_uniforms,
+			GL_LINES,
+			ui->mesh.stroke_indices_length);
 }
 
 void ui_update_styles(Ui *ui, Grid *g)

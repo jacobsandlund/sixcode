@@ -38,6 +38,8 @@ typedef struct {
 	GLint iv0;
 	GLfloat fv0;
 	GLfloat fv1;
+	GLfloat fv2;
+	GLfloat fv3;
 } GLmockUniform;
 
 typedef struct {
@@ -400,6 +402,16 @@ void glUniform2f(GLint location, GLfloat v0, GLfloat v1)
 	GLmockUniform *uniform = &p->uniforms[location];
 	uniform->fv0 = v0;
 	uniform->fv1 = v1;
+}
+
+void glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+{
+	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
+	GLmockUniform *uniform = &p->uniforms[location];
+	uniform->fv0 = v0;
+	uniform->fv1 = v1;
+	uniform->fv2 = v2;
+	uniform->fv3 = v3;
 }
 
 void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)

@@ -383,11 +383,11 @@ TEST(ui_draw_fill)
 	_hx(g->storage_quad.size);
 	//=> 192, 128
 
-	_d(program->uniforms[ui->fill_uniforms.viewMatrix].matrix4fv == &ui->view_matrix.m[0][0]);
-	//=> 1
-
 	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
 	//=> 128, 0
+
+	_d(program->uniforms[ui->fill_uniforms.viewMatrix].matrix4fv == &ui->view_matrix.m[0][0]);
+	//=> 1
 
 	// Textures
 
@@ -419,6 +419,99 @@ TEST(ui_draw_fill)
 	//=> 0, 0.00166667, 0, 0
 	_gggg(m->m[2][0], m->m[2][1], m->m[2][2], m->m[2][3]);
 	//=> 0, 0, 0, 0
+	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
+	//=> 0.0908512, 0.0333333, 0, 0.1
+
+	ui_terminate(ui);
+	grid_terminate(g);
+
+	free(g);
+	free(ui);
+}
+
+TEST(ui_draw_stroke)
+{
+	View vw = {
+		.viewport_size = {1000, 600},
+		.translation = {100, 100},
+		.scale = 10.0,
+	};
+	Quad quad = {{-128, 0}, {255, 127}};
+
+	Grid *g = malloc(sizeof *g);
+	Ui *ui = malloc(sizeof *ui);
+
+	glmock_initialize();
+	grid_initialize(g, &quad);
+	ui_initialize(ui, 0);
+	ui_update_styles(ui, g);
+
+	Quad viewport_quad;
+	view_viewport_to_quad(&vw, &viewport_quad);
+	_hx(viewport_quad.min);
+	//=> -93, -27
+	_hx(viewport_quad.max);
+	//=> 139, 54
+
+	ui_draw_stroke(ui, &vw, g, &viewport_quad);
+
+	_dd(GLmock.using_program, ui->stroke_shader.program);
+	//=> 2, 2
+
+	_d(GLmock.bound_buffers[0] == ui->buffers.vertices);
+	//=> 1
+	_d(GLmock.bound_buffers[1] == ui->buffers.stroke_indices);
+	//=> 1
+
+	// Attributes
+
+	GLmockProgram *program = &GLmock.programs[ui->stroke_shader.program];
+
+	_d(program->attributes[ui->attributes.position].stride);
+	//=> 12
+	_d(program->attributes[ui->attributes.gridPosition].offset);
+	//=> 8
+
+	// Uniform
+
+	GLmockUniform *grid_size = &program->uniforms[ui->stroke_uniforms.gridSize];
+	GLmockUniform *grid_position_offset = &program->uniforms[ui->fill_uniforms.gridPositionOffset];
+	GLmockUniform *stroke_color = &program->uniforms[ui->stroke_uniforms.strokeColor];
+
+	_gg(grid_size->fv0, grid_size->fv1);
+	//=> 192, 128
+	_hx(g->storage_quad.size);
+	//=> 192, 128
+
+	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
+	//=> 128, 0
+
+	_gggg(stroke_color->fv0, stroke_color->fv1, stroke_color->fv2, stroke_color->fv3);
+	//=> 0.5, 0.5, 0.5, 1
+
+	_d(program->uniforms[ui->stroke_uniforms.viewMatrix].matrix4fv == &ui->view_matrix.m[0][0]);
+	//=> 1
+
+	// Textures
+
+	_d(program->uniforms[ui->stroke_uniforms.gridStyles].iv0);
+	//=> 0
+
+	_d(GLmock.bound_textures[0] == ui->textures.grid_styles);
+	//=> 1
+
+	// Draw
+
+	_d(GLmock.draw_elements_mode == GL_LINES);
+	//=> 1
+	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
+	//=> 1
+	_d(GLmock.draw_elements_count);
+	//=> 147456
+	_d(49152 * 3);  // Draw the three showing blocks
+	//=> 147456
+
+	mat4 *m = &ui->view_matrix;
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
 	//=> 0.0908512, 0.0333333, 0, 0.1
 
