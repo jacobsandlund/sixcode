@@ -133,6 +133,38 @@ TEST(storage_quad_from_quad)
 	//=> 2, 2
 }
 
+TEST(storage_quad_even_align)
+{
+	StorageQuad out_sq;
+	StorageQuad sq = {
+		.min = {-2, 3},
+		.size = {10, 20},
+	};
+
+	storage_quad_even_align(&out_sq, &sq);
+
+	_hx(out_sq.min);
+	//=> -2, 2
+	_hx(out_sq.size);
+	//=> 10, 21
+
+	sq.min = (Hex) {-5, -21};
+	storage_quad_even_align(&out_sq, &sq);
+
+	_hx(out_sq.min);
+	//=> -5, -22
+	_hx(out_sq.size);
+	//=> 10, 21
+
+	sq.min = (Hex) {-5, -20};
+	storage_quad_even_align(&out_sq, &sq);
+
+	_hx(out_sq.min);
+	//=> -5, -20
+	_hx(out_sq.size);
+	//=> 10, 20
+}
+
 TEST(storage_quad_capacity)
 {
 	StorageQuad sq = {{-3, -1}, {6, 2}};

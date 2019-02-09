@@ -61,6 +61,15 @@ void storage_quad_from_quad(StorageQuad *sq, Quad *q)
 	};
 }
 
+void storage_quad_even_align(StorageQuad *out_sq, StorageQuad *sq)
+{
+	i8 odd_row = sq->min.r & 1;
+	out_sq->min.c = sq->min.c;
+	out_sq->min.r = sq->min.r & ~1;
+	out_sq->size.c = sq->size.c;
+	out_sq->size.r = sq->size.r + odd_row;
+}
+
 i32 storage_quad_capacity(StorageQuad *sq)
 {
 	return sq->size.c * sq->size.r;

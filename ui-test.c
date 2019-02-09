@@ -384,7 +384,7 @@ TEST(ui_draw_fill)
 	//=> 192, 128
 
 	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
-	//=> 128, 0
+	//=> 81, 0
 
 	_d(program->uniforms[ui->fill_uniforms.viewMatrix].matrix4fv == &ui->view_matrix.m[0][0]);
 	//=> 1
@@ -408,7 +408,7 @@ TEST(ui_draw_fill)
 	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
 	//=> 1
 	_d(GLmock.draw_elements_count);
-	//=> 147456
+	//=> 98304
 	_d(49152 * 3);  // Draw the three showing blocks
 	//=> 147456
 
@@ -420,7 +420,7 @@ TEST(ui_draw_fill)
 	_gggg(m->m[2][0], m->m[2][1], m->m[2][2], m->m[2][3]);
 	//=> 0, 0, 0, 0
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
-	//=> 0.0908512, 0.0333333, 0, 0.1
+	//=> 0.00944486, 0.0333333, 0, 0.1
 
 	ui_terminate(ui);
 	grid_terminate(g);
@@ -516,7 +516,7 @@ TEST(ui_draw_stroke)
 	//=> 192, 128
 
 	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
-	//=> 128, 0
+	//=> 81, 0
 
 	_gggg(stroke_color->fv0, stroke_color->fv1, stroke_color->fv2, stroke_color->fv3);
 	//=> 0.2, 0.2, 0.2, 1
@@ -537,13 +537,13 @@ TEST(ui_draw_stroke)
 	_d(GLmock.draw_arrays_mode == GL_LINES);
 	//=> 1
 	_d(GLmock.draw_arrays_count);
-	//=> 73728
+	//=> 49152
 	_d(24576 * 3);  // Draw the three showing blocks
 	//=> 73728
 
 	mat4 *m = &ui->view_matrix;
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
-	//=> 0.0908512, 0.0333333, 0, 0.1
+	//=> 0.00944486, 0.0333333, 0, 0.1
 
 	ui_terminate(ui);
 	grid_terminate(g);

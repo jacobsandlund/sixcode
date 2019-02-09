@@ -52,9 +52,13 @@ vec2 view_point_to_vec_hex(View *vw, vec2 v)
 
 void view_viewport_to_quad(View *vw, Quad *out_q)
 {
-	vec2 origin = {0, 0};
-	vec2 top_left = view_point_to_vec_hex(vw, origin);
-	vec2 bottom_right = view_point_to_vec_hex(vw, vw->viewport_size);
+	vec2 top_left_point = {-1, -1};
+	vec2 bottom_right_point = {
+		vw->viewport_size.x + 1,
+		vw->viewport_size.y + 1,
+	};
+	vec2 top_left = view_point_to_vec_hex(vw, top_left_point);
+	vec2 bottom_right = view_point_to_vec_hex(vw, bottom_right_point);
 
 	i32 top = floor(top_left.y);
 	i32 left = floor(top_left.x);

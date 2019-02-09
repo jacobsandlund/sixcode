@@ -44,9 +44,9 @@ TEST(draw)
 	//=> 600
 
 	_d(GLmock.draw_elements_count);
-	//=> 98304
-	_d(GLmock.draw_arrays_count);
 	//=> 49152
+	_d(GLmock.draw_arrays_count);
+	//=> 24576
 
 	// Zoomed out far with no stroke
 

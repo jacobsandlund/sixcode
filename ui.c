@@ -301,11 +301,10 @@ static void ui_update_view_matrix(Ui *ui, View *vw)
 
 static void ui_draw_storage_quad(StorageQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
 {
-	Quad block_quad;
-	quad_block_align(&block_quad, viewport_quad, GRID_BLOCK_SIZE);
-	quad_intersect(&block_quad, &block_quad, grid_styles_quad);
-
-	storage_quad_from_quad(out_sq, &block_quad);
+	Quad intersect_quad;
+	quad_intersect(&intersect_quad, viewport_quad, grid_styles_quad);
+	storage_quad_from_quad(out_sq, &intersect_quad);
+	storage_quad_even_align(out_sq, out_sq);
 }
 
 void ui_draw_fill(Ui *ui, View *vw, Grid *g, Quad *viewport_quad)
