@@ -139,29 +139,41 @@ TEST(ui)
 	/////////////////////
 	// mesh + buffers
 
-	_d(ui->mesh.fill_vertices_length);
+	_d(ui->meshes[0].fill_vertices_length);
 	//=> 24576
-	_d(ui->mesh.fill_indices_length);
+	_d(ui->meshes[1].fill_vertices_length);
+	//=> 6144
+	_d(ui->meshes[2].fill_vertices_length);
+	//=> 1536
+	_d(ui->meshes[3].fill_vertices_length);
+	//=> 384
+	_d(ui->meshes[0].fill_indices_length);
 	//=> 49152
-	_d(ui->mesh.stroke_vertices_length);
+	_d(ui->meshes[0].stroke_vertices_length);
 	//=> 24576
 
-	_d(ui->buffers.fill_vertices);
+	_d(ui->buffers[0].fill_vertices);
 	//=> 1
-	_d(ui->buffers.fill_indices);
+	_d(ui->buffers[1].fill_vertices);
+	//=> 4
+	_d(ui->buffers[2].fill_vertices);
+	//=> 7
+	_d(ui->buffers[3].fill_vertices);
+	//=> 10
+	_d(ui->buffers[0].fill_indices);
 	//=> 2
-	_d(ui->buffers.stroke_vertices);
+	_d(ui->buffers[0].stroke_vertices);
 	//=> 3
 
-	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers.fill_vertices];
-	GLmockBuffer *fill_indices_buffer = &GLmock.buffers[ui->buffers.fill_indices];
-	GLmockBuffer *stroke_vertices_buffer = &GLmock.buffers[ui->buffers.stroke_vertices];
+	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers[0].fill_vertices];
+	GLmockBuffer *fill_indices_buffer = &GLmock.buffers[ui->buffers[1].fill_indices];
+	GLmockBuffer *stroke_vertices_buffer = &GLmock.buffers[ui->buffers[2].stroke_vertices];
 
 	_d(vertices_buffer->created);
 	//=> 1
 	_d(vertices_buffer->size);
 	//=> 294912
-	_d(vertices_buffer->data == ui->mesh.fill_vertices);
+	_d(vertices_buffer->data == ui->meshes[0].fill_vertices);
 	//=> 1
 	_d(vertices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -169,8 +181,8 @@ TEST(ui)
 	_d(fill_indices_buffer->created);
 	//=> 1
 	_d(fill_indices_buffer->size);
-	//=> 98304
-	_d(fill_indices_buffer->data == ui->mesh.fill_indices);
+	//=> 24576
+	_d(fill_indices_buffer->data == ui->meshes[1].fill_indices);
 	//=> 1
 	_d(fill_indices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -178,8 +190,8 @@ TEST(ui)
 	_d(stroke_vertices_buffer->created);
 	//=> 1
 	_d(stroke_vertices_buffer->size);
-	//=> 294912
-	_d(stroke_vertices_buffer->data == ui->mesh.stroke_vertices);
+	//=> 18432
+	_d(stroke_vertices_buffer->data == ui->meshes[2].stroke_vertices);
 	//=> 1
 	_d(stroke_vertices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -337,9 +349,9 @@ TEST(ui_draw_fill)
 	_dd(GLmock.using_program, ui->fill_shader.program);
 	//=> 1, 1
 
-	_d(GLmock.bound_buffers[0] == ui->buffers.fill_vertices);
+	_d(GLmock.bound_buffers[0] == ui->buffers[0].fill_vertices);
 	//=> 1
-	_d(GLmock.bound_buffers[1] == ui->buffers.fill_indices);
+	_d(GLmock.bound_buffers[1] == ui->buffers[0].fill_indices);
 	//=> 1
 
 	// Attributes
@@ -434,7 +446,7 @@ TEST(ui_draw_stroke)
 	View vw = {
 		.viewport_size = {1000, 600},
 		.translation = {100, 100},
-		.scale = 10.0,
+		.scale = 150.0,
 	};
 	Quad quad = {{-126, 1}, {253, 126}};
 
@@ -449,16 +461,16 @@ TEST(ui_draw_stroke)
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
 	_hx(viewport_quad.min);
-	//=> -93, -27
+	//=> -7, -2
 	_hx(viewport_quad.max);
-	//=> 139, 54
+	//=> 10, 4
 
 	ui_draw_stroke(ui, &vw, g, &viewport_quad);
 
 	_dd(GLmock.using_program, ui->stroke_shader.program);
 	//=> 2, 2
 
-	_d(GLmock.bound_buffers[0] == ui->buffers.stroke_vertices);
+	_d(GLmock.bound_buffers[0] == ui->buffers[2].stroke_vertices);
 	//=> 1
 
 	// Attributes
@@ -516,7 +528,7 @@ TEST(ui_draw_stroke)
 	//=> 192, 128
 
 	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
-	//=> 81, 0
+	//=> 60, 0
 
 	_gggg(stroke_color->fv0, stroke_color->fv1, stroke_color->fv2, stroke_color->fv3);
 	//=> 0.2, 0.2, 0.2, 1
@@ -537,13 +549,13 @@ TEST(ui_draw_stroke)
 	_d(GLmock.draw_arrays_mode == GL_LINES);
 	//=> 1
 	_d(GLmock.draw_arrays_count);
-	//=> 49152
+	//=> 1536
 	_d(24576 * 3);  // Draw the three showing blocks
 	//=> 73728
 
 	mat4 *m = &ui->view_matrix;
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
-	//=> 0.00944486, 0.0333333, 0, 0.1
+	//=> -0.00826154, 0.00222222, 0, 0.00666667
 
 	ui_terminate(ui);
 	grid_terminate(g);

@@ -12,6 +12,11 @@ TEST(mesh)
 	_d(32 * 64 * 12);
 	//=> 24576
 
+	_d(m->size_c);
+	//=> 32
+	_d(m->size_r);
+	//=> 64
+
 	_d(m->fill_vertices_length);
 	//=> 12288
 	_d(m->fill_indices_length);

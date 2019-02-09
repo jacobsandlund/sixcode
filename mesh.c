@@ -17,9 +17,9 @@ static vec2 mesh_hex_corner(i8 corner)
 	return (vec2) {cos(angle), sin(angle)};
 }
 
-void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows)
+void mesh_initialize(Mesh *m, i32 size_c, i32 size_r)
 {
-	i32 num_hexes = num_columns * num_rows;
+	i32 num_hexes = size_c * size_r;
 	i32 fill_vertices_length = MESH_FILL_VERTICES_PER_HEX * num_hexes;
 	i32 fill_indices_length = MESH_FILL_INDICES_PER_HEX * num_hexes;
 	i32 stroke_vertices_length = MESH_STROKE_VERTICES_PER_HEX * num_hexes;
@@ -30,6 +30,9 @@ void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows)
 	m->fill_vertices_length = fill_vertices_length;
 	m->fill_indices_length = fill_indices_length;
 	m->stroke_vertices_length = stroke_vertices_length;
+
+	m->size_c = size_c;
+	m->size_r = size_r;
 
 	vec2 fill_corners[] = {
 		mesh_hex_corner(0),
@@ -69,8 +72,8 @@ void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows)
 	i32 fi = 0;
 	i32 sv = 0;
 
-	for (i32 r = 0; r < num_rows; ++r) {
-		for (i32 c = 0; c < num_columns; ++c) {
+	for (i32 r = 0; r < size_r; ++r) {
+		for (i32 c = 0; c < size_c; ++c) {
 			vec2 h = {(c << 1) + (r & 1), r};
 			vec2 center = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
 

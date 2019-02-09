@@ -9,8 +9,10 @@
 #include "sixcode.h"
 #include "quad.h"
 
-#define UI_MESH_SIZE GRID_BLOCK_SIZE_R
 #define UI_MAX_TEXTURE_SIZE 4096
+
+#define UI_MESH_MAX_SIZE 64
+#define UI_NUM_MESHES 4     // 64, 32, 16, 8
 
 typedef struct {
 	GLint position;
@@ -45,10 +47,10 @@ typedef struct {
 	UiAttributes attributes;
 	UiUniforms fill_uniforms;
 	UiUniforms stroke_uniforms;
-	UiBuffers buffers;
+	UiBuffers buffers[UI_NUM_MESHES];
 	UiTextures textures;
 
-	Mesh mesh;
+	Mesh meshes[UI_NUM_MESHES];
 
 	mat4 view_matrix;
 	f64 translation_x;

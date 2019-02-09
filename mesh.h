@@ -21,9 +21,11 @@ typedef struct {
 	i32 fill_vertices_length;
 	i32 fill_indices_length;
 	i32 stroke_vertices_length;
+	i32 size_c;
+	i32 size_r;
 } Mesh;
 
-void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows);
+void mesh_initialize(Mesh *m, i32 size_c, i32 size_r);
 void mesh_terminate(Mesh *m);
 
 #endif // __MESH_H__

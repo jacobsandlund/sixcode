@@ -29,7 +29,7 @@ if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
         fi
     done
 
-    git diff --exit-code valgrind-output/
+    git --no-pager diff valgrind-output/
 else
     valgrind_single "$@"
 fi
