@@ -1,8 +1,6 @@
 #include "test.h"
 #include "matrix.c"
 
-#define _v2(v) _gg(v.x, v.y)
-
 TEST(mat2_multiply_v)
 {
 	vec2 v = {2.23, -4};

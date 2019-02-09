@@ -2,9 +2,6 @@
 #include "core.c"
 #include "glmock.c"
 
-#define _hx(h) _dd(h.c, h.r)
-#define _v2(v) _gg(v.x, v.y)
-
 TEST(core_grid_expand_for_hex)
 {
 	Hex h1 = {5, 27};
@@ -15,6 +12,11 @@ TEST(core_grid_expand_for_hex)
 	glmock_initialize();
 	core_grid_initialize(g);
 	ui_initialize(ui, 0);
+
+	_hx(g->quad.min);
+	//=> 2, 1
+	_hx(g->quad.max);
+	//=> 125, 62
 
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);
@@ -31,9 +33,9 @@ TEST(core_grid_expand_for_hex)
 	_d(grid_get(g, h2));
 	//=> 2
 	_hx(g->quad.min);
-	//=> -384, 0
+	//=> -382, 1
 	_hx(g->quad.max);
-	//=> 127, 191
+	//=> 125, 190
 
 	grid_set(g, h3, 3);
 
@@ -44,7 +46,7 @@ TEST(core_grid_expand_for_hex)
 	_d(grid_get(g, h3));
 	//=> 3
 	_hx(g->quad.min);
-	//=> -384, 0
+	//=> -382, 1
 
 	grid_terminate(g);
 	ui_terminate(ui);
@@ -59,14 +61,13 @@ TEST(core_toggle_hex_at_point)
 		.translation = {100, 250},
 		.scale = 20.0,
 	};
-	Quad quad = {{0, 0}, {127, 63}};
 	vec2 v = {537.8, 482.3};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	grid_initialize(g, &quad);
+	core_grid_initialize(g);
 	_hx(g->storage_quad.size);
 	//=> 64, 64
 

@@ -9,8 +9,6 @@
 #include "ui.c"
 #include "view.c"
 
-#define _hx(h) _dd(h.c, h.r)
-
 TEST(ui)
 {
 	Ui *ui = malloc(sizeof *ui);
@@ -69,6 +67,8 @@ TEST(ui)
 	//=> 0
 	_d(ui->attributes.gridPosition);
 	//=> 1
+	_d(ui->attributes.gridPosition2);
+	//=> 2
 
 	_s(fill_program->attributes[ui->attributes.position].name);
 	//=> position
@@ -78,6 +78,8 @@ TEST(ui)
 	//=> position
 	_s(stroke_program->attributes[ui->attributes.gridPosition].name);
 	//=> gridPosition
+	_s(stroke_program->attributes[ui->attributes.gridPosition2].name);
+	//=> gridPosition2
 
 	/////////////////////
 	// link
@@ -137,29 +139,29 @@ TEST(ui)
 	/////////////////////
 	// mesh + buffers
 
-	_d(ui->mesh.vertices_length);
+	_d(ui->mesh.fill_vertices_length);
 	//=> 24576
 	_d(ui->mesh.fill_indices_length);
 	//=> 49152
-	_d(ui->mesh.stroke_indices_length);
-	//=> 49152
+	_d(ui->mesh.stroke_vertices_length);
+	//=> 24576
 
-	_d(ui->buffers.vertices);
+	_d(ui->buffers.fill_vertices);
 	//=> 1
 	_d(ui->buffers.fill_indices);
 	//=> 2
-	_d(ui->buffers.stroke_indices);
+	_d(ui->buffers.stroke_vertices);
 	//=> 3
 
-	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers.vertices];
+	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers.fill_vertices];
 	GLmockBuffer *fill_indices_buffer = &GLmock.buffers[ui->buffers.fill_indices];
-	GLmockBuffer *stroke_indices_buffer = &GLmock.buffers[ui->buffers.stroke_indices];
+	GLmockBuffer *stroke_vertices_buffer = &GLmock.buffers[ui->buffers.stroke_vertices];
 
 	_d(vertices_buffer->created);
 	//=> 1
 	_d(vertices_buffer->size);
 	//=> 294912
-	_d(vertices_buffer->data == ui->mesh.vertices);
+	_d(vertices_buffer->data == ui->mesh.fill_vertices);
 	//=> 1
 	_d(vertices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -173,13 +175,13 @@ TEST(ui)
 	_d(fill_indices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
 
-	_d(stroke_indices_buffer->created);
+	_d(stroke_vertices_buffer->created);
 	//=> 1
-	_d(stroke_indices_buffer->size);
-	//=> 98304
-	_d(stroke_indices_buffer->data == ui->mesh.stroke_indices);
+	_d(stroke_vertices_buffer->size);
+	//=> 294912
+	_d(stroke_vertices_buffer->data == ui->mesh.stroke_vertices);
 	//=> 1
-	_d(stroke_indices_buffer->usage == GL_STATIC_DRAW);
+	_d(stroke_vertices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
 
 	/////////////////////
@@ -261,7 +263,7 @@ TEST(ui)
 	//=> 1
 	_d(fill_indices_buffer->deleted);
 	//=> 1
-	_d(stroke_indices_buffer->deleted);
+	_d(stroke_vertices_buffer->deleted);
 	//=> 1
 
 	_d(fill_colors_texture->deleted);
@@ -315,7 +317,7 @@ TEST(ui_draw_fill)
 		.translation = {100, 100},
 		.scale = 10.0,
 	};
-	Quad quad = {{-128, 0}, {255, 127}};
+	Quad quad = {{-126, 1}, {253, 126}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -327,17 +329,15 @@ TEST(ui_draw_fill)
 
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
-	_hx(viewport_quad.min);
-	//=> -93, -27
-	_hx(viewport_quad.max);
-	//=> 139, 54
+	_qd(viewport_quad);
+	//=> (-93, -27), (139, 54)
 
 	ui_draw_fill(ui, &vw, g, &viewport_quad);
 
 	_dd(GLmock.using_program, ui->fill_shader.program);
 	//=> 1, 1
 
-	_d(GLmock.bound_buffers[0] == ui->buffers.vertices);
+	_d(GLmock.bound_buffers[0] == ui->buffers.fill_vertices);
 	//=> 1
 	_d(GLmock.bound_buffers[1] == ui->buffers.fill_indices);
 	//=> 1
@@ -436,7 +436,7 @@ TEST(ui_draw_stroke)
 		.translation = {100, 100},
 		.scale = 10.0,
 	};
-	Quad quad = {{-128, 0}, {255, 127}};
+	Quad quad = {{-126, 1}, {253, 126}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -458,19 +458,51 @@ TEST(ui_draw_stroke)
 	_dd(GLmock.using_program, ui->stroke_shader.program);
 	//=> 2, 2
 
-	_d(GLmock.bound_buffers[0] == ui->buffers.vertices);
-	//=> 1
-	_d(GLmock.bound_buffers[1] == ui->buffers.stroke_indices);
+	_d(GLmock.bound_buffers[0] == ui->buffers.stroke_vertices);
 	//=> 1
 
 	// Attributes
 
 	GLmockProgram *program = &GLmock.programs[ui->stroke_shader.program];
 
-	_d(program->attributes[ui->attributes.position].stride);
+	GLmockAttribute *position = &program->attributes[ui->attributes.position];
+	GLmockAttribute *gridPosition = &program->attributes[ui->attributes.gridPosition];
+	GLmockAttribute *gridPosition2 = &program->attributes[ui->attributes.gridPosition2];
+
+	_d(position->size);
+	//=> 2
+	_d(position->type == GL_FLOAT);
+	//=> 1
+	_d(position->stride);
 	//=> 12
-	_d(program->attributes[ui->attributes.gridPosition].offset);
+	_d(position->offset);
+	//=> 0
+	_d(position->enabled_vertex_attrib_array);
+	//=> 1
+	_gggg(position->v0, position->v1, position->v2, position->v3);
+	//=> 0, 0, 0, 1
+
+	_d(gridPosition->size);
+	//=> 2
+	_d(gridPosition->type == GL_BYTE);
+	//=> 1
+	_d(gridPosition->stride);
+	//=> 12
+	_d(gridPosition->offset);
 	//=> 8
+	_d(gridPosition->enabled_vertex_attrib_array);
+	//=> 1
+
+	_d(gridPosition2->size);
+	//=> 2
+	_d(gridPosition2->type == GL_BYTE);
+	//=> 1
+	_d(gridPosition2->stride);
+	//=> 12
+	_d(gridPosition2->offset);
+	//=> 10
+	_d(gridPosition2->enabled_vertex_attrib_array);
+	//=> 1
 
 	// Uniform
 
@@ -487,7 +519,7 @@ TEST(ui_draw_stroke)
 	//=> 128, 0
 
 	_gggg(stroke_color->fv0, stroke_color->fv1, stroke_color->fv2, stroke_color->fv3);
-	//=> 0.5, 0.5, 0.5, 1
+	//=> 0.2, 0.2, 0.2, 1
 
 	_d(program->uniforms[ui->stroke_uniforms.viewMatrix].matrix4fv == &ui->view_matrix.m[0][0]);
 	//=> 1
@@ -502,14 +534,12 @@ TEST(ui_draw_stroke)
 
 	// Draw
 
-	_d(GLmock.draw_elements_mode == GL_LINES);
+	_d(GLmock.draw_arrays_mode == GL_LINES);
 	//=> 1
-	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
-	//=> 1
-	_d(GLmock.draw_elements_count);
-	//=> 147456
-	_d(49152 * 3);  // Draw the three showing blocks
-	//=> 147456
+	_d(GLmock.draw_arrays_count);
+	//=> 73728
+	_d(24576 * 3);  // Draw the three showing blocks
+	//=> 73728
 
 	mat4 *m = &ui->view_matrix;
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
@@ -524,7 +554,7 @@ TEST(ui_draw_stroke)
 
 TEST(ui_update_styles)
 {
-	Quad quad = {{0, 0}, {127, 127}};
+	Quad quad = {{2, 1}, {125, 126}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -557,7 +587,7 @@ TEST(ui_update_styles_in_quad)
 {
 	Quad quad;
 	StorageQuad sq;
-	Quad grid_quad = {{0, 0}, {127, 63}};
+	Quad grid_quad = {{2, 1}, {125, 62}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);

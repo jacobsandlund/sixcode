@@ -83,6 +83,9 @@ typedef struct {
 	GLenum draw_elements_type;
 	GLsizei draw_elements_count;
 
+	GLenum draw_arrays_mode;
+	GLsizei draw_arrays_count;
+
 	GLenum force_gl_error;
 	const char *force_info_log;
 
@@ -231,6 +234,13 @@ void glDetachShader(GLuint program, GLuint shader)
 	} else {
 		GLmock.programs[program].attached_fragment_shader = 0;
 	}
+}
+
+void glDrawArrays(GLenum mode, GLint first, GLsizei count)
+{
+	(void) first;
+	GLmock.draw_arrays_mode = mode;
+	GLmock.draw_arrays_count += count;
 }
 
 void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)

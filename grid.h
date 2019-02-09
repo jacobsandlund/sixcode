@@ -10,12 +10,14 @@
 
 typedef struct {
 	Quad quad;
+	Quad styles_quad;  // quad with extra border
 	StorageQuad storage_quad;
 	u8 *styles;
 } Grid;
 
 extern const Hex GRID_BLOCK_SIZE;
 
+void grid_storage_quad_from_quad(StorageQuad *sq, Quad *q);
 void grid_initialize(Grid *g, Quad *quad);
 void grid_terminate(Grid *g);
 u8 grid_get(Grid *g, Hex h);

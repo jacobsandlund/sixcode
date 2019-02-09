@@ -10,8 +10,6 @@
 #include "ui.c"
 #include "view.c"
 
-#define _hx(h) _dd(h.c, h.r)
-
 TEST(draw)
 {
 	View vw = {
@@ -19,7 +17,7 @@ TEST(draw)
 		.translation = {100, 100},
 		.scale = 20.0,
 	};
-	Quad quad = {{-128, 0}, {255, 127}};
+	Quad quad = {{-126, 1}, {253, 126}};
 
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
@@ -45,22 +43,23 @@ TEST(draw)
 	_d(GLmock.viewport_height);
 	//=> 600
 
-	_d(GLmock.draw_elements_mode == GL_LINES);
-	//=> 1
 	_d(GLmock.draw_elements_count);
-	//=> 196608
+	//=> 98304
+	_d(GLmock.draw_arrays_count);
+	//=> 49152
 
 	// Zoomed out far with no stroke
 
 	vw.scale = 5.0;
 	GLmock.draw_elements_count = 0;
+	GLmock.draw_arrays_count = 0;
 
 	draw(ui, &vw, g);
 
-	_d(GLmock.draw_elements_mode == GL_TRIANGLES);
-	//=> 1
 	_d(GLmock.draw_elements_count);
 	//=> 294912
+	_d(GLmock.draw_arrays_count);
+	//=> 0
 
 	ui_terminate(ui);
 	grid_terminate(g);

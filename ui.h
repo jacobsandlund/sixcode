@@ -15,6 +15,7 @@
 typedef struct {
 	GLint position;
 	GLint gridPosition;
+	GLint gridPosition2;
 } UiAttributes;
 
 typedef struct {
@@ -27,9 +28,9 @@ typedef struct {
 } UiUniforms;
 
 typedef struct {
-	GLuint vertices;
+	GLuint fill_vertices;
 	GLuint fill_indices;
-	GLuint stroke_indices;
+	GLuint stroke_vertices;
 } UiBuffers;
 
 typedef struct {
@@ -50,6 +51,8 @@ typedef struct {
 	Mesh mesh;
 
 	mat4 view_matrix;
+	f64 translation_x;
+	f64 translation_y;
 
 	u8 *styles_buffer;
 	i32 styles_buffer_capacity;

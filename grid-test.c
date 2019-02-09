@@ -4,7 +4,13 @@
 #include "hex.c"
 #include "quad.c"
 
-#define _hx(h) _dd(h.c, h.r)
+TEST(grid_styles_quad_from_quad)
+{
+	Quad q = {{0, 23}, {125, 63}};
+	grid_styles_quad_from_quad(&q, &q);
+	_qd(q);
+	//=> (-128, 0), (127, 127)
+}
 
 TEST(grid_basics)
 {
@@ -14,6 +20,15 @@ TEST(grid_basics)
 	Grid *g = malloc(sizeof *g);
 
 	grid_initialize(g, &quad);
+
+	_qd(g->quad);
+	//=> (-126, -63), (253, 126)
+	_qd(g->styles_quad);
+	//=> (-128, -64), (255, 127)
+	_hx(g->storage_quad.min);
+	//=> -64, -64
+	_hx(g->storage_quad.size);
+	//=> 192, 192
 
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);
@@ -38,7 +53,7 @@ TEST(grid_expand_quad)
 {
 	Hex h1 = {5, 27};
 	Hex h2 = {48, 62};
-	Quad quad = {{0, 0}, {127, 63}};
+	Quad quad = {{2, 1}, {125, 62}};
 	Grid *g = malloc(sizeof *g);
 
 	grid_initialize(g, &quad);
@@ -46,7 +61,7 @@ TEST(grid_expand_quad)
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);
 
-	quad = (Quad) {{-256, 0}, {127, 127}};
+	quad = (Quad) {{-254, 1}, {125, 126}};
 	grid_expand_quad(g, &quad);
 
 	_d(grid_get(g, h1));
@@ -57,7 +72,7 @@ TEST(grid_expand_quad)
 	Hex h3 = {-200, 120};
 	grid_set(g, h3, 3);
 
-	quad = (Quad) {{-512, -256}, {1023, 127}};
+	quad = (Quad) {{-510, -254}, {1021, 126}};
 	grid_expand_quad(g, &quad);
 
 	_d(grid_get(g, h1));

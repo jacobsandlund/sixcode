@@ -4,9 +4,6 @@
 #include "quad.c"
 #include "matrix.c"
 
-#define _v2(v) _gg(v.x, v.y)
-#define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
-
 TEST(view_zoom_at_point)
 {
 	View vw = {

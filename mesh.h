@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include "sixcode.h"
+#include "hex.h"
 
 typedef struct {
 	f32 x;
@@ -14,12 +15,12 @@ typedef struct {
 } MeshVertex;
 
 typedef struct {
-	MeshVertex *vertices;
+	MeshVertex *fill_vertices;
+	MeshVertex *stroke_vertices;
 	u16 *fill_indices;
-	u16 *stroke_indices;
-	i32 vertices_length;
+	i32 fill_vertices_length;
 	i32 fill_indices_length;
-	i32 stroke_indices_length;
+	i32 stroke_vertices_length;
 } Mesh;
 
 void mesh_initialize(Mesh *m, i32 num_columns, i32 num_rows);

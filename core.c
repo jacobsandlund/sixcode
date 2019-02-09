@@ -17,8 +17,8 @@
 
 void core_grid_initialize(Grid *g)
 {
-	Quad quad = {{-UI_MAX_TEXTURE_SIZE, -UI_MAX_TEXTURE_SIZE / 2}, {UI_MAX_TEXTURE_SIZE - 1, UI_MAX_TEXTURE_SIZE / 2 - 1}};
-	quad_block_align(&quad, &quad, GRID_BLOCK_SIZE);
+	//Quad quad = {{-UI_MAX_TEXTURE_SIZE + 2, -UI_MAX_TEXTURE_SIZE / 2 + 1}, {UI_MAX_TEXTURE_SIZE - 3, UI_MAX_TEXTURE_SIZE / 2 - 2}};
+	Quad quad = {{2, 1}, {125, 62}};
 	grid_initialize(g, &quad);
 }
 
@@ -26,10 +26,12 @@ i8 core_grid_expand_for_hex(Ui *ui, Grid *g, Hex h)
 {
 	Quad expanded;
 	quad_expand_quad(&expanded, &g->quad, h);
-	quad_block_align(&expanded, &expanded, GRID_BLOCK_SIZE);
+
+	Quad styles_quad;
+	grid_styles_quad_from_quad(&styles_quad, &expanded);
 
 	StorageQuad sq;
-	storage_quad_from_quad(&sq, &expanded);
+	storage_quad_from_quad(&sq, &styles_quad);
 
 	if (sq.size.c > UI_MAX_TEXTURE_SIZE || sq.size.r > UI_MAX_TEXTURE_SIZE) {
 		return 0;

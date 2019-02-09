@@ -45,9 +45,11 @@ function core_initialized() {
 
     let count = 6000000;
 
+    let size = 4096 - 2;
+
     for (let i = 0; i < count; ++i) {
-        let r = Math.floor(Math.random() * 4096) - 4096/2;
-        let c = 2 * Math.floor(Math.random() * 4096) + (r & 1) - 4096;
+        let r = Math.floor(Math.random() * size) - 4096/2 + 1;
+        let c = 2 * Math.floor(Math.random() * size) + (r & 1) - 4096 + 2;
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, c, r, style);
     }

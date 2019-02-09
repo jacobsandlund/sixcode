@@ -1,16 +1,6 @@
 #include <math.h>
 #include "quad.h"
 
-i8 quad_equals(Quad *a, Quad *b)
-{
-	return (
-		a->min.c == b->min.c &&
-		a->min.r == b->min.r &&
-		a->max.c == b->max.c &&
-		a->max.r == b->max.r
-	);
-}
-
 i8 quad_contains(Quad *q, Hex h)
 {
 	return (
@@ -45,11 +35,12 @@ void quad_block_align(Quad *out_q, Quad *q, Hex block_size)
 	out_q->max.r = q->max.r | (block_size.r - 1);
 }
 
-i8 quad_is_block_aligned(Quad *q, Hex block_size)
+void quad_resize(Quad *out_q, Quad *q, i32 size_delta)
 {
-	Quad aligned;
-	quad_block_align(&aligned, q, block_size);
-	return quad_equals(&aligned, q);
+	out_q->min.c = q->min.c - 2 * size_delta;
+	out_q->min.r = q->min.r - 1 * size_delta;
+	out_q->max.c = q->max.c + 2 * size_delta;
+	out_q->max.r = q->max.r + 1 * size_delta;
 }
 
 void quad_intersect(Quad *out_q, Quad *a, Quad *b)

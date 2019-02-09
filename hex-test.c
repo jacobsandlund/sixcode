@@ -1,8 +1,6 @@
 #include "test.h"
 #include "hex.c"
 
-#define _hx(h) _dd(h.c, h.r)
-
 TEST(hex_sub)
 {
 	Hex a = {3, 19};

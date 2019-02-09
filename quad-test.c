@@ -2,23 +2,6 @@
 #include "hex.c"
 #include "quad.c"
 
-#define _hx(h) _dd(h.c, h.r)
-#define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
-
-TEST(quad_equals)
-{
-	Quad q1 = {{3, 4}, {60, 80}};
-	Quad q2 = {{3, 4}, {60, 1000}};
-	Quad q3 = {{-3, 4}, {60, 80}};
-
-	_d(quad_equals(&q1, &q1));
-	//=> 1
-	_d(quad_equals(&q1, &q2));
-	//=> 0
-	_d(quad_equals(&q1, &q3));
-	//=> 0
-}
-
 TEST(quad_contains)
 {
 	Quad q = {
@@ -95,25 +78,22 @@ TEST(quad_block_align)
 	//=> (-256, -64), (511, 1023)
 }
 
-TEST(quad_is_block_aligned)
+TEST(quad_resize)
 {
-	Quad q1 = {{0, 0}, {127, 63}};
-	Quad q2 = {{-256, 128}, {-1, 1023}};
-	Quad q3 = {{-240, 128}, {-1, 1023}};
-	Quad q4 = {{-256, 128}, {0, 1023}};
-	Quad q5 = {{-256, -63}, {-1, 1023}};
-	Hex block_size = {128, 64};
+	Quad out_q;
+	Quad q = {{4, -8}, {10, 32}};
 
-	_d(quad_is_block_aligned(&q1, block_size));
-	//=> 1
-	_d(quad_is_block_aligned(&q2, block_size));
-	//=> 1
-	_d(quad_is_block_aligned(&q3, block_size));
-	//=> 0
-	_d(quad_is_block_aligned(&q4, block_size));
-	//=> 0
-	_d(quad_is_block_aligned(&q5, block_size));
-	//=> 0
+	quad_resize(&out_q, &q, +1);
+	_qd(out_q);
+	//=> (2, -9), (12, 33)
+
+	quad_resize(&out_q, &out_q, -1);
+	_qd(out_q);
+	//=> (4, -8), (10, 32)
+
+	quad_resize(&out_q, &q, +4);
+	_qd(out_q);
+	//=> (-4, -12), (18, 36)
 }
 
 TEST(quad_intersect)

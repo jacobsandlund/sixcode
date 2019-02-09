@@ -24,6 +24,11 @@
 #define _ggg(...) _("%g, %g, %g\n", __VA_ARGS__)
 #define _gggg(...) _("%g, %g, %g, %g\n", __VA_ARGS__)
 #define _s(...) _("%s\n", __VA_ARGS__)
+
+#define _hx(h) _dd(h.c, h.r)
+#define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
+#define _v2(v) _gg(v.x, v.y)
+
 #define _TEST_SIXCODE_ERROR() { \
 	_s(test_sixcode_error); \
 	test_reset_sixcode_error(); \
