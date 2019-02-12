@@ -41,39 +41,40 @@ function core_initialized() {
     resizeUI();
 
     grid = Module._web_grid_malloc();
-    Module._web_core_grid_initialize(grid);
+    Module._web_grid_initialize(grid);
 
     // Big
 
-    //let count = 6000000;
-    //let size = 4096 - 2;
-
-    //for (let i = 0; i < count; ++i) {
-    //    let r = Math.floor(Math.random() * size) - 4096/2 + 1;
-    //    let c = 2 * Math.floor(Math.random() * size) + (r & 1) - 4096 + 2;
-    //    let style = Math.floor(Math.random() * 15) + 1;
-    //    Module._web_grid_set(grid, c, r, style);
-    //}
-
-    // Small
-
-    let count = 512;
-    let size = 64 - 2;
+    let count = 6000000;
+    let size = 4096 - 2;
 
     for (let i = 0; i < count; ++i) {
-        let r = Math.floor(Math.random() * size) + 1;
-        let c = 2 * Math.floor(Math.random() * size) + (r & 1) + 2;
+        let r = Math.floor(Math.random() * size) - 4096/2 + 1;
+        let c = 2 * Math.floor(Math.random() * size) + (r & 1) - 4096 + 2;
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, c, r, style);
     }
+
+    // Small
+
+    //let count = 512;
+    //let size = 64 - 2;
+
+    //for (let i = 0; i < count; ++i) {
+    //    let r = Math.floor(Math.random() * size) + 1;
+    //    let c = 2 * Math.floor(Math.random() * size) + (r & 1) + 2;
+    //    let style = Math.floor(Math.random() * 15) + 1;
+    //    Module._web_grid_set(grid, c, r, style);
+    //}
 
     let scale = SCALE_LEVELS[scaleLevel];
     view = Module._web_view_malloc();
     Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
 
-    ui = Module._web_ui_malloc();
-    Module._web_ui_initialize(ui);
-    Module._web_ui_update_styles(ui, grid);
+    ui = Module._web_ui_all_malloc();
+    Module._web_ui_all_initialize(ui);
+    let uig = Module._web_ui_grid(ui);
+    Module._web_ui_grid_update_styles(uig, grid);
 
     window.addEventListener('resize', resize);
     canvas.addEventListener('wheel', wheel, {passive: true});
@@ -87,7 +88,7 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._web_draw(ui, view, grid);
+    Module._web_ui_all_draw(ui, view, grid);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');

@@ -64,19 +64,16 @@ const char TEST_FRAGMENT_SHADER_SOURCE[] =
 
 TEST(shader_load_and_delete)
 {
-	ShaderProgram s = {};
-
 	// Bad create
 
 	glmock_initialize();
 	GLmock.shader_i = -1;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	_d(s.vertex);
+	_d(shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
-	//=> shader-test.c:75 - The specified operation is not allowed in the current state.
+	//=> shader-test.c:73 - The specified operation is not allowed in the current state.
 	//=>
 
 	// Bad compile
@@ -86,61 +83,64 @@ TEST(shader_load_and_delete)
 	GLmock.force_gl_error = GL_OUT_OF_MEMORY;
 	GLmock.force_info_log = "[Info Log] - Compilation failed";
 
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	_d(s.vertex);
+	_d(shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error compiling shader:
 	//=> [Info Log] - Compilation failed
-	//=> shader-test.c:89 - There is not enough memory left to execute the command.
+	//=> shader-test.c:86 - There is not enough memory left to execute the command.
 	//=>
 
 	// Success
 
 	glmock_initialize();
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	s.fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
-	_dd(s.vertex, s.fragment);
+	GLuint vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	GLuint fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	_dd(vertex, fragment);
 	//=> 1, 2
 
-	GLmockShader *vertex = &GLmock.shaders[s.vertex];
-	GLmockShader *fragment = &GLmock.shaders[s.fragment];
+	GLmockShader *v = &GLmock.shaders[vertex];
+	GLmockShader *f = &GLmock.shaders[fragment];
 
-	_dd(vertex->created, fragment->created);
+	_dd(v->created, f->created);
 	//=> 1, 1
-	_d(vertex->shaderType == GL_VERTEX_SHADER);
+	_d(v->shaderType == GL_VERTEX_SHADER);
 	//=> 1
-	_d(vertex->source == TEST_VERTEX_SHADER_SOURCE);
+	_d(v->source == TEST_VERTEX_SHADER_SOURCE);
 	//=> 1
-	_d(fragment->shaderType == GL_FRAGMENT_SHADER);
+	_d(f->shaderType == GL_FRAGMENT_SHADER);
 	//=> 1
-	_d(fragment->source == TEST_FRAGMENT_SHADER_SOURCE);
+	_d(f->source == TEST_FRAGMENT_SHADER_SOURCE);
 	//=> 1
 
 	GLint compiled;
-	_dd(vertex->compiled, fragment->compiled);
+	_dd(v->compiled, f->compiled);
 	//=> 1, 1
-	glGetShaderiv(s.vertex, GL_COMPILE_STATUS, &compiled);
+	glGetShaderiv(vertex, GL_COMPILE_STATUS, &compiled);
 	_d(compiled);
 	//=> 1
-	glGetShaderiv(s.fragment, GL_COMPILE_STATUS, &compiled);
+	glGetShaderiv(fragment, GL_COMPILE_STATUS, &compiled);
 	_d(compiled);
 	//=> 1
 
 	// Delete
 
-	shader_program_delete_shaders(&s);
-	_dd(vertex->deleted, fragment->deleted);
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+
+	_dd(v->deleted, f->deleted);
 	//=> 1, 1
 }
 
 TEST(shader_program_create_and_delete)
 {
+	GLuint vertex;
+	GLuint fragment;
 	ShaderProgram s = {};
 
 	// No vertex or fragment shaders
 
-	_d(shader_program_create(&s, __FILE__, __LINE__));
+	_d(shader_program_create(&s, 0, 0, __FILE__, __LINE__));
 	//=> 0
 
 	// Bad create
@@ -148,10 +148,10 @@ TEST(shader_program_create_and_delete)
 	glmock_initialize();
 	GLmock.program_i = -1;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	s.fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 
-	_d(shader_program_create(&s, __FILE__, __LINE__));
+	_d(shader_program_create(&s, vertex, fragment, __FILE__, __LINE__));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> shader-test.c:154 - The specified operation is not allowed in the current state.
@@ -161,10 +161,10 @@ TEST(shader_program_create_and_delete)
 	// Success
 
 	glmock_initialize();
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	s.fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 
-	_d(shader_program_create(&s, __FILE__, __LINE__));
+	_d(shader_program_create(&s, vertex, fragment, __FILE__, __LINE__));
 	//=> 1
 
 	_d(s.program);
@@ -178,6 +178,8 @@ TEST(shader_program_create_and_delete)
 	_dd(p->attached_fragment_shader, s.fragment);
 	//=> 2, 2
 
+	// Delete
+
 	shader_program_delete(&s);
 
 	_d(p->deleted);
@@ -187,19 +189,27 @@ TEST(shader_program_create_and_delete)
 	_d(p->attached_fragment_shader);
 	//=> 0
 
-	shader_program_delete_shaders(&s);
+	glDeleteShader(s.vertex);
+	glDeleteShader(s.fragment);
+
+	_d(GLmock.shaders[s.vertex].deleted);
+	//=> 1
+	_d(GLmock.shaders[s.fragment].deleted);
+	//=> 1
 }
 
 TEST(shader_program_link)
 {
+	GLuint vertex;
+	GLuint fragment;
 	ShaderProgram s = {};
 
 	// Bad link
 
 	glmock_initialize();
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	s.fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
-	shader_program_create(&s, __FILE__, __LINE__);
+	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	shader_program_create(&s, vertex, fragment, __FILE__, __LINE__);
 	GLmock.programs[s.program].linked = -1;
 	GLmock.force_gl_error = GL_INVALID_VALUE;
 	GLmock.force_info_log = "[Info Log] Link program failed";
@@ -216,15 +226,15 @@ TEST(shader_program_link)
 	_TEST_SIXCODE_ERROR();
 	//=> Error linking program:
 	//=> [Info Log] Link program failed
-	//=> shader-test.c:207 - A numeric argument is out of range.
+	//=> shader-test.c:217 - A numeric argument is out of range.
 	//=>
 
 	// Success
 
 	glmock_initialize();
-	s.vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	s.fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
-	shader_program_create(&s, __FILE__, __LINE__);
+	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	shader_program_create(&s, vertex, fragment, __FILE__, __LINE__);
 
 	_d(shader_program_link(&s, __FILE__, __LINE__));
 	//=> 1
@@ -236,5 +246,6 @@ TEST(shader_program_link)
 	//=> 1
 
 	shader_program_delete(&s);
-	shader_program_delete_shaders(&s);
+	glDeleteShader(s.vertex);
+	glDeleteShader(s.fragment);
 }

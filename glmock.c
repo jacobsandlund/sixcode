@@ -50,6 +50,7 @@ typedef struct {
 	i32 attached_fragment_shader;
 
 	i32 uniform_i;
+	i32 attributes_i;
 	GLmockUniform uniforms[GLMOCK_MAX_ATTRIBUTES];
 	GLmockAttribute attributes[GLMOCK_MAX_ATTRIBUTES];
 } GLmockProgram;
@@ -145,11 +146,6 @@ void glAttachShader(GLuint program, GLuint shader)
 	} else {
 		GLmock.programs[program].attached_fragment_shader = shader;
 	}
-}
-
-void glBindAttribLocation(GLuint program, GLuint index, const GLchar *name)
-{
-	GLmock.programs[program].attributes[index].name = name;
 }
 
 void glBindTexture(GLenum target, GLuint texture)
@@ -337,6 +333,14 @@ void glGetShaderiv(GLuint shader, GLenum pname, GLint *params)
 
 		break;
 	}
+}
+
+GLint glGetAttribLocation(GLuint program, const GLchar *name)
+{
+	GLmockProgram *p = &GLmock.programs[program];
+	++p->attributes_i;
+	p->attributes[p->attributes_i].name = name;
+	return p->attributes_i;
 }
 
 GLint glGetUniformLocation(GLuint program, const GLchar *name)

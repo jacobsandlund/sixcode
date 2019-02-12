@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "mesh.h"
 
-#define MESH_FILL_VERTICES_PER_HEX 6
-#define MESH_FILL_INDICES_PER_HEX 12
-#define MESH_STROKE_VERTICES_PER_HEX 6
+#define FILL_MESH_VERTICES_PER_HEX 6
+#define FILL_MESH_INDICES_PER_HEX 12
+#define STROKE_MESH_VERTICES_PER_HEX 6
 
 static const mat2 MESH_HEX_TO_POINT = {{
 	{0.8660254037844386,	0.0},	// sqrt(3) / 2.0
@@ -17,24 +17,18 @@ static vec2 mesh_hex_corner(i8 corner)
 	return (vec2) {cos(angle), sin(angle)};
 }
 
-void mesh_initialize(Mesh *m, i32 size_c, i32 size_r)
+void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r)
 {
 	i32 num_hexes = size_c * size_r;
-	i32 fill_vertices_length = MESH_FILL_VERTICES_PER_HEX * num_hexes;
-	i32 fill_indices_length = MESH_FILL_INDICES_PER_HEX * num_hexes;
-	i32 stroke_vertices_length = MESH_STROKE_VERTICES_PER_HEX * num_hexes;
-
-	m->fill_vertices = malloc(fill_vertices_length * sizeof *m->fill_vertices);
-	m->fill_indices = malloc(fill_indices_length * sizeof *m->fill_indices);
-	m->stroke_vertices = malloc(stroke_vertices_length * sizeof *m->stroke_vertices);
-	m->fill_vertices_length = fill_vertices_length;
-	m->fill_indices_length = fill_indices_length;
-	m->stroke_vertices_length = stroke_vertices_length;
-
+	m->vertices_length = FILL_MESH_VERTICES_PER_HEX * num_hexes;
+	m->indices_length = FILL_MESH_INDICES_PER_HEX * num_hexes;
 	m->size_c = size_c;
 	m->size_r = size_r;
 
-	vec2 fill_corners[] = {
+	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
+	m->indices = malloc(m->indices_length * sizeof *m->indices);
+
+	vec2 corners[] = {
 		mesh_hex_corner(0),
 		mesh_hex_corner(1),
 		mesh_hex_corner(2),
@@ -43,81 +37,99 @@ void mesh_initialize(Mesh *m, i32 size_c, i32 size_r)
 		mesh_hex_corner(5),
 	};
 
-	u16 fill_indices_single[] = {
+	u16 indices_single[] = {
 		1, 2, 0,
 		0, 2, 3,
 		0, 3, 5,
 		5, 3, 4,
 	};
 
-	vec2 stroke_corners[] = {
-		fill_corners[0],
-		fill_corners[1],
-		fill_corners[1],
-		fill_corners[2],
-		fill_corners[2],
-		fill_corners[3],
-	};
-
-	Hex stroke_neighbor_offsets[] = {
-		{+1, -1},
-		{+1, -1},
-		{-1, -1},
-		{-1, -1},
-		{-2, 0},
-		{-2, 0},
-	};
-
-	i32 fv = 0;
-	i32 fi = 0;
-	i32 sv = 0;
+	i32 vi = 0;
+	i32 ii = 0;
 
 	for (i32 r = 0; r < size_r; ++r) {
 		for (i32 c = 0; c < size_c; ++c) {
 			vec2 h = {(c << 1) + (r & 1), r};
 			vec2 center = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
 
-			// Fill
-
-			for (i32 i = 0; i < MESH_FILL_INDICES_PER_HEX; ++i) {
-				m->fill_indices[fi + i] = fv + fill_indices_single[i];
+			for (i32 i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
+				m->indices[ii + i] = vi + indices_single[i];
 			}
 
-			fi += MESH_FILL_INDICES_PER_HEX;
+			ii += FILL_MESH_INDICES_PER_HEX;
 
-			for (i32 i = 0; i < MESH_FILL_VERTICES_PER_HEX; ++i) {
-				MeshVertex *vx = &m->fill_vertices[fv + i];
-				vx->x = fill_corners[i].x + center.x;
-				vx->y = fill_corners[i].y + center.y;
+			for (i32 i = 0; i < FILL_MESH_VERTICES_PER_HEX; ++i) {
+				FillMeshVertex *vx = &m->vertices[vi + i];
+				vx->x = corners[i].x + center.x;
+				vx->y = corners[i].y + center.y;
 				vx->c = c;
 				vx->r = r;
 			}
 
-			fv += MESH_FILL_VERTICES_PER_HEX;
+			vi += FILL_MESH_VERTICES_PER_HEX;
+		}
+	}
+}
 
-			// Stroke
+void fill_mesh_terminate(FillMesh *m)
+{
+	free(m->vertices);
+	free(m->indices);
+}
 
-			for (i32 i = 0; i < MESH_STROKE_VERTICES_PER_HEX; ++i) {
-				MeshVertex *vx = &m->stroke_vertices[sv + i];
-				vx->x = stroke_corners[i].x + center.x;
-				vx->y = stroke_corners[i].y + center.y;
+void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r)
+{
+	i32 num_hexes = size_c * size_r;
+	m->vertices_length = STROKE_MESH_VERTICES_PER_HEX * num_hexes;
+	m->size_c = size_c;
+	m->size_r = size_r;
+
+	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
+
+	vec2 corners[] = {
+		mesh_hex_corner(0),
+		mesh_hex_corner(1),
+		mesh_hex_corner(1),
+		mesh_hex_corner(2),
+		mesh_hex_corner(2),
+		mesh_hex_corner(3),
+	};
+
+	Hex neighbor_offsets[] = {
+		{+1, -1},
+		{+1, -1},
+		{-1, -1},
+		{-1, -1},
+		{-2, 0},
+		{-2, 0},
+	};
+
+	i32 vi = 0;
+
+	for (i32 r = 0; r < size_r; ++r) {
+		for (i32 c = 0; c < size_c; ++c) {
+			vec2 h = {(c << 1) + (r & 1), r};
+			vec2 center = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
+
+			for (i32 i = 0; i < STROKE_MESH_VERTICES_PER_HEX; ++i) {
+				StrokeMeshVertex *vx = &m->vertices[vi + i];
+				vx->x = corners[i].x + center.x;
+				vx->y = corners[i].y + center.y;
 				vx->c = c;
 				vx->r = r;
 
-				Hex offset = stroke_neighbor_offsets[i];
+				Hex offset = neighbor_offsets[i];
 				Hex h2 = {h.x + offset.c, h.y + offset.r};
 				vx->c2 = h2.c >> 1;
 				vx->r2 = h2.r;
 			}
 
-			sv += MESH_STROKE_VERTICES_PER_HEX;
+			vi += STROKE_MESH_VERTICES_PER_HEX;
 		}
 	}
 }
 
-void mesh_terminate(Mesh *m)
+void stroke_mesh_terminate(StrokeMesh *m)
 {
-	free(m->fill_vertices);
-	free(m->fill_indices);
-	free(m->stroke_vertices);
+	free(m->vertices);
 }

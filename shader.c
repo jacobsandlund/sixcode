@@ -28,9 +28,9 @@ void shader_print_gl_error(const char *filename, i32 line)
 	}
 }
 
-Shader shader_load(GLenum type, const char *shader_source, const char *filename, i32 line)
+GLuint shader_load(GLenum type, const char *shader_source, const char *filename, i32 line)
 {
-	Shader shader = glCreateShader(type);
+	GLuint shader = glCreateShader(type);
 
 	if (!shader) {
 		shader_print_gl_error(filename, line);
@@ -66,12 +66,14 @@ Shader shader_load(GLenum type, const char *shader_source, const char *filename,
 	return shader;
 }
 
-i8 shader_program_create(ShaderProgram *s, const char *filename, i32 line)
+i8 shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, i32 line)
 {
-	if (!s->vertex || !s->fragment) {
+	if (!vertex || !fragment) {
 		return 0;
 	}
 
+	s->vertex = vertex;
+	s->fragment = fragment;
 	s->program = glCreateProgram();
 
 	if (!s->program) {
@@ -123,10 +125,4 @@ void shader_program_delete(ShaderProgram *s)
 		glDetachShader(s->program, s->fragment);
 		glDeleteProgram(s->program);
 	}
-}
-
-void shader_program_delete_shaders(ShaderProgram *s)
-{
-	glDeleteShader(s->vertex);
-	glDeleteShader(s->fragment);
 }

@@ -6,12 +6,13 @@ TEST(core_grid_expand_for_hex)
 {
 	Hex h1 = {5, 27};
 	Hex h2 = {48, 62};
+	Quad grid_quad = {{2, 1}, {125, 62}};
 	Grid *g = malloc(sizeof *g);
-	Ui *ui = malloc(sizeof *ui);
+	UiAll *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	core_grid_initialize(g);
-	ui_initialize(ui, 0);
+	grid_initialize(g, &grid_quad);
+	ui_all_initialize(ui, 0);
 
 	_hx(g->quad.min);
 	//=> 2, 1
@@ -25,7 +26,7 @@ TEST(core_grid_expand_for_hex)
 	_d(core_grid_expand_for_hex(ui, g, h3));
 	//=> 1
 
-	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->textures.grid_styles];
+	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid.textures.grid_styles];
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
 	//=> 256, 192
 	_d(grid_get(g, h1));
@@ -39,7 +40,7 @@ TEST(core_grid_expand_for_hex)
 
 	grid_set(g, h3, 3);
 
-	Hex h4 = {300, -UI_MAX_TEXTURE_SIZE};
+	Hex h4 = {300, -UI_GRID_MAX_TEXTURE_SIZE};
 	_d(core_grid_expand_for_hex(ui, g, h4));
 	//=> 0
 
@@ -49,7 +50,7 @@ TEST(core_grid_expand_for_hex)
 	//=> -382, 1
 
 	grid_terminate(g);
-	ui_terminate(ui);
+	ui_all_terminate(ui);
 	free(g);
 	free(ui);
 }
@@ -61,18 +62,19 @@ TEST(core_toggle_hex_at_point)
 		.translation = {100, 250},
 		.scale = 20.0,
 	};
+	Quad grid_quad = {{2, 1}, {125, 62}};
 	vec2 v = {537.8, 482.3};
 
 	Grid *g = malloc(sizeof *g);
-	Ui *ui = malloc(sizeof *ui);
+	UiAll *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	core_grid_initialize(g);
+	grid_initialize(g, &grid_quad);
 	_hx(g->storage_quad.size);
 	//=> 64, 64
 
-	ui_initialize(ui, 0);
-	ui_update_styles(ui, g);
+	ui_all_initialize(ui, 0);
+	ui_grid_update_styles(&ui->grid, g);
 
 	Hex h = hex_round(view_point_to_vec_hex(&vw, v));
 	_hx(h);
@@ -83,7 +85,7 @@ TEST(core_toggle_hex_at_point)
 	_d(grid_get(g, h));
 	//=> 1
 
-	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->textures.grid_styles];
+	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid.textures.grid_styles];
 	_dd(grid_styles_texture->xoffset, grid_styles_texture->yoffset);
 	//=> 7, 29
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
@@ -106,7 +108,7 @@ TEST(core_toggle_hex_at_point)
 	core_toggle_hex_at_point(ui, &vw, g, v);
 
 	grid_terminate(g);
-	ui_terminate(ui);
+	ui_all_terminate(ui);
 	free(g);
 	free(ui);
 }

@@ -50,6 +50,13 @@ EMSCRIPTEN_KEEPALIVE Grid *web_grid_malloc()
 	return g;
 }
 
+EMSCRIPTEN_KEEPALIVE void web_grid_initialize(Grid *g)
+{
+	Quad quad = {{-UI_GRID_MAX_TEXTURE_SIZE + 2, -UI_GRID_MAX_TEXTURE_SIZE / 2 + 1}, {UI_GRID_MAX_TEXTURE_SIZE - 3, UI_GRID_MAX_TEXTURE_SIZE / 2 - 2}};
+	//Quad quad = {{2, 1}, {125, 62}};
+	grid_initialize(g, &quad);
+}
+
 EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 {
 	Hex h = {c, r};
@@ -58,43 +65,43 @@ EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 
 
 ////////////////
-// Ui
+// Ui All
 
-EMSCRIPTEN_KEEPALIVE Ui *web_ui_malloc()
+EMSCRIPTEN_KEEPALIVE UiAll *web_ui_all_malloc()
 {
-	Ui *ui = malloc(sizeof *ui);
+	UiAll *ui = malloc(sizeof *ui);
 	return ui;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_initialize(Ui *ui)
+EMSCRIPTEN_KEEPALIVE void web_ui_all_initialize(UiAll *ui)
 {
-	ui_initialize(ui, WEB_UI_STYLES_BUFFER_CAPACITY_MAX);
+	ui_all_initialize(ui, WEB_UI_STYLES_BUFFER_CAPACITY_MAX);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_update_styles(Ui *ui, Grid *g)
+EMSCRIPTEN_KEEPALIVE UiGrid *web_ui_grid(UiAll *ui)
 {
-	ui_update_styles(ui, g);
+	return &ui->grid;
+}
+
+EMSCRIPTEN_KEEPALIVE void web_ui_all_draw(UiAll *ui, View *vw, Grid *g)
+{
+	ui_all_draw(ui, vw, g);
 }
 
 
-//////////////////
-// Draw
+///////////////
+// Ui Grid
 
-EMSCRIPTEN_KEEPALIVE void web_draw(Ui *ui, View *vw, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_ui_grid_update_styles(UiGrid *ui_grid, Grid *g)
 {
-	draw(ui, vw, g);
+	ui_grid_update_styles(ui_grid, g);
 }
 
 
 //////////////////
 // Core
 
-EMSCRIPTEN_KEEPALIVE void web_core_grid_initialize(Grid *g)
-{
-	core_grid_initialize(g);
-}
-
-EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, f32 x, f32 y)
+EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y)
 {
 	vec2 v = {x, y};
 	core_toggle_hex_at_point(ui, vw, g, v);

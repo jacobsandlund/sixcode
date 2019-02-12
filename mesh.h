@@ -10,22 +10,36 @@ typedef struct {
 	f32 y;
 	i8 c;
 	i8 r;
-	i8 c2;
-	i8 r2;
-} MeshVertex;
+} FillMeshVertex;
 
 typedef struct {
-	MeshVertex *fill_vertices;
-	MeshVertex *stroke_vertices;
-	u16 *fill_indices;
-	i32 fill_vertices_length;
-	i32 fill_indices_length;
-	i32 stroke_vertices_length;
+	f32 x;
+	f32 y;
+	i8 c;
+	i8 r;
+	i8 c2;
+	i8 r2;
+} StrokeMeshVertex;
+
+typedef struct {
+	FillMeshVertex *vertices;
+	u16 *indices;
+	i32 vertices_length;
+	i32 indices_length;
 	i32 size_c;
 	i32 size_r;
-} Mesh;
+} FillMesh;
 
-void mesh_initialize(Mesh *m, i32 size_c, i32 size_r);
-void mesh_terminate(Mesh *m);
+typedef struct {
+	StrokeMeshVertex *vertices;
+	i32 vertices_length;
+	i32 size_c;
+	i32 size_r;
+} StrokeMesh;
+
+void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r);
+void fill_mesh_terminate(FillMesh *m);
+void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r);
+void stroke_mesh_terminate(StrokeMesh *m);
 
 #endif // __MESH_H__
