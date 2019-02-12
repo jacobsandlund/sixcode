@@ -50,7 +50,7 @@ TEST(view_translate)
 	//=> 800, -1600
 }
 
-TEST(view_point_to_vec_hex)
+TEST(view_point_to_hex_space)
 {
 	View vw = {
 		.viewport_size = {1000, 600},
@@ -60,10 +60,10 @@ TEST(view_point_to_vec_hex)
 	vec2 v1 = {125.981, 275};
 	vec2 v2 = {980.3, 540};
 
-	_v2(view_point_to_vec_hex(&vw, v1));
+	_v2(view_point_to_hex_space(&vw, v1));
 	//=> -109.47, -30
 
-	_v2(view_point_to_vec_hex(&vw, v2));
+	_v2(view_point_to_hex_space(&vw, v2));
 	//=> 87.8265, 5.33333
 }
 

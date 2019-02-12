@@ -11,6 +11,7 @@
 #include "ui-all.c"
 #include "ui-fill.c"
 #include "ui-grid.c"
+#include "ui-points.c"
 #include "ui-stroke.c"
 #include "view.c"
 
@@ -42,7 +43,7 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 {
 	static u8 style = CORE_STYLE_MIN;
 
-	Hex h = hex_round(view_point_to_vec_hex(vw, v));
+	Hex h = hex_round(view_point_to_hex_space(vw, v));
 
 	if (!quad_contains(&g->quad, h)) {
 		if (!core_grid_expand_for_hex(ui, g, h)) {

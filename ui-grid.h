@@ -12,6 +12,7 @@
 
 typedef struct {
 	GLuint grid_styles;
+	GLuint fill_colors;
 } UiGridTextures;
 
 typedef struct {

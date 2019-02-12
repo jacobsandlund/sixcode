@@ -9,6 +9,7 @@
 #include "ui-all.c"
 #include "ui-grid.c"
 #include "ui-fill.c"
+#include "ui-points.c"
 #include "ui-stroke.c"
 #include "view.c"
 
@@ -17,7 +18,7 @@ TEST(ui_all)
 	View vw = {
 		.viewport_size = {1000, 600},
 		.translation = {100, 100},
-		.scale = 20.0,
+		.scale = 8.0,
 	};
 	Quad quad = {{-126, 1}, {253, 126}};
 
@@ -32,11 +33,11 @@ TEST(ui_all)
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
 	_hx(viewport_quad.min);
-	//=> -47, -14
+	//=> -116, -34
 	_hx(viewport_quad.max);
-	//=> 70, 27
+	//=> 174, 67
 
-	// Normal zoom with stroke and fill
+	// Zoom with stroke and fill
 
 	ui_all_draw(ui, &vw, g);
 
@@ -46,13 +47,13 @@ TEST(ui_all)
 	//=> 600
 
 	_d(GLmock.draw_elements_count);
-	//=> 49152
+	//=> 294912
 	_d(GLmock.draw_arrays_count);
-	//=> 24576
+	//=> 147456
 
-	// Zoomed out far with no stroke
+	// Zoom with fill and no stroke
 
-	vw.scale = 5.0;
+	vw.scale = 6.0;
 	GLmock.draw_elements_count = 0;
 	GLmock.draw_arrays_count = 0;
 
@@ -62,6 +63,19 @@ TEST(ui_all)
 	//=> 294912
 	_d(GLmock.draw_arrays_count);
 	//=> 0
+
+	// Zoom with only points
+
+	vw.scale = 1.0;
+	GLmock.draw_elements_count = 0;
+	GLmock.draw_arrays_count = 0;
+
+	ui_all_draw(ui, &vw, g);
+
+	_d(GLmock.draw_elements_count);
+	//=> 0
+	_d(GLmock.draw_arrays_count);
+	//=> 65536
 
 	ui_all_terminate(ui);
 	grid_terminate(g);

@@ -32,10 +32,6 @@ typedef struct {
 } UiFillBuffers;
 
 typedef struct {
-	GLuint fill_colors;
-} UiFillTextures;
-
-typedef struct {
 	UiGrid *ui_grid;
 
 	ShaderProgram shader;
@@ -43,7 +39,6 @@ typedef struct {
 	UiFillAttributes attributes;
 	UiFillUniforms uniforms;
 	UiFillBuffers buffers[UI_FILL_NUM_MESHES];
-	UiFillTextures textures;
 
 	FillMesh meshes[UI_FILL_NUM_MESHES];
 } UiFill;

@@ -32,8 +32,20 @@ TEST(ui_grid)
 
 	_d(ui->textures.grid_styles);
 	//=> 1
+	_d(ui->textures.fill_colors);
+	//=> 2
 
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->textures.fill_colors];
 	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->textures.grid_styles];
+
+	_d(glmock_get_tex_parameter(ui->textures.fill_colors, GL_TEXTURE_WRAP_S) == GL_CLAMP_TO_EDGE);
+	//=> 1
+	_d(glmock_get_tex_parameter(ui->textures.fill_colors, GL_TEXTURE_WRAP_T) == GL_CLAMP_TO_EDGE);
+	//=> 1
+	_d(glmock_get_tex_parameter(ui->textures.fill_colors, GL_TEXTURE_MAG_FILTER) == GL_NEAREST);
+	//=> 1
+	_d(glmock_get_tex_parameter(ui->textures.fill_colors, GL_TEXTURE_MIN_FILTER) == GL_NEAREST);
+	//=> 1
 
 	_d(glmock_get_tex_parameter(ui->textures.grid_styles, GL_TEXTURE_WRAP_S) == GL_CLAMP_TO_EDGE);
 	//=> 1
@@ -42,6 +54,17 @@ TEST(ui_grid)
 	_d(glmock_get_tex_parameter(ui->textures.grid_styles, GL_TEXTURE_MAG_FILTER) == GL_NEAREST);
 	//=> 1
 	_d(glmock_get_tex_parameter(ui->textures.grid_styles, GL_TEXTURE_MIN_FILTER) == GL_NEAREST);
+	//=> 1
+
+	_d(fill_colors_texture->created);
+	//=> 1
+	_dd(fill_colors_texture->width, fill_colors_texture->height);
+	//=> 256, 1
+	_d(fill_colors_texture->format == GL_RGBA);
+	//=> 1
+	_d(fill_colors_texture->type == GL_UNSIGNED_BYTE);
+	//=> 1
+	_d(fill_colors_texture->data == UI_GRID_FILL_COLORS);
 	//=> 1
 
 	_d(grid_styles_texture->created);

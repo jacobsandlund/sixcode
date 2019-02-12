@@ -15,6 +15,13 @@ typedef struct {
 typedef struct {
 	f32 x;
 	f32 y;
+	i16 c;
+	i16 r;
+} PointsMeshVertex;
+
+typedef struct {
+	f32 x;
+	f32 y;
 	i8 c;
 	i8 r;
 	i8 c2;
@@ -31,6 +38,13 @@ typedef struct {
 } FillMesh;
 
 typedef struct {
+	PointsMeshVertex *vertices;
+	i32 vertices_length;
+	i32 size_c;
+	i32 size_r;
+} PointsMesh;
+
+typedef struct {
 	StrokeMeshVertex *vertices;
 	i32 vertices_length;
 	i32 size_c;
@@ -39,6 +53,8 @@ typedef struct {
 
 void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r);
 void fill_mesh_terminate(FillMesh *m);
+void points_mesh_initialize(PointsMesh *m, i32 size_c, i32 size_r);
+void points_mesh_terminate(PointsMesh *m);
 void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r);
 void stroke_mesh_terminate(StrokeMesh *m);
 

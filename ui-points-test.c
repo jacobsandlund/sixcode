@@ -6,19 +6,19 @@
 #include "mesh.c"
 #include "shader.c"
 #include "quad.c"
-#include "ui-fill.c"
 #include "ui-grid.c"
+#include "ui-points.c"
 #include "view.c"
 
 TEST(ui)
 {
 	UiGrid *ui_grid = malloc(sizeof *ui_grid);
-	UiFill *ui = malloc(sizeof *ui);
+	UiPoints *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	ui_grid_initialize(ui_grid, 1024);
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_points_initialize(ui, ui_grid));
 	//=> 1
 
 	///////////////////////
@@ -68,10 +68,12 @@ TEST(ui)
 	//=> 2
 	_d(ui->uniforms.gridPositionOffset);
 	//=> 3
-	_d(ui->uniforms.gridStyles);
+	_d(ui->uniforms.pointSize);
 	//=> 4
-	_d(ui->uniforms.fillColors);
+	_d(ui->uniforms.gridStyles);
 	//=> 5
+	_d(ui->uniforms.fillColors);
+	//=> 6
 
 	_s(program->uniforms[ui->uniforms.viewMatrix].name);
 	//=> viewMatrix
@@ -79,6 +81,8 @@ TEST(ui)
 	//=> gridSize
 	_s(program->uniforms[ui->uniforms.gridPositionOffset].name);
 	//=> gridPositionOffset
+	_s(program->uniforms[ui->uniforms.pointSize].name);
+	//=> pointSize
 	_s(program->uniforms[ui->uniforms.gridStyles].name);
 	//=> gridStyles
 	_s(program->uniforms[ui->uniforms.fillColors].name);
@@ -87,70 +91,32 @@ TEST(ui)
 	/////////////////////
 	// mesh + buffers
 
-	_d(ui->meshes[0].vertices_length);
-	//=> 24576
-	_d(ui->meshes[1].vertices_length);
-	//=> 6144
-	_d(ui->meshes[2].vertices_length);
-	//=> 1536
-	_d(ui->meshes[3].vertices_length);
-	//=> 384
-	_d(ui->meshes[4].vertices_length);
-	//=> 96
-	_d(ui->meshes[0].indices_length);
-	//=> 49152
-	_d(ui->meshes[4].indices_length);
-	//=> 192
+	_d(ui->mesh.vertices_length);
+	//=> 65536
 
-	_d(ui->buffers[0].vertices);
+	_d(ui->buffers.vertices);
 	//=> 1
-	_d(ui->buffers[1].vertices);
-	//=> 3
-	_d(ui->buffers[2].vertices);
-	//=> 5
-	_d(ui->buffers[3].vertices);
-	//=> 7
-	_d(ui->buffers[4].vertices);
-	//=> 9
-	_d(ui->buffers[0].indices);
-	//=> 2
-	_d(ui->buffers[4].indices);
-	//=> 10
 
-	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers[0].vertices];
-	GLmockBuffer *indices_buffer = &GLmock.buffers[ui->buffers[1].indices];
+	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers.vertices];
 
 	_d(vertices_buffer->created);
 	//=> 1
 	_d(vertices_buffer->size);
-	//=> 294912
-	_d(vertices_buffer->data == ui->meshes[0].vertices);
+	//=> 786432
+	_d(vertices_buffer->data == ui->mesh.vertices);
 	//=> 1
 	_d(vertices_buffer->usage == GL_STATIC_DRAW);
-	//=> 1
-
-	_d(indices_buffer->created);
-	//=> 1
-	_d(indices_buffer->size);
-	//=> 24576
-	_d(indices_buffer->data == ui->meshes[1].indices);
-	//=> 1
-	_d(indices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
 
 	////////////////////////////
 	// terminate
 
-	ui_fill_terminate(ui);
+	ui_points_terminate(ui);
 
 	_d(vertex->deleted);
 	//=> 1
-	_d(program->deleted);
-	//=> 1
 
 	_d(vertices_buffer->deleted);
-	//=> 1
-	_d(indices_buffer->deleted);
 	//=> 1
 
 	ui_grid_terminate(ui_grid);
@@ -161,7 +127,7 @@ TEST(ui)
 TEST(ui_initialize_fail)
 {
 	UiGrid *ui_grid = malloc(sizeof *ui_grid);
-	UiFill *ui = malloc(sizeof *ui);
+	UiPoints *ui = malloc(sizeof *ui);
 
 	// Failures
 
@@ -169,7 +135,7 @@ TEST(ui_initialize_fail)
 	ui_grid_initialize(ui_grid, 1024);
 	GLmock.shaders[ui_grid->fragment_shader + 1].compiled = -1;
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_points_initialize(ui, ui_grid));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error compiling shader. Nothing in info log.
@@ -180,7 +146,7 @@ TEST(ui_initialize_fail)
 	ui_grid_initialize(ui_grid, 1024);
 	GLmock.programs[1].linked = -1;
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_points_initialize(ui, ui_grid));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error linking program. Nothing in info log.
@@ -191,38 +157,38 @@ TEST(ui_initialize_fail)
 	free(ui);
 }
 
-TEST(ui_draw_fill)
+TEST(ui_points_draw)
 {
 	View vw = {
-		.viewport_size = {1000, 600},
-		.translation = {100, 100},
-		.scale = 10.0,
+		.viewport_size = {1600, 1000},
+		.translation = {-600, -300},
+		.scale = 1.0,
 	};
-	Quad quad = {{-126, 1}, {253, 126}};
+	Quad quad = {{-826, -298}, {753, 826}};
 
 	Grid *g = malloc(sizeof *g);
 	UiGrid *ui_grid = malloc(sizeof *ui_grid);
-	UiFill *ui = malloc(sizeof *ui);
+	UiPoints *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	grid_initialize(g, &quad);
 	ui_grid_initialize(ui_grid, 0);
 	ui_grid_update_styles(ui_grid, g);
-	ui_fill_initialize(ui, ui_grid);
+	ui_points_initialize(ui, ui_grid);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
-	_qd(viewport_quad);
-	//=> (-93, -27), (139, 54)
+	_hx(viewport_quad.min);
+	//=> -3236, -1068
+	_hx(viewport_quad.max);
+	//=> 465, 268
 
-	ui_fill_draw(ui, &vw, g, &viewport_quad);
+	ui_points_draw(ui, &vw, g, &viewport_quad);
 
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
 
-	_d(GLmock.bound_buffers[0] == ui->buffers[0].vertices);
-	//=> 1
-	_d(GLmock.bound_buffers[1] == ui->buffers[0].indices);
+	_d(GLmock.bound_buffers[0] == ui->buffers.vertices);
 	//=> 1
 
 	// Attributes
@@ -247,7 +213,7 @@ TEST(ui_draw_fill)
 
 	_d(gridPosition->size);
 	//=> 2
-	_d(gridPosition->type == GL_BYTE);
+	_d(gridPosition->type == GL_SHORT);
 	//=> 1
 	_d(gridPosition->stride);
 	//=> 12
@@ -260,14 +226,18 @@ TEST(ui_draw_fill)
 
 	GLmockUniform *grid_size = &program->uniforms[ui->uniforms.gridSize];
 	GLmockUniform *grid_position_offset = &program->uniforms[ui->uniforms.gridPositionOffset];
+	GLmockUniform *point_size = &program->uniforms[ui->uniforms.pointSize];
 
 	_gg(grid_size->fv0, grid_size->fv1);
-	//=> 192, 128
+	//=> 832, 1152
 	_hx(g->storage_quad.size);
-	//=> 192, 128
+	//=> 832, 1152
+
+	_g(point_size->fv0);
+	//=> 0.75
 
 	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
-	//=> 81, 0
+	//=> 512, 512
 
 	_d(program->uniforms[ui->uniforms.viewMatrix].matrix4fv == &ui_grid->view_matrix.m[0][0]);
 	//=> 1
@@ -286,22 +256,20 @@ TEST(ui_draw_fill)
 
 	// Draw
 
-	_d(GLmock.draw_elements_mode == GL_TRIANGLES);
+	_d(GLmock.draw_arrays_mode == GL_POINTS);
 	//=> 1
-	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
-	//=> 1
-	_d(GLmock.draw_elements_count);
-	//=> 98304
-	_d(49152 * 2);  // Draw the two showing blocks
-	//=> 98304
+	_d(GLmock.draw_arrays_count);
+	//=> 589824
+	_d(ui->mesh.vertices_length * 9);  // Draw 9 point blocks
+	//=> 589824
 
 	mat4 *m = &ui_grid->view_matrix;
-	_ggg(m->m[3][0], m->m[3][1], m->m[3][3]);
-	//=> 0.00944486, 0.0333333, 0.1
+	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
+	//=> 0.819282, -0.888, 0, 1
 
 	grid_terminate(g);
 	ui_grid_terminate(ui_grid);
-	ui_fill_terminate(ui);
+	ui_points_terminate(ui);
 
 	free(g);
 	free(ui_grid);

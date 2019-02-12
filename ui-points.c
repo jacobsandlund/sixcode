@@ -1,15 +1,19 @@
 #include <stdio.h>
 #include <string.h>
-#include "ui-fill.h"
+#include "ui-points.h"
+
+#define UI_POINT_MESH_SIZE 256
+#define UI_POINTS_POINT_SIZE_FACTOR 0.75
 
 // 0.001953125 = 0.5 / 256
-const char UI_FILL_VERTEX_SHADER_SOURCE[] =
+const char UI_POINTS_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
 "attribute vec2 gridPosition;\n"
 "\n"
 "uniform mat4 viewMatrix;\n"
 "uniform vec2 gridSize;\n"
 "uniform vec2 gridPositionOffset;\n"
+"uniform float pointSize;\n"
 "\n"
 "uniform sampler2D gridStyles;\n"
 "uniform sampler2D fillColors;\n"
@@ -21,16 +25,17 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
+"	gl_PointSize = pointSize;\n"
 "}\n";
 
-i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
+i8 ui_points_initialize(UiPoints *ui, UiGrid *ui_grid)
 {
 	ui->ui_grid = ui_grid;
 
 	////////////////////////
 	// load/create/link
 
-	GLuint vertex_shader = shader_load(GL_VERTEX_SHADER, UI_FILL_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	GLuint vertex_shader = shader_load(GL_VERTEX_SHADER, UI_POINTS_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 
 	if (
 		!shader_program_create(&ui->shader, vertex_shader, ui_grid->fragment_shader, __FILE__, __LINE__) ||
@@ -67,6 +72,10 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 			ui->shader.program,
 			"gridPositionOffset");
 
+	ui->uniforms.pointSize = glGetUniformLocation(
+			ui->shader.program,
+			"pointSize");
+
 	ui->uniforms.gridStyles = glGetUniformLocation(
 			ui->shader.program,
 			"gridStyles");
@@ -78,78 +87,41 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	//////////////////
 	// mesh + buffers
 
-	i32 size = UI_FILL_MESH_MAX_SIZE;
+	points_mesh_initialize(&ui->mesh, UI_POINT_MESH_SIZE, UI_POINT_MESH_SIZE);
 
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
-		FillMesh *mesh = &ui->meshes[i];
-		UiFillBuffers *buffers = &ui->buffers[i];
+	glGenBuffers(1, &ui->buffers.vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
+	glBufferData(
+			GL_ARRAY_BUFFER,
+			ui->mesh.vertices_length * sizeof *ui->mesh.vertices,
+			ui->mesh.vertices,
+			GL_STATIC_DRAW);
 
-		fill_mesh_initialize(mesh, size, size);
-
-		glGenBuffers(1, &buffers->vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
-		glBufferData(
-				GL_ARRAY_BUFFER,
-				mesh->vertices_length * sizeof *mesh->vertices,
-				mesh->vertices,
-				GL_STATIC_DRAW);
-
-		glGenBuffers(1, &buffers->indices);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
-		glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER,
-				mesh->indices_length * sizeof *mesh->indices,
-				mesh->indices,
-				GL_STATIC_DRAW);
-
-		size >>= 1;
-	}
-	
 	return 1;
 }
 
-void ui_fill_terminate(UiFill *ui)
+void ui_points_terminate(UiPoints *ui)
 {
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
+	glDeleteBuffers(1, &ui->buffers.vertices);
 
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
-		fill_mesh_terminate(&ui->meshes[i]);
-
-		glDeleteBuffers(1, &ui->buffers[i].vertices);
-		glDeleteBuffers(1, &ui->buffers[i].indices);
-	}
+	points_mesh_terminate(&ui->mesh);
 }
 
-static i32 ui_fill_draw_mesh_index(UiFill *ui, StorageQuad *draw_quad)
-{
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
-		if (
-			draw_quad->size.c > ui->meshes[i].size_c ||
-			draw_quad->size.r > ui->meshes[i].size_r
-		) {
-			return i > 0 ? i - 1 : 0;
-		}
-	}
-
-	return UI_FILL_NUM_MESHES - 1;
-}
-
-void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
+void ui_points_draw(UiPoints *ui, View *vw, Grid *g, Quad *viewport_quad)
 {
 	UiGrid *ui_grid = ui->ui_grid;
 
 	glUseProgram(ui->shader.program);
 
+	Quad resized_viewport_quad;
+	quad_resize(&resized_viewport_quad, viewport_quad, +1);
+
 	StorageQuad draw_quad;
-	ui_grid_storage_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
+	ui_grid_storage_quad_for_draw(&draw_quad, &g->styles_quad, &resized_viewport_quad);
 
-	i32 mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
-	FillMesh *mesh = &ui->meshes[mesh_index];
-	UiFillBuffers *buffers = &ui->buffers[mesh_index];
-
-	glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
+	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
 
 	ui_grid_update_view_matrix(ui_grid, vw);
 
@@ -160,7 +132,7 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			2,
 			GL_FLOAT,
 			GL_FALSE,
-			sizeof mesh->vertices[0],
+			sizeof ui->mesh.vertices[0],
 			0);
 	glEnableVertexAttribArray(ui->attributes.position);
 
@@ -169,10 +141,10 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glVertexAttribPointer(
 			ui->attributes.gridPosition,
 			2,
-			GL_BYTE,
+			GL_SHORT,
 			GL_FALSE,
-			sizeof mesh->vertices[0],
-			(GLvoid *) (2 * sizeof mesh->vertices[0].x));
+			sizeof ui->mesh.vertices[0],
+			(GLvoid *) (2 * sizeof ui->mesh.vertices[0].x));
 	glEnableVertexAttribArray(ui->attributes.gridPosition);
 
 	// Uniforms + Textures
@@ -181,6 +153,12 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			ui->uniforms.gridSize,
 			(f32) g->storage_quad.size.c,
 			(f32) g->storage_quad.size.r);
+
+	f32 pointSize = (f64) vw->scale * UI_POINTS_POINT_SIZE_FACTOR;
+
+	glUniform1f(
+			ui->uniforms.pointSize,
+			pointSize);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.grid_styles);
@@ -200,8 +178,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	f64 size_y = vw->viewport_size.y;
 	mat4 *view_matrix = &ui_grid->view_matrix;
 
-	for (i32 r = 0; r < draw_quad.size.r; r += UI_FILL_MESH_MAX_SIZE) {
-		for (i32 c = 0; c < draw_quad.size.c; c += UI_FILL_MESH_MAX_SIZE) {
+	for (i32 r = 0; r < draw_quad.size.r; r += UI_POINT_MESH_SIZE) {
+		for (i32 c = 0; c < draw_quad.size.c; c += UI_POINT_MESH_SIZE) {
 			vec2 h = {
 				(c + draw_quad.min.c) << 1,
 				r + draw_quad.min.r,
@@ -222,11 +200,10 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 					(f32) (c + draw_quad_min_offset.c),
 					(f32) (r + draw_quad_min_offset.r));
 
-			glDrawElements(
-					GL_TRIANGLES,
-					mesh->indices_length,
-					GL_UNSIGNED_SHORT,
-					0);
+			glDrawArrays(
+					GL_POINTS,
+					0,
+					ui->mesh.vertices_length);
 		}
 	}
 }

@@ -11,6 +11,7 @@
 #include "ui-all.h"
 #include "ui-fill.h"
 #include "ui-grid.h"
+#include "ui-points.h"
 #include "ui-stroke.h"
 #include "view.h"
 

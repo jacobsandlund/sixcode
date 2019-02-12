@@ -77,6 +77,37 @@ void fill_mesh_terminate(FillMesh *m)
 	free(m->indices);
 }
 
+void points_mesh_initialize(PointsMesh *m, i32 size_c, i32 size_r)
+{
+	m->vertices_length = size_c * size_r;
+	m->size_c = size_c;
+	m->size_r = size_r;
+
+	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
+
+	i32 vi = 0;
+
+	for (i32 r = 0; r < size_r; ++r) {
+		for (i32 c = 0; c < size_c; ++c) {
+			vec2 h = {(c << 1) + (r & 1), r};
+			vec2 center = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
+
+			PointsMeshVertex *vx = &m->vertices[vi];
+			vx->x = center.x;
+			vx->y = center.y;
+			vx->c = c;
+			vx->r = r;
+
+			++vi;
+		}
+	}
+}
+
+void points_mesh_terminate(PointsMesh *m)
+{
+	free(m->vertices);
+}
+
 void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r)
 {
 	i32 num_hexes = size_c * size_r;

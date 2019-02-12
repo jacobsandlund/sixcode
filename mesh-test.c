@@ -41,6 +41,8 @@ TEST(fill_mesh)
 	//=> 0, 0
 	_dd(m->vertices[5].c, m->vertices[5].r);
 	//=> 0, 0
+	_dd(m->vertices[6].c, m->vertices[6].r);
+	//=> 1, 0
 	_dd(m->vertices[12287].c, m->vertices[12287].r);
 	//=> 31, 63
 
@@ -56,6 +58,42 @@ TEST(fill_mesh)
 	//=> 12287, 12285, 12286
 
 	fill_mesh_terminate(m);
+	free(m);
+}
+
+TEST(points_mesh)
+{
+	PointsMesh *m = malloc(sizeof *m);
+	points_mesh_initialize(m, 32, 64);
+
+	_d(m->size_c);
+	//=> 32
+	_d(m->size_r);
+	//=> 64
+
+	_d(32 * 64);
+	//=> 2048
+
+	_d(m->vertices_length);
+	//=> 2048
+
+	_gg(m->vertices[0].x, m->vertices[0].y);
+	//=> 0, 0
+	_gg(m->vertices[1].x, m->vertices[1].y);
+	//=> 1.73205, 0
+	_gg(m->vertices[2].x, m->vertices[2].y);
+	//=> 3.4641, 0
+	_gg(m->vertices[2047].x, m->vertices[2047].y);
+	//=> 54.5596, -94.5
+
+	_dd(m->vertices[0].c, m->vertices[0].r);
+	//=> 0, 0
+	_dd(m->vertices[1].c, m->vertices[1].r);
+	//=> 1, 0
+	_dd(m->vertices[2047].c, m->vertices[2047].r);
+	//=> 31, 63
+
+	points_mesh_terminate(m);
 	free(m);
 }
 
@@ -94,6 +132,10 @@ TEST(stroke_mesh)
 	//=> 0, 0
 	_dd(m->vertices[0].c2, m->vertices[0].r2);
 	//=> 0, -1
+	_dd(m->vertices[7].c, m->vertices[7].r);
+	//=> 1, 0
+	_dd(m->vertices[7].c2, m->vertices[7].r2);
+	//=> 1, -1
 	_dd(m->vertices[12287].c, m->vertices[12287].r);
 	//=> 31, 63
 	_dd(m->vertices[12287].c2, m->vertices[12287].r2);

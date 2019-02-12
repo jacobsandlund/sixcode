@@ -36,7 +36,7 @@ void view_translate(View *vw, vec2 delta)
 	vw->translation.y += delta.y;
 }
 
-vec2 view_point_to_vec_hex(View *vw, vec2 v)
+vec2 view_point_to_hex_space(View *vw, vec2 v)
 {
 	vec2 v_moved = {
 		 v.x - vw->viewport_size.x / 2.0f + vw->translation.x,
@@ -57,8 +57,8 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 		vw->viewport_size.x + 1,
 		vw->viewport_size.y + 1,
 	};
-	vec2 top_left = view_point_to_vec_hex(vw, top_left_point);
-	vec2 bottom_right = view_point_to_vec_hex(vw, bottom_right_point);
+	vec2 top_left = view_point_to_hex_space(vw, top_left_point);
+	vec2 bottom_right = view_point_to_hex_space(vw, bottom_right_point);
 
 	i32 top = floor(top_left.y);
 	i32 left = floor(top_left.x);

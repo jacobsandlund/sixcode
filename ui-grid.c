@@ -2,7 +2,10 @@
 #include <string.h>
 #include "ui-grid.h"
 
-#define UI_STYLES_BUFFER_CAPACITY_MIN 256
+#define UI_GRID_FILL_COLORS_COUNT 256
+#define UI_GRID_FILL_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
+
+#define UI_GRID_STYLES_BUFFER_CAPACITY_MIN 256
 
 const char UI_GRID_FRAGMENT_SHADER_SOURCE[] =
 "varying lowp vec4 color;\n"
@@ -10,6 +13,28 @@ const char UI_GRID_FRAGMENT_SHADER_SOURCE[] =
 "void main() {\n"
 "	gl_FragColor = color;\n"
 "}\n";
+
+const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
+      0,   0,   0,   0,  // Not present
+    190, 190, 190, 255,
+    255, 140, 140, 255,
+    140, 255, 140, 255,
+
+    140, 140, 255, 255,
+    255, 255,  40, 255,
+    255,  40, 255, 255,
+     40, 255, 255, 255,
+
+    255, 190,  90, 255,
+    255,  90, 190, 255,
+    190, 255,  90, 255,
+     90, 255, 190, 255,
+
+    190,  90, 255, 255,
+     90, 190, 255, 255,
+    220, 190, 140, 255,
+    140, 190, 220, 255,
+};
 
 i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max)
 {
@@ -33,15 +58,33 @@ i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+	glGenTextures(1, &ui->textures.fill_colors);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, ui->textures.fill_colors);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA,
+			UI_GRID_FILL_COLORS_COUNT,
+			1,
+			0,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			UI_GRID_FILL_COLORS);
+
 	///////////////////////
 	// styles_buffer
 
-	if (styles_buffer_capacity_max < UI_STYLES_BUFFER_CAPACITY_MIN) {
-		styles_buffer_capacity_max = UI_STYLES_BUFFER_CAPACITY_MIN;
+	if (styles_buffer_capacity_max < UI_GRID_STYLES_BUFFER_CAPACITY_MIN) {
+		styles_buffer_capacity_max = UI_GRID_STYLES_BUFFER_CAPACITY_MIN;
 	}
 
-	ui->styles_buffer = malloc(UI_STYLES_BUFFER_CAPACITY_MIN * sizeof *ui->styles_buffer);
-	ui->styles_buffer_capacity = UI_STYLES_BUFFER_CAPACITY_MIN;
+	ui->styles_buffer = malloc(UI_GRID_STYLES_BUFFER_CAPACITY_MIN * sizeof *ui->styles_buffer);
+	ui->styles_buffer_capacity = UI_GRID_STYLES_BUFFER_CAPACITY_MIN;
 	ui->styles_buffer_capacity_max = styles_buffer_capacity_max;
 
 	///////////////////////
@@ -60,6 +103,7 @@ void ui_grid_terminate(UiGrid *ui)
 {
 	glDeleteShader(ui->fragment_shader);
 	glDeleteTextures(1, &ui->textures.grid_styles);
+	glDeleteTextures(1, &ui->textures.fill_colors);
 
 	free(ui->styles_buffer);
 }

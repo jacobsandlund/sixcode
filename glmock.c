@@ -410,6 +410,13 @@ void glUniform1i(GLint location, GLint v0)
 	uniform->iv0 = v0;
 }
 
+void glUniform1f(GLint location, GLfloat v0)
+{
+	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
+	GLmockUniform *uniform = &p->uniforms[location];
+	uniform->fv0 = v0;
+}
+
 void glUniform2f(GLint location, GLfloat v0, GLfloat v1)
 {
 	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
