@@ -1,7 +1,4 @@
 const SCALE_LEVELS = [
-    0.3,
-    0.5,
-    0.75,
     1.0,
     1.5,
     2.0,
@@ -31,6 +28,7 @@ const SCALE_LEVELS = [
 
 let canvas;
 let grid;
+let areaGrid;
 let ui;
 let view;
 
@@ -41,7 +39,8 @@ function core_initialized() {
     resizeUI();
 
     grid = Module._web_grid_malloc();
-    Module._web_grid_initialize(grid);
+    areaGrid = Module._web_area_grid_malloc();
+    Module._web_core_grids_initialize(grid, areaGrid);
 
     // Big
 

@@ -178,10 +178,8 @@ TEST(ui_points_draw)
 
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
-	_hx(viewport_quad.min);
-	//=> -3236, -1068
-	_hx(viewport_quad.max);
-	//=> 465, 268
+	_qd(viewport_quad);
+	//=> (-3236, -1068), (465, 268)
 
 	ui_points_draw(ui, &vw, g, &viewport_quad);
 

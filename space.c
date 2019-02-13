@@ -1,5 +1,40 @@
 #include <math.h>
+#include "area.h"
 #include "space.h"
+
+Hex space_hex_round(vec2 v)
+{
+	f64 r = v.y;
+	f64 q = (v.x - v.y) / 2.0;
+	f64 s = -q - r;
+	i32 qi = lround(q);
+	i32 ri = lround(r);
+	i32 si = lround(s);
+	f64 q_diff = fabs(qi - q);
+	f64 r_diff = fabs(ri - r);
+	f64 s_diff = fabs(si - s);
+
+	if (q_diff > r_diff && q_diff > s_diff) {
+		qi = -ri - si;
+	} else if (r_diff > s_diff) {
+		ri = -qi - si;
+	}
+
+	return (Hex) {(qi << 1) + ri, ri};
+}
+
+Hex space_hex_floor(vec2 v)
+{
+	return (Hex) {
+		floor(v.x),
+		floor(v.y),
+	};
+}
+
+vec2 space_hex_to_vec(Hex h)
+{
+	return (vec2) {h.c, h.r};
+}
 
 vec2 space_screen_to_world(View *vw, vec2 v)
 {
@@ -30,32 +65,6 @@ vec2 space_hex_to_world(vec2 v)
 	};
 }
 
-Hex space_hex_round(vec2 v)
-{
-	f64 r = v.y;
-	f64 q = (v.x - v.y) / 2.0;
-	f64 s = -q - r;
-	i32 qi = lround(q);
-	i32 ri = lround(r);
-	i32 si = lround(s);
-	f64 q_diff = fabs(qi - q);
-	f64 r_diff = fabs(ri - r);
-	f64 s_diff = fabs(si - s);
-
-	if (q_diff > r_diff && q_diff > s_diff) {
-		qi = -ri - si;
-	} else if (r_diff > s_diff) {
-		ri = -qi - si;
-	}
-
-	return (Hex) {(qi << 1) + ri, ri};
-}
-
-vec2 space_hex_to_vec(Hex h)
-{
-	return (vec2) {h.c, h.r};
-}
-
 Hex space_hex_to_storage(Hex h)
 {
 	return (Hex) {h.c >> 1, h.r};
@@ -66,5 +75,21 @@ Hex space_storage_to_hex(Hex h)
 	return (Hex) {
 		(h.c << 1) + (h.r & 1),
 		h.r,
+	};
+}
+
+vec2 space_world_to_area_zone(vec2 v)
+{
+	return (vec2) {
+		v.x / AREA_ZONE_SIZE,
+		v.y / AREA_ZONE_SIZE,
+	};
+}
+
+vec2 space_area_zone_to_world(vec2 v)
+{
+	return (vec2) {
+		v.x * AREA_ZONE_SIZE,
+		v.y * AREA_ZONE_SIZE,
 	};
 }

@@ -2,30 +2,6 @@
 #include "space.c"
 #include "hex.c"
 
-TEST(space_world_to_hex)
-{
-	vec2 v1 = {-94.8038, 45};
-	vec2 v2 = {76.06, -8};
-
-	_v2(space_world_to_hex(v1));
-	//=> -109.47, -30
-
-	_v2(space_world_to_hex(v2));
-	//=> 87.8265, 5.33333
-}
-
-TEST(space_hex_to_world)
-{
-	vec2 v1 = {-109.47, 30};
-	vec2 v2 = {87.8265, 5.333333333};
-
-	_v2(space_hex_to_world(v1));
-	//=> -94.8038, -45
-
-	_v2(space_hex_to_world(v2));
-	//=> 76.06, -8
-}
-
 TEST(space_hex_round)
 {
 	Hex a = {0, 0};
@@ -65,11 +41,42 @@ TEST(space_hex_round)
 	//=> -8, 32
 }
 
+TEST(space_hex_floor)
+{
+	vec2 v = {-3.1, 17.6};
+	_hx(space_hex_floor(v));
+	//=> -4, 17
+}
+
 TEST(space_hex_to_vec)
 {
 	Hex h = {-3, 17};
 	_v2(space_hex_to_vec(h));
 	//=> -3, 17
+}
+
+TEST(space_world_to_hex)
+{
+	vec2 v1 = {-94.8038, 45};
+	vec2 v2 = {76.06, -8};
+
+	_v2(space_world_to_hex(v1));
+	//=> -109.47, -30
+
+	_v2(space_world_to_hex(v2));
+	//=> 87.8265, 5.33333
+}
+
+TEST(space_hex_to_world)
+{
+	vec2 v1 = {-109.47, 30};
+	vec2 v2 = {87.8265, 5.333333333};
+
+	_v2(space_hex_to_world(v1));
+	//=> -94.8038, -45
+
+	_v2(space_hex_to_world(v2));
+	//=> 76.06, -8
 }
 
 TEST(space_hex_to_storage)
@@ -92,4 +99,26 @@ TEST(space_storage_to_hex)
 	//=> -5, 43
 	_hx(space_storage_to_hex(h2));
 	//=> 64, -28
+}
+
+TEST(space_world_to_area_zone)
+{
+	vec2 v1 = {-400.5, 1220};
+	vec2 v2 = {-7680, 767};
+
+	_v2(space_world_to_area_zone(v1));
+	//=> -0.521484, 1.58854
+	_v2(space_world_to_area_zone(v2));
+	//=> -10, 0.998698
+}
+
+TEST(space_area_zone_to_world)
+{
+	vec2 v1 = {-0.521484, 1.58854};
+	vec2 v2 = {-10, 0.998698};
+
+	_v2(space_area_zone_to_world(v1));
+	//=> -400.5, 1220
+	_v2(space_area_zone_to_world(v2));
+	//=> -7680, 767
 }

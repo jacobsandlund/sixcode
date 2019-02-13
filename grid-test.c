@@ -26,10 +26,8 @@ TEST(grid_basics)
 	//=> (-126, -63), (253, 126)
 	_qd(g->styles_quad);
 	//=> (-128, -64), (255, 127)
-	_hx(g->storage_quad.min);
-	//=> -64, -64
-	_hx(g->storage_quad.size);
-	//=> 192, 192
+	_sq(g->storage_quad);
+	//=> (-64, -64), (192, 192)
 
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);

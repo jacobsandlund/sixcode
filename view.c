@@ -78,3 +78,12 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 		}
 	}
 }
+
+void view_screen_points_to_quad(View *vw, Quad *out_q, vec2 v1, vec2 v2)
+{
+	Hex h1 = space_hex_round(space_world_to_hex(
+			space_screen_to_world(vw, v1)));
+	Hex h2 = space_hex_round(space_world_to_hex(
+			space_screen_to_world(vw, v2)));
+	quad_from_hexes(out_q, h1, h2);
+}

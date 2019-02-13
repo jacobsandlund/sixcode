@@ -27,7 +27,13 @@
 
 #define _hx(h) _dd(h.c, h.r)
 #define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
+#define _sq(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.size.c, q.size.r);
 #define _v2(v) _gg(v.x, v.y)
+#define _aq(aq) _("(%g, %g), (%g, %g)\n(%g, %g), (%g, %g)", \
+		aq.top_left.x, aq.top_left.y, \
+		aq.top_right.x, aq.top_right.y, \
+		aq.bottom_left.x, aq.bottom_left.y, \
+		aq.bottom_right.x, aq.bottom_right.y);
 
 #define _TEST_SIXCODE_ERROR() { \
 	_s(test_sixcode_error); \

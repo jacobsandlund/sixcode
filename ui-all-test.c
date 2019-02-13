@@ -32,10 +32,8 @@ TEST(ui_all)
 
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
-	_hx(viewport_quad.min);
-	//=> -116, -34
-	_hx(viewport_quad.max);
-	//=> 174, 67
+	_qd(viewport_quad);
+	//=> (-116, -34), (174, 67)
 
 	// Zoom with stroke and fill
 
@@ -49,7 +47,7 @@ TEST(ui_all)
 	_d(GLmock.draw_elements_count);
 	//=> 294912
 	_d(GLmock.draw_arrays_count);
-	//=> 147456
+	//=> 0
 
 	// Zoom with fill and no stroke
 

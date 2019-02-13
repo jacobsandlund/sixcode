@@ -194,10 +194,8 @@ TEST(ui_stroke_draw)
 
 	Quad viewport_quad;
 	view_viewport_to_quad(&vw, &viewport_quad);
-	_hx(viewport_quad.min);
-	//=> -7, -2
-	_hx(viewport_quad.max);
-	//=> 10, 4
+	_qd(viewport_quad);
+	//=> (-7, -2), (10, 4)
 
 	ui_stroke_draw(ui, &vw, g, &viewport_quad);
 

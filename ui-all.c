@@ -1,7 +1,7 @@
 #include "ui-all.h"
 
 #define UI_ALL_FILL_SCALE_CUTOFF 4.0f
-#define UI_ALL_STROKE_SCALE_CUTOFF 8.0f
+#define UI_ALL_STROKE_SCALE_CUTOFF 11.0f
 
 #define UI_ALL_NUM_COMPONENTS 4
 

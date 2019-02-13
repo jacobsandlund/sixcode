@@ -1,13 +1,15 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#include "sixcode.h"
+#include "area.h"
+#include "area-quad.h"
 #include "grid.h"
 #include "hex.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "quad.h"
 #include "shader.h"
+#include "sixcode.h"
 #include "space.h"
 #include "ui-all.h"
 #include "ui-fill.h"

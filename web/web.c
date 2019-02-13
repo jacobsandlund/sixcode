@@ -50,17 +50,20 @@ EMSCRIPTEN_KEEPALIVE Grid *web_grid_malloc()
 	return g;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_grid_initialize(Grid *g)
-{
-	Quad quad = {{-UI_GRID_MAX_TEXTURE_SIZE + 2, -UI_GRID_MAX_TEXTURE_SIZE / 2 + 1}, {UI_GRID_MAX_TEXTURE_SIZE - 3, UI_GRID_MAX_TEXTURE_SIZE / 2 - 2}};
-	//Quad quad = {{2, 1}, {125, 62}};
-	grid_initialize(g, &quad);
-}
-
 EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 {
 	Hex h = {c, r};
 	grid_set(g, h, style);
+}
+
+
+////////////////
+// Area Grid
+
+EMSCRIPTEN_KEEPALIVE AreaGrid *web_area_grid_malloc()
+{
+	AreaGrid *ag = malloc(sizeof *ag);
+	return ag;
 }
 
 
@@ -100,6 +103,15 @@ EMSCRIPTEN_KEEPALIVE void web_ui_grid_update_styles(UiGrid *ui_grid, Grid *g)
 
 //////////////////
 // Core
+
+EMSCRIPTEN_KEEPALIVE void web_core_grids_initialize(Grid *g, AreaGrid *a)
+{
+	Quad quad = {{-UI_GRID_MAX_TEXTURE_SIZE + 2, -UI_GRID_MAX_TEXTURE_SIZE / 2 + 1}, {UI_GRID_MAX_TEXTURE_SIZE - 3, UI_GRID_MAX_TEXTURE_SIZE / 2 - 2}};
+	// Try to be close to center of area zone
+	//Quad quad = {{386, 257}, {509, 319}};
+	core_grids_initialize(g, a, &quad);
+}
+
 
 EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y)
 {

@@ -14,10 +14,8 @@ TEST(core_grid_expand_for_hex)
 	grid_initialize(g, &grid_quad);
 	ui_all_initialize(ui, 0);
 
-	_hx(g->quad.min);
-	//=> 2, 1
-	_hx(g->quad.max);
-	//=> 125, 62
+	_qd(g->quad);
+	//=> (2, 1), (125, 62)
 
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);
@@ -33,10 +31,8 @@ TEST(core_grid_expand_for_hex)
 	//=> 1
 	_d(grid_get(g, h2));
 	//=> 2
-	_hx(g->quad.min);
-	//=> -382, 1
-	_hx(g->quad.max);
-	//=> 125, 190
+	_qd(g->quad);
+	//=> (-382, 1), (125, 190)
 
 	grid_set(g, h3, 3);
 
@@ -46,8 +42,8 @@ TEST(core_grid_expand_for_hex)
 
 	_d(grid_get(g, h3));
 	//=> 3
-	_hx(g->quad.min);
-	//=> -382, 1
+	_qd(g->quad);
+	//=> (-382, 1), (125, 190)
 
 	grid_terminate(g);
 	ui_all_terminate(ui);

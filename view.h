@@ -16,5 +16,6 @@ void view_zoom_at_screen_point(View *vw, vec2 v, f32 new_scale);
 void view_resize(View *vw, vec2 viewport_size);
 void view_translate(View *vw, vec2 delta);
 void view_viewport_to_quad(View *vw, Quad *out_q);
+void view_screen_points_to_quad(View *vw, Quad *out_q, vec2 v1, vec2 v2);
 
 #endif // __VIEW_H__

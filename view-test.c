@@ -96,3 +96,20 @@ TEST(view_viewport_to_quad)
 	_qd(q);
 	//=> (64, 18), (64, 18)
 }
+
+TEST(view_screen_points_to_quad)
+{
+	Quad q;
+	View vw = {
+		.viewport_size = {1997, 1440},
+		.translation = {1256.66, 778.438},
+		.scale = 45,
+	};
+	vec2 v1 = {15.3, 1040};
+	vec2 v2 = {1698, 370};
+
+	view_screen_points_to_quad(&vw, &q, v1, v2);
+
+	_qd(q);
+	//=> (14, 13), (101, 32)
+}

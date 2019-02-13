@@ -125,10 +125,8 @@ TEST(ui_grid_size_quad_for_draw)
 
 	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
-	_hx(out_sq.min);
-	//=> 0, 0
-	_hx(out_sq.size);
-	//=> 30, 30
+	_sq(out_sq);
+	//=> (0, 0), (30, 30)
 
 	viewport_quad.min = (Hex) {5, 5};
 
@@ -136,10 +134,8 @@ TEST(ui_grid_size_quad_for_draw)
 
 	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
-	_hx(out_sq.min);
-	//=> 2, 4
-	_hx(out_sq.size);
-	//=> 28, 26
+	_sq(out_sq);
+	//=> (2, 4), (28, 26)
 }
 
 TEST(ui_grid_update_view_matrix)

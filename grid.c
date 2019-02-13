@@ -4,13 +4,13 @@
 #include <string.h>
 #include "grid.h"
 
-const Hex GRID_BLOCK_SIZE = {GRID_BLOCK_SIZE_C, GRID_BLOCK_SIZE_R};
+const Hex GRID_BLOCK_SIZE = {128, 64};
 
 // Extra room for border
 void grid_quad_to_styles_quad(Quad *styles_quad, Quad *quad)
 {
 	Hex size_delta = {+2, +1};
-	quad_resize(styles_quad, quad, size_delta);
+	quad_resize_by_delta(styles_quad, quad, size_delta);
 	quad_block_align(styles_quad, styles_quad, GRID_BLOCK_SIZE);
 }
 
@@ -18,7 +18,7 @@ static void grid_set_quads(Grid *g, SizeQuad *storage_quad, Quad *quad)
 {
 	Hex size_delta = {-2, -1};
 	grid_quad_to_styles_quad(&g->styles_quad, quad);
-	quad_resize(&g->quad, &g->styles_quad, size_delta);
+	quad_resize_by_delta(&g->quad, &g->styles_quad, size_delta);
 	quad_to_storage_space_size_quad(storage_quad, &g->styles_quad);
 }
 

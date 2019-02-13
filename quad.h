@@ -16,9 +16,11 @@ typedef struct {
 
 i8 quad_contains(Quad *q, Hex h);
 i8 quad_contains_quad(Quad *outer, Quad *inner);
-void quad_expand_quad(Quad *out_q, Quad *q, Hex h);
+void quad_from_hexes(Quad *q, Hex h1, Hex h2);
+void quad_expand_for_hex(Quad *out_q, Quad *q, Hex h);
+void quad_expand_for_quad(Quad *out_q, Quad *a, Quad *b);
 void quad_block_align(Quad *out_q, Quad *q, Hex block_size);
-void quad_resize(Quad *out_q, Quad *q, Hex size_delta);
+void quad_resize_by_delta(Quad *out_q, Quad *q, Hex delta);
 void quad_intersect(Quad *out_q, Quad *a, Quad *b);
 void quad_space_hex_to_storage(Quad *out_q, Quad *q);
 
