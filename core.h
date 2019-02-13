@@ -8,11 +8,13 @@
 #include "mesh.h"
 #include "quad.h"
 #include "shader.h"
+#include "space.h"
 #include "ui-all.h"
 #include "ui-fill.h"
 #include "ui-grid.h"
 #include "ui-points.h"
 #include "ui-stroke.h"
+#include "vector.h"
 #include "view.h"
 
 i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h);

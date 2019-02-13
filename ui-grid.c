@@ -118,12 +118,12 @@ void ui_grid_update_view_matrix(UiGrid *ui, View *vw)
 	ui->view_matrix.m[3][3] = scale_inv;
 }
 
-void ui_grid_storage_quad_for_draw(StorageQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
+void ui_grid_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
 {
 	Quad intersect_quad;
 	quad_intersect(&intersect_quad, viewport_quad, grid_styles_quad);
-	storage_quad_from_quad(out_sq, &intersect_quad);
-	storage_quad_even_align(out_sq, out_sq);
+	quad_to_storage_space_size_quad(out_sq, &intersect_quad);
+	size_quad_even_align(out_sq, out_sq);
 }
 
 void ui_grid_update_styles(UiGrid *ui, Grid *g)
@@ -145,9 +145,9 @@ void ui_grid_update_styles(UiGrid *ui, Grid *g)
 
 void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 {
-	StorageQuad sq;
-	storage_quad_from_quad(&sq, quad);
-	i32 need_capacity = storage_quad_capacity(&sq);
+	SizeQuad sq;
+	quad_to_storage_space_size_quad(&sq, quad);
+	i32 need_capacity = size_quad_capacity(&sq);
 
 	if (need_capacity > ui->styles_buffer_capacity) {
 		if (need_capacity > ui->styles_buffer_capacity_max) {

@@ -12,17 +12,20 @@ typedef struct {
 typedef struct {
 	Hex min;
 	Hex size;
-} StorageQuad;
+} SizeQuad;
 
 i8 quad_contains(Quad *q, Hex h);
 i8 quad_contains_quad(Quad *outer, Quad *inner);
 void quad_expand_quad(Quad *out_q, Quad *q, Hex h);
 void quad_block_align(Quad *out_q, Quad *q, Hex block_size);
-void quad_resize(Quad *out_q, Quad *q, i32 size_delta);
+void quad_resize(Quad *out_q, Quad *q, Hex size_delta);
 void quad_intersect(Quad *out_q, Quad *a, Quad *b);
+void quad_space_hex_to_storage(Quad *out_q, Quad *q);
 
-void storage_quad_from_quad(StorageQuad *sq, Quad *q);
-void storage_quad_even_align(StorageQuad *out_sq, StorageQuad *sq);
-i32 storage_quad_capacity(StorageQuad *sq);
+void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
+void quad_to_storage_space_size_quad(SizeQuad *out_sq, Quad *q);
+
+void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
+i32 size_quad_capacity(SizeQuad *sq);
 
 #endif // __QUAD_H__

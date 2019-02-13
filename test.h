@@ -152,7 +152,7 @@ void split_lines(LineData *line_data, char *contents, int len)
 
 	if (len == 0) {
 		line_data->num_lines = 0;
-		line_data->lines = NULL;
+		line_data->lines = 0;
 		return;
 	}
 
@@ -198,15 +198,15 @@ FileInfo *get_file_info(const char *filename)
 
 	file = fopen(filename, "r");
 
-	if (file == NULL) {
+	if (!file) {
 		fprintf(stderr, "Error opening file: %s - %s\n", filename, strerror(errno));
-		return NULL;
+		return 0;
 	}
 
 	file_len = fread(contents, sizeof(char), MAX_FILE_LEN, file);
 	if (ferror(file)) {
 		fprintf(stderr, "Error reading file: %s - %s\n", filename, strerror(errno));
-		return NULL;
+		return 0;
 	}
 
 	contents[file_len] = '\0';
@@ -316,7 +316,7 @@ int main()
 		for (int i = 0; i < num_lines_old; ++i) {
 			if (strncmp(LOG_PREFIX, lines_old[i], LOG_PREFIX_LEN) == 0) {
 				++num_result_lines_old;
-				lines_old[i] = NULL;
+				lines_old[i] = 0;
 			}
 		}
 
@@ -330,7 +330,7 @@ int main()
 			int num_result_lines = result->line_data.num_lines;
 
 			while (i <= result->line) {
-				if (lines_old[i] != NULL) {
+				if (lines_old[i] != 0) {
 					lines_new[j] = lines_old[i];
 					++j;
 				}
@@ -344,7 +344,7 @@ int main()
 		}
 
 		while (i < num_lines_old) {
-			if (lines_old[i] != NULL) {
+			if (lines_old[i] != 0) {
 				lines_new[j] = lines_old[i];
 				++j;
 			}
@@ -371,7 +371,7 @@ int main()
 			const char *filename = file_info->name;
 			FILE *file = fopen(filename, "w");
 
-			if (file == NULL) {
+			if (!file) {
 				fprintf(stderr, "Error opening file: %s - %s\n", filename, strerror(errno));
 				return 1;
 			}

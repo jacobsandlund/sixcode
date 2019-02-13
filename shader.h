@@ -2,6 +2,7 @@
 #define __SHADER_H__
 
 #include <GLES2/gl2.h>
+#include "sixcode.h"
 
 typedef struct {
 	GLuint vertex;

@@ -1,4 +1,5 @@
 #include "test.h"
+#include "space.c"
 #include "hex.c"
 #include "quad.c"
 
@@ -82,18 +83,21 @@ TEST(quad_resize)
 {
 	Quad out_q;
 	Quad q = {{4, -8}, {10, 32}};
+	Hex delta = {+2, +1};
 
-	quad_resize(&out_q, &q, +1);
+	quad_resize(&out_q, &q, delta);
 	_qd(out_q);
 	//=> (2, -9), (12, 33)
 
-	quad_resize(&out_q, &out_q, -1);
+	delta = (Hex) {-2, -1};
+	quad_resize(&out_q, &out_q, delta);
 	_qd(out_q);
 	//=> (4, -8), (10, 32)
 
-	quad_resize(&out_q, &q, +4);
+	delta = (Hex) {+4, +4};
+	quad_resize(&out_q, &q, delta);
 	_qd(out_q);
-	//=> (-4, -12), (18, 36)
+	//=> (0, -12), (14, 36)
 }
 
 TEST(quad_intersect)
@@ -112,36 +116,58 @@ TEST(quad_intersect)
 	//=> (256, 128), (255, 63)
 }
 
-TEST(storage_quad_from_quad)
+TEST(quad_space_hex_to_storage)
 {
-	StorageQuad sq;
+	Quad storage_quad;
 	Quad q1 = {{-2, 8}, {5, 18}};
 	Quad q2 = {{3, 2}, {4, 3}};
 
-	storage_quad_from_quad(&sq, &q1);
+	quad_space_hex_to_storage(&storage_quad, &q1);
 
-	_hx(sq.min);
-	//=> -1, 8
-	_hx(sq.size);
-	//=> 4, 11
+	_qd(storage_quad);
+	//=> (-1, 8), (2, 18)
 
-	storage_quad_from_quad(&sq, &q2);
+	quad_space_hex_to_storage(&storage_quad, &q2);
 
-	_hx(sq.min);
-	//=> 1, 2
-	_hx(sq.size);
-	//=> 2, 2
+	_qd(storage_quad);
+	//=> (1, 2), (2, 3)
 }
 
-TEST(storage_quad_even_align)
+TEST(quad_to_size_quad)
 {
-	StorageQuad out_sq;
-	StorageQuad sq = {
+	SizeQuad sq;
+	Quad q = {{0, 1}, {6, 4}};
+
+	quad_to_size_quad(&sq, &q);
+
+	_hx(sq.min);
+	//=> 0, 1
+	_hx(sq.size);
+	//=> 7, 4
+}
+
+TEST(quad_to_storage_space_size_quad)
+{
+	SizeQuad storage_quad;
+	Quad quad = {{0, 23}, {125, 63}};
+
+	quad_to_storage_space_size_quad(&storage_quad, &quad);
+
+	_hx(storage_quad.min);
+	//=> 0, 23
+	_hx(storage_quad.size);
+	//=> 63, 41
+}
+
+TEST(size_quad_even_align)
+{
+	SizeQuad out_sq;
+	SizeQuad sq = {
 		.min = {-2, 3},
 		.size = {10, 20},
 	};
 
-	storage_quad_even_align(&out_sq, &sq);
+	size_quad_even_align(&out_sq, &sq);
 
 	_hx(out_sq.min);
 	//=> -2, 2
@@ -149,7 +175,7 @@ TEST(storage_quad_even_align)
 	//=> 10, 21
 
 	sq.min = (Hex) {-5, -21};
-	storage_quad_even_align(&out_sq, &sq);
+	size_quad_even_align(&out_sq, &sq);
 
 	_hx(out_sq.min);
 	//=> -5, -22
@@ -157,7 +183,7 @@ TEST(storage_quad_even_align)
 	//=> 10, 21
 
 	sq.min = (Hex) {-5, -20};
-	storage_quad_even_align(&out_sq, &sq);
+	size_quad_even_align(&out_sq, &sq);
 
 	_hx(out_sq.min);
 	//=> -5, -20
@@ -165,10 +191,10 @@ TEST(storage_quad_even_align)
 	//=> 10, 20
 }
 
-TEST(storage_quad_capacity)
+TEST(size_quad_capacity)
 {
-	StorageQuad sq = {{-3, -1}, {6, 2}};
+	SizeQuad sq = {{-3, -1}, {6, 2}};
 
-	_d(storage_quad_capacity(&sq));
+	_d(size_quad_capacity(&sq));
 	//=> 12
 }

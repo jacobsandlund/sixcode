@@ -1,9 +1,8 @@
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include "matrix.h"
 #include "sixcode.h"
-#include "hex.h"
+#include "view.h"
 
 typedef struct {
 	f32 x;

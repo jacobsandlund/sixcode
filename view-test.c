@@ -1,10 +1,10 @@
 #include "test.h"
 #include "hex.c"
-#include "view.c"
 #include "quad.c"
-#include "matrix.c"
+#include "space.c"
+#include "view.c"
 
-TEST(view_zoom_at_point)
+TEST(view_zoom_at_screen_point)
 {
 	View vw = {
 		.viewport_size = {1000, 600},
@@ -13,14 +13,14 @@ TEST(view_zoom_at_point)
 	};
 
 	vec2 v = vw.viewport_size;
-	view_zoom_at_point(&vw, v, 30.0);
+	view_zoom_at_screen_point(&vw, v, 30.0);
 	_v2(vw.translation);
 	//=> 1000, -2850
 	_g(vw.scale);
 	//=> 30
 
 	v = (vec2) {300, 400};
-	view_zoom_at_point(&vw, v, 10.0);
+	view_zoom_at_screen_point(&vw, v, 10.0);
 
 	_v2(vw.translation);
 	//=> 466.667, -1016.67
@@ -48,23 +48,6 @@ TEST(view_translate)
 
 	_v2(vw.translation);
 	//=> 800, -1600
-}
-
-TEST(view_point_to_hex_space)
-{
-	View vw = {
-		.viewport_size = {1000, 600},
-		.translation = {-100, -200},
-		.scale = 10,
-	};
-	vec2 v1 = {125.981, 275};
-	vec2 v2 = {980.3, 540};
-
-	_v2(view_point_to_hex_space(&vw, v1));
-	//=> -109.47, -30
-
-	_v2(view_point_to_hex_space(&vw, v2));
-	//=> 87.8265, 5.33333
 }
 
 TEST(view_viewport_to_quad)

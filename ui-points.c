@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include "space.h"
+#include "matrix.h"
 #include "ui-points.h"
 
 #define UI_POINT_MESH_SIZE 256
@@ -115,11 +117,8 @@ void ui_points_draw(UiPoints *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	glUseProgram(ui->shader.program);
 
-	Quad resized_viewport_quad;
-	quad_resize(&resized_viewport_quad, viewport_quad, +1);
-
-	StorageQuad draw_quad;
-	ui_grid_storage_quad_for_draw(&draw_quad, &g->styles_quad, &resized_viewport_quad);
+	SizeQuad draw_quad;
+	ui_grid_size_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
 
 	glBindBuffer(GL_ARRAY_BUFFER, ui->buffers.vertices);
 
@@ -172,19 +171,19 @@ void ui_points_draw(UiPoints *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	Hex draw_quad_min_offset = hex_sub(draw_quad.min, g->storage_quad.min);
 
+	Hex h;
+	mat4 *view_matrix = &ui_grid->view_matrix;
 	f64 trans_x = ui_grid->translation_x;
 	f64 trans_y = ui_grid->translation_y;
 	f64 size_x = vw->viewport_size.x;
 	f64 size_y = vw->viewport_size.y;
-	mat4 *view_matrix = &ui_grid->view_matrix;
 
-	for (i32 r = 0; r < draw_quad.size.r; r += UI_POINT_MESH_SIZE) {
-		for (i32 c = 0; c < draw_quad.size.c; c += UI_POINT_MESH_SIZE) {
-			vec2 h = {
-				(c + draw_quad.min.c) << 1,
-				r + draw_quad.min.r,
-			};
-			vec2 v = mat2_multiply_v(&MESH_HEX_TO_POINT, h);
+	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_POINT_MESH_SIZE) {
+		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_POINT_MESH_SIZE) {
+			vec2 v = space_hex_to_world(
+					space_hex_to_vec(
+					space_storage_to_hex(
+					hex_add(h, draw_quad.min))));
 
 			view_matrix->m[3][0] = (trans_x + v.x) / size_x;
 			view_matrix->m[3][1] = (trans_y + v.y) / size_y;
@@ -195,10 +194,12 @@ void ui_points_draw(UiPoints *ui, View *vw, Grid *g, Quad *viewport_quad)
 					GL_FALSE,
 					(GLfloat*) &view_matrix->m[0][0]);
 
+			Hex grid_offset = hex_add(h, draw_quad_min_offset);
+
 			glUniform2f(
 					ui->uniforms.gridPositionOffset,
-					(f32) (c + draw_quad_min_offset.c),
-					(f32) (r + draw_quad_min_offset.r));
+					(f32) grid_offset.c,
+					(f32) grid_offset.r);
 
 			glDrawArrays(
 					GL_POINTS,

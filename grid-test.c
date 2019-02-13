@@ -3,11 +3,12 @@
 #include "grid.c"
 #include "hex.c"
 #include "quad.c"
+#include "space.c"
 
-TEST(grid_styles_quad_from_quad)
+TEST(grid_quad_to_styles_quad)
 {
 	Quad q = {{0, 23}, {125, 63}};
-	grid_styles_quad_from_quad(&q, &q);
+	grid_quad_to_styles_quad(&q, &q);
 	_qd(q);
 	//=> (-128, 0), (127, 127)
 }

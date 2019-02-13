@@ -38,7 +38,7 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 		return 0;
 	}
 
-	glShaderSource(shader, 1, &shader_source, NULL);
+	glShaderSource(shader, 1, &shader_source, 0);
 	glCompileShader(shader);
 
 	GLint compiled;
@@ -50,7 +50,7 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
-			glGetShaderInfoLog(shader, info_log_length, NULL, info_log);
+			glGetShaderInfoLog(shader, info_log_length, 0, info_log);
 			SIXCODE_ERROR("Error compiling shader:\n%s\n", info_log);
 			free(info_log);
 		} else {
@@ -102,7 +102,7 @@ i8 shader_program_link(ShaderProgram *s, const char *filename, i32 line)
 
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
-			glGetProgramInfoLog(s->program, info_log_length, NULL, info_log);
+			glGetProgramInfoLog(s->program, info_log_length, 0, info_log);
 			SIXCODE_ERROR("Error linking program:\n%s\n", info_log);
 			free(info_log);
 		} else {

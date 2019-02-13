@@ -2,8 +2,8 @@
 #include "glmock.c"
 #include "grid.c"
 #include "hex.c"
-#include "matrix.c"
 #include "shader.c"
+#include "space.c"
 #include "quad.c"
 #include "ui-grid.c"
 #include "view.c"
@@ -73,7 +73,7 @@ TEST(ui_grid)
 	//////////////////////
 	// styles_buffer
 
-	_d(ui->styles_buffer != NULL);
+	_d(ui->styles_buffer != 0);
 	//=> 1
 	_d(ui->styles_buffer_capacity);
 	//=> 256
@@ -115,15 +115,15 @@ TEST(ui_grid_initialize_fail)
 	free(ui);
 }
 
-TEST(ui_grid_storage_quad_for_draw)
+TEST(ui_grid_size_quad_for_draw)
 {
-	StorageQuad out_sq;
+	SizeQuad out_sq;
 	Quad grid_styles_quad = {{0, 0}, {127, 63}};
 	Quad viewport_quad = {{-5, -5}, {59, 29}};
 
 	// Intersect
 
-	ui_grid_storage_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
+	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
 	_hx(out_sq.min);
 	//=> 0, 0
@@ -134,7 +134,7 @@ TEST(ui_grid_storage_quad_for_draw)
 
 	// Even-align
 
-	ui_grid_storage_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
+	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
 	_hx(out_sq.min);
 	//=> 2, 4
@@ -208,7 +208,7 @@ TEST(ui_grid_update_styles)
 TEST(ui_grid_update_styles_in_quad)
 {
 	Quad quad;
-	StorageQuad sq;
+	SizeQuad sq;
 	Quad grid_quad = {{2, 1}, {125, 62}};
 
 	Grid *g = malloc(sizeof *g);
@@ -226,7 +226,7 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Under the current capacity
 	quad = (Quad) {{10, 20}, {31, 59}};
-	storage_quad_from_quad(&sq, &quad);
+	quad_to_storage_space_size_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
 	//=> 5, 20
 	_hx(sq.size);
@@ -251,10 +251,10 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Under/equal the max capacity
 	quad = (Quad) {{10, 10}, {109, 59}};
-	storage_quad_from_quad(&sq, &quad);
+	quad_to_storage_space_size_quad(&sq, &quad);
 	_hx(sq.size);
 	//=> 50, 50
-	_d(storage_quad_capacity(&sq));
+	_d(size_quad_capacity(&sq));
 	//=> 2500
 
 	ui_grid_update_styles_in_quad(ui, g, &quad);
@@ -266,7 +266,7 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Over the max capacity
 	quad = (Quad) {{10, 10}, {109, 60}};
-	storage_quad_from_quad(&sq, &quad);
+	quad_to_storage_space_size_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
 	//=> 5, 10
 	_hx(sq.size);

@@ -1,6 +1,7 @@
 #include "test.h"
-#include "matrix.c"
+#include "hex.c"
 #include "mesh.c"
+#include "space.c"
 
 TEST(fill_mesh)
 {
@@ -78,11 +79,11 @@ TEST(points_mesh)
 	//=> 2048
 
 	_gg(m->vertices[0].x, m->vertices[0].y);
-	//=> 0, 0
+	//=> 0, -0
 	_gg(m->vertices[1].x, m->vertices[1].y);
-	//=> 1.73205, 0
+	//=> 1.73205, -0
 	_gg(m->vertices[2].x, m->vertices[2].y);
-	//=> 3.4641, 0
+	//=> 3.4641, -0
 	_gg(m->vertices[2047].x, m->vertices[2047].y);
 	//=> 54.5596, -94.5
 

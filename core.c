@@ -1,13 +1,12 @@
 #include "core.h"
 
-
 // Include all source code in single translation unit
 #include "grid.c"
 #include "hex.c"
-#include "matrix.c"
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
+#include "space.c"
 #include "ui-all.c"
 #include "ui-fill.c"
 #include "ui-grid.c"
@@ -24,10 +23,10 @@ i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h)
 	quad_expand_quad(&expanded, &g->quad, h);
 
 	Quad styles_quad;
-	grid_styles_quad_from_quad(&styles_quad, &expanded);
+	grid_quad_to_styles_quad(&styles_quad, &expanded);
 
-	StorageQuad sq;
-	storage_quad_from_quad(&sq, &styles_quad);
+	SizeQuad sq;
+	quad_to_storage_space_size_quad(&sq, &styles_quad);
 
 	if (sq.size.c > UI_GRID_MAX_TEXTURE_SIZE || sq.size.r > UI_GRID_MAX_TEXTURE_SIZE) {
 		return 0;
@@ -43,7 +42,8 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 {
 	static u8 style = CORE_STYLE_MIN;
 
-	Hex h = hex_round(view_point_to_hex_space(vw, v));
+	Hex h = space_hex_round(space_world_to_hex(
+			space_screen_to_world(vw, v)));
 
 	if (!quad_contains(&g->quad, h)) {
 		if (!core_grid_expand_for_hex(ui, g, h)) {

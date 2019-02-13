@@ -1,5 +1,6 @@
 #include <math.h>
 #include "quad.h"
+#include "space.h"
 
 i8 quad_contains(Quad *q, Hex h)
 {
@@ -35,12 +36,12 @@ void quad_block_align(Quad *out_q, Quad *q, Hex block_size)
 	out_q->max.r = q->max.r | (block_size.r - 1);
 }
 
-void quad_resize(Quad *out_q, Quad *q, i32 size_delta)
+void quad_resize(Quad *out_q, Quad *q, Hex size_delta)
 {
-	out_q->min.c = q->min.c - 2 * size_delta;
-	out_q->min.r = q->min.r - 1 * size_delta;
-	out_q->max.c = q->max.c + 2 * size_delta;
-	out_q->max.r = q->max.r + 1 * size_delta;
+	out_q->min.c = q->min.c - size_delta.c;
+	out_q->min.r = q->min.r - size_delta.r;
+	out_q->max.c = q->max.c + size_delta.c;
+	out_q->max.r = q->max.r + size_delta.r;
 }
 
 void quad_intersect(Quad *out_q, Quad *a, Quad *b)
@@ -51,17 +52,29 @@ void quad_intersect(Quad *out_q, Quad *a, Quad *b)
 	out_q->max.r = a->max.r < b->max.r ? a->max.r : b->max.r;
 }
 
-void storage_quad_from_quad(StorageQuad *sq, Quad *q)
+void quad_space_hex_to_storage(Quad *out_q, Quad *q)
 {
-	i32 sq_max_c = q->max.c >> 1;
-	sq->min = (Hex) {q->min.c >> 1, q->min.r};
-	sq->size = (Hex) {
-		sq_max_c - sq->min.c + 1,
+	out_q->min = space_hex_to_storage(q->min);
+	out_q->max = space_hex_to_storage(q->max);
+}
+
+void quad_to_size_quad(SizeQuad *out_sq, Quad *q)
+{
+	out_sq->min = q->min;
+	out_sq->size = (Hex) {
+		q->max.c - q->min.c + 1,
 		q->max.r - q->min.r + 1,
 	};
 }
 
-void storage_quad_even_align(StorageQuad *out_sq, StorageQuad *sq)
+void quad_to_storage_space_size_quad(SizeQuad *storage_quad, Quad *styles_quad)
+{
+	Quad storage_space_quad;
+	quad_space_hex_to_storage(&storage_space_quad, styles_quad);
+	quad_to_size_quad(storage_quad, &storage_space_quad);
+}
+
+void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq)
 {
 	i8 odd_row = sq->min.r & 1;
 	out_sq->min.c = sq->min.c;
@@ -70,7 +83,7 @@ void storage_quad_even_align(StorageQuad *out_sq, StorageQuad *sq)
 	out_sq->size.r = sq->size.r + odd_row;
 }
 
-i32 storage_quad_capacity(StorageQuad *sq)
+i32 size_quad_capacity(SizeQuad *sq)
 {
 	return sq->size.c * sq->size.r;
 }

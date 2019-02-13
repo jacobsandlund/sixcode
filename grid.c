@@ -7,18 +7,25 @@
 const Hex GRID_BLOCK_SIZE = {GRID_BLOCK_SIZE_C, GRID_BLOCK_SIZE_R};
 
 // Extra room for border
-void grid_styles_quad_from_quad(Quad *grid_quad, Quad *quad)
+void grid_quad_to_styles_quad(Quad *styles_quad, Quad *quad)
 {
-	quad_resize(grid_quad, quad, +1);
-	quad_block_align(grid_quad, grid_quad, GRID_BLOCK_SIZE);
+	Hex size_delta = {+2, +1};
+	quad_resize(styles_quad, quad, size_delta);
+	quad_block_align(styles_quad, styles_quad, GRID_BLOCK_SIZE);
+}
+
+static void grid_set_quads(Grid *g, SizeQuad *storage_quad, Quad *quad)
+{
+	Hex size_delta = {-2, -1};
+	grid_quad_to_styles_quad(&g->styles_quad, quad);
+	quad_resize(&g->quad, &g->styles_quad, size_delta);
+	quad_to_storage_space_size_quad(storage_quad, &g->styles_quad);
 }
 
 void grid_initialize(Grid *g, Quad *quad)
 {
-	grid_styles_quad_from_quad(&g->styles_quad, quad);
-	quad_resize(&g->quad, &g->styles_quad, -1);
-	storage_quad_from_quad(&g->storage_quad, &g->styles_quad);
-	i32 capacity = storage_quad_capacity(&g->storage_quad);
+	grid_set_quads(g, &g->storage_quad, quad);
+	i32 capacity = size_quad_capacity(&g->storage_quad);
 	g->styles = calloc(capacity, sizeof *g->styles);
 }
 
@@ -59,13 +66,10 @@ void grid_expand_quad(Grid *g, Quad *quad)
 {
 	assert(quad_contains_quad(quad, &g->quad));
 
-	StorageQuad new_storage_quad;
-	grid_styles_quad_from_quad(&g->styles_quad, quad);
-	quad_resize(&g->quad, &g->styles_quad, -1);
+	SizeQuad new_storage_quad;
+	grid_set_quads(g, &new_storage_quad, quad);
 
-	storage_quad_from_quad(&new_storage_quad, &g->styles_quad);
-
-	i32 capacity = storage_quad_capacity(&new_storage_quad);
+	i32 capacity = size_quad_capacity(&new_storage_quad);
 	u8 *new_styles = calloc(capacity, sizeof *new_styles);
 
 	Hex min = hex_sub(g->storage_quad.min, new_storage_quad.min);

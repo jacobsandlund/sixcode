@@ -156,7 +156,7 @@ function wheel(e) {
         let x = e.clientX * dpr;
         let y = e.clientY * dpr;
 
-        Module._web_view_zoom_at_point(view, x, y, scale);
+        Module._web_view_zoom_at_screen_point(view, x, y, scale);
 
         draw();
 

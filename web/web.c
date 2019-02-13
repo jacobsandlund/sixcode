@@ -22,10 +22,10 @@ EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, f32 width, f32 height, f
 	vw->scale = scale;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_point(View *vw, f32 x, f32 y, f32 new_scale)
+EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_screen_point(View *vw, f32 x, f32 y, f32 new_scale)
 {
 	vec2 v = {x, y};
-	view_zoom_at_point(vw, v, new_scale);
+	view_zoom_at_screen_point(vw, v, new_scale);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_view_resize(View *vw, f32 width, f32 height)

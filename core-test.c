@@ -76,7 +76,8 @@ TEST(core_toggle_hex_at_point)
 	ui_all_initialize(ui, 0);
 	ui_grid_update_styles(&ui->grid, g);
 
-	Hex h = hex_round(view_point_to_hex_space(&vw, v));
+	Hex h = space_hex_round(space_world_to_hex(
+			space_screen_to_world(&vw, v)));
 	_hx(h);
 	//=> 15, 29
 
@@ -102,7 +103,8 @@ TEST(core_toggle_hex_at_point)
 
 	// Ignores outside of grid quad
 	v = (vec2) {342, 500};
-	h = hex_round(view_point_to_hex_space(&vw, v));
+	h = space_hex_round(space_world_to_hex(
+			space_screen_to_world(&vw, v)));
 	_hx(h);
 	//=> -6, 30
 	core_toggle_hex_at_point(ui, &vw, g, v);
