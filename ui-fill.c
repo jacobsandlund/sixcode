@@ -4,7 +4,8 @@
 #include "matrix.h"
 #include "ui-fill.h"
 
-// 0.001953125 = 0.5 / 256
+#define UI_FILL_ZOOMED_OUT_CUTOFF 10.0f
+
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
 "attribute vec2 gridPosition;\n"
@@ -12,6 +13,7 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "uniform mat4 viewMatrix;\n"
 "uniform vec2 gridSize;\n"
 "uniform vec2 gridPositionOffset;\n"
+"uniform float styleOffset;\n"
 "\n"
 "uniform sampler2D gridStyles;\n"
 "uniform sampler2D fillColors;\n"
@@ -20,7 +22,7 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "\n"
 "void main() {\n"
 "	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
-"	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
+"	float style = texture2D(gridStyles, styleCoord).a + styleOffset;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
@@ -68,6 +70,10 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	ui->uniforms.gridPositionOffset = glGetUniformLocation(
 			ui->shader.program,
 			"gridPositionOffset");
+
+	ui->uniforms.styleOffset = glGetUniformLocation(
+			ui->shader.program,
+			"styleOffset");
 
 	ui->uniforms.gridStyles = glGetUniformLocation(
 			ui->shader.program,
@@ -183,6 +189,12 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			ui->uniforms.gridSize,
 			(f32) g->storage_quad.size.c,
 			(f32) g->storage_quad.size.r);
+
+	f32 styleOffset = vw->scale < UI_FILL_ZOOMED_OUT_CUTOFF ? 0.25f : 0.0f;
+
+	glUniform1f(
+			ui->uniforms.styleOffset,
+			styleOffset);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.grid_styles);

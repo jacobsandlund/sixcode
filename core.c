@@ -16,8 +16,8 @@
 #include "ui-stroke.c"
 #include "view.c"
 
-#define CORE_STYLE_MIN 1
-#define CORE_STYLE_MAX 15
+#define CORE_HEX_FILL_MIN 128
+#define CORE_HEX_FILL_MAX 143  // 128 + 15
 
 void core_grids_initialize(Grid *g, AreaGrid *a, Quad *quad)
 {
@@ -51,7 +51,7 @@ i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h)
 
 void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 {
-	static u8 style = CORE_STYLE_MIN;
+	static u8 style = CORE_HEX_FILL_MIN;
 
 	Hex h = space_hex_round(space_world_to_hex(
 			space_screen_to_world(vw, v)));
@@ -68,9 +68,31 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 		grid_set(g, h, style);
 
 		++style;
-		if (style > CORE_STYLE_MAX) {
-			style = CORE_STYLE_MIN;
+		if (style > CORE_HEX_FILL_MAX) {
+			style = CORE_HEX_FILL_MIN;
 		}
+	}
+
+	Quad quad = {h, h};
+	ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
+	ui_all_draw(ui, vw, g);
+}
+
+void core_set_area_at_point(UiAll *ui, View *vw, Grid *g, vec2 v, u8 area)
+{
+	Hex h = space_hex_round(space_world_to_hex(
+			space_screen_to_world(vw, v)));
+
+	if (!quad_contains(&g->quad, h)) {
+		if (!core_grid_expand_for_hex(ui, g, h)) {
+			return;
+		}
+	}
+
+	if (grid_get(g, h)) {
+		grid_clear(g, h);
+	} else {
+		grid_set(g, h, area);
 	}
 
 	Quad quad = {h, h};

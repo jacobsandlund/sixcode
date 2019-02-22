@@ -23,8 +23,12 @@ const char UI_STROKE_VERTEX_SHADER_SOURCE[] =
 "	vec2 styleCoord2 = (gridPosition2 + gridPositionOffset) / gridSize;\n"
 "	float style = texture2D(gridStyles, styleCoord).a;\n"
 "	float style2 = texture2D(gridStyles, styleCoord2).a;\n"
-"	float present = ceil(style + style2);\n"
-"	color = strokeColor * present;\n"
+"\n"
+"	bool hexEdge = style + style2 >= 0.5;\n"
+"	bool areaInnerEdge = style == style2 && style >= 0.125;\n"
+"	float gridColor = areaInnerEdge ? 0.98 : 1.0;\n"
+"	color = hexEdge ? strokeColor : vec4(vec3(gridColor), 1.0);\n"
+"\n"
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
 

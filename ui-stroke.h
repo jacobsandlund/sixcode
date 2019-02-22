@@ -25,6 +25,7 @@ typedef struct {
 	GLint gridPositionOffset;
 	GLint strokeColor;
 	GLint gridStyles;
+	GLint fillColors;
 } UiStrokeUniforms;
 
 typedef struct {

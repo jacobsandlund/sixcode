@@ -22,6 +22,7 @@ typedef struct {
 	GLint viewMatrix;
 	GLint gridSize;
 	GLint gridPositionOffset;
+	GLint styleOffset;
 	GLint gridStyles;
 	GLint fillColors;
 } UiFillUniforms;

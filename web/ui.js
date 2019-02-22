@@ -31,6 +31,7 @@ let grid;
 let areaGrid;
 let ui;
 let view;
+let area = 32;
 
 let scaleLevel = SCALE_LEVELS.indexOf(32.0);
 
@@ -50,7 +51,7 @@ function core_initialized() {
     for (let i = 0; i < count; ++i) {
         let r = Math.floor(Math.random() * size) - 4096/2 + 1;
         let c = 2 * Math.floor(Math.random() * size) + (r & 1) - 4096 + 2;
-        let style = Math.floor(Math.random() * 15) + 1;
+        let style = Math.floor(Math.random() * 16) + 128;
         Module._web_grid_set(grid, c, r, style);
     }
 
@@ -62,7 +63,7 @@ function core_initialized() {
     //for (let i = 0; i < count; ++i) {
     //    let r = Math.floor(Math.random() * size) + 1;
     //    let c = 2 * Math.floor(Math.random() * size) + (r & 1) + 2;
-    //    let style = Math.floor(Math.random() * 15) + 1;
+    //    let style = Math.floor(Math.random() * 16) + 128;
     //    Module._web_grid_set(grid, c, r, style);
     //}
 
@@ -80,6 +81,9 @@ function core_initialized() {
     canvas.addEventListener('mousedown', mouseDown);
     window.addEventListener('mousemove', mouseMove);
     window.addEventListener('mouseup', mouseUp);
+    window.oncontextmenu = function () {
+        return false;
+    };
 
     draw();
 }
@@ -191,7 +195,11 @@ function mouseUp(e) {
         let x = e.clientX * window.devicePixelRatio;
         let y = e.clientY * window.devicePixelRatio;
 
-        Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
+        if (e.button === 0) {
+            Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
+        } else {
+            Module._web_core_set_area_at_point(ui, view, grid, x, y, area);
+        }
 
         let endTime = performance.now();
         console.log('click in ' + (endTime - startTime) + ' ms');

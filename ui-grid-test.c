@@ -60,7 +60,7 @@ TEST(ui_grid)
 	//=> 1
 	_dd(fill_colors_texture->width, fill_colors_texture->height);
 	//=> 256, 1
-	_d(fill_colors_texture->format == GL_RGBA);
+	_d(fill_colors_texture->format == GL_RGB);
 	//=> 1
 	_d(fill_colors_texture->type == GL_UNSIGNED_BYTE);
 	//=> 1

@@ -24,7 +24,7 @@ const char UI_POINTS_VERTEX_SHADER_SOURCE[] =
 "\n"
 "void main() {\n"
 "	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
-"	float style = texture2D(gridStyles, styleCoord).a + 0.001953125;\n"
+"	float style = texture2D(gridStyles, styleCoord).a + 0.25;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
 "	gl_PointSize = pointSize;\n"

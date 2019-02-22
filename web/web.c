@@ -119,6 +119,12 @@ EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid
 	core_toggle_hex_at_point(ui, vw, g, v);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_core_set_area_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y, u8 area)
+{
+	vec2 v = {x, y};
+	core_set_area_at_point(ui, vw, g, v, area);
+}
+
 
 //////////////////
 // Main
