@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/compile "$@"
+else
+    CFLAGS="$(grep '^CFLAGS' development/Makefile | sed 's/CFLAGS = //')"
+    clang $CFLAGS "$@"
+fi

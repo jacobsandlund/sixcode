@@ -1,6 +1,0 @@
-#!/bin/bash
-
-bin/compile "$@" && ./a.out
-exit_code=$?
-rm -f a.out
-exit $exit_code

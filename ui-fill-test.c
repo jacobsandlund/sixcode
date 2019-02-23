@@ -69,9 +69,9 @@ TEST(ui)
 	_d(ui->uniforms.gridPositionOffset);
 	//=> 3
 	_d(ui->uniforms.gridStyles);
-	//=> 4
-	_d(ui->uniforms.fillColors);
 	//=> 5
+	_d(ui->uniforms.fillColors);
+	//=> 6
 
 	_s(program->uniforms[ui->uniforms.viewMatrix].name);
 	//=> viewMatrix

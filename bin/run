@@ -1,3 +1,8 @@
 #!/bin/bash -e
 
-docker exec -it sixcode bin/run "$@"
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/run "$@"
+else
+    trap "rm -f a.out" EXIT
+    bin/compile "$@" && ./a.out
+fi

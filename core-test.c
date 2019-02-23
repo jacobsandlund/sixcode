@@ -80,7 +80,7 @@ TEST(core_toggle_hex_at_point)
 	core_toggle_hex_at_point(ui, &vw, g, v);
 
 	_d(grid_get(g, h));
-	//=> 1
+	//=> 128
 
 	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid.textures.grid_styles];
 	_dd(grid_styles_texture->xoffset, grid_styles_texture->yoffset);
@@ -95,7 +95,7 @@ TEST(core_toggle_hex_at_point)
 	// Increment style index
 	core_toggle_hex_at_point(ui, &vw, g, v);
 	_d(grid_get(g, h));
-	//=> 2
+	//=> 129
 
 	// Ignores outside of grid quad
 	v = (vec2) {342, 500};

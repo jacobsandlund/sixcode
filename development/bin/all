@@ -1,6 +1,0 @@
-#!/bin/bash -e
-
-bin/make
-bin/test
-bin/valgrind
-git add -- valgrind-output/

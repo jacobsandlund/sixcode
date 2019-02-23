@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-/emscripten/emscripten/emmake make -f development/Makefile "$@"

@@ -1,3 +1,10 @@
 #!/bin/bash -e
 
-docker exec -it sixcode bin/all "$@"
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/all "$@"
+else
+    bin/make
+    bin/test
+    bin/valgrind
+    git add -- valgrind-output/
+fi
