@@ -28,7 +28,12 @@ void core_grids_initialize(Grid *g, AreaGrid *a, Quad *quad)
 	area_grid_initialize(a, &area_quad);
 }
 
-i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h)
+void core_tick(UiAll *ui, View *vw, Grid *g)
+{
+	ui_all_draw(ui, vw, g);
+}
+
+i8 core_grid_expand_for_hex(Grid *g, Hex h)
 {
 	Quad expanded;
 	quad_expand_for_hex(&expanded, &g->quad, h);
@@ -44,7 +49,6 @@ i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h)
 	}
 
 	grid_expand_quad(g, &expanded);
-	ui_grid_update_styles(&ui->grid, g);
 
 	return 1;
 }
@@ -56,8 +60,12 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 	Hex h = space_hex_round(space_world_to_hex(
 			space_screen_to_world(vw, v)));
 
+	i8 expanded = 0;
+
 	if (!quad_contains(&g->quad, h)) {
-		if (!core_grid_expand_for_hex(ui, g, h)) {
+		expanded = core_grid_expand_for_hex(g, h);
+
+		if (!expanded) {
 			return;
 		}
 	}
@@ -73,9 +81,12 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 		}
 	}
 
-	Quad quad = {h, h};
-	ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
-	ui_all_draw(ui, vw, g);
+	if (expanded) {
+		ui_grid_update_styles(&ui->grid, g);
+	} else {
+		Quad quad = {h, h};
+		ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
+	}
 }
 
 void core_set_area_at_point(UiAll *ui, View *vw, Grid *g, vec2 v, u8 area)
@@ -83,21 +94,24 @@ void core_set_area_at_point(UiAll *ui, View *vw, Grid *g, vec2 v, u8 area)
 	Hex h = space_hex_round(space_world_to_hex(
 			space_screen_to_world(vw, v)));
 
+	i8 expanded = 0;
+
 	if (!quad_contains(&g->quad, h)) {
-		if (!core_grid_expand_for_hex(ui, g, h)) {
+		expanded = core_grid_expand_for_hex(g, h);
+
+		if (!expanded) {
 			return;
 		}
 	}
 
-	if (grid_get(g, h)) {
-		grid_clear(g, h);
-	} else {
-		grid_set(g, h, area);
-	}
+	grid_set(g, h, area);
 
-	Quad quad = {h, h};
-	ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
-	ui_all_draw(ui, vw, g);
+	if (expanded) {
+		ui_grid_update_styles(&ui->grid, g);
+	} else {
+		Quad quad = {h, h};
+		ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
+	}
 }
 
 //void core_area_grid_expand_for_quad(AreaGrid *a, Quad *quad)

@@ -112,6 +112,10 @@ EMSCRIPTEN_KEEPALIVE void web_core_grids_initialize(Grid *g, AreaGrid *a)
 	core_grids_initialize(g, a, &quad);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_core_tick(UiAll *ui, View *vw, Grid *g)
+{
+	core_tick(ui, vw, g);
+}
 
 EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y)
 {

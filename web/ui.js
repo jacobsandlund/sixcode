@@ -91,7 +91,7 @@ function core_initialized() {
 function draw() {
     let startTime = performance.now();
 
-    Module._web_ui_all_draw(ui, view, grid);
+    Module._web_core_tick(ui, view, grid);
 
     let endTime = performance.now();
     console.log('draw in ' + (endTime - startTime) + ' ms');
@@ -203,6 +203,8 @@ function mouseUp(e) {
 
         let endTime = performance.now();
         console.log('click in ' + (endTime - startTime) + ' ms');
+
+        draw();
     }
 
     isMouseDown = false;

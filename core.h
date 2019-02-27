@@ -19,7 +19,9 @@
 #include "vector.h"
 #include "view.h"
 
-i8 core_grid_expand_for_hex(UiAll *ui, Grid *g, Hex h);
+void core_grids_initialize(Grid *g, AreaGrid *a, Quad *quad);
+void core_tick(UiAll *ui, View *vw, Grid *g);
+i8 core_grid_expand_for_hex(Grid *g, Hex h);
 void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v);
 
 #endif // __CORE_H__
