@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-docker run -it --rm -v $PWD:/sixcode -p 8080:8080 --name sixcode sixcodeio/sixcode:latest
+docker run -it --rm -v $PWD:/sixcode -p 8080:8080 --name sixcode jacobsandlund/sixcode:latest

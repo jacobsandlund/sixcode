@@ -2,7 +2,7 @@ FROM debian:9.6-slim
 
 WORKDIR /sixcode
 
-ENV EMSCRIPTEN_VERSION 1.38.22
+ENV EMSCRIPTEN_VERSION 1.38.29
 
 RUN apt-get update && apt-get install -y curl gnupg2 && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
@@ -57,10 +57,12 @@ RUN dpkg --add-architecture i386 && \
 
 COPY development/emscripten_config /root/.emscripten
 
-COPY *.c *.h development/Makefile ./
+RUN mkdir web/
 
-RUN mkdir web/ && \
-    /emscripten/emscripten/emmake make && \
+COPY *.c *.h development/Makefile ./
+COPY web/*.c ./web/
+
+RUN /emscripten/emscripten/emmake make && \
     rm *.c *.h Makefile && rm -r web
 
 EXPOSE 8080
