@@ -54,9 +54,9 @@ TEST(fill_mesh)
 	_ddd(m->indices[6], m->indices[7], m->indices[8]);
 	//=> 0, 3, 5
 	_ddd(m->indices[9], m->indices[10], m->indices[11]);
-	//=> 5, 3, 4
+	//=> 3, 4, 5
 	_ddd(m->indices[24573], m->indices[24574], m->indices[24575]);
-	//=> 12287, 12285, 12286
+	//=> 12285, 12286, 12287
 
 	fill_mesh_terminate(m);
 	free(m);

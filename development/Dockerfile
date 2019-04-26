@@ -2,10 +2,10 @@ FROM debian:9.6-slim
 
 WORKDIR /sixcode
 
-ENV EMSCRIPTEN_VERSION 1.38.29
+ENV EMSCRIPTEN_VERSION 1.38.31
 
 RUN apt-get update && apt-get install -y curl gnupg2 && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
     mkdir -p /usr/share/man/man1 && \
     apt-get install -y \
         build-essential \
@@ -44,28 +44,33 @@ RUN dpkg --add-architecture i386 && \
     apt-get install -y \
         bash \
         binutils \
+        inotify-tools \
         less \
         libc6-dbg:i386 \
         libc6-dev-i386 \
         libgcc-6-dev \
-        libgles2-mesa-dev:i386 \
         make \
         man-db \
-        nginx \
         valgrind \
+        ;
+
+# TODO: remove
+RUN apt-get update && \
+    apt-get install -y \
+        libgles2-mesa-dev:i386 \
         ;
 
 COPY development/emscripten_config /root/.emscripten
 
-RUN mkdir web/
+RUN mkdir electron/
 
 COPY *.c *.h development/Makefile ./
-COPY web/*.c ./web/
+COPY electron/*.c electron/*.h ./electron/
 
 RUN /emscripten/emscripten/emmake make && \
-    rm *.c *.h Makefile && rm -r web
+    rm *.c *.h Makefile && rm -r electron
 
 EXPOSE 8080
 
 ENTRYPOINT ["development/entrypoint.sh"]
-CMD ["bin/start-server"]
+CMD ["development/start.sh"]

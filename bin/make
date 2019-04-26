@@ -3,5 +3,5 @@
 if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
     docker exec -it sixcode bin/make "$@"
 else
-    /emscripten/emscripten/emmake make -f development/Makefile "$@"
+    /emscripten/emscripten/emmake make -f development/Makefile --no-print-directory "$@"
 fi

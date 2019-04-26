@@ -18,7 +18,8 @@ const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 
 	// Area middles (0 - 31)
 
-	244, 244, 244,  // grey - nothing
+	// 244, 244, 244,  // grey - nothing
+	255, 255, 255,  // white - nothing
 	237, 243, 252,  // blue
 	239, 252, 237,	// green
 	252, 237, 239,	// red
@@ -39,7 +40,8 @@ const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 
 	// Area edges (32 - 63)
 
-	186, 186, 186,  // grey - nothing
+	// 186, 186, 186,  // grey - nothing
+	255, 255, 255,  // white - nothing
 	92, 150, 237,	// blue
 	49, 163, 24,	// green
 	255, 224, 228,	// red
@@ -60,7 +62,8 @@ const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 
 	// Area middles - zoomed out (64 - 95)
 
-	244, 244, 244,  // grey - nothing
+	// 244, 244, 244,  // grey - nothing
+	255, 255, 255,  // white - nothing
 	237, 243, 252,  // blue
 	239, 252, 237,	// green
 	255, 224, 228,	// red
@@ -81,7 +84,8 @@ const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 
 	// Area edges - zoomed out (96 - 127)
 
-	186, 186, 186,  // grey - nothing
+	// 186, 186, 186,  // grey - nothing
+	255, 255, 255,  // white - nothing
 	92, 150, 237,	// blue
 	49, 163, 24,	// green
 	242, 188, 195,	// red

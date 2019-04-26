@@ -39,7 +39,7 @@ void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r)
 		1, 2, 0,
 		0, 2, 3,
 		0, 3, 5,
-		5, 3, 4,
+		3, 4, 5,
 	};
 
 	Hex h;
