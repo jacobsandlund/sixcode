@@ -3,12 +3,13 @@
 #include <string.h>
 
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
-"attribute vec4 position;\n"
+"attribute vec2 position;\n"
 "attribute vec2 gridPosition;\n"
+"attribute vec2 positionOffset;\n"
+"attribute vec2 gridPositionOffset;\n"
 "\n"
 "uniform mat4 viewMatrix;\n"
 "uniform vec2 gridSize;\n"
-"uniform vec2 gridPositionOffset;\n"
 "uniform float styleOffset;\n"
 "\n"
 "uniform sampler2D gridStyles;\n"
@@ -20,7 +21,7 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
 "	float style = texture2D(gridStyles, styleCoord).a + styleOffset;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
-"	gl_Position = viewMatrix * position;\n"
+"	gl_Position = viewMatrix * vec4(position + positionOffset, 0.0, 1.0);\n"
 "}\n";
 
 i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
@@ -52,6 +53,14 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 			ui->shader.program,
 			"gridPosition");
 
+	ui->attributes.positionOffset = glGetAttribLocation(
+			ui->shader.program,
+			"positionOffset");
+
+	ui->attributes.gridPositionOffset = glGetAttribLocation(
+			ui->shader.program,
+			"gridPositionOffset");
+
 	////////////////////
 	// uniforms
 
@@ -62,10 +71,6 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	ui->uniforms.gridSize = glGetUniformLocation(
 			ui->shader.program,
 			"gridSize");
-
-	ui->uniforms.gridPositionOffset = glGetUniformLocation(
-			ui->shader.program,
-			"gridPositionOffset");
 
 	ui->uniforms.styleOffset = glGetUniformLocation(
 			ui->shader.program,
@@ -108,6 +113,9 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 
 		size >>= 1;
 	}
+
+	instance_mesh_initialize(&ui->instance_mesh, 32);
+	glGenBuffers(1, &ui->instanceBuffer);
 	
 	return 1;
 }
@@ -123,6 +131,9 @@ void ui_fill_terminate(UiFill *ui)
 		glDeleteBuffers(1, &ui->buffers[i].vertices);
 		glDeleteBuffers(1, &ui->buffers[i].indices);
 	}
+
+	instance_mesh_terminate(&ui->instance_mesh);
+	glDeleteBuffers(1, &ui->instanceBuffer);
 }
 
 static i32 ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
@@ -155,8 +166,6 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
 
-	ui_grid_update_view_matrix(ui_grid, vw);
-
 	// Attributes
 
 	glVertexAttribPointer(
@@ -167,8 +176,6 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			sizeof mesh->vertices[0],
 			0);
 	glEnableVertexAttribArray(ui->attributes.position);
-
-	glVertexAttrib4f(ui->attributes.position, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	glVertexAttribPointer(
 			ui->attributes.gridPosition,
@@ -198,45 +205,79 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.fill_colors);
 	glUniform1i(ui->uniforms.fillColors, 1);
 
-	// Draw
+	vec2 draw_offset = view_hex_to_world(
+			hex_to_vec(
+			hex_from_storage(draw_quad.min)));
+	ui_grid_update_view_matrix(ui_grid, vw, draw_offset);
 
-	Hex draw_quad_min_offset = hex_sub(draw_quad.min, g->storage_quad.min);
+	glUniformMatrix4fv(
+			ui->uniforms.viewMatrix,
+			1,
+			GL_FALSE,
+			(GLfloat*) &ui->ui_grid->view_matrix.m[0][0]);
+
+	// Instance buffer
+
+	InstanceMesh *imesh = &ui->instance_mesh;
+
+	i32 num_instances = (
+		((draw_quad.size.r - 1) / UI_FILL_MESH_MAX_SIZE + 1) *
+		((draw_quad.size.c - 1) / UI_FILL_MESH_MAX_SIZE + 1)
+	);
+	instance_mesh_resize(imesh, num_instances);
 
 	Hex h;
-	mat4 *view_matrix = &ui_grid->view_matrix;
-	f64 trans_x = ui_grid->translation_x;
-	f64 trans_y = ui_grid->translation_y;
-	f64 size_x = vw->viewport_size.x;
-	f64 size_y = vw->viewport_size.y;
+	i32 i = 0;
+	Hex draw_quad_min_offset = hex_sub(draw_quad.min, g->storage_quad.min);
 
 	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_FILL_MESH_MAX_SIZE) {
 		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_FILL_MESH_MAX_SIZE) {
-			vec2 v = view_hex_to_world(
+			InstanceMeshVertex *vx = &imesh->vertices[i];
+
+			vx->positionOffset = view_hex_to_world(
 					hex_to_vec(
-					hex_from_storage(
-					hex_add(h, draw_quad.min))));
+					hex_from_storage(h)));
 
-			view_matrix->m[3][0] = (trans_x + v.x) / size_x;
-			view_matrix->m[3][1] = (trans_y + v.y) / size_y;
-
-			glUniformMatrix4fv(
-					ui->uniforms.viewMatrix,
-					1,
-					GL_FALSE,
-					(GLfloat*) &view_matrix->m[0][0]);
-
-			Hex grid_offset = hex_add(h, draw_quad_min_offset);
-
-			glUniform2f(
-					ui->uniforms.gridPositionOffset,
-					(f32) grid_offset.c,
-					(f32) grid_offset.r);
-
-			glDrawElements(
-					GL_TRIANGLES,
-					mesh->indices_length,
-					GL_UNSIGNED_SHORT,
-					0);
+			vx->gridPositionOffset = hex_add(h, draw_quad_min_offset);
+			i++;
 		}
 	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, ui->instanceBuffer);
+	glBufferData(
+			GL_ARRAY_BUFFER,
+			imesh->vertices_length * sizeof *imesh->vertices,
+			imesh->vertices,
+			GL_STREAM_DRAW);
+
+	// Instance attributes
+
+	glVertexAttribPointer(
+			ui->attributes.positionOffset,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof imesh->vertices[0],
+			0);
+	glVertexAttribDivisor(ui->attributes.positionOffset, 1);
+	glEnableVertexAttribArray(ui->attributes.positionOffset);
+
+	glVertexAttribPointer(
+			ui->attributes.gridPositionOffset,
+			2,
+			GL_SHORT,
+			GL_FALSE,
+			sizeof imesh->vertices[0],
+			(GLvoid *) (2 * sizeof imesh->vertices[0].positionOffset.x));
+	glVertexAttribDivisor(ui->attributes.gridPositionOffset, 1);
+	glEnableVertexAttribArray(ui->attributes.gridPositionOffset);
+
+	// Draw
+
+	glDrawElementsInstanced(
+			GL_TRIANGLES,
+			mesh->indices_length,
+			GL_UNSIGNED_SHORT,
+			0,
+			num_instances);
 }

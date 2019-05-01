@@ -149,7 +149,8 @@ TEST(ui_grid_update_view_matrix)
 	glmock_initialize();
 	ui_grid_initialize(ui, 0);
 
-	ui_grid_update_view_matrix(ui, &vw);
+	vec2 offset = {93.0f, -13.0f};
+	ui_grid_update_view_matrix(ui, &vw, offset);
 
 	mat4 *m = &ui->view_matrix;
 	_gggg(m->m[0][0], m->m[0][1], m->m[0][2], m->m[0][3]);
@@ -159,7 +160,7 @@ TEST(ui_grid_update_view_matrix)
 	_gggg(m->m[2][0], m->m[2][1], m->m[2][2], m->m[2][3]);
 	//=> 0, 0, 0, 0
 	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
-	//=> 0, 0, 0, 0.1
+	//=> 0.073, 0.0116667, 0, 0.1
 
 	ui_grid_terminate(ui);
 	free(ui);

@@ -2,6 +2,7 @@
 #define __MESH_H__
 
 #include "sixcode.h"
+#include "hex.h"
 
 typedef struct {
 	f32 x;
@@ -11,20 +12,9 @@ typedef struct {
 } FillMeshVertex;
 
 typedef struct {
-	f32 x;
-	f32 y;
-	i16 c;
-	i16 r;
-} PointsMeshVertex;
-
-typedef struct {
-	f32 x;
-	f32 y;
-	i8 c;
-	i8 r;
-	i8 c2;
-	i8 r2;
-} StrokeMeshVertex;
+	vec2 positionOffset;
+	Hex gridPositionOffset;
+} InstanceMeshVertex;
 
 typedef struct {
 	FillMeshVertex *vertices;
@@ -36,24 +26,15 @@ typedef struct {
 } FillMesh;
 
 typedef struct {
-	PointsMeshVertex *vertices;
+	InstanceMeshVertex *vertices;
 	i32 vertices_length;
-	i32 size_c;
-	i32 size_r;
-} PointsMesh;
-
-typedef struct {
-	StrokeMeshVertex *vertices;
-	i32 vertices_length;
-	i32 size_c;
-	i32 size_r;
-} StrokeMesh;
+	i32 vertices_capacity;
+} InstanceMesh;
 
 void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r);
 void fill_mesh_terminate(FillMesh *m);
-void points_mesh_initialize(PointsMesh *m, i32 size_c, i32 size_r);
-void points_mesh_terminate(PointsMesh *m);
-void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r);
-void stroke_mesh_terminate(StrokeMesh *m);
+void instance_mesh_initialize(InstanceMesh *m, i32 length);
+void instance_mesh_resize(InstanceMesh *m, i32 length);
+void instance_mesh_terminate(InstanceMesh *m);
 
 #endif // __MESH_H__

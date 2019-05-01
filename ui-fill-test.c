@@ -52,11 +52,19 @@ TEST(ui)
 	//=> 1
 	_d(ui->attributes.gridPosition);
 	//=> 2
+	_d(ui->attributes.positionOffset);
+	//=> 3
+	_d(ui->attributes.gridPositionOffset);
+	//=> 4
 
 	_s(program->attributes[ui->attributes.position].name);
 	//=> position
 	_s(program->attributes[ui->attributes.gridPosition].name);
 	//=> gridPosition
+	_s(program->attributes[ui->attributes.positionOffset].name);
+	//=> positionOffset
+	_s(program->attributes[ui->attributes.gridPositionOffset].name);
+	//=> gridPositionOffset
 
 	////////////////////
 	// uniforms
@@ -65,19 +73,19 @@ TEST(ui)
 	//=> 1
 	_d(ui->uniforms.gridSize);
 	//=> 2
-	_d(ui->uniforms.gridPositionOffset);
+	_d(ui->uniforms.styleOffset);
 	//=> 3
 	_d(ui->uniforms.gridStyles);
-	//=> 5
+	//=> 4
 	_d(ui->uniforms.fillColors);
-	//=> 6
+	//=> 5
 
 	_s(program->uniforms[ui->uniforms.viewMatrix].name);
 	//=> viewMatrix
 	_s(program->uniforms[ui->uniforms.gridSize].name);
 	//=> gridSize
-	_s(program->uniforms[ui->uniforms.gridPositionOffset].name);
-	//=> gridPositionOffset
+	_s(program->uniforms[ui->uniforms.styleOffset].name);
+	//=> styleOffset
 	_s(program->uniforms[ui->uniforms.gridStyles].name);
 	//=> gridStyles
 	_s(program->uniforms[ui->uniforms.fillColors].name);
@@ -87,19 +95,17 @@ TEST(ui)
 	// mesh + buffers
 
 	_d(ui->meshes[0].vertices_length);
-	//=> 24576
-	_d(ui->meshes[1].vertices_length);
-	//=> 6144
-	_d(ui->meshes[2].vertices_length);
-	//=> 1536
-	_d(ui->meshes[3].vertices_length);
 	//=> 384
-	_d(ui->meshes[4].vertices_length);
+	_d(ui->meshes[1].vertices_length);
 	//=> 96
+	_d(ui->meshes[2].vertices_length);
+	//=> 24
+	_d(ui->meshes[3].vertices_length);
+	//=> 6
 	_d(ui->meshes[0].indices_length);
-	//=> 49152
-	_d(ui->meshes[4].indices_length);
-	//=> 192
+	//=> 768
+	_d(ui->meshes[3].indices_length);
+	//=> 12
 
 	_d(ui->buffers[0].vertices);
 	//=> 1
@@ -109,20 +115,24 @@ TEST(ui)
 	//=> 5
 	_d(ui->buffers[3].vertices);
 	//=> 7
-	_d(ui->buffers[4].vertices);
-	//=> 9
 	_d(ui->buffers[0].indices);
 	//=> 2
-	_d(ui->buffers[4].indices);
-	//=> 10
+	_d(ui->buffers[3].indices);
+	//=> 8
+
+	_d(ui->instanceBuffer);
+	//=> 9
+	_d(ui->instance_mesh.vertices_length);
+	//=> 32
 
 	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers[0].vertices];
 	GLmockBuffer *indices_buffer = &GLmock.buffers[ui->buffers[1].indices];
+	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
 
 	_d(vertices_buffer->created);
 	//=> 1
 	_d(vertices_buffer->size);
-	//=> 294912
+	//=> 4608
 	_d(vertices_buffer->data == ui->meshes[0].vertices);
 	//=> 1
 	_d(vertices_buffer->usage == GL_STATIC_DRAW);
@@ -131,10 +141,13 @@ TEST(ui)
 	_d(indices_buffer->created);
 	//=> 1
 	_d(indices_buffer->size);
-	//=> 24576
+	//=> 384
 	_d(indices_buffer->data == ui->meshes[1].indices);
 	//=> 1
 	_d(indices_buffer->usage == GL_STATIC_DRAW);
+	//=> 1
+
+	_d(instance_buffer->created);
 	//=> 1
 
 	////////////////////////////
@@ -150,6 +163,8 @@ TEST(ui)
 	_d(vertices_buffer->deleted);
 	//=> 1
 	_d(indices_buffer->deleted);
+	//=> 1
+	_d(instance_buffer->deleted);
 	//=> 1
 
 	ui_grid_terminate(ui_grid);
@@ -219,11 +234,6 @@ TEST(ui_draw_fill)
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
 
-	_d(GLmock.bound_buffers[0] == ui->buffers[0].vertices);
-	//=> 1
-	_d(GLmock.bound_buffers[1] == ui->buffers[0].indices);
-	//=> 1
-
 	// Attributes
 
 	GLmockProgram *program = &GLmock.programs[ui->shader.program];
@@ -241,8 +251,6 @@ TEST(ui_draw_fill)
 	//=> 0
 	_d(position->enabled_vertex_attrib_array);
 	//=> 1
-	_gggg(position->v0, position->v1, position->v2, position->v3);
-	//=> 0, 0, 0, 1
 
 	_d(gridPosition->size);
 	//=> 2
@@ -258,18 +266,23 @@ TEST(ui_draw_fill)
 	// Uniform
 
 	GLmockUniform *grid_size = &program->uniforms[ui->uniforms.gridSize];
-	GLmockUniform *grid_position_offset = &program->uniforms[ui->uniforms.gridPositionOffset];
 
 	_gg(grid_size->fv0, grid_size->fv1);
 	//=> 192, 128
 	_hx(g->storage_quad.size);
 	//=> 192, 128
 
-	_gg(grid_position_offset->fv0, grid_position_offset->fv1);
-	//=> 81, 0
+	_d(program->uniforms[ui->uniforms.styleOffset].iv0);
+	//=> 0
 
-	_d(program->uniforms[ui->uniforms.viewMatrix].matrix4fv == &ui_grid->view_matrix.m[0][0]);
+	mat4 *m = &ui_grid->view_matrix;
+	_d(program->uniforms[ui->uniforms.viewMatrix].matrix4fv == &m->m[0][0]);
 	//=> 1
+
+	_gg(m->m[0][0], m->m[1][1]);
+	//=> 0.001, 0.00166667
+	_ggg(m->m[3][0], m->m[3][1], m->m[3][3]);
+	//=> -0.101406, 0.0333333, 0.1
 
 	// Textures
 
@@ -283,20 +296,76 @@ TEST(ui_draw_fill)
 	_d(GLmock.bound_textures[1] == ui_grid->textures.fill_colors);
 	//=> 1
 
+	// Instance Buffer
+
+	InstanceMesh *imesh = &ui->instance_mesh;
+	_d(imesh->vertices_length);
+	//=> 105
+
+	_v2(imesh->vertices[0].positionOffset);
+	//=> 0, -0
+	_hx(imesh->vertices[0].gridPositionOffset);
+	//=> 17, 0
+
+	_v2(imesh->vertices[104].positionOffset);
+	//=> 193.99, -72
+	_hx(imesh->vertices[104].gridPositionOffset);
+	//=> 129, 48
+
+	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
+	_d(instance_buffer->size);
+	//=> 1260
+	_d(instance_buffer->data == ui->meshes[0].vertices);
+	//=> 0
+	_d(instance_buffer->usage == GL_STREAM_DRAW);
+	//=> 1
+
+	// Instance attributes
+
+	GLmockAttribute *positionOffset = &program->attributes[ui->attributes.positionOffset];
+	GLmockAttribute *gridPositionOffset = &program->attributes[ui->attributes.gridPositionOffset];
+
+	_d(positionOffset->size);
+	//=> 2
+	_d(positionOffset->type == GL_FLOAT);
+	//=> 1
+	_d(positionOffset->stride);
+	//=> 12
+	_d(positionOffset->offset);
+	//=> 0
+	_d(positionOffset->divisor);
+	//=> 1
+	_d(positionOffset->enabled_vertex_attrib_array);
+	//=> 1
+
+	_d(gridPositionOffset->size);
+	//=> 2
+	_d(gridPositionOffset->type == GL_SHORT);
+	//=> 1
+	_d(gridPositionOffset->stride);
+	//=> 12
+	_d(gridPositionOffset->offset);
+	//=> 8
+	_d(gridPositionOffset->divisor);
+	//=> 1
+	_d(gridPositionOffset->enabled_vertex_attrib_array);
+	//=> 1
+
 	// Draw
+
+	_d(GLmock.bound_buffers[0] == ui->instanceBuffer);
+	//=> 1
+	_d(GLmock.bound_buffers[1] == ui->buffers[0].indices);
+	//=> 1
 
 	_d(GLmock.draw_elements_mode == GL_TRIANGLES);
 	//=> 1
 	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
 	//=> 1
 	_d(GLmock.draw_elements_count);
-	//=> 98304
-	_d(49152 * 2);  // Draw the two showing blocks
-	//=> 98304
-
-	mat4 *m = &ui_grid->view_matrix;
-	_ggg(m->m[3][0], m->m[3][1], m->m[3][3]);
-	//=> 0.00944486, 0.0333333, 0.1
+	//=> 80640
+	_d(GLmock.draw_elements_instanced_primcount);
+	//=> 105
 
 	grid_terminate(g);
 	ui_grid_terminate(ui_grid);

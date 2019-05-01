@@ -9,8 +9,6 @@
 #include "ui-all.c"
 #include "ui-fill.c"
 #include "ui-grid.c"
-#include "ui-points.c"
-#include "ui-stroke.c"
 #include "view.c"
 
 #define CORE_HEX_FILL_MIN 1

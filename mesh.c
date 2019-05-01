@@ -6,12 +6,15 @@
 
 #define FILL_MESH_VERTICES_PER_HEX 6
 #define FILL_MESH_INDICES_PER_HEX 12
-#define STROKE_MESH_VERTICES_PER_HEX 6
+#define MESH_FILL_FRACTION 0.95
 
 static vec2 mesh_hex_corner(i8 corner)
 {
 	f64 angle = M_PI / 3.0 * (0.5 + corner);
-	return (vec2) {cos(angle), sin(angle)};
+	return (vec2) {
+		cos(angle) * MESH_FILL_FRACTION,
+		sin(angle) * MESH_FILL_FRACTION,
+	};
 }
 
 void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r)
@@ -76,94 +79,24 @@ void fill_mesh_terminate(FillMesh *m)
 	free(m->indices);
 }
 
-void points_mesh_initialize(PointsMesh *m, i32 size_c, i32 size_r)
+void instance_mesh_initialize(InstanceMesh *m, i32 length)
 {
-	m->vertices_length = size_c * size_r;
-	m->size_c = size_c;
-	m->size_r = size_r;
+	m->vertices = malloc(length * sizeof *m->vertices);
+	m->vertices_length = length;
+	m->vertices_capacity = length;
+}
 
-	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
-
-	Hex h;
-	i32 vi = 0;
-
-	for (h.r = 0; h.r < size_r; ++h.r) {
-		for (h.c = 0; h.c < size_c; ++h.c) {
-			vec2 center = view_hex_to_world(
-					hex_to_vec(
-					hex_from_storage(h)));
-
-			PointsMeshVertex *vx = &m->vertices[vi];
-			vx->x = center.x;
-			vx->y = center.y;
-			vx->c = h.c;
-			vx->r = h.r;
-
-			++vi;
-		}
+void instance_mesh_resize(InstanceMesh *m, i32 length)
+{
+	if (length > m->vertices_capacity) {
+		instance_mesh_terminate(m);
+		instance_mesh_initialize(m, length);
+	} else {
+		m->vertices_length = length;
 	}
 }
 
-void points_mesh_terminate(PointsMesh *m)
-{
-	free(m->vertices);
-}
-
-void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r)
-{
-	i32 num_hexes = size_c * size_r;
-	m->vertices_length = STROKE_MESH_VERTICES_PER_HEX * num_hexes;
-	m->size_c = size_c;
-	m->size_r = size_r;
-
-	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
-
-	vec2 corners[] = {
-		mesh_hex_corner(0),
-		mesh_hex_corner(1),
-		mesh_hex_corner(1),
-		mesh_hex_corner(2),
-		mesh_hex_corner(2),
-		mesh_hex_corner(3),
-	};
-
-	Hex neighbor_offsets[] = {
-		{+1, -1},
-		{+1, -1},
-		{-1, -1},
-		{-1, -1},
-		{-2, 0},
-		{-2, 0},
-	};
-
-	Hex h;
-	i32 vi = 0;
-
-	for (h.r = 0; h.r < size_r; ++h.r) {
-		for (h.c = 0; h.c < size_c; ++h.c) {
-			Hex hex = hex_from_storage(h);
-			vec2 center = view_hex_to_world(hex_to_vec(hex));
-
-			for (i32 i = 0; i < STROKE_MESH_VERTICES_PER_HEX; ++i) {
-				StrokeMeshVertex *vx = &m->vertices[vi + i];
-				vx->x = corners[i].x + center.x;
-				vx->y = corners[i].y + center.y;
-				vx->c = h.c;
-				vx->r = h.r;
-
-				Hex offset = neighbor_offsets[i];
-				Hex h2 = hex_to_storage(
-						hex_add(hex, offset));
-				vx->c2 = h2.c;
-				vx->r2 = h2.r;
-			}
-
-			vi += STROKE_MESH_VERTICES_PER_HEX;
-		}
-	}
-}
-
-void stroke_mesh_terminate(StrokeMesh *m)
+void instance_mesh_terminate(InstanceMesh *m)
 {
 	free(m->vertices);
 }

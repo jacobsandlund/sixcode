@@ -32,9 +32,7 @@ TEST(core_tick)
 	//=> 600
 
 	_d(GLmock.draw_elements_count);
-	//=> 294912
-	_d(GLmock.draw_arrays_count);
-	//=> 0
+	//=> 131328
 
 	ui_all_terminate(ui);
 	grid_terminate(g);

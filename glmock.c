@@ -24,6 +24,7 @@ typedef struct {
 	GLenum type;
 	GLsizei stride;
 	GLsizei offset;
+	GLuint divisor;
 	i8 enabled_vertex_attrib_array;
 
 	GLfloat v0;
@@ -83,6 +84,7 @@ typedef struct {
 	GLenum draw_elements_mode;
 	GLenum draw_elements_type;
 	GLsizei draw_elements_count;
+	GLsizei draw_elements_instanced_primcount;
 
 	GLenum draw_arrays_mode;
 	GLsizei draw_arrays_count;
@@ -245,6 +247,15 @@ void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indic
 	GLmock.draw_elements_mode = mode;
 	GLmock.draw_elements_type = type;
 	GLmock.draw_elements_count += count;
+}
+
+void glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei primcount)
+{
+	(void) indices;
+	GLmock.draw_elements_mode = mode;
+	GLmock.draw_elements_type = type;
+	GLmock.draw_elements_count += primcount * count;
+	GLmock.draw_elements_instanced_primcount += primcount;
 }
 
 void glEnableVertexAttribArray(GLuint index)
@@ -457,6 +468,13 @@ void glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat 
 	attrib->v1 = v1;
 	attrib->v2 = v2;
 	attrib->v3 = v3;
+}
+
+void glVertexAttribDivisor(GLuint index, GLuint divisor)
+{
+	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
+	GLmockAttribute *attrib = &p->attributes[index];
+	attrib->divisor = divisor;
 }
 
 void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer)

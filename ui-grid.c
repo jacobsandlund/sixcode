@@ -17,7 +17,7 @@ const char UI_GRID_FRAGMENT_SHADER_SOURCE[] =
 
 const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 
-	255, 255, 255,
+	250, 250, 250,
 	64, 239, 233,
 	190, 190, 190,
 	255, 140, 140,
@@ -110,13 +110,18 @@ void ui_grid_terminate(UiGrid *ui)
 	free(ui->styles_buffer);
 }
 
-void ui_grid_update_view_matrix(UiGrid *ui, View *vw)
+void ui_grid_update_view_matrix(UiGrid *ui, View *vw, vec2 draw_offset)
 {
 	f64 scale_inv = 1.0 / (f64) vw->scale;
-	ui->translation_x = -vw->translation.x * scale_inv * 2.0;
-	ui->translation_y = vw->translation.y * scale_inv * 2.0;
-	ui->view_matrix.m[0][0] = 1.0 / (f64) vw->viewport_size.x;
-	ui->view_matrix.m[1][1] = 1.0 / (f64) vw->viewport_size.y;
+	f64 size_x = vw->viewport_size.x;
+	f64 size_y = vw->viewport_size.y;
+	f64 trans_x = -vw->translation.x * scale_inv * 2.0;
+	f64 trans_y = vw->translation.y * scale_inv * 2.0;
+
+	ui->view_matrix.m[0][0] = 1.0 / size_x;
+	ui->view_matrix.m[1][1] = 1.0 / size_y;
+	ui->view_matrix.m[3][0] = (trans_x + draw_offset.x) / size_x;
+	ui->view_matrix.m[3][1] = (trans_y + draw_offset.y) / size_y;
 	ui->view_matrix.m[3][3] = scale_inv;
 }
 

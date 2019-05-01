@@ -8,8 +8,6 @@
 #include "quad.c"
 #include "ui-grid.c"
 #include "ui-fill.c"
-#include "ui-points.c"
-#include "ui-stroke.c"
 #include "view.c"
 
 TEST(ui_all)
@@ -34,7 +32,7 @@ TEST(ui_all)
 	_qd(viewport_quad);
 	//=> (-116, -34), (174, 67)
 
-	// Zoom with stroke and fill
+	// Zoom 1
 
 	ui_all_draw(ui, &vw, g);
 
@@ -44,11 +42,9 @@ TEST(ui_all)
 	//=> 600
 
 	_d(GLmock.draw_elements_count);
-	//=> 294912
-	_d(GLmock.draw_arrays_count);
-	//=> 0
+	//=> 131328
 
-	// Zoom with fill and no stroke
+	// Zoom 2
 
 	vw.scale = 6.0;
 	GLmock.draw_elements_count = 0;
@@ -57,11 +53,9 @@ TEST(ui_all)
 	ui_all_draw(ui, &vw, g);
 
 	_d(GLmock.draw_elements_count);
-	//=> 294912
-	_d(GLmock.draw_arrays_count);
-	//=> 0
+	//=> 211968
 
-	// Zoom with only points
+	// Zoom 3
 
 	vw.scale = 1.0;
 	GLmock.draw_elements_count = 0;
@@ -70,9 +64,7 @@ TEST(ui_all)
 	ui_all_draw(ui, &vw, g);
 
 	_d(GLmock.draw_elements_count);
-	//=> 0
-	_d(GLmock.draw_arrays_count);
-	//=> 65536
+	//=> 294912
 
 	ui_all_terminate(ui);
 	grid_terminate(g);
@@ -89,7 +81,7 @@ TEST(ui_all_initialize_fail)
 	UiAll *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	GLmock.shaders[3].compiled = -1;
+	GLmock.shaders[1].compiled = -1;
 	grid_initialize(g, &quad);
 
 	_d(ui_all_initialize(ui, 0));
