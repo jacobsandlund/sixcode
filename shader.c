@@ -1,5 +1,6 @@
-#include <stdio.h>
 #include "shader.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void shader_print_gl_error(const char *filename, i32 line)
 {

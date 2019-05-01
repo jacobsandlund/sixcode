@@ -1,7 +1,6 @@
-#include "test.h"
-#include "space.c"
-#include "hex.c"
 #include "quad.c"
+#include "test.h"
+#include "hex.c"
 
 TEST(quad_contains)
 {
@@ -147,18 +146,18 @@ TEST(quad_intersect)
 	//=> (256, 128), (255, 63)
 }
 
-TEST(quad_space_hex_to_storage)
+TEST(quad_hex_to_storage)
 {
 	Quad storage_quad;
 	Quad q1 = {{-2, 8}, {5, 18}};
 	Quad q2 = {{3, 2}, {4, 3}};
 
-	quad_space_hex_to_storage(&storage_quad, &q1);
+	quad_hex_to_storage(&storage_quad, &q1);
 
 	_qd(storage_quad);
 	//=> (-1, 8), (2, 18)
 
-	quad_space_hex_to_storage(&storage_quad, &q2);
+	quad_hex_to_storage(&storage_quad, &q2);
 
 	_qd(storage_quad);
 	//=> (1, 2), (2, 3)
@@ -175,12 +174,12 @@ TEST(quad_to_size_quad)
 	//=> (0, 1), (7, 4)
 }
 
-TEST(quad_to_storage_space_size_quad)
+TEST(quad_to_storage_size_quad)
 {
 	SizeQuad storage_quad;
 	Quad quad = {{0, 23}, {125, 63}};
 
-	quad_to_storage_space_size_quad(&storage_quad, &quad);
+	quad_to_storage_size_quad(&storage_quad, &quad);
 
 	_sq(storage_quad);
 	//=> (0, 23), (63, 41)

@@ -1,9 +1,9 @@
 #ifndef __GRID_H__
 #define __GRID_H__
 
+#include "sixcode.h"
 #include "hex.h"
 #include "quad.h"
-#include "sixcode.h"
 
 typedef struct {
 	Quad quad;

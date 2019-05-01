@@ -1,13 +1,12 @@
 #ifndef __UI_GRID_H__
 #define __UI_GRID_H__
 
-#include <GLES2/gl2.h>
-#include "view.h"
-#include "grid.h"
-#include "matrix.h"
-#include "shader.h"
 #include "sixcode.h"
+#include <GLES2/gl2.h>
+#include "grid.h"
 #include "quad.h"
+#include "shader.h"
+#include "view.h"
 
 #define UI_GRID_MAX_TEXTURE_SIZE 4096
 

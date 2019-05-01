@@ -1,8 +1,6 @@
+#include "ui-points.h"
 #include <stdio.h>
 #include <string.h>
-#include "space.h"
-#include "matrix.h"
-#include "ui-points.h"
 
 #define UI_POINT_MESH_SIZE 256
 #define UI_POINTS_POINT_SIZE_FACTOR 0.75
@@ -24,7 +22,7 @@ const char UI_POINTS_VERTEX_SHADER_SOURCE[] =
 "\n"
 "void main() {\n"
 "	vec2 styleCoord = (gridPosition + gridPositionOffset) / gridSize;\n"
-"	float style = texture2D(gridStyles, styleCoord).a + 0.25;\n"
+"	float style = texture2D(gridStyles, styleCoord).a;\n"
 "	color = texture2D(fillColors, vec2(style, 0.5));\n"
 "	gl_Position = viewMatrix * position;\n"
 "	gl_PointSize = pointSize;\n"
@@ -180,9 +178,9 @@ void ui_points_draw(UiPoints *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_POINT_MESH_SIZE) {
 		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_POINT_MESH_SIZE) {
-			vec2 v = space_hex_to_world(
-					space_hex_to_vec(
-					space_storage_to_hex(
+			vec2 v = view_hex_to_world(
+					hex_to_vec(
+					hex_from_storage(
 					hex_add(h, draw_quad.min))));
 
 			view_matrix->m[3][0] = (trans_x + v.x) / size_x;

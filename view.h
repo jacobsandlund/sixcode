@@ -1,10 +1,9 @@
 #ifndef __VIEW_H__
 #define __VIEW_H__
 
-#include "hex.h"
 #include "sixcode.h"
+#include "hex.h"
 #include "quad.h"
-#include "vector.h"
 
 typedef struct {
 	vec2 viewport_size;
@@ -12,6 +11,9 @@ typedef struct {
 	f32 scale;
 } View;
 
+vec2 view_screen_to_world(View *vw, vec2 v);
+vec2 view_world_to_hex(vec2 v);
+vec2 view_hex_to_world(vec2 v);
 void view_zoom_at_screen_point(View *vw, vec2 v, f32 new_scale);
 void view_resize(View *vw, vec2 viewport_size);
 void view_translate(View *vw, vec2 delta);

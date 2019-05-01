@@ -1,7 +1,7 @@
+#include "../core.c"
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
-#include "../core.h"
-#include "../core.c"
+#include <stdarg.h>
 
 #define WEB_UI_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
 
@@ -58,16 +58,6 @@ EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 
 
 ////////////////
-// Area Grid
-
-EMSCRIPTEN_KEEPALIVE AreaGrid *web_area_grid_malloc()
-{
-	AreaGrid *ag = malloc(sizeof *ag);
-	return ag;
-}
-
-
-////////////////
 // Ui All
 
 EMSCRIPTEN_KEEPALIVE UiAll *web_ui_all_malloc()
@@ -104,12 +94,10 @@ EMSCRIPTEN_KEEPALIVE void web_ui_grid_update_styles(UiGrid *ui_grid, Grid *g)
 //////////////////
 // Core
 
-EMSCRIPTEN_KEEPALIVE void web_core_grids_initialize(Grid *g, AreaGrid *a)
+EMSCRIPTEN_KEEPALIVE void web_core_grid_initialize(Grid *g)
 {
 	Quad quad = {{-UI_GRID_MAX_TEXTURE_SIZE + 2, -UI_GRID_MAX_TEXTURE_SIZE / 2 + 1}, {UI_GRID_MAX_TEXTURE_SIZE - 3, UI_GRID_MAX_TEXTURE_SIZE / 2 - 2}};
-	// Try to be close to center of area zone
-	//Quad quad = {{386, 257}, {509, 319}};
-	core_grids_initialize(g, a, &quad);
+	core_grid_initialize(g, &quad);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_core_tick(UiAll *ui, View *vw, Grid *g)
@@ -123,17 +111,19 @@ EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid
 	core_toggle_hex_at_point(ui, vw, g, v);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_core_set_area_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y, u8 area)
-{
-	vec2 v = {x, y};
-	core_set_area_at_point(ui, vw, g, v, area);
-}
-
 
 //////////////////
 // Main
 
 #ifdef __EMSCRIPTEN__
+
+void log_error(const char *format, ...)
+{
+	va_list argptr;
+	va_start(argptr, format);
+	vfprintf(stderr, format, argptr);
+	va_end(argptr);
+}
 
 int main()
 {
@@ -149,7 +139,7 @@ int main()
 	assert(res == EMSCRIPTEN_RESULT_SUCCESS);
 	assert(emscripten_webgl_get_current_context() == context);
 
-	EM_ASM( core_initialized() );
+	EM_ASM( sixcode_initialized() );
 
 	return 0;
 }

@@ -1,9 +1,7 @@
-#include <assert.h>
-#include "test.h"
 #include "grid.c"
+#include "test.h"
 #include "hex.c"
 #include "quad.c"
-#include "space.c"
 
 TEST(grid_quad_to_styles_quad)
 {

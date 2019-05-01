@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/watch "$@"
+else
+    while true; do
+        bin/make
+        echo '---'
+        inotifywait -q \
+            -e close_write \
+            -e modify \
+            -e move \
+            -e create \
+            -e delete \
+            --exclude '(\-test\.c|[^ch])$' \
+            $(bin/ls-src) .
+    done
+fi

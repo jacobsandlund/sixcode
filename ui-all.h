@@ -1,6 +1,7 @@
 #ifndef __UI_ALL_H__
 #define __UI_ALL_H__
 
+#include "sixcode.h"
 #include "grid.h"
 #include "ui-fill.h"
 #include "ui-grid.h"

@@ -1,7 +1,8 @@
+#include "mesh.c"
 #include "test.h"
 #include "hex.c"
-#include "mesh.c"
-#include "space.c"
+#include "quad.c"
+#include "view.c"
 
 TEST(fill_mesh)
 {

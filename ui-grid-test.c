@@ -1,11 +1,10 @@
+#include "ui-grid.c"
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
 #include "hex.c"
-#include "shader.c"
-#include "space.c"
 #include "quad.c"
-#include "ui-grid.c"
+#include "shader.c"
 #include "view.c"
 
 TEST(ui_grid)
@@ -222,7 +221,7 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Under the current capacity
 	quad = (Quad) {{10, 20}, {31, 59}};
-	quad_to_storage_space_size_quad(&sq, &quad);
+	quad_to_storage_size_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
 	//=> 5, 20
 	_hx(sq.size);
@@ -247,7 +246,7 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Under/equal the max capacity
 	quad = (Quad) {{10, 10}, {109, 59}};
-	quad_to_storage_space_size_quad(&sq, &quad);
+	quad_to_storage_size_quad(&sq, &quad);
 	_hx(sq.size);
 	//=> 50, 50
 	_d(size_quad_capacity(&sq));
@@ -262,7 +261,7 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Over the max capacity
 	quad = (Quad) {{10, 10}, {109, 60}};
-	quad_to_storage_space_size_quad(&sq, &quad);
+	quad_to_storage_size_quad(&sq, &quad);
 	_hx(hex_sub(sq.min, g->storage_quad.min));
 	//=> 5, 10
 	_hx(sq.size);

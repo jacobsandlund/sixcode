@@ -1,25 +1,14 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#include "area.h"
-#include "area-quad.h"
+#include "sixcode.h"
 #include "grid.h"
 #include "hex.h"
-#include "matrix.h"
-#include "mesh.h"
 #include "quad.h"
-#include "shader.h"
-#include "sixcode.h"
-#include "space.h"
 #include "ui-all.h"
-#include "ui-fill.h"
-#include "ui-grid.h"
-#include "ui-points.h"
-#include "ui-stroke.h"
-#include "vector.h"
 #include "view.h"
 
-void core_grids_initialize(Grid *g, AreaGrid *a, Quad *quad);
+void core_grid_initialize(Grid *g, Quad *quad);
 void core_tick(UiAll *ui, View *vw, Grid *g);
 i8 core_grid_expand_for_hex(Grid *g, Hex h);
 void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v);

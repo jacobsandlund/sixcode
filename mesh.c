@@ -1,9 +1,8 @@
+#include "mesh.h"
 #include <math.h>
 #include <stdlib.h>
 #include "hex.h"
-#include "mesh.h"
-#include "space.h"
-#include "vector.h"
+#include "view.h"
 
 #define FILL_MESH_VERTICES_PER_HEX 6
 #define FILL_MESH_INDICES_PER_HEX 12
@@ -48,9 +47,9 @@ void fill_mesh_initialize(FillMesh *m, i32 size_c, i32 size_r)
 
 	for (h.r = 0; h.r < size_r; ++h.r) {
 		for (h.c = 0; h.c < size_c; ++h.c) {
-			vec2 center = space_hex_to_world(
-					space_hex_to_vec(
-					space_storage_to_hex(h)));
+			vec2 center = view_hex_to_world(
+					hex_to_vec(
+					hex_from_storage(h)));
 
 			for (i32 i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
 				m->indices[ii + i] = vi + indices_single[i];
@@ -90,9 +89,9 @@ void points_mesh_initialize(PointsMesh *m, i32 size_c, i32 size_r)
 
 	for (h.r = 0; h.r < size_r; ++h.r) {
 		for (h.c = 0; h.c < size_c; ++h.c) {
-			vec2 center = space_hex_to_world(
-					space_hex_to_vec(
-					space_storage_to_hex(h)));
+			vec2 center = view_hex_to_world(
+					hex_to_vec(
+					hex_from_storage(h)));
 
 			PointsMeshVertex *vx = &m->vertices[vi];
 			vx->x = center.x;
@@ -142,9 +141,8 @@ void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r)
 
 	for (h.r = 0; h.r < size_r; ++h.r) {
 		for (h.c = 0; h.c < size_c; ++h.c) {
-			Hex hex_space_h = space_storage_to_hex(h);
-			vec2 center = space_hex_to_world(
-					space_hex_to_vec(hex_space_h));
+			Hex hex = hex_from_storage(h);
+			vec2 center = view_hex_to_world(hex_to_vec(hex));
 
 			for (i32 i = 0; i < STROKE_MESH_VERTICES_PER_HEX; ++i) {
 				StrokeMeshVertex *vx = &m->vertices[vi + i];
@@ -154,8 +152,8 @@ void stroke_mesh_initialize(StrokeMesh *m, i32 size_c, i32 size_r)
 				vx->r = h.r;
 
 				Hex offset = neighbor_offsets[i];
-				Hex h2 = space_hex_to_storage(
-						hex_add(hex_space_h, offset));
+				Hex h2 = hex_to_storage(
+						hex_add(hex, offset));
 				vx->c2 = h2.c;
 				vx->r2 = h2.r;
 			}

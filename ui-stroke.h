@@ -1,14 +1,14 @@
 #ifndef __UI_STROKE_H__
 #define __UI_STROKE_H__
 
-#include <GLES2/gl2.h>
-#include "mesh.h"
-#include "view.h"
-#include "grid.h"
-#include "shader.h"
 #include "sixcode.h"
+#include <GLES2/gl2.h>
+#include "grid.h"
+#include "mesh.h"
 #include "quad.h"
+#include "shader.h"
 #include "ui-grid.h"
+#include "view.h"
 
 #define UI_STROKE_MESH_MAX_SIZE 64
 #define UI_STROKE_NUM_MESHES 5     // 64, 32, 16, 8, 4

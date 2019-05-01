@@ -1,8 +1,6 @@
+#include "ui-stroke.h"
 #include <stdio.h>
 #include <string.h>
-#include "space.h"
-#include "matrix.h"
-#include "ui-stroke.h"
 
 const char UI_STROKE_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
@@ -25,9 +23,7 @@ const char UI_STROKE_VERTEX_SHADER_SOURCE[] =
 "	float style2 = texture2D(gridStyles, styleCoord2).a;\n"
 "\n"
 "	bool hexEdge = style + style2 >= 0.5;\n"
-"	bool areaInnerEdge = style == style2 && style >= 0.125;\n"
-"	float gridColor = areaInnerEdge ? 0.98 : 1.0;\n"
-"	color = hexEdge ? strokeColor : vec4(vec3(gridColor), 1.0);\n"
+"	color = hexEdge ? strokeColor : vec4(1.0);\n"
 "\n"
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
@@ -221,9 +217,9 @@ void ui_stroke_draw(UiStroke *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_STROKE_MESH_MAX_SIZE) {
 		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_STROKE_MESH_MAX_SIZE) {
-			vec2 v = space_hex_to_world(
-					space_hex_to_vec(
-					space_storage_to_hex(
+			vec2 v = view_hex_to_world(
+					hex_to_vec(
+					hex_from_storage(
 					hex_add(h, draw_quad.min))));
 
 			view_matrix->m[3][0] = (trans_x + v.x) / size_x;

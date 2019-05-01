@@ -2,17 +2,10 @@
 
 CFLAGS = -std=gnu11 -m32 -lm -Werror -Wall -Wextra
 EMSCRIPTEN_FLAGS = -lGLESv2 -g4 -s ALLOW_MEMORY_GROWTH=1 -s GL_DEBUG=1
-SRC = $(shell find . -name '*.c' | grep -v '\-test.c')
+SRC = $(shell bin/ls-src | grep -v '\.h')
 
-electron/core.js: $(SRC)
-	$(CC) -o $@ electron/core.c $(EMSCRIPTEN_FLAGS) $(CFLAGS)
-
-watch:
-	while true; do \
-		bin/make; \
-		echo '---'; \
-		inotifywait -qq -e close_write -e modify -e move -e create -e delete *.c electron/*.c .; \
-	done
+electron/sixcode.js: $(SRC)
+	$(CC) -o $@ electron/sixcode.c $(EMSCRIPTEN_FLAGS) $(CFLAGS)
 
 clean:
-	@rm -f electron/core.*
+	@rm -f electron/sixcode.js electron/sixcode.was*

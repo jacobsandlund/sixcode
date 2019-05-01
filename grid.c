@@ -1,8 +1,8 @@
+#include "grid.h"
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "grid.h"
 
 const Hex GRID_BLOCK_SIZE = {128, 64};
 
@@ -19,7 +19,7 @@ static void grid_set_quads(Grid *g, SizeQuad *storage_quad, Quad *quad)
 	Hex size_delta = {-2, -1};
 	grid_quad_to_styles_quad(&g->styles_quad, quad);
 	quad_resize_by_delta(&g->quad, &g->styles_quad, size_delta);
-	quad_to_storage_space_size_quad(storage_quad, &g->styles_quad);
+	quad_to_storage_size_quad(storage_quad, &g->styles_quad);
 }
 
 void grid_initialize(Grid *g, Quad *quad)

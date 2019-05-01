@@ -1,13 +1,12 @@
+#include "ui-points.c"
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
 #include "hex.c"
 #include "mesh.c"
-#include "shader.c"
-#include "space.c"
 #include "quad.c"
+#include "shader.c"
 #include "ui-grid.c"
-#include "ui-points.c"
 #include "view.c"
 
 TEST(ui)

@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include "valgrind.h"
 
-#define SIXCODE_ERROR(...) sixcode_error_for_test(__VA_ARGS__)
-
 #define _(...) log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)
 #define _dd(...) _("%d, %d\n", __VA_ARGS__)
@@ -124,7 +122,7 @@ void TPRINTF(const char *format, ...)
 	}
 }
 
-void sixcode_error_for_test(const char *format, ...)
+void log_error(const char *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);

@@ -1,6 +1,6 @@
+#include "shader.c"
 #include "test.h"
 #include "glmock.c"
-#include "shader.c"
 #include <string.h>
 
 TEST(shader_print_gl_error)

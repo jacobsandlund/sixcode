@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SixCode</title>
+  <title>Sixcode</title>
   <style>
     body {
       margin: 0;
@@ -23,17 +23,17 @@
         canvas: document.getElementById('canvas'),
     };
 
-    var isCoreInitialized = false;
+    var isSixcodeInitialized = false;
 
-    function core_initialized() {
-        isCoreInitialized = true;
+    function sixcode_initialized() {
+        isSixcodeInitialized = true;
     }
 
     function displayError(error) {
         document.body.innerHTML = '<pre class="error">' + error + '</pre>';
     }
   </script>
-  <script async type="text/javascript" src="core.js"></script>
+  <script async type="text/javascript" src="sixcode.js"></script>
   <script async type="text/javascript" src="ui.js"></script>
 </body>
 </html>

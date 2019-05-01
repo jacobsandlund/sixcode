@@ -2,7 +2,6 @@
 #define __MESH_H__
 
 #include "sixcode.h"
-#include "view.h"
 
 typedef struct {
 	f32 x;

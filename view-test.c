@@ -1,8 +1,49 @@
+#include "view.c"
 #include "test.h"
 #include "hex.c"
 #include "quad.c"
-#include "space.c"
-#include "view.c"
+
+TEST(view_screen_to_world)
+{
+	View vw = {
+		.viewport_size = {1000, 600},
+		.translation = {-100, -200},
+		.scale = 10,
+	};
+	vec2 v1 = {125.981, 275};
+	vec2 v2 = {980.3, 540};
+
+	_v2(view_screen_to_world(&vw, v1));
+	//=> -94.8038, 45
+
+	_v2(view_screen_to_world(&vw, v2));
+	//=> 76.06, -8
+}
+
+TEST(view_world_to_hex)
+{
+	vec2 v1 = {-94.8038, 45};
+	vec2 v2 = {76.06, -8};
+
+	_v2(view_world_to_hex(v1));
+	//=> -109.47, -30
+
+	_v2(view_world_to_hex(v2));
+	//=> 87.8265, 5.33333
+}
+
+TEST(view_hex_to_world)
+{
+	vec2 v1 = {-109.47, 30};
+	vec2 v2 = {87.8265, 5.333333333};
+
+	_v2(view_hex_to_world(v1));
+	//=> -94.8038, -45
+
+	_v2(view_hex_to_world(v2));
+	//=> 76.06, -8
+}
+
 
 TEST(view_zoom_at_screen_point)
 {

@@ -1,6 +1,5 @@
-#include <math.h>
 #include "quad.h"
-#include "space.h"
+#include <math.h>
 
 i8 quad_contains(Quad *q, Hex h)
 {
@@ -68,10 +67,10 @@ void quad_intersect(Quad *out_q, Quad *a, Quad *b)
 	out_q->max.r = a->max.r < b->max.r ? a->max.r : b->max.r;
 }
 
-void quad_space_hex_to_storage(Quad *out_q, Quad *q)
+void quad_hex_to_storage(Quad *out_q, Quad *q)
 {
-	out_q->min = space_hex_to_storage(q->min);
-	out_q->max = space_hex_to_storage(q->max);
+	out_q->min = hex_to_storage(q->min);
+	out_q->max = hex_to_storage(q->max);
 }
 
 void quad_to_size_quad(SizeQuad *out_sq, Quad *q)
@@ -83,11 +82,11 @@ void quad_to_size_quad(SizeQuad *out_sq, Quad *q)
 	};
 }
 
-void quad_to_storage_space_size_quad(SizeQuad *storage_quad, Quad *styles_quad)
+void quad_to_storage_size_quad(SizeQuad *storage_quad, Quad *styles_quad)
 {
-	Quad storage_space_quad;
-	quad_space_hex_to_storage(&storage_space_quad, styles_quad);
-	quad_to_size_quad(storage_quad, &storage_space_quad);
+	Quad q;
+	quad_hex_to_storage(&q, styles_quad);
+	quad_to_size_quad(storage_quad, &q);
 }
 
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq)

@@ -1,10 +1,6 @@
+#include "ui-fill.h"
 #include <stdio.h>
 #include <string.h>
-#include "space.h"
-#include "matrix.h"
-#include "ui-fill.h"
-
-#define UI_FILL_ZOOMED_OUT_CUTOFF 10.0f
 
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
@@ -190,11 +186,9 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			(f32) g->storage_quad.size.c,
 			(f32) g->storage_quad.size.r);
 
-	f32 styleOffset = vw->scale < UI_FILL_ZOOMED_OUT_CUTOFF ? 0.25f : 0.0f;
-
 	glUniform1f(
 			ui->uniforms.styleOffset,
-			styleOffset);
+			0.0f);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.grid_styles);
@@ -217,9 +211,9 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_FILL_MESH_MAX_SIZE) {
 		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_FILL_MESH_MAX_SIZE) {
-			vec2 v = space_hex_to_world(
-					space_hex_to_vec(
-					space_storage_to_hex(
+			vec2 v = view_hex_to_world(
+					hex_to_vec(
+					hex_from_storage(
 					hex_add(h, draw_quad.min))));
 
 			view_matrix->m[3][0] = (trans_x + v.x) / size_x;

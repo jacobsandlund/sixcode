@@ -14,8 +14,17 @@ typedef u_int8_t u8;
 typedef double f64;
 typedef float f32;
 
-#ifndef SIXCODE_ERROR
-	#define SIXCODE_ERROR(...) fprintf(stderr, __VA_ARGS__)
-#endif
+typedef struct {
+	f32 x;
+	f32 y;
+} vec2;
+
+typedef struct {
+	f32 m[4][4];
+} mat4;
+
+// log_error is defined in test.h and electron/sixcode.c
+void log_error(const char *format, ...);
+#define SIXCODE_ERROR(...) log_error(__VA_ARGS__)
 
 #endif // __SIXCODE_H__

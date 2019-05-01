@@ -1,3 +1,3 @@
 electron/node_modules/
-electron/core.*
-!electron/core.c
+electron/sixcode.*
+!electron/sixcode.c
