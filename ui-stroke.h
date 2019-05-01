@@ -2,7 +2,7 @@
 #define __UI_STROKE_H__
 
 #include "sixcode.h"
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "grid.h"
 #include "mesh.h"
 #include "quad.h"
