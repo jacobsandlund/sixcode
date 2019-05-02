@@ -15,26 +15,26 @@ EMSCRIPTEN_KEEPALIVE View *web_view_malloc()
 	return vw;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, f32 width, f32 height, f32 translation_x, f32 translation_y, f32 scale)
+EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, float width, float height, float translation_x, float translation_y, float scale)
 {
 	vw->viewport_size = (vec2) {width, height};
 	vw->translation = (vec2) {translation_x, translation_y};
 	vw->scale = scale;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_screen_point(View *vw, f32 x, f32 y, f32 new_scale)
+EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_screen_point(View *vw, float x, float y, float new_scale)
 {
 	vec2 v = {x, y};
 	view_zoom_at_screen_point(vw, v, new_scale);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_resize(View *vw, f32 width, f32 height)
+EMSCRIPTEN_KEEPALIVE void web_view_resize(View *vw, float width, float height)
 {
 	vec2 viewport_size = {width, height};
 	view_resize(vw, viewport_size);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_view_translate(View *vw, f32 delta_x, f32 delta_y)
+EMSCRIPTEN_KEEPALIVE void web_view_translate(View *vw, float delta_x, float delta_y)
 {
 	vec2 delta = {delta_x, delta_y};
 	view_translate(vw, delta);
@@ -105,7 +105,7 @@ EMSCRIPTEN_KEEPALIVE void web_core_tick(UiAll *ui, View *vw, Grid *g)
 	core_tick(ui, vw, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, f32 x, f32 y)
+EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, float x, float y)
 {
 	vec2 v = {x, y};
 	core_toggle_hex_at_point(ui, vw, g, v);

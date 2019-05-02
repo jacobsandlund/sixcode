@@ -81,7 +81,7 @@ TEST(ui_all_initialize_fail)
 	UiAll *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	GLmock.shaders[1].compiled = -1;
+	GLmock.shaders[1].force_compile_error = true;
 	grid_initialize(g, &quad);
 
 	_d(ui_all_initialize(ui, 0));

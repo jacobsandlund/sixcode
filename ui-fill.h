@@ -47,7 +47,7 @@ typedef struct {
 	InstanceMesh instance_mesh;
 } UiFill;
 
-i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid);
+bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid);
 void ui_fill_terminate(UiFill *ui);
 void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad);
 

@@ -67,7 +67,7 @@ TEST(shader_load_and_delete)
 	// Bad create
 
 	glmock_initialize();
-	GLmock.shader_i = -1;
+	GLmock.force_create_shader_error = true;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 
 	_d(shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__));
@@ -79,7 +79,7 @@ TEST(shader_load_and_delete)
 	// Bad compile
 
 	glmock_initialize();
-	GLmock.shaders[1].compiled = -1;
+	GLmock.shaders[1].force_compile_error = true;
 	GLmock.force_gl_error = GL_OUT_OF_MEMORY;
 	GLmock.force_info_log = "[Info Log] - Compilation failed";
 
@@ -146,7 +146,7 @@ TEST(shader_program_create_and_delete)
 	// Bad create
 
 	glmock_initialize();
-	GLmock.program_i = -1;
+	GLmock.force_create_program_error = true;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
@@ -210,7 +210,7 @@ TEST(shader_program_link)
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 	shader_program_create(&s, vertex, fragment, __FILE__, __LINE__);
-	GLmock.programs[s.program].linked = -1;
+	GLmock.programs[s.program].force_link_error = true;
 	GLmock.force_gl_error = GL_INVALID_VALUE;
 	GLmock.force_info_log = "[Info Log] Link program failed";
 

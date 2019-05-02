@@ -72,7 +72,7 @@ TEST(instance_mesh)
 	//=> 1
 	_d(m->vertices_capacity);
 	//=> 1
-	m->vertices[0].gridPositionOffset.r = 4;
+	m->vertices[0].gridPositionOffset.y = 4;
 
 	instance_mesh_resize(m, 6);
 
@@ -80,7 +80,7 @@ TEST(instance_mesh)
 	//=> 6
 	_d(m->vertices_capacity);
 	//=> 6
-	m->vertices[5].gridPositionOffset.r = 6;
+	m->vertices[5].gridPositionOffset.y = 6;
 
 	instance_mesh_resize(m, 3);
 
@@ -88,7 +88,7 @@ TEST(instance_mesh)
 	//=> 3
 	_d(m->vertices_capacity);
 	//=> 6
-	_d(m->vertices[5].gridPositionOffset.r);
+	_d(m->vertices[5].gridPositionOffset.y);
 	//=> 6
 
 	instance_mesh_terminate(m);

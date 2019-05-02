@@ -3,15 +3,15 @@
 
 Hex hex_round(vec2 v)
 {
-	f64 r = v.y;
-	f64 q = (v.x - v.y) / 2.0;
-	f64 s = -q - r;
-	i32 qi = lround(q);
-	i32 ri = lround(r);
-	i32 si = lround(s);
-	f64 q_diff = fabs(qi - q);
-	f64 r_diff = fabs(ri - r);
-	f64 s_diff = fabs(si - s);
+	double r = v.y;
+	double q = (v.x - v.y) / 2.0;
+	double s = -q - r;
+	int qi = lround(q);
+	int ri = lround(r);
+	int si = lround(s);
+	double q_diff = fabs(qi - q);
+	double r_diff = fabs(ri - r);
+	double s_diff = fabs(si - s);
 
 	if (q_diff > r_diff && q_diff > s_diff) {
 		qi = -ri - si;

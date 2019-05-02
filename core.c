@@ -24,7 +24,7 @@ void core_tick(UiAll *ui, View *vw, Grid *g)
 	ui_all_draw(ui, vw, g);
 }
 
-i8 core_grid_expand_for_hex(Grid *g, Hex h)
+bool core_grid_expand_for_hex(Grid *g, Hex h)
 {
 	Quad expanded;
 	quad_expand_for_hex(&expanded, &g->quad, h);
@@ -36,12 +36,12 @@ i8 core_grid_expand_for_hex(Grid *g, Hex h)
 	quad_to_storage_size_quad(&sq, &styles_quad);
 
 	if (sq.size.c > UI_GRID_MAX_TEXTURE_SIZE || sq.size.r > UI_GRID_MAX_TEXTURE_SIZE) {
-		return 0;
+		return false;
 	}
 
 	grid_expand_quad(g, &expanded);
 
-	return 1;
+	return true;
 }
 
 void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
@@ -51,7 +51,7 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 	Hex h = hex_round(view_world_to_hex(
 			view_screen_to_world(vw, v)));
 
-	i8 expanded = 0;
+	bool expanded = false;
 
 	if (!quad_contains(&g->quad, h)) {
 		expanded = core_grid_expand_for_hex(g, h);

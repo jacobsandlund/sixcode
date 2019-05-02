@@ -14,8 +14,8 @@ typedef struct {
 	Hex size;
 } SizeQuad;
 
-i8 quad_contains(Quad *q, Hex h);
-i8 quad_contains_quad(Quad *outer, Quad *inner);
+bool quad_contains(Quad *q, Hex h);
+bool quad_contains_quad(Quad *outer, Quad *inner);
 void quad_from_hexes(Quad *q, Hex h1, Hex h2);
 void quad_expand_for_hex(Quad *out_q, Quad *q, Hex h);
 void quad_expand_for_quad(Quad *out_q, Quad *a, Quad *b);
@@ -28,6 +28,6 @@ void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
 void quad_to_storage_size_quad(SizeQuad *out_sq, Quad *q);
 
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
-i32 size_quad_capacity(SizeQuad *sq);
+int size_quad_capacity(SizeQuad *sq);
 
 #endif // __QUAD_H__

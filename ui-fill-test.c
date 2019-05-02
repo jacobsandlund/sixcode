@@ -181,7 +181,7 @@ TEST(ui_initialize_fail)
 
 	glmock_initialize();
 	ui_grid_initialize(ui_grid, 1024);
-	GLmock.shaders[ui_grid->fragment_shader + 1].compiled = -1;
+	GLmock.shaders[ui_grid->fragment_shader + 1].force_compile_error = true;
 
 	_d(ui_fill_initialize(ui, ui_grid));
 	//=> 0
@@ -192,7 +192,7 @@ TEST(ui_initialize_fail)
 	ui_grid_terminate(ui_grid);
 	glmock_initialize();
 	ui_grid_initialize(ui_grid, 1024);
-	GLmock.programs[1].linked = -1;
+	GLmock.programs[1].force_link_error = true;
 
 	_d(ui_fill_initialize(ui, ui_grid));
 	//=> 0
@@ -304,17 +304,17 @@ TEST(ui_draw_fill)
 
 	_v2(imesh->vertices[0].positionOffset);
 	//=> 0, -0
-	_hx(imesh->vertices[0].gridPositionOffset);
+	_i2(imesh->vertices[0].gridPositionOffset);
 	//=> 17, 0
 
 	_v2(imesh->vertices[104].positionOffset);
 	//=> 193.99, -72
-	_hx(imesh->vertices[104].gridPositionOffset);
+	_i2(imesh->vertices[104].gridPositionOffset);
 	//=> 129, 48
 
 	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
 	_d(instance_buffer->size);
-	//=> 1260
+	//=> 1680
 	_d(instance_buffer->data == ui->meshes[0].vertices);
 	//=> 0
 	_d(instance_buffer->usage == GL_STREAM_DRAW);
@@ -330,7 +330,7 @@ TEST(ui_draw_fill)
 	_d(positionOffset->type == GL_FLOAT);
 	//=> 1
 	_d(positionOffset->stride);
-	//=> 12
+	//=> 16
 	_d(positionOffset->offset);
 	//=> 0
 	_d(positionOffset->divisor);
@@ -343,7 +343,7 @@ TEST(ui_draw_fill)
 	_d(gridPositionOffset->type == GL_SHORT);
 	//=> 1
 	_d(gridPositionOffset->stride);
-	//=> 12
+	//=> 16
 	_d(gridPositionOffset->offset);
 	//=> 8
 	_d(gridPositionOffset->divisor);

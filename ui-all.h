@@ -12,7 +12,7 @@ typedef struct {
 	UiFill fill;
 } UiAll;
 
-i8 ui_all_initialize(UiAll *ui, i32 styles_buffer_capacity_max);
+bool ui_all_initialize(UiAll *ui, int styles_buffer_capacity_max);
 void ui_all_terminate(UiAll *ui);
 void ui_all_draw(UiAll *ui, View *vw, Grid *g);
 

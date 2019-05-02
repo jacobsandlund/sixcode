@@ -38,7 +38,7 @@ const u8 UI_GRID_FILL_COLORS[UI_GRID_FILL_COLOR_COMPONENTS_LENGTH] = {
 	220, 190, 140,
 };
 
-i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max)
+bool ui_grid_initialize(UiGrid *ui, int styles_buffer_capacity_max)
 {
 	////////////////////////
 	// load/create
@@ -46,7 +46,7 @@ i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max)
 	ui->fragment_shader = shader_load(GL_FRAGMENT_SHADER, UI_GRID_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 
 	if (!ui->fragment_shader) {
-		return 0;
+		return false;
 	}
 
 	////////////////
@@ -92,13 +92,13 @@ i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max)
 	///////////////////////
 	// view_matrix
 
-	for (i32 i = 0; i < 4; i++) {
-		for (i32 j = 0; j < 4; j++) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
 			ui->view_matrix.m[i][j] = 0.0f;
 		}
 	}
 
-	return 1;
+	return true;
 }
 
 void ui_grid_terminate(UiGrid *ui)
@@ -112,11 +112,11 @@ void ui_grid_terminate(UiGrid *ui)
 
 void ui_grid_update_view_matrix(UiGrid *ui, View *vw, vec2 draw_offset)
 {
-	f64 scale_inv = 1.0 / (f64) vw->scale;
-	f64 size_x = vw->viewport_size.x;
-	f64 size_y = vw->viewport_size.y;
-	f64 trans_x = -vw->translation.x * scale_inv * 2.0;
-	f64 trans_y = vw->translation.y * scale_inv * 2.0;
+	double scale_inv = 1.0 / (double) vw->scale;
+	double size_x = vw->viewport_size.x;
+	double size_y = vw->viewport_size.y;
+	double trans_x = -vw->translation.x * scale_inv * 2.0;
+	double trans_y = vw->translation.y * scale_inv * 2.0;
 
 	ui->view_matrix.m[0][0] = 1.0 / size_x;
 	ui->view_matrix.m[1][1] = 1.0 / size_y;
@@ -154,7 +154,7 @@ void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 {
 	SizeQuad sq;
 	quad_to_storage_size_quad(&sq, quad);
-	i32 need_capacity = size_quad_capacity(&sq);
+	int need_capacity = size_quad_capacity(&sq);
 
 	if (need_capacity > ui->styles_buffer_capacity) {
 		if (need_capacity > ui->styles_buffer_capacity_max) {
@@ -170,11 +170,11 @@ void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 	}
 
 	Hex min = hex_sub(sq.min, g->storage_quad.min);
-	i32 storage_size_c = g->storage_quad.size.c;
+	int storage_size_c = g->storage_quad.size.c;
 
-	for (i32 r = 0; r < sq.size.r; ++r) {
+	for (int r = 0; r < sq.size.r; ++r) {
 		u8 *dest = &ui->styles_buffer[r * sq.size.c];
-		i32 src_i = (r + min.r) * storage_size_c + min.c;
+		int src_i = (r + min.r) * storage_size_c + min.c;
 		const u8 *src = &g->styles[src_i];
 
 		memcpy(dest, src, sq.size.c);

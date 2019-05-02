@@ -2,18 +2,18 @@
 
 #define UI_ALL_NUM_COMPONENTS 1
 
-i8 ui_all_initialize(UiAll *ui, i32 styles_buffer_capacity_max)
+bool ui_all_initialize(UiAll *ui, int styles_buffer_capacity_max)
 {
 	if (!ui_grid_initialize(&ui->grid, styles_buffer_capacity_max)) {
-		return 0;
+		return false;
 	}
 
-	i8 initialized[UI_ALL_NUM_COMPONENTS] = {
+	bool initialized[UI_ALL_NUM_COMPONENTS] = {
 		[0] = ui_fill_initialize(&ui->fill, &ui->grid),
 	};
 
-	i32 count = 0;
-	for (i32 i = 0; i < UI_ALL_NUM_COMPONENTS; ++i) {
+	int count = 0;
+	for (int i = 0; i < UI_ALL_NUM_COMPONENTS; ++i) {
 		if (initialized[i]) {
 			++count;
 		}
@@ -26,10 +26,10 @@ i8 ui_all_initialize(UiAll *ui, i32 styles_buffer_capacity_max)
 
 		ui_grid_terminate(&ui->grid);
 
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
 void ui_all_terminate(UiAll *ui)

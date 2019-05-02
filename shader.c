@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void shader_print_gl_error(const char *filename, i32 line)
+void shader_print_gl_error(const char *filename, int line)
 {
 	GLenum error;
 	while ((error = glGetError()) != GL_NO_ERROR) {
@@ -23,13 +23,13 @@ void shader_print_gl_error(const char *filename, i32 line)
 			SIXCODE_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
 			break;
 		default:
-			SIXCODE_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (i32) error);
+			SIXCODE_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (int) error);
 			break;
 		}
 	}
 }
 
-GLuint shader_load(GLenum type, const char *shader_source, const char *filename, i32 line)
+GLuint shader_load(GLenum type, const char *shader_source, const char *filename, int line)
 {
 	GLuint shader = glCreateShader(type);
 
@@ -67,10 +67,10 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 	return shader;
 }
 
-i8 shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, i32 line)
+bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, int line)
 {
 	if (!vertex || !fragment) {
-		return 0;
+		return false;
 	}
 
 	s->vertex = vertex;
@@ -81,16 +81,16 @@ i8 shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const
 		shader_print_gl_error(filename, line);
 		SIXCODE_ERROR("Error creating program.\n");
 
-		return 0;
+		return false;
 	}
 
 	glAttachShader(s->program, s->vertex);
 	glAttachShader(s->program, s->fragment);
 
-	return 1;
+	return true;
 }
 
-i8 shader_program_link(ShaderProgram *s, const char *filename, i32 line)
+bool shader_program_link(ShaderProgram *s, const char *filename, int line)
 {
 	glLinkProgram(s->program);
 
@@ -113,10 +113,10 @@ i8 shader_program_link(ShaderProgram *s, const char *filename, i32 line)
 		shader_print_gl_error(filename, line);
 		shader_program_delete(s);
 
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
 void shader_program_delete(ShaderProgram *s)

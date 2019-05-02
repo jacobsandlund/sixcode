@@ -24,7 +24,7 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "	gl_Position = viewMatrix * vec4(position + positionOffset, 0.0, 1.0);\n"
 "}\n";
 
-i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
+bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 {
 	ui->ui_grid = ui_grid;
 
@@ -39,7 +39,7 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	) {
 		glDeleteShader(vertex_shader);
 
-		return 0;
+		return false;
 	}
 
 	////////////////////
@@ -87,9 +87,9 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	//////////////////
 	// mesh + buffers
 
-	i32 size = UI_FILL_MESH_MAX_SIZE;
+	int size = UI_FILL_MESH_MAX_SIZE;
 
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
+	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
 		FillMesh *mesh = &ui->meshes[i];
 		UiFillBuffers *buffers = &ui->buffers[i];
 
@@ -117,7 +117,7 @@ i8 ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	instance_mesh_initialize(&ui->instance_mesh, 32);
 	glGenBuffers(1, &ui->instanceBuffer);
 	
-	return 1;
+	return true;
 }
 
 void ui_fill_terminate(UiFill *ui)
@@ -125,7 +125,7 @@ void ui_fill_terminate(UiFill *ui)
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
 
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
+	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
 		fill_mesh_terminate(&ui->meshes[i]);
 
 		glDeleteBuffers(1, &ui->buffers[i].vertices);
@@ -136,9 +136,9 @@ void ui_fill_terminate(UiFill *ui)
 	glDeleteBuffers(1, &ui->instanceBuffer);
 }
 
-static i32 ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
+static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
 {
-	for (i32 i = 0; i < UI_FILL_NUM_MESHES; ++i) {
+	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
 		if (
 			draw_quad->size.c > ui->meshes[i].size_c ||
 			draw_quad->size.r > ui->meshes[i].size_r
@@ -159,7 +159,7 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	SizeQuad draw_quad;
 	ui_grid_size_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
 
-	i32 mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
+	int mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
 	FillMesh *mesh = &ui->meshes[mesh_index];
 	UiFillBuffers *buffers = &ui->buffers[mesh_index];
 
@@ -190,8 +190,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	glUniform2f(
 			ui->uniforms.gridSize,
-			(f32) g->storage_quad.size.c,
-			(f32) g->storage_quad.size.r);
+			(float) g->storage_quad.size.c,
+			(float) g->storage_quad.size.r);
 
 	glUniform1f(
 			ui->uniforms.styleOffset,
@@ -220,14 +220,14 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	InstanceMesh *imesh = &ui->instance_mesh;
 
-	i32 num_instances = (
+	int num_instances = (
 		((draw_quad.size.r - 1) / UI_FILL_MESH_MAX_SIZE + 1) *
 		((draw_quad.size.c - 1) / UI_FILL_MESH_MAX_SIZE + 1)
 	);
 	instance_mesh_resize(imesh, num_instances);
 
 	Hex h;
-	i32 i = 0;
+	int i = 0;
 	Hex draw_quad_min_offset = hex_sub(draw_quad.min, g->storage_quad.min);
 
 	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_FILL_MESH_MAX_SIZE) {
@@ -238,7 +238,9 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 					hex_to_vec(
 					hex_from_storage(h)));
 
-			vx->gridPositionOffset = hex_add(h, draw_quad_min_offset);
+			Hex grid_offset = hex_add(h, draw_quad_min_offset);
+			vx->gridPositionOffset.x = grid_offset.c;
+			vx->gridPositionOffset.y = grid_offset.r;
 			i++;
 		}
 	}

@@ -11,9 +11,10 @@
 #define GLMOCK_MAX_TEXTURE_PARAMETERS 4
 
 typedef struct {
-	i8 created;
-	i8 deleted;
-	i8 compiled;
+	bool created;
+	bool deleted;
+	bool compiled;
+	bool force_compile_error;
 	GLenum shaderType;
 	const char *source;
 } GLmockShader;
@@ -25,7 +26,7 @@ typedef struct {
 	GLsizei stride;
 	GLsizei offset;
 	GLuint divisor;
-	i8 enabled_vertex_attrib_array;
+	bool enabled_vertex_attrib_array;
 
 	GLfloat v0;
 	GLfloat v1;
@@ -44,37 +45,38 @@ typedef struct {
 } GLmockUniform;
 
 typedef struct {
-	i8 created;
-	i8 deleted;
-	i8 linked;
-	i32 attached_vertex_shader;
-	i32 attached_fragment_shader;
+	bool created;
+	bool deleted;
+	bool linked;
+	bool force_link_error;
+	int attached_vertex_shader;
+	int attached_fragment_shader;
 
-	i32 uniform_i;
-	i32 attributes_i;
+	int uniform_i;
+	int attributes_i;
 	GLmockUniform uniforms[GLMOCK_MAX_ATTRIBUTES];
 	GLmockAttribute attributes[GLMOCK_MAX_ATTRIBUTES];
 } GLmockProgram;
 
 typedef struct {
-	i8 created;
-	i8 deleted;
+	bool created;
+	bool deleted;
 	const GLvoid *data;
 	GLsizeiptr size;
 	GLenum usage;
 } GLmockBuffer;
 
 typedef struct {
-	i8 created;
-	i8 deleted;
-	i32 width;
-	i32 height;
+	bool created;
+	bool deleted;
+	int width;
+	int height;
 	GLenum format;
 	GLenum type;
 	const GLvoid *data;
 	GLint parameters[GLMOCK_MAX_TEXTURE_PARAMETERS];
-	i32 xoffset;
-	i32 yoffset;
+	int xoffset;
+	int yoffset;
 } GLmockTexture;
 
 typedef struct {
@@ -90,12 +92,14 @@ typedef struct {
 	GLsizei draw_arrays_count;
 
 	GLenum force_gl_error;
+	bool force_create_program_error;
+	bool force_create_shader_error;
 	const char *force_info_log;
 
-	i32 buffer_i;
-	i32 program_i;
-	i32 shader_i;
-	i32 texture_i;
+	int buffer_i;
+	int program_i;
+	int shader_i;
+	int texture_i;
 
 	GLenum active_texture;
 	GLuint using_program;
@@ -115,24 +119,24 @@ void glmock_initialize()
 	GLmock = (GLmockGlobal) {};
 }
 
-static i32 glmock_buffer_target_i(GLenum target)
+static int glmock_buffer_target_i(GLenum target)
 {
 	return target == GL_ARRAY_BUFFER ? 0 : 1;
 }
 
-static i32 glmock_texture_i()
+static int glmock_texture_i()
 {
 	return GLmock.active_texture - GL_TEXTURE0;
 }
 
-static i32 glmock_texture_parameter_i(GLenum pname)
+static int glmock_texture_parameter_i(GLenum pname)
 {
 	return pname - GL_TEXTURE_MAG_FILTER;
 }
 
 GLint glmock_get_tex_parameter(GLuint texture, GLenum pname)
 {
-	i32 param_i = glmock_texture_parameter_i(pname);
+	int param_i = glmock_texture_parameter_i(pname);
 	return GLmock.textures[texture].parameters[param_i];
 }
 
@@ -185,20 +189,28 @@ void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 
 void glCompileShader(GLuint shader)
 {
-	++GLmock.shaders[shader].compiled;
+	GLmock.shaders[shader].compiled = !GLmock.shaders[shader].force_compile_error;
 }
 
 GLuint glCreateProgram()
 {
-	++GLmock.program_i;
-	GLmock.programs[GLmock.program_i].created = 1;
+	if (GLmock.force_create_program_error) {
+		return 0;
+	}
+
+	GLmock.program_i++;
+	GLmock.programs[GLmock.program_i].created = true;
 	return GLmock.program_i;
 }
 	
 GLuint glCreateShader(GLenum shaderType)
 {
-	++GLmock.shader_i;
-	GLmock.shaders[GLmock.shader_i].created = 1;
+	if (GLmock.force_create_shader_error) {
+		return 0;
+	}
+
+	GLmock.shader_i++;
+	GLmock.shaders[GLmock.shader_i].created = true;
 	GLmock.shaders[GLmock.shader_i].shaderType = shaderType;
 	return GLmock.shader_i;
 }
@@ -206,23 +218,23 @@ GLuint glCreateShader(GLenum shaderType)
 void glDeleteBuffers(GLsizei n, const GLuint *buffers)
 {
 	(void) n;
-	GLmock.buffers[buffers[0]].deleted = 1;
+	GLmock.buffers[buffers[0]].deleted = true;
 }
 
 void glDeleteTextures(GLsizei n, const GLuint *textures)
 {
 	(void) n;
-	GLmock.textures[textures[0]].deleted = 1;
+	GLmock.textures[textures[0]].deleted = true;
 }
 
 void glDeleteProgram(GLuint program)
 {
-	GLmock.programs[program].deleted = 1;
+	GLmock.programs[program].deleted = true;
 }
 
 void glDeleteShader(GLuint shader)
 {
-	GLmock.shaders[shader].deleted = 1;
+	GLmock.shaders[shader].deleted = true;
 }
 
 void glDetachShader(GLuint program, GLuint shader)
@@ -261,22 +273,22 @@ void glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvo
 void glEnableVertexAttribArray(GLuint index)
 {
 	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
-	p->attributes[index].enabled_vertex_attrib_array = 1;
+	p->attributes[index].enabled_vertex_attrib_array = true;
 }
 
 void glGenBuffers(GLsizei n, GLuint *buffers)
 {
 	(void) n;
-	++GLmock.buffer_i;
-	GLmock.buffers[GLmock.buffer_i].created = 1;
+	GLmock.buffer_i++;
+	GLmock.buffers[GLmock.buffer_i].created = true;
 	buffers[0] = GLmock.buffer_i;
 }
 
 void glGenTextures(GLsizei n, GLuint *textures)
 {
 	(void) n;
-	++GLmock.texture_i;
-	GLmock.textures[GLmock.texture_i].created = 1;
+	GLmock.texture_i++;
+	GLmock.textures[GLmock.texture_i].created = true;
 	textures[0] = GLmock.texture_i;
 }
 
@@ -349,7 +361,7 @@ void glGetShaderiv(GLuint shader, GLenum pname, GLint *params)
 GLint glGetAttribLocation(GLuint program, const GLchar *name)
 {
 	GLmockProgram *p = &GLmock.programs[program];
-	++p->attributes_i;
+	p->attributes_i++;
 	p->attributes[p->attributes_i].name = name;
 	return p->attributes_i;
 }
@@ -357,14 +369,14 @@ GLint glGetAttribLocation(GLuint program, const GLchar *name)
 GLint glGetUniformLocation(GLuint program, const GLchar *name)
 {
 	GLmockProgram *p = &GLmock.programs[program];
-	++p->uniform_i;
+	p->uniform_i++;
 	p->uniforms[p->uniform_i].name = name;
 	return p->uniform_i;
 }
 
 void glLinkProgram(GLuint program)
 {
-	++GLmock.programs[program].linked;
+	GLmock.programs[program].linked = !GLmock.programs[program].force_link_error;
 }
 	
 void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, const GLint *length)
@@ -410,7 +422,7 @@ void glTexParameteri(GLenum target, GLenum pname, GLint param)
 {
 	(void) target;
 	GLuint texture_i = GLmock.bound_textures[glmock_texture_i()];
-	i32 param_i = glmock_texture_parameter_i(pname);
+	int param_i = glmock_texture_parameter_i(pname);
 	GLmock.textures[texture_i].parameters[param_i] = param;
 }
 

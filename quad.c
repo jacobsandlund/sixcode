@@ -1,7 +1,7 @@
 #include "quad.h"
 #include <math.h>
 
-i8 quad_contains(Quad *q, Hex h)
+bool quad_contains(Quad *q, Hex h)
 {
 	return (
 		q->min.c <= h.c && h.c <= q->max.c &&
@@ -9,7 +9,7 @@ i8 quad_contains(Quad *q, Hex h)
 	);
 }
 
-i8 quad_contains_quad(Quad *outer, Quad *inner)
+bool quad_contains_quad(Quad *outer, Quad *inner)
 {
 	return (
 		outer->min.c <= inner->min.c &&
@@ -91,14 +91,14 @@ void quad_to_storage_size_quad(SizeQuad *storage_quad, Quad *styles_quad)
 
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq)
 {
-	i8 odd_row = sq->min.r & 1;
+	int odd_row = sq->min.r & 1;
 	out_sq->min.c = sq->min.c;
 	out_sq->min.r = sq->min.r & ~1;
 	out_sq->size.c = sq->size.c;
 	out_sq->size.r = sq->size.r + odd_row;
 }
 
-i32 size_quad_capacity(SizeQuad *sq)
+int size_quad_capacity(SizeQuad *sq)
 {
 	return sq->size.c * sq->size.r;
 }

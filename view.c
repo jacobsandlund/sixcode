@@ -5,7 +5,7 @@
 #define VIEW_HEX_TOP_POINT_CUTOFF 0.3333333333333333
 #define VIEW_HEX_BOTTOM_POINT_CUTOFF 0.6666666666666666
 
-static const f64 VIEW_DOUBLE_EPSILON = 1e-9;
+static const double VIEW_DOUBLE_EPSILON = 1e-9;
 
 vec2 view_screen_to_world(View *vw, vec2 v)
 {
@@ -15,8 +15,8 @@ vec2 view_screen_to_world(View *vw, vec2 v)
 	};
 
 	return (vec2) {
-		(f64) v_moved.x / (f64) vw->scale * 2.0,
-		(f64) v_moved.y / (f64) vw->scale * 2.0,
+		(double) v_moved.x / (double) vw->scale * 2.0,
+		(double) v_moved.y / (double) vw->scale * 2.0,
 	};
 }
 
@@ -36,13 +36,13 @@ vec2 view_hex_to_world(vec2 v)
 	};
 }
 
-void view_zoom_at_screen_point(View *vw, vec2 v, f32 new_scale)
+void view_zoom_at_screen_point(View *vw, vec2 v, float new_scale)
 {
 	vec2 v_world = view_screen_to_world(vw, v);
-	f64 scale_factor = (f64) (new_scale - vw->scale) / 2.0;
+	double scale_factor = (double) (new_scale - vw->scale) / 2.0;
 
-	vw->translation.x += (f64) v_world.x * scale_factor;
-	vw->translation.y -= (f64) v_world.y * scale_factor;
+	vw->translation.x += (double) v_world.x * scale_factor;
+	vw->translation.y -= (double) v_world.y * scale_factor;
 	vw->scale = new_scale;
 }
 
@@ -69,10 +69,10 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 	vec2 bottom_right = view_world_to_hex(
 			view_screen_to_world(vw, bottom_right_point));
 
-	i32 top = floor(top_left.y);
-	i32 left = floor(top_left.x);
-	i32 bottom = floor(bottom_right.y);
-	i32 right = ceil((f64) bottom_right.x + VIEW_DOUBLE_EPSILON);
+	int top = floor(top_left.y);
+	int left = floor(top_left.x);
+	int bottom = floor(bottom_right.y);
+	int right = ceil((double) bottom_right.x + VIEW_DOUBLE_EPSILON);
 
 	top += top_left.y - top > VIEW_HEX_BOTTOM_POINT_CUTOFF;
 	bottom += bottom_right.y - bottom > VIEW_HEX_TOP_POINT_CUTOFF;

@@ -103,7 +103,7 @@ TEST(ui_grid_initialize_fail)
 	UiGrid *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	GLmock.shaders[1].compiled = -1;
+	GLmock.shaders[1].force_compile_error = true;
 
 	_d(ui_grid_initialize(ui, 0));
 	//=> 0

@@ -22,11 +22,11 @@ typedef struct {
 	mat4 view_matrix;
 
 	u8 *styles_buffer;
-	i32 styles_buffer_capacity;
-	i32 styles_buffer_capacity_max;
+	int styles_buffer_capacity;
+	int styles_buffer_capacity_max;
 } UiGrid;
 
-i8 ui_grid_initialize(UiGrid *ui, i32 styles_buffer_capacity_max);
+bool ui_grid_initialize(UiGrid *ui, int styles_buffer_capacity_max);
 void ui_grid_terminate(UiGrid *ui);
 void ui_grid_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad);
 void ui_grid_update_view_matrix(UiGrid *ui, View *vw, vec2 draw_offset);

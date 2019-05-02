@@ -25,7 +25,7 @@ static void grid_set_quads(Grid *g, SizeQuad *storage_quad, Quad *quad)
 void grid_initialize(Grid *g, Quad *quad)
 {
 	grid_set_quads(g, &g->storage_quad, quad);
-	i32 capacity = size_quad_capacity(&g->storage_quad);
+	int capacity = size_quad_capacity(&g->storage_quad);
 	g->styles = calloc(capacity, sizeof *g->styles);
 }
 
@@ -34,11 +34,11 @@ void grid_terminate(Grid *g)
 	free(g->styles);
 }
 
-static i32 grid_index(Grid *g, Hex h)
+static int grid_index(Grid *g, Hex h)
 {
 	assert(quad_contains(&g->quad, h));
-	i32 diff_min_c = (h.c >> 1) - g->storage_quad.min.c;
-	i32 diff_min_r = h.r - g->storage_quad.min.r;
+	int diff_min_c = (h.c >> 1) - g->storage_quad.min.c;
+	int diff_min_r = h.r - g->storage_quad.min.r;
 	return diff_min_c + diff_min_r * g->storage_quad.size.c;
 }
 
@@ -51,14 +51,14 @@ u8 grid_get(Grid *g, Hex h)
 void grid_set(Grid *g, Hex h, u8 style)
 {
 	assert(quad_contains(&g->quad, h));
-	i32 i = grid_index(g, h);
+	int i = grid_index(g, h);
 	g->styles[i] = style;
 }
 
 void grid_clear(Grid *g, Hex h)
 {
 	assert(quad_contains(&g->quad, h));
-	i32 i = grid_index(g, h);
+	int i = grid_index(g, h);
 	g->styles[i] = 0;
 }
 
@@ -69,15 +69,15 @@ void grid_expand_quad(Grid *g, Quad *quad)
 	SizeQuad new_storage_quad;
 	grid_set_quads(g, &new_storage_quad, quad);
 
-	i32 capacity = size_quad_capacity(&new_storage_quad);
+	int capacity = size_quad_capacity(&new_storage_quad);
 	u8 *new_styles = calloc(capacity, sizeof *new_styles);
 
 	Hex min = hex_sub(g->storage_quad.min, new_storage_quad.min);
 	Hex old_size = g->storage_quad.size;
-	i32 new_size_c = new_storage_quad.size.c;
+	int new_size_c = new_storage_quad.size.c;
 
-	for (i32 r = 0; r < old_size.r; ++r) {
-		i32 dest_i = (r + min.r) * new_size_c + min.c;
+	for (int r = 0; r < old_size.r; ++r) {
+		int dest_i = (r + min.r) * new_size_c + min.c;
 		u8 *dest = &new_styles[dest_i];
 		const u8 *src = &g->styles[r * old_size.c];
 

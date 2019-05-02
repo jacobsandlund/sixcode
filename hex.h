@@ -4,8 +4,8 @@
 #include "sixcode.h"
 
 typedef struct {
-	i16 c;
-	i16 r;
+	i32 c;
+	i32 r;
 } Hex;
 
 Hex hex_round(vec2 v);
