@@ -19,8 +19,6 @@ typedef struct {
 	GLuint fragment_shader;
 	UiGridTextures textures;
 
-	mat4 view_matrix;
-
 	u8 *styles_buffer;
 	int styles_buffer_capacity;
 	int styles_buffer_capacity_max;
@@ -29,7 +27,6 @@ typedef struct {
 bool ui_grid_initialize(UiGrid *ui, int styles_buffer_capacity_max);
 void ui_grid_terminate(UiGrid *ui);
 void ui_grid_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad);
-void ui_grid_update_view_matrix(UiGrid *ui, View *vw, vec2 draw_offset);
 void ui_grid_update_styles(UiGrid *ui, Grid *g);
 void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad);
 

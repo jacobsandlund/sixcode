@@ -89,15 +89,6 @@ bool ui_grid_initialize(UiGrid *ui, int styles_buffer_capacity_max)
 	ui->styles_buffer_capacity = UI_GRID_STYLES_BUFFER_CAPACITY_MIN;
 	ui->styles_buffer_capacity_max = styles_buffer_capacity_max;
 
-	///////////////////////
-	// view_matrix
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			ui->view_matrix.m[i][j] = 0.0f;
-		}
-	}
-
 	return true;
 }
 
@@ -108,21 +99,6 @@ void ui_grid_terminate(UiGrid *ui)
 	glDeleteTextures(1, &ui->textures.fill_colors);
 
 	free(ui->styles_buffer);
-}
-
-void ui_grid_update_view_matrix(UiGrid *ui, View *vw, vec2 draw_offset)
-{
-	double scale_inv = 1.0 / (double) vw->scale;
-	double size_x = vw->viewport_size.x;
-	double size_y = vw->viewport_size.y;
-	double trans_x = -vw->translation.x * scale_inv * 2.0;
-	double trans_y = vw->translation.y * scale_inv * 2.0;
-
-	ui->view_matrix.m[0][0] = 1.0 / size_x;
-	ui->view_matrix.m[1][1] = 1.0 / size_y;
-	ui->view_matrix.m[3][0] = (trans_x + draw_offset.x) / size_x;
-	ui->view_matrix.m[3][1] = (trans_y + draw_offset.y) / size_y;
-	ui->view_matrix.m[3][3] = scale_inv;
 }
 
 void ui_grid_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)

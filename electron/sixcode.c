@@ -17,9 +17,9 @@ EMSCRIPTEN_KEEPALIVE View *web_view_malloc()
 
 EMSCRIPTEN_KEEPALIVE void web_view_initialize(View *vw, float width, float height, float translation_x, float translation_y, float scale)
 {
-	vw->viewport_size = (vec2) {width, height};
-	vw->translation = (vec2) {translation_x, translation_y};
-	vw->scale = scale;
+	vec2 viewport_size = {width, height};
+	vec2 translation = {translation_x, translation_y};
+	view_initialize(vw, viewport_size, translation, scale);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_view_zoom_at_screen_point(View *vw, float x, float y, float new_scale)

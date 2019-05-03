@@ -79,12 +79,6 @@ TEST(ui_grid)
 	_d(ui->styles_buffer_capacity_max);
 	//=> 1024
 
-	///////////////////////
-	// view_matrix
-
-	_gggg(ui->view_matrix.m[0][0], ui->view_matrix.m[1][0], ui->view_matrix.m[2][3], ui->view_matrix.m[3][3]);
-	//=> 0, 0, 0, 0
-
 	////////////////////////////
 	// terminate
 
@@ -135,35 +129,6 @@ TEST(ui_grid_size_quad_for_draw)
 
 	_sq(out_sq);
 	//=> (2, 4), (28, 26)
-}
-
-TEST(ui_grid_update_view_matrix)
-{
-	View vw = {
-		.viewport_size = {1000, 600},
-		.translation = {100, 100},
-		.scale = 10.0,
-	};
-	UiGrid *ui = malloc(sizeof *ui);
-
-	glmock_initialize();
-	ui_grid_initialize(ui, 0);
-
-	vec2 offset = {93.0f, -13.0f};
-	ui_grid_update_view_matrix(ui, &vw, offset);
-
-	mat4 *m = &ui->view_matrix;
-	_gggg(m->m[0][0], m->m[0][1], m->m[0][2], m->m[0][3]);
-	//=> 0.001, 0, 0, 0
-	_gggg(m->m[1][0], m->m[1][1], m->m[1][2], m->m[1][3]);
-	//=> 0, 0.00166667, 0, 0
-	_gggg(m->m[2][0], m->m[2][1], m->m[2][2], m->m[2][3]);
-	//=> 0, 0, 0, 0
-	_gggg(m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3]);
-	//=> 0.073, 0.0116667, 0, 0.1
-
-	ui_grid_terminate(ui);
-	free(ui);
 }
 
 TEST(ui_grid_update_styles)

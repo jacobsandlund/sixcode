@@ -8,6 +8,20 @@
 
 static const double VIEW_DOUBLE_EPSILON = 1e-9;
 
+void view_initialize(View *vw, vec2 viewport_size, vec2 translation, float layout_independent_scale)
+{
+	vw->viewport_size = viewport_size;
+	vw->translation = translation;
+	vw->scale = (vec2) {layout_independent_scale, layout_independent_scale};
+	vw->layout_independent_scale = layout_independent_scale;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			vw->view_matrix.m[i][j] = 0.0f;
+		}
+	}
+}
+
 vec2 view_screen_to_world(View *vw, vec2 v)
 {
 	vec2 v_moved = {
@@ -16,8 +30,8 @@ vec2 view_screen_to_world(View *vw, vec2 v)
 	};
 
 	return (vec2) {
-		(double) v_moved.x / (double) vw->scale * 2.0,
-		(double) v_moved.y / (double) vw->scale * 2.0,
+		(double) v_moved.x / (double) vw->scale.x * 2.0,
+		(double) v_moved.y / (double) vw->scale.y * 2.0,
 	};
 }
 
@@ -37,14 +51,15 @@ vec2 view_hex_to_world(vec2 v)
 	};
 }
 
-void view_zoom_at_screen_point(View *vw, vec2 v, float new_scale)
+void view_zoom_at_screen_point(View *vw, vec2 v, float new_layout_independent_scale)
 {
 	vec2 v_world = view_screen_to_world(vw, v);
-	double scale_factor = (double) (new_scale - vw->scale) / 2.0;
+	double scale_factor = (double) (new_layout_independent_scale - vw->scale.x) / 2.0;
 
 	vw->translation.x += (double) v_world.x * scale_factor;
 	vw->translation.y -= (double) v_world.y * scale_factor;
-	vw->scale = new_scale;
+	vw->scale = (vec2) {new_layout_independent_scale, new_layout_independent_scale};
+	vw->layout_independent_scale = new_layout_independent_scale;
 }
 
 void view_resize(View *vw, vec2 viewport_size)
@@ -56,6 +71,21 @@ void view_translate(View *vw, vec2 delta)
 {
 	vw->translation.x += delta.x;
 	vw->translation.y += delta.y;
+}
+
+void view_update_matrix(View *vw, vec2 draw_offset)
+{
+	double scale_inv = 1.0 / (double) vw->scale.x;
+	double size_x = vw->viewport_size.x;
+	double size_y = vw->viewport_size.y;
+	double trans_x = -vw->translation.x * scale_inv * 2.0;
+	double trans_y = vw->translation.y * scale_inv * 2.0;
+
+	vw->view_matrix.m[0][0] = 1.0 / size_x;
+	vw->view_matrix.m[1][1] = 1.0 / size_y;
+	vw->view_matrix.m[3][0] = (trans_x + draw_offset.x) / size_x;
+	vw->view_matrix.m[3][1] = (trans_y + draw_offset.y) / size_y;
+	vw->view_matrix.m[3][3] = scale_inv;
 }
 
 void view_viewport_to_quad(View *vw, Quad *out_q)

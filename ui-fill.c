@@ -209,13 +209,13 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	vec2 draw_offset = view_hex_to_world(
 			vec2_from_ivec(
 			hex_coords_from_storage(draw_quad.min)));
-	ui_grid_update_view_matrix(ui_grid, vw, draw_offset);
+	view_update_matrix(vw, draw_offset);
 
 	glUniformMatrix4fv(
 			ui->uniforms.viewMatrix,
 			1,
 			GL_FALSE,
-			(GLfloat*) &ui->ui_grid->view_matrix.m[0][0]);
+			(GLfloat*) &vw->view_matrix.m[0][0]);
 
 	// Instance buffer
 

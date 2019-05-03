@@ -207,29 +207,29 @@ TEST(ui_initialize_fail)
 
 TEST(ui_draw_fill)
 {
-	View vw = {
-		.viewport_size = {1000, 600},
-		.translation = {100, 100},
-		.scale = 10.0,
-	};
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {100, 100};
+	float scale = 10.0;
 	Quad quad = {{-126, 1}, {253, 126}};
 
+	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
 	UiGrid *ui_grid = malloc(sizeof *ui_grid);
 	UiFill *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
+	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g, &quad);
 	ui_grid_initialize(ui_grid, 0);
 	ui_grid_update_styles(ui_grid, g);
 	ui_fill_initialize(ui, ui_grid);
 
 	Quad viewport_quad;
-	view_viewport_to_quad(&vw, &viewport_quad);
+	view_viewport_to_quad(vw, &viewport_quad);
 	_qd(viewport_quad);
 	//=> (-93, -27), (139, 54)
 
-	ui_fill_draw(ui, &vw, g, &viewport_quad);
+	ui_fill_draw(ui, vw, g, &viewport_quad);
 
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
@@ -275,7 +275,7 @@ TEST(ui_draw_fill)
 	_d(program->uniforms[ui->uniforms.styleOffset].iv0);
 	//=> 0
 
-	mat4 *m = &ui_grid->view_matrix;
+	mat4 *m = &vw->view_matrix;
 	_d(program->uniforms[ui->uniforms.viewMatrix].matrix4fv == &m->m[0][0]);
 	//=> 1
 
@@ -371,6 +371,7 @@ TEST(ui_draw_fill)
 	ui_grid_terminate(ui_grid);
 	ui_fill_terminate(ui);
 
+	free(vw);
 	free(g);
 	free(ui_grid);
 	free(ui);
