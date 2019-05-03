@@ -2,7 +2,6 @@
 #define __VIEW_H__
 
 #include "sixcode.h"
-#include "hex.h"
 #include "quad.h"
 
 typedef struct {

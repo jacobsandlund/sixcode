@@ -23,9 +23,8 @@
 #define _gggg(...) _("%g, %g, %g, %g\n", __VA_ARGS__)
 #define _s(...) _("%s\n", __VA_ARGS__)
 
-#define _hx(h) _dd(h.c, h.r)
-#define _qd(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.max.c, q.max.r);
-#define _sq(q) _("(%d, %d), (%d, %d)", q.min.c, q.min.r, q.size.c, q.size.r);
+#define _qd(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.max.x, q.max.y);
+#define _sq(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.size.x, q.size.y);
 #define _v2(v) _gg(v.x, v.y)
 #define _i2(v) _dd(v.x, v.y)
 #define _aq(aq) _("(%g, %g), (%g, %g)\n(%g, %g), (%g, %g)", \

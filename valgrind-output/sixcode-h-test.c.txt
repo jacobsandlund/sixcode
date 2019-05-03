@@ -1,4 +1,4 @@
-bin/valgrind ui-all-test.c
+bin/valgrind sixcode-h-test.c
 
 Memcheck, a memory error detector
 Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
@@ -8,7 +8,7 @@ Command: ./a.out
 
 HEAP SUMMARY:
     in use at exit: 24 bytes in 1 blocks
-  total heap usage: 60 allocs, 59 frees, 83,667 bytes allocated
+  total heap usage: 29 allocs, 28 frees, 6,232 bytes allocated
 
 LEAK SUMMARY:
    definitely lost: 0 bytes in 0 blocks

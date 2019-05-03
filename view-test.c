@@ -1,6 +1,6 @@
 #include "view.c"
 #include "test.h"
-#include "hex.c"
+#include "hex-coords.c"
 #include "quad.c"
 
 TEST(view_screen_to_world)

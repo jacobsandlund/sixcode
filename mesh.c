@@ -1,7 +1,7 @@
 #include "mesh.h"
 #include <math.h>
 #include <stdlib.h>
-#include "hex.h"
+#include "hex-coords.h"
 #include "view.h"
 
 #define FILL_MESH_VERTICES_PER_HEX 6
@@ -17,13 +17,13 @@ static vec2 mesh_hex_corner(int corner)
 	};
 }
 
-void fill_mesh_initialize(FillMesh *m, int size_c, int size_r)
+void fill_mesh_initialize(FillMesh *m, int size_x, int size_y)
 {
-	int num_hexes = size_c * size_r;
+	int num_hexes = size_x * size_y;
 	m->vertices_length = FILL_MESH_VERTICES_PER_HEX * num_hexes;
 	m->indices_length = FILL_MESH_INDICES_PER_HEX * num_hexes;
-	m->size_c = size_c;
-	m->size_r = size_r;
+	m->size_x = size_x;
+	m->size_y = size_y;
 
 	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
 	m->indices = malloc(m->indices_length * sizeof *m->indices);
@@ -44,15 +44,15 @@ void fill_mesh_initialize(FillMesh *m, int size_c, int size_r)
 		3, 4, 5,
 	};
 
-	Hex h;
+	ivec2 h;
 	int vi = 0;
 	int ii = 0;
 
-	for (h.r = 0; h.r < size_r; ++h.r) {
-		for (h.c = 0; h.c < size_c; ++h.c) {
+	for (h.y = 0; h.y < size_y; ++h.y) {
+		for (h.x = 0; h.x < size_x; ++h.x) {
 			vec2 center = view_hex_to_world(
-					hex_to_vec(
-					hex_from_storage(h)));
+					vec2_from_ivec(
+					hex_coords_from_storage(h)));
 
 			for (int i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
 				m->indices[ii + i] = vi + indices_single[i];
@@ -64,8 +64,8 @@ void fill_mesh_initialize(FillMesh *m, int size_c, int size_r)
 				FillMeshVertex *vx = &m->vertices[vi + i];
 				vx->x = corners[i].x + center.x;
 				vx->y = corners[i].y + center.y;
-				vx->c = h.c;
-				vx->r = h.r;
+				vx->hx = h.x;
+				vx->hy = h.y;
 			}
 
 			vi += FILL_MESH_VERTICES_PER_HEX;

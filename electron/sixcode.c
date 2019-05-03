@@ -52,7 +52,7 @@ EMSCRIPTEN_KEEPALIVE Grid *web_grid_malloc()
 
 EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 {
-	Hex h = {c, r};
+	ivec2 h = {c, r};
 	grid_set(g, h, style);
 }
 

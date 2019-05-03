@@ -2,7 +2,7 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex.c"
+#include "hex-coords.c"
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
@@ -269,7 +269,7 @@ TEST(ui_draw_fill)
 
 	_gg(grid_size->fv0, grid_size->fv1);
 	//=> 192, 128
-	_hx(g->storage_quad.size);
+	_i2(g->storage_quad.size);
 	//=> 192, 128
 
 	_d(program->uniforms[ui->uniforms.styleOffset].iv0);
@@ -340,7 +340,7 @@ TEST(ui_draw_fill)
 
 	_d(gridPositionOffset->size);
 	//=> 2
-	_d(gridPositionOffset->type == GL_SHORT);
+	_d(gridPositionOffset->type == GL_INT);
 	//=> 1
 	_d(gridPositionOffset->stride);
 	//=> 16

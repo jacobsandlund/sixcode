@@ -1,6 +1,6 @@
 #include "grid.c"
 #include "test.h"
-#include "hex.c"
+#include "hex-coords.c"
 #include "quad.c"
 
 TEST(grid_quad_to_styles_quad)
@@ -13,8 +13,8 @@ TEST(grid_quad_to_styles_quad)
 
 TEST(grid_basics)
 {
-	Hex h1 = {5, 27};
-	Hex h2 = {48, 62};
+	ivec2 h1 = {5, 27};
+	ivec2 h2 = {48, 62};
 	Quad quad = {{0, 0}, {127, 63}};
 	Grid *g = malloc(sizeof *g);
 
@@ -48,8 +48,8 @@ TEST(grid_basics)
 
 TEST(grid_expand_quad)
 {
-	Hex h1 = {5, 27};
-	Hex h2 = {48, 62};
+	ivec2 h1 = {5, 27};
+	ivec2 h2 = {48, 62};
 	Quad quad = {{2, 1}, {125, 62}};
 	Grid *g = malloc(sizeof *g);
 
@@ -66,7 +66,7 @@ TEST(grid_expand_quad)
 	_d(grid_get(g, h2));
 	//=> 2
 
-	Hex h3 = {-200, 120};
+	ivec2 h3 = {-200, 120};
 	grid_set(g, h3, 3);
 
 	quad = (Quad) {{-510, -254}, {1021, 126}};

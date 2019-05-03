@@ -1,6 +1,7 @@
 #include "view.h"
 #include <math.h>
 #include <stdlib.h>
+#include "hex-coords.h"
 
 #define VIEW_HEX_TOP_POINT_CUTOFF 0.3333333333333333
 #define VIEW_HEX_BOTTOM_POINT_CUTOFF 0.6666666666666666
@@ -77,41 +78,41 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 	top += top_left.y - top > VIEW_HEX_BOTTOM_POINT_CUTOFF;
 	bottom += bottom_right.y - bottom > VIEW_HEX_TOP_POINT_CUTOFF;
 
-	out_q->min = (Hex) {left, top};
-	out_q->max = (Hex) {right, bottom};
+	out_q->min = (ivec2) {left, top};
+	out_q->max = (ivec2) {right, bottom};
 
 	if (right - left <= 2 || bottom - top <= 2) {
 		vec2 top_right = {bottom_right.x, top_left.y};
 		vec2 bottom_left = {top_left.x, bottom_right.y};
 
-		Hex top_left_hex = hex_round(top_left);
-		Hex top_right_hex = hex_round(top_right);
-		Hex bottom_left_hex = hex_round(bottom_left);
-		Hex bottom_right_hex = hex_round(bottom_right);
+		ivec2 top_left_hex = hex_coords_round(top_left);
+		ivec2 top_right_hex = hex_coords_round(top_right);
+		ivec2 bottom_left_hex = hex_coords_round(bottom_left);
+		ivec2 bottom_right_hex = hex_coords_round(bottom_right);
 
-		if (top_left_hex.c == top_right_hex.c) {
-			out_q->min.r = top_left_hex.r;
+		if (top_left_hex.x == top_right_hex.x) {
+			out_q->min.y = top_left_hex.y;
 		}
 
-		if (bottom_left_hex.c == bottom_right_hex.c) {
-			out_q->max.r = bottom_left_hex.r;
+		if (bottom_left_hex.x == bottom_right_hex.x) {
+			out_q->max.y = bottom_left_hex.y;
 		}
 
-		if (top_left_hex.r == bottom_left_hex.r) {
-			out_q->min.c = top_left_hex.c;
+		if (top_left_hex.y == bottom_left_hex.y) {
+			out_q->min.x = top_left_hex.x;
 		}
 
-		if (top_right_hex.r == bottom_right_hex.r) {
-			out_q->max.c = top_right_hex.c;
+		if (top_right_hex.y == bottom_right_hex.y) {
+			out_q->max.x = top_right_hex.x;
 		}
 	}
 }
 
 void view_screen_points_to_quad(View *vw, Quad *out_q, vec2 v1, vec2 v2)
 {
-	Hex h1 = hex_round(view_world_to_hex(
+	ivec2 h1 = hex_coords_round(view_world_to_hex(
 			view_screen_to_world(vw, v1)));
-	Hex h2 = hex_round(view_world_to_hex(
+	ivec2 h2 = hex_coords_round(view_world_to_hex(
 			view_screen_to_world(vw, v2)));
 	quad_from_hexes(out_q, h1, h2);
 }

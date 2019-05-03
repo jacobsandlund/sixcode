@@ -1,6 +1,6 @@
 #include "mesh.c"
 #include "test.h"
-#include "hex.c"
+#include "hex-coords.c"
 #include "quad.c"
 #include "view.c"
 
@@ -9,9 +9,9 @@ TEST(fill_mesh)
 	FillMesh *m = malloc(sizeof *m);
 	fill_mesh_initialize(m, 32, 64);
 
-	_d(m->size_c);
+	_d(m->size_x);
 	//=> 32
-	_d(m->size_r);
+	_d(m->size_y);
 	//=> 64
 
 	_d(32 * 64 * 6);
@@ -39,13 +39,13 @@ TEST(fill_mesh)
 	_gg(m->vertices[12287].x, m->vertices[12287].y);
 	//=> 55.3823, -94.975
 
-	_dd(m->vertices[0].c, m->vertices[0].r);
+	_dd(m->vertices[0].hx, m->vertices[0].hy);
 	//=> 0, 0
-	_dd(m->vertices[5].c, m->vertices[5].r);
+	_dd(m->vertices[5].hx, m->vertices[5].hy);
 	//=> 0, 0
-	_dd(m->vertices[6].c, m->vertices[6].r);
+	_dd(m->vertices[6].hx, m->vertices[6].hy);
 	//=> 1, 0
-	_dd(m->vertices[12287].c, m->vertices[12287].r);
+	_dd(m->vertices[12287].hx, m->vertices[12287].hy);
 	//=> 31, 63
 
 	_ddd(m->indices[0], m->indices[1], m->indices[2]);

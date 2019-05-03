@@ -2,7 +2,7 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex.c"
+#include "hex-coords.c"
 #include "mesh.c"
 #include "shader.c"
 #include "quad.c"

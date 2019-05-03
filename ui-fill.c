@@ -1,6 +1,7 @@
 #include "ui-fill.h"
 #include <stdio.h>
 #include <string.h>
+#include "hex-coords.h"
 
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 position;\n"
@@ -140,8 +141,8 @@ static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
 {
 	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
 		if (
-			draw_quad->size.c > ui->meshes[i].size_c ||
-			draw_quad->size.r > ui->meshes[i].size_r
+			draw_quad->size.x > ui->meshes[i].size_x ||
+			draw_quad->size.y > ui->meshes[i].size_y
 		) {
 			return i > 0 ? i - 1 : 0;
 		}
@@ -190,8 +191,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	glUniform2f(
 			ui->uniforms.gridSize,
-			(float) g->storage_quad.size.c,
-			(float) g->storage_quad.size.r);
+			(float) g->storage_quad.size.x,
+			(float) g->storage_quad.size.y);
 
 	glUniform1f(
 			ui->uniforms.styleOffset,
@@ -206,8 +207,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glUniform1i(ui->uniforms.fillColors, 1);
 
 	vec2 draw_offset = view_hex_to_world(
-			hex_to_vec(
-			hex_from_storage(draw_quad.min)));
+			vec2_from_ivec(
+			hex_coords_from_storage(draw_quad.min)));
 	ui_grid_update_view_matrix(ui_grid, vw, draw_offset);
 
 	glUniformMatrix4fv(
@@ -221,26 +222,26 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	InstanceMesh *imesh = &ui->instance_mesh;
 
 	int num_instances = (
-		((draw_quad.size.r - 1) / UI_FILL_MESH_MAX_SIZE + 1) *
-		((draw_quad.size.c - 1) / UI_FILL_MESH_MAX_SIZE + 1)
+		((draw_quad.size.y - 1) / UI_FILL_MESH_MAX_SIZE + 1) *
+		((draw_quad.size.x - 1) / UI_FILL_MESH_MAX_SIZE + 1)
 	);
 	instance_mesh_resize(imesh, num_instances);
 
-	Hex h;
+	ivec2 h;
 	int i = 0;
-	Hex draw_quad_min_offset = hex_sub(draw_quad.min, g->storage_quad.min);
+	ivec2 draw_quad_min_offset = ivec2_sub(draw_quad.min, g->storage_quad.min);
 
-	for (h.r = 0; h.r < draw_quad.size.r; h.r += UI_FILL_MESH_MAX_SIZE) {
-		for (h.c = 0; h.c < draw_quad.size.c; h.c += UI_FILL_MESH_MAX_SIZE) {
+	for (h.y = 0; h.y < draw_quad.size.y; h.y += UI_FILL_MESH_MAX_SIZE) {
+		for (h.x = 0; h.x < draw_quad.size.x; h.x += UI_FILL_MESH_MAX_SIZE) {
 			InstanceMeshVertex *vx = &imesh->vertices[i];
 
 			vx->positionOffset = view_hex_to_world(
-					hex_to_vec(
-					hex_from_storage(h)));
+					vec2_from_ivec(
+					hex_coords_from_storage(h)));
 
-			Hex grid_offset = hex_add(h, draw_quad_min_offset);
-			vx->gridPositionOffset.x = grid_offset.c;
-			vx->gridPositionOffset.y = grid_offset.r;
+			ivec2 grid_offset = ivec2_add(h, draw_quad_min_offset);
+			vx->gridPositionOffset.x = grid_offset.x;
+			vx->gridPositionOffset.y = grid_offset.y;
 			i++;
 		}
 	}
@@ -267,7 +268,7 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glVertexAttribPointer(
 			ui->attributes.gridPositionOffset,
 			2,
-			GL_SHORT,
+			GL_INT,
 			GL_FALSE,
 			sizeof imesh->vertices[0],
 			(GLvoid *) (2 * sizeof imesh->vertices[0].positionOffset.x));

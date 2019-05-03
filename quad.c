@@ -1,104 +1,105 @@
 #include "quad.h"
 #include <math.h>
+#include "hex-coords.h"
 
-bool quad_contains(Quad *q, Hex h)
+bool quad_contains(Quad *q, ivec2 h)
 {
 	return (
-		q->min.c <= h.c && h.c <= q->max.c &&
-		q->min.r <= h.r && h.r <= q->max.r
+		q->min.x <= h.x && h.x <= q->max.x &&
+		q->min.y <= h.y && h.y <= q->max.y
 	);
 }
 
 bool quad_contains_quad(Quad *outer, Quad *inner)
 {
 	return (
-		outer->min.c <= inner->min.c &&
-		outer->min.r <= inner->min.r &&
-		outer->max.c >= inner->max.c &&
-		outer->max.r >= inner->max.r
+		outer->min.x <= inner->min.x &&
+		outer->min.y <= inner->min.y &&
+		outer->max.x >= inner->max.x &&
+		outer->max.y >= inner->max.y
 	);
 }
 
-void quad_from_hexes(Quad *q, Hex h1, Hex h2)
+void quad_from_hexes(Quad *q, ivec2 h1, ivec2 h2)
 {
-	q->min.c = h1.c < h2.c ? h1.c : h2.c;
-	q->min.r = h1.r < h2.r ? h1.r : h2.r;
-	q->max.c = h1.c > h2.c ? h1.c : h2.c;
-	q->max.r = h1.r > h2.r ? h1.r : h2.r;
+	q->min.x = h1.x < h2.x ? h1.x : h2.x;
+	q->min.y = h1.y < h2.y ? h1.y : h2.y;
+	q->max.x = h1.x > h2.x ? h1.x : h2.x;
+	q->max.y = h1.y > h2.y ? h1.y : h2.y;
 }
 
-void quad_expand_for_hex(Quad *out_q, Quad *q, Hex h)
+void quad_expand_for_hex(Quad *out_q, Quad *q, ivec2 h)
 {
-	out_q->min.c = h.c < q->min.c ? h.c : q->min.c;
-	out_q->min.r = h.r < q->min.r ? h.r : q->min.r;
-	out_q->max.c = h.c > q->max.c ? h.c : q->max.c;
-	out_q->max.r = h.r > q->max.r ? h.r : q->max.r;
+	out_q->min.x = h.x < q->min.x ? h.x : q->min.x;
+	out_q->min.y = h.y < q->min.y ? h.y : q->min.y;
+	out_q->max.x = h.x > q->max.x ? h.x : q->max.x;
+	out_q->max.y = h.y > q->max.y ? h.y : q->max.y;
 }
 
 void quad_expand_for_quad(Quad *out_q, Quad *a, Quad *b)
 {
-	out_q->min.c = a->min.c < b->min.c ? a->min.c : b->min.c;
-	out_q->min.r = a->min.r < b->min.r ? a->min.r : b->min.r;
-	out_q->max.c = a->max.c > b->max.c ? a->max.c : b->max.c;
-	out_q->max.r = a->max.r > b->max.r ? a->max.r : b->max.r;
+	out_q->min.x = a->min.x < b->min.x ? a->min.x : b->min.x;
+	out_q->min.y = a->min.y < b->min.y ? a->min.y : b->min.y;
+	out_q->max.x = a->max.x > b->max.x ? a->max.x : b->max.x;
+	out_q->max.y = a->max.y > b->max.y ? a->max.y : b->max.y;
 }
 
-void quad_block_align(Quad *out_q, Quad *q, Hex block_size)
+void quad_block_align(Quad *out_q, Quad *q, ivec2 block_size)
 {
-	out_q->min.c = q->min.c & ~(block_size.c - 1);
-	out_q->min.r = q->min.r & ~(block_size.r - 1);
-	out_q->max.c = q->max.c | (block_size.c - 1);
-	out_q->max.r = q->max.r | (block_size.r - 1);
+	out_q->min.x = q->min.x & ~(block_size.x - 1);
+	out_q->min.y = q->min.y & ~(block_size.y - 1);
+	out_q->max.x = q->max.x | (block_size.x - 1);
+	out_q->max.y = q->max.y | (block_size.y - 1);
 }
 
-void quad_resize_by_delta(Quad *out_q, Quad *q, Hex delta)
+void quad_resize_by_delta(Quad *out_q, Quad *q, ivec2 delta)
 {
-	out_q->min.c = q->min.c - delta.c;
-	out_q->min.r = q->min.r - delta.r;
-	out_q->max.c = q->max.c + delta.c;
-	out_q->max.r = q->max.r + delta.r;
+	out_q->min.x = q->min.x - delta.x;
+	out_q->min.y = q->min.y - delta.y;
+	out_q->max.x = q->max.x + delta.x;
+	out_q->max.y = q->max.y + delta.y;
 }
 
 void quad_intersect(Quad *out_q, Quad *a, Quad *b)
 {
-	out_q->min.c = a->min.c > b->min.c ? a->min.c : b->min.c;
-	out_q->min.r = a->min.r > b->min.r ? a->min.r : b->min.r;
-	out_q->max.c = a->max.c < b->max.c ? a->max.c : b->max.c;
-	out_q->max.r = a->max.r < b->max.r ? a->max.r : b->max.r;
+	out_q->min.x = a->min.x > b->min.x ? a->min.x : b->min.x;
+	out_q->min.y = a->min.y > b->min.y ? a->min.y : b->min.y;
+	out_q->max.x = a->max.x < b->max.x ? a->max.x : b->max.x;
+	out_q->max.y = a->max.y < b->max.y ? a->max.y : b->max.y;
 }
 
-void quad_hex_to_storage(Quad *out_q, Quad *q)
+void quad_hex_coords_to_storage(Quad *out_q, Quad *q)
 {
-	out_q->min = hex_to_storage(q->min);
-	out_q->max = hex_to_storage(q->max);
+	out_q->min = hex_coords_to_storage(q->min);
+	out_q->max = hex_coords_to_storage(q->max);
 }
 
 void quad_to_size_quad(SizeQuad *out_sq, Quad *q)
 {
 	out_sq->min = q->min;
-	out_sq->size = (Hex) {
-		q->max.c - q->min.c + 1,
-		q->max.r - q->min.r + 1,
+	out_sq->size = (ivec2) {
+		q->max.x - q->min.x + 1,
+		q->max.y - q->min.y + 1,
 	};
 }
 
 void quad_to_storage_size_quad(SizeQuad *storage_quad, Quad *styles_quad)
 {
 	Quad q;
-	quad_hex_to_storage(&q, styles_quad);
+	quad_hex_coords_to_storage(&q, styles_quad);
 	quad_to_size_quad(storage_quad, &q);
 }
 
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq)
 {
-	int odd_row = sq->min.r & 1;
-	out_sq->min.c = sq->min.c;
-	out_sq->min.r = sq->min.r & ~1;
-	out_sq->size.c = sq->size.c;
-	out_sq->size.r = sq->size.r + odd_row;
+	int odd_row = sq->min.y & 1;
+	out_sq->min.x = sq->min.x;
+	out_sq->min.y = sq->min.y & ~1;
+	out_sq->size.x = sq->size.x;
+	out_sq->size.y = sq->size.y + odd_row;
 }
 
 int size_quad_capacity(SizeQuad *sq)
 {
-	return sq->size.c * sq->size.r;
+	return sq->size.x * sq->size.y;
 }

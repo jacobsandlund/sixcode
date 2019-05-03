@@ -43,8 +43,8 @@ TEST(core_tick)
 
 TEST(core_grid_expand_for_hex)
 {
-	Hex h1 = {5, 27};
-	Hex h2 = {48, 62};
+	ivec2 h1 = {5, 27};
+	ivec2 h2 = {48, 62};
 	Quad grid_quad = {{2, 1}, {125, 62}};
 	Grid *g = malloc(sizeof *g);
 
@@ -57,7 +57,7 @@ TEST(core_grid_expand_for_hex)
 	grid_set(g, h1, 1);
 	grid_set(g, h2, 2);
 
-	Hex h3 = {-270, 130};
+	ivec2 h3 = {-270, 130};
 	_d(core_grid_expand_for_hex(g, h3));
 	//=> 1
 
@@ -70,7 +70,7 @@ TEST(core_grid_expand_for_hex)
 
 	grid_set(g, h3, 3);
 
-	Hex h4 = {300, -UI_GRID_MAX_TEXTURE_SIZE};
+	ivec2 h4 = {300, -UI_GRID_MAX_TEXTURE_SIZE};
 	_d(core_grid_expand_for_hex(g, h4));
 	//=> 0
 
@@ -98,15 +98,15 @@ TEST(core_toggle_hex_at_point)
 
 	glmock_initialize();
 	grid_initialize(g, &grid_quad);
-	_hx(g->storage_quad.size);
+	_i2(g->storage_quad.size);
 	//=> 64, 64
 
 	ui_all_initialize(ui, 0);
 	ui_grid_update_styles(&ui->grid, g);
 
-	Hex h = hex_round(view_world_to_hex(
+	ivec2 h = hex_coords_round(view_world_to_hex(
 			view_screen_to_world(&vw, v)));
-	_hx(h);
+	_i2(h);
 	//=> 15, 29
 
 	core_toggle_hex_at_point(ui, &vw, g, v);
@@ -133,9 +133,9 @@ TEST(core_toggle_hex_at_point)
 	// Expands when outside of grid quad
 
 	v = (vec2) {0, 100};
-	h = hex_round(view_world_to_hex(
+	h = hex_coords_round(view_world_to_hex(
 			view_screen_to_world(&vw, v)));
-	_hx(h);
+	_i2(h);
 	//=> -47, 3
 
 	core_toggle_hex_at_point(ui, &vw, g, v);

@@ -46,10 +46,10 @@ function sixcode_initialized() {
     let size = 4096 - 2;
 
     for (let i = 0; i < count; ++i) {
-        let r = Math.floor(Math.random() * size) - 4096/2 + 1;
-        let c = 2 * Math.floor(Math.random() * size) + (r & 1) - 4096 + 2;
+        let y = Math.floor(Math.random() * size) - 4096/2 + 1;
+        let x = 2 * Math.floor(Math.random() * size) + (y & 1) - 4096 + 2;
         let style = Math.floor(Math.random() * 15) + 1;
-        Module._web_grid_set(grid, c, r, style);
+        Module._web_grid_set(grid, x, y, style);
     }
 
     // Small
@@ -58,10 +58,10 @@ function sixcode_initialized() {
     //let size = 64 - 2;
 
     //for (let i = 0; i < count; ++i) {
-    //    let r = Math.floor(Math.random() * size) + 1;
-    //    let c = 2 * Math.floor(Math.random() * size) + (r & 1) + 2;
+    //    let y = Math.floor(Math.random() * size) + 1;
+    //    let x = 2 * Math.floor(Math.random() * size) + (y & 1) + 2;
     //    let style = Math.floor(Math.random() * 15) + 1;
-    //    Module._web_grid_set(grid, c, r, style);
+    //    Module._web_grid_set(grid, x, y, style);
     //}
 
     let scale = SCALE_LEVELS[scaleLevel];

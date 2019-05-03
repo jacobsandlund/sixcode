@@ -42,6 +42,16 @@ static inline vec2 vec2_from_ivec(ivec2 v) {
 	return (vec2) {v.x, v.y};
 }
 
+static inline ivec2 ivec2_add(ivec2 a, ivec2 b)
+{
+	return (ivec2) {a.x + b.x, a.y + b.y};
+}
+
+static inline ivec2 ivec2_sub(ivec2 a, ivec2 b)
+{
+	return (ivec2) {a.x - b.x, a.y - b.y};
+}
+
 // log_error is defined in test.h and electron/sixcode.c
 void log_error(const char *format, ...);
 #define SIXCODE_ERROR(...) log_error(__VA_ARGS__)

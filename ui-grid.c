@@ -142,8 +142,8 @@ void ui_grid_update_styles(UiGrid *ui, Grid *g)
 			GL_TEXTURE_2D,
 			0,
 			GL_ALPHA,
-			g->storage_quad.size.c,
-			g->storage_quad.size.r,
+			g->storage_quad.size.x,
+			g->storage_quad.size.y,
 			0,
 			GL_ALPHA,
 			GL_UNSIGNED_BYTE,
@@ -169,15 +169,15 @@ void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 		ui->styles_buffer_capacity = need_capacity;
 	}
 
-	Hex min = hex_sub(sq.min, g->storage_quad.min);
-	int storage_size_c = g->storage_quad.size.c;
+	ivec2 min = ivec2_sub(sq.min, g->storage_quad.min);
+	int storage_size_x = g->storage_quad.size.x;
 
-	for (int r = 0; r < sq.size.r; ++r) {
-		u8 *dest = &ui->styles_buffer[r * sq.size.c];
-		int src_i = (r + min.r) * storage_size_c + min.c;
+	for (int r = 0; r < sq.size.y; ++r) {
+		u8 *dest = &ui->styles_buffer[r * sq.size.x];
+		int src_i = (r + min.y) * storage_size_x + min.x;
 		const u8 *src = &g->styles[src_i];
 
-		memcpy(dest, src, sq.size.c);
+		memcpy(dest, src, sq.size.x);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -186,10 +186,10 @@ void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 	glTexSubImage2D(
 			GL_TEXTURE_2D,
 			0,
-			min.c,
-			min.r,
-			sq.size.c,
-			sq.size.r,
+			min.x,
+			min.y,
+			sq.size.x,
+			sq.size.y,
 			GL_ALPHA,
 			GL_UNSIGNED_BYTE,
 			ui->styles_buffer);

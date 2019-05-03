@@ -2,7 +2,7 @@
 
 // Include all source code in single translation unit
 #include "grid.c"
-#include "hex.c"
+#include "hex-coords.c"
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
@@ -24,7 +24,7 @@ void core_tick(UiAll *ui, View *vw, Grid *g)
 	ui_all_draw(ui, vw, g);
 }
 
-bool core_grid_expand_for_hex(Grid *g, Hex h)
+bool core_grid_expand_for_hex(Grid *g, ivec2 h)
 {
 	Quad expanded;
 	quad_expand_for_hex(&expanded, &g->quad, h);
@@ -35,7 +35,7 @@ bool core_grid_expand_for_hex(Grid *g, Hex h)
 	SizeQuad sq;
 	quad_to_storage_size_quad(&sq, &styles_quad);
 
-	if (sq.size.c > UI_GRID_MAX_TEXTURE_SIZE || sq.size.r > UI_GRID_MAX_TEXTURE_SIZE) {
+	if (sq.size.x > UI_GRID_MAX_TEXTURE_SIZE || sq.size.y > UI_GRID_MAX_TEXTURE_SIZE) {
 		return false;
 	}
 
@@ -48,7 +48,7 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 {
 	static u8 style = CORE_HEX_FILL_MIN;
 
-	Hex h = hex_round(view_world_to_hex(
+	ivec2 h = hex_coords_round(view_world_to_hex(
 			view_screen_to_world(vw, v)));
 
 	bool expanded = false;

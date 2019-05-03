@@ -2,7 +2,7 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex.c"
+#include "hex-coords.c"
 #include "quad.c"
 #include "shader.c"
 #include "view.c"
@@ -127,7 +127,7 @@ TEST(ui_grid_size_quad_for_draw)
 	_sq(out_sq);
 	//=> (0, 0), (30, 30)
 
-	viewport_quad.min = (Hex) {5, 5};
+	viewport_quad.min = (ivec2) {5, 5};
 
 	// Even-align
 
@@ -223,9 +223,9 @@ TEST(ui_grid_update_styles_in_quad)
 	// Under the current capacity
 	quad = (Quad) {{10, 20}, {31, 59}};
 	quad_to_storage_size_quad(&sq, &quad);
-	_hx(hex_sub(sq.min, g->storage_quad.min));
+	_i2(ivec2_sub(sq.min, g->storage_quad.min));
 	//=> 5, 20
-	_hx(sq.size);
+	_i2(sq.size);
 	//=> 11, 40
 	
 	ui_grid_update_styles_in_quad(ui, g, &quad);
@@ -248,7 +248,7 @@ TEST(ui_grid_update_styles_in_quad)
 	// Under/equal the max capacity
 	quad = (Quad) {{10, 10}, {109, 59}};
 	quad_to_storage_size_quad(&sq, &quad);
-	_hx(sq.size);
+	_i2(sq.size);
 	//=> 50, 50
 	_d(size_quad_capacity(&sq));
 	//=> 2500
@@ -263,11 +263,11 @@ TEST(ui_grid_update_styles_in_quad)
 	// Over the max capacity
 	quad = (Quad) {{10, 10}, {109, 60}};
 	quad_to_storage_size_quad(&sq, &quad);
-	_hx(hex_sub(sq.min, g->storage_quad.min));
+	_i2(ivec2_sub(sq.min, g->storage_quad.min));
 	//=> 5, 10
-	_hx(sq.size);
+	_i2(sq.size);
 	//=> 50, 51
-	_hx(g->storage_quad.size);
+	_i2(g->storage_quad.size);
 	//=> 64, 64
 
 	ui_grid_update_styles_in_quad(ui, g, &quad);
