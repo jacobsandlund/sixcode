@@ -93,46 +93,64 @@ TEST(ui)
 	/////////////////////
 	// mesh + buffers
 
-	_d(ui->meshes[0].vertices_length);
+	_d(ui->layouts[0].meshes[0].vertices_length);
 	//=> 384
-	_d(ui->meshes[1].vertices_length);
+	_d(ui->layouts[0].meshes[1].vertices_length);
 	//=> 96
-	_d(ui->meshes[2].vertices_length);
+	_d(ui->layouts[0].meshes[2].vertices_length);
 	//=> 24
-	_d(ui->meshes[3].vertices_length);
+	_d(ui->layouts[0].meshes[3].vertices_length);
 	//=> 6
-	_d(ui->meshes[0].indices_length);
+	_d(ui->layouts[0].meshes[0].indices_length);
 	//=> 768
-	_d(ui->meshes[3].indices_length);
+	_d(ui->layouts[0].meshes[3].indices_length);
 	//=> 12
 
-	_d(ui->buffers[0].vertices);
+	_d(ui->layouts[1].meshes[0].vertices_length);
+	//=> 256
+	_d(ui->layouts[1].meshes[3].vertices_length);
+	//=> 4
+	_d(ui->layouts[1].meshes[0].indices_length);
+	//=> 384
+	_d(ui->layouts[1].meshes[3].indices_length);
+	//=> 6
+
+	_d(ui->layouts[0].buffers[0].vertices);
 	//=> 1
-	_d(ui->buffers[1].vertices);
+	_d(ui->layouts[0].buffers[1].vertices);
 	//=> 3
-	_d(ui->buffers[2].vertices);
+	_d(ui->layouts[0].buffers[2].vertices);
 	//=> 5
-	_d(ui->buffers[3].vertices);
+	_d(ui->layouts[0].buffers[3].vertices);
 	//=> 7
-	_d(ui->buffers[0].indices);
+	_d(ui->layouts[0].buffers[0].indices);
 	//=> 2
-	_d(ui->buffers[3].indices);
+	_d(ui->layouts[0].buffers[3].indices);
 	//=> 8
 
-	_d(ui->instanceBuffer);
+	_d(ui->layouts[1].buffers[0].vertices);
 	//=> 9
+	_d(ui->layouts[1].buffers[3].vertices);
+	//=> 15
+	_d(ui->layouts[1].buffers[0].indices);
+	//=> 10
+	_d(ui->layouts[1].buffers[3].indices);
+	//=> 16
+
+	_d(ui->instanceBuffer);
+	//=> 17
 	_d(ui->instance_mesh.vertices_length);
 	//=> 32
 
-	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->buffers[0].vertices];
-	GLmockBuffer *indices_buffer = &GLmock.buffers[ui->buffers[1].indices];
+	GLmockBuffer *vertices_buffer = &GLmock.buffers[ui->layouts[0].buffers[0].vertices];
+	GLmockBuffer *indices_buffer = &GLmock.buffers[ui->layouts[1].buffers[1].indices];
 	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
 
 	_d(vertices_buffer->created);
 	//=> 1
 	_d(vertices_buffer->size);
 	//=> 4608
-	_d(vertices_buffer->data == ui->meshes[0].vertices);
+	_d(vertices_buffer->data == ui->layouts[0].meshes[0].vertices);
 	//=> 1
 	_d(vertices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -140,8 +158,8 @@ TEST(ui)
 	_d(indices_buffer->created);
 	//=> 1
 	_d(indices_buffer->size);
-	//=> 384
-	_d(indices_buffer->data == ui->meshes[1].indices);
+	//=> 192
+	_d(indices_buffer->data == ui->layouts[1].meshes[1].indices);
 	//=> 1
 	_d(indices_buffer->usage == GL_STATIC_DRAW);
 	//=> 1
@@ -313,8 +331,8 @@ TEST(ui_draw_fill)
 	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
 	_d(instance_buffer->size);
 	//=> 768
-	_d(instance_buffer->data == ui->meshes[0].vertices);
-	//=> 0
+	_d(instance_buffer->data == ui->instance_mesh.vertices);
+	//=> 1
 	_d(instance_buffer->usage == GL_STREAM_DRAW);
 	//=> 1
 
@@ -353,7 +371,7 @@ TEST(ui_draw_fill)
 
 	_d(GLmock.bound_buffers[0] == ui->instanceBuffer);
 	//=> 1
-	_d(GLmock.bound_buffers[1] == ui->buffers[0].indices);
+	_d(GLmock.bound_buffers[1] == ui->layouts[0].buffers[0].indices);
 	//=> 1
 
 	_d(GLmock.draw_elements_mode == GL_TRIANGLES);
@@ -362,6 +380,58 @@ TEST(ui_draw_fill)
 	//=> 1
 	_d(GLmock.draw_elements_count);
 	//=> 36864
+	_d(GLmock.draw_elements_instanced_primcount);
+	//=> 48
+
+	grid_terminate(g);
+	ui_grid_terminate(ui_grid);
+	ui_fill_terminate(ui);
+
+	free(vw);
+	free(g);
+	free(ui_grid);
+	free(ui);
+}
+
+TEST(ui_draw_fill_rect)
+{
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {100, 100};
+	float scale = 10.0;
+
+	View *vw = malloc(sizeof *vw);
+	Grid *g = malloc(sizeof *g);
+	UiGrid *ui_grid = malloc(sizeof *ui_grid);
+	UiFill *ui = malloc(sizeof *ui);
+
+	glmock_initialize();
+	view_initialize(vw, viewport_size, translation, scale);
+	view_layout(vw, VIEW_LAYOUT_RECT);
+	grid_initialize(g);
+	ui_grid_initialize(ui_grid, 0);
+	ui_grid_update_styles(ui_grid, g);
+	ui_fill_initialize(ui, ui_grid);
+
+	Quad viewport_quad;
+	view_viewport_to_quad(vw, &viewport_quad);
+	_qd(viewport_quad);
+	//=> (71, 80), (129, 120)
+
+	ui_fill_draw(ui, vw, g, &viewport_quad);
+
+	// Draw
+
+	_d(GLmock.bound_buffers[0] == ui->instanceBuffer);
+	//=> 1
+	_d(GLmock.bound_buffers[1] == ui->layouts[1].buffers[0].indices);
+	//=> 1
+
+	_d(GLmock.draw_elements_mode == GL_TRIANGLES);
+	//=> 1
+	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
+	//=> 1
+	_d(GLmock.draw_elements_count);
+	//=> 18432
 	_d(GLmock.draw_elements_instanced_primcount);
 	//=> 48
 

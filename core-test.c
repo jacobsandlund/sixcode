@@ -61,7 +61,7 @@ TEST(core_toggle_hex_at_point)
 	ui_all_initialize(ui, 0);
 	ui_grid_update_styles(&ui->grid, g);
 
-	ivec2 h = view_hex_round(view_screen_to_world(vw, v));
+	ivec2 h = view_world_round(vw, view_screen_to_world(vw, v));
 	_i2(h);
 	//=> 101, 256
 

@@ -1,11 +1,12 @@
 #include "mesh.c"
 #include "test.h"
 #include "quad.c"
+#include "view.c"
 
-TEST(fill_mesh)
+TEST(fill_mesh_initialize_hex)
 {
 	FillMesh *m = malloc(sizeof *m);
-	fill_mesh_initialize(m, 32, 64);
+	fill_mesh_initialize(m, VIEW_LAYOUT_HEX, 32, 64);
 
 	_d(m->size_x);
 	//=> 32
@@ -23,19 +24,19 @@ TEST(fill_mesh)
 	//=> 24576
 
 	_gg(m->vertices[0].x, m->vertices[0].y);
-	//=> 0.475, -0.316667
-	_gg(m->vertices[1].x, m->vertices[1].y);
-	//=> 3.35849e-17, -0.633333
-	_gg(m->vertices[2].x, m->vertices[2].y);
-	//=> -0.475, -0.316667
-	_gg(m->vertices[3].x, m->vertices[3].y);
-	//=> -0.475, 0.316667
-	_gg(m->vertices[4].x, m->vertices[4].y);
-	//=> -1.00755e-16, 0.633333
-	_gg(m->vertices[5].x, m->vertices[5].y);
 	//=> 0.475, 0.316667
+	_gg(m->vertices[1].x, m->vertices[1].y);
+	//=> 3.35849e-17, 0.633333
+	_gg(m->vertices[2].x, m->vertices[2].y);
+	//=> -0.475, 0.316667
+	_gg(m->vertices[3].x, m->vertices[3].y);
+	//=> -0.475, -0.316667
+	_gg(m->vertices[4].x, m->vertices[4].y);
+	//=> -1.00755e-16, -0.633333
+	_gg(m->vertices[5].x, m->vertices[5].y);
+	//=> 0.475, -0.316667
 	_gg(m->vertices[m->vertices_length - 1].x, m->vertices[m->vertices_length - 1].y);
-	//=> 31.975, 63.3167
+	//=> 31.975, 62.6833
 
 	_dd(m->vertices[0].hx, m->vertices[0].hy);
 	//=> 0, 0
@@ -56,6 +57,57 @@ TEST(fill_mesh)
 	//=> 3, 4, 5
 	_ddd(m->indices[m->indices_length - 3], m->indices[m->indices_length - 1], m->indices[m->indices_length - 1]);
 	//=> 12285, 12287, 12287
+
+	fill_mesh_terminate(m);
+	free(m);
+}
+
+TEST(fill_mesh_initialize_rect)
+{
+	FillMesh *m = malloc(sizeof *m);
+	fill_mesh_initialize(m, VIEW_LAYOUT_RECT, 32, 64);
+
+	_d(m->size_x);
+	//=> 32
+	_d(m->size_y);
+	//=> 64
+
+	_d(32 * 64 * 4);
+	//=> 8192
+	_d(32 * 64 * 6);
+	//=> 12288
+
+	_d(m->vertices_length);
+	//=> 8192
+	_d(m->indices_length);
+	//=> 12288
+
+	_gg(m->vertices[0].x, m->vertices[0].y);
+	//=> 0.475, -0.475
+	_gg(m->vertices[1].x, m->vertices[1].y);
+	//=> -0.475, -0.475
+	_gg(m->vertices[2].x, m->vertices[2].y);
+	//=> -0.475, 0.475
+	_gg(m->vertices[3].x, m->vertices[3].y);
+	//=> 0.475, 0.475
+	_gg(m->vertices[m->vertices_length - 1].x, m->vertices[m->vertices_length - 1].y);
+	//=> 31.475, 63.475
+
+	_dd(m->vertices[0].hx, m->vertices[0].hy);
+	//=> 0, 0
+	_dd(m->vertices[3].hx, m->vertices[3].hy);
+	//=> 0, 0
+	_dd(m->vertices[4].hx, m->vertices[4].hy);
+	//=> 1, 0
+	_dd(m->vertices[m->vertices_length - 1].hx, m->vertices[m->vertices_length - 1].hy);
+	//=> 31, 63
+
+	_ddd(m->indices[0], m->indices[1], m->indices[2]);
+	//=> 0, 1, 2
+	_ddd(m->indices[3], m->indices[4], m->indices[5]);
+	//=> 0, 2, 3
+	_ddd(m->indices[m->indices_length - 3], m->indices[m->indices_length - 1], m->indices[m->indices_length - 1]);
+	//=> 8188, 8191, 8191
 
 	fill_mesh_terminate(m);
 	free(m);

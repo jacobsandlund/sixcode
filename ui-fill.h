@@ -34,16 +34,20 @@ typedef struct {
 } UiFillBuffers;
 
 typedef struct {
+	UiFillBuffers buffers[UI_FILL_NUM_MESHES];
+	FillMesh meshes[UI_FILL_NUM_MESHES];
+} UiFillLayoutData;
+
+typedef struct {
 	UiGrid *ui_grid;
 
 	ShaderProgram shader;
 
 	UiFillAttributes attributes;
 	UiFillUniforms uniforms;
-	UiFillBuffers buffers[UI_FILL_NUM_MESHES];
 	GLuint instanceBuffer;
 
-	FillMesh meshes[UI_FILL_NUM_MESHES];
+	UiFillLayoutData layouts[VIEW_NUM_LAYOUTS];
 	InstanceMesh instance_mesh;
 } UiFill;
 

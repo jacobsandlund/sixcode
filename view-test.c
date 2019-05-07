@@ -137,12 +137,15 @@ TEST(view_update_matrix)
 	free(vw);
 }
 
-TEST(view_hex_round)
+TEST(view_world_round_hex)
 {
-	ivec2 a = {0, 0};
-	ivec2 b = {1, -1};
-	ivec2 c = {-1, -1};
-	ivec2 d = {-15, 63};
+	View *vw = malloc(sizeof *vw);
+	view_layout(vw, VIEW_LAYOUT_HEX);
+
+	vec2 a = {0, 0};
+	vec2 b = {0.5, -1};
+	vec2 c = {-0.5, -1};
+	vec2 d = {-14.5, 63};
 	vec2 closer_to_a = {
 		a.x * 0.4 + b.x * 0.3 + c.x * 0.3,
 		a.y * 0.4 + b.y * 0.3 + c.y * 0.3,
@@ -164,19 +167,65 @@ TEST(view_hex_round)
 		a.y * 0.449 + d.y * 0.501,
 	};
 
-	_i2(view_hex_round(closer_to_a));
+	_i2(view_world_round(vw, closer_to_a));
 	//=> 0, 0
-	_i2(view_hex_round(closer_to_b));
+	_i2(view_world_round(vw, closer_to_b));
 	//=> 0, -1
-	_i2(view_hex_round(closer_to_c));
+	_i2(view_world_round(vw, closer_to_c));
 	//=> -1, -1
-	_i2(view_hex_round(between_c_and_d_1));
+	_i2(view_world_round(vw, between_c_and_d_1));
 	//=> -8, 31
-	_i2(view_hex_round(between_c_and_d_2));
-	//=> -8, 31
+	_i2(view_world_round(vw, between_c_and_d_2));
+	//=> -7, 32
+
+	free(vw);
 }
 
-TEST(view_viewport_to_quad)
+TEST(view_world_round_rect)
+{
+	View *vw = malloc(sizeof *vw);
+	view_layout(vw, VIEW_LAYOUT_RECT);
+
+	vec2 a = {0, 0};
+	vec2 b = {1, -1};
+	vec2 c = {0, -1};
+	vec2 d = {-15, 63};
+	vec2 closer_to_a = {
+		a.x * 0.6 + b.x * 0.4,
+		a.y * 0.6 + b.y * 0.4,
+	};
+	vec2 closer_to_b = {
+		a.x * 0.4 + b.x * 0.6,
+		a.y * 0.4 + b.y * 0.6,
+	};
+	vec2 closer_to_c = {
+		b.x * 0.4 + c.x * 0.6,
+		b.y * 0.4 + c.y * 0.6,
+	};
+	vec2 between_c_and_d_1 = {
+		a.x * 0.501 + d.x * 0.499,
+		a.y * 0.501 + d.y * 0.499,
+	};
+	vec2 between_c_and_d_2 = {
+		a.x * 0.449 + d.x * 0.501,
+		a.y * 0.449 + d.y * 0.501,
+	};
+
+	_i2(view_world_round(vw, closer_to_a));
+	//=> 0, 0
+	_i2(view_world_round(vw, closer_to_b));
+	//=> 1, -1
+	_i2(view_world_round(vw, closer_to_c));
+	//=> 0, -1
+	_i2(view_world_round(vw, between_c_and_d_1));
+	//=> -7, 31
+	_i2(view_world_round(vw, between_c_and_d_2));
+	//=> -8, 32
+
+	free(vw);
+}
+
+TEST(view_viewport_to_quad_hex)
 {
 	Quad q;
 	View *vw = malloc(sizeof *vw);
@@ -229,21 +278,56 @@ TEST(view_viewport_to_quad)
 	free(vw);
 }
 
-TEST(view_screen_points_to_quad)
+TEST(view_viewport_to_quad_rect)
 {
 	Quad q;
 	View *vw = malloc(sizeof *vw);
-	vec2 viewport_size = {1997, 1440};
-	vec2 translation = {1256.66, 778.438};
-	float scale = 45.0;
+	vec2 viewport_size = {2000, 1440};
+	vec2 translation = {1.64184, 0.75};
+	float scale = 32.0;
 	view_initialize(vw, viewport_size, translation, scale);
-	vec2 v1 = {15.3, 1040};
-	vec2 v2 = {1698, 370};
+	view_layout(vw, VIEW_LAYOUT_RECT);
 
-	view_screen_points_to_quad(vw, &q, v1, v2);
-
+	// Wide viewport
+	view_viewport_to_quad(vw, &q);
 	_qd(q);
-	//=> (1244, 773), (1265, 783)
+	//=> (-16, -14), (20, 16)
+
+	// Narrow with bottom and tops showing
+	translation = (vec2) {1.13244, -1.50198};
+	scale = 256;
+	view_initialize(vw, viewport_size, translation, scale);
+
+	view_viewport_to_quad(vw, &q);
+	_qd(q);
+	//=> (-2, -4), (3, 1)
+	
+	// Right and left barely showing
+	translation = (vec2) {1.01235, -1.98722};
+	scale = 1024;
+	view_initialize(vw, viewport_size, translation, scale);
+
+	view_viewport_to_quad(vw, &q);
+	_qd(q);
+	//=> (0, -3), (2, -1)
+
+	// Almost only showing one hex
+	translation = (vec2) {8.54057, -3.04374};
+	scale = 1448;
+	view_initialize(vw, viewport_size, translation, scale);
+
+	view_viewport_to_quad(vw, &q);
+	_qd(q);
+	//=> (8, -4), (9, -3)
+
+	// Only showing one hex
+	translation = (vec2) {1.00386, -2.02635};
+	scale = 1448;
+	view_initialize(vw, viewport_size, translation, scale);
+
+	view_viewport_to_quad(vw, &q);
+	_qd(q);
+	//=> (1, -2), (1, -2)
 
 	free(vw);
 }

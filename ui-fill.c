@@ -87,31 +87,40 @@ bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	//////////////////
 	// mesh + buffers
 
-	int size = UI_FILL_MESH_MAX_SIZE;
+	ViewLayout view_layouts[VIEW_NUM_LAYOUTS] = {
+		VIEW_LAYOUT_HEX,
+		VIEW_LAYOUT_RECT,
+	};
 
-	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
-		FillMesh *mesh = &ui->meshes[i];
-		UiFillBuffers *buffers = &ui->buffers[i];
+	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
+		UiFillLayoutData *layout = &ui->layouts[i];
 
-		fill_mesh_initialize(mesh, size, size);
+		int size = UI_FILL_MESH_MAX_SIZE;
 
-		glGenBuffers(1, &buffers->vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
-		glBufferData(
-				GL_ARRAY_BUFFER,
-				mesh->vertices_length * sizeof *mesh->vertices,
-				mesh->vertices,
-				GL_STATIC_DRAW);
+		for (int j = 0; j < UI_FILL_NUM_MESHES; ++j) {
+			FillMesh *mesh = &layout->meshes[j];
+			UiFillBuffers *buffers = &layout->buffers[j];
 
-		glGenBuffers(1, &buffers->indices);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
-		glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER,
-				mesh->indices_length * sizeof *mesh->indices,
-				mesh->indices,
-				GL_STATIC_DRAW);
+			fill_mesh_initialize(mesh, view_layouts[i], size, size);
 
-		size >>= 1;
+			glGenBuffers(1, &buffers->vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
+			glBufferData(
+					GL_ARRAY_BUFFER,
+					mesh->vertices_length * sizeof *mesh->vertices,
+					mesh->vertices,
+					GL_STATIC_DRAW);
+
+			glGenBuffers(1, &buffers->indices);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
+			glBufferData(
+					GL_ELEMENT_ARRAY_BUFFER,
+					mesh->indices_length * sizeof *mesh->indices,
+					mesh->indices,
+					GL_STATIC_DRAW);
+
+			size >>= 1;
+		}
 	}
 
 	instance_mesh_initialize(&ui->instance_mesh, 32);
@@ -125,11 +134,13 @@ void ui_fill_terminate(UiFill *ui)
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
 
-	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
-		fill_mesh_terminate(&ui->meshes[i]);
+	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
+		for (int j = 0; j < UI_FILL_NUM_MESHES; j++) {
+			fill_mesh_terminate(&ui->layouts[i].meshes[j]);
 
-		glDeleteBuffers(1, &ui->buffers[i].vertices);
-		glDeleteBuffers(1, &ui->buffers[i].indices);
+			glDeleteBuffers(1, &ui->layouts[i].buffers[j].vertices);
+			glDeleteBuffers(1, &ui->layouts[i].buffers[j].indices);
+		}
 	}
 
 	instance_mesh_terminate(&ui->instance_mesh);
@@ -140,8 +151,8 @@ static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
 {
 	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
 		if (
-			draw_quad->size.x > ui->meshes[i].size_x ||
-			draw_quad->size.y > ui->meshes[i].size_y
+			draw_quad->size.x > ui->layouts[0].meshes[i].size_x ||
+			draw_quad->size.y > ui->layouts[0].meshes[i].size_y
 		) {
 			return i > 0 ? i - 1 : 0;
 		}
@@ -160,8 +171,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	ui_grid_size_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
 
 	int mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
-	FillMesh *mesh = &ui->meshes[mesh_index];
-	UiFillBuffers *buffers = &ui->buffers[mesh_index];
+	FillMesh *mesh = &ui->layouts[vw->layout].meshes[mesh_index];
+	UiFillBuffers *buffers = &ui->layouts[vw->layout].buffers[mesh_index];
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);

@@ -40,6 +40,16 @@ EMSCRIPTEN_KEEPALIVE void web_view_translate(View *vw, float delta_x, float delt
 	view_translate(vw, delta);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_view_layout_set(View *vw, int layout)
+{
+	view_layout(vw, (ViewLayout) layout);
+}
+
+EMSCRIPTEN_KEEPALIVE int web_view_layout_get(View *vw)
+{
+	return (int) vw->layout;
+}
+
 
 ////////////////
 // Grid

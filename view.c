@@ -24,22 +24,10 @@ void view_initialize(View *vw, vec2 viewport_size, vec2 translation, float layou
 void view_layout(View *vw, ViewLayout layout)
 {
 	vw->layout = layout;
-
-	// TODO
-	switch (layout) {
-	case VIEW_LAYOUT_HEX:
-		vw->scale = (dvec2) {
-			1.7320508075688772,	// sqrt(3)
-			-1.5,			// -3.0 / 2.0
-		};
-		break;
-	case VIEW_LAYOUT_RECT:
-		vw->scale = (dvec2) {
-			1.0,
-			1.0,
-		};
-		break;
-	}
+	vw->scale = (dvec2) {
+		1.7320508075688772,	// sqrt(3)
+		-1.5,			// -3.0 / 2.0
+	};
 }
 
 vec2 view_screen_to_world(View *vw, vec2 v)
@@ -98,7 +86,7 @@ void view_update_matrix(View *vw, vec2 draw_offset)
 	vw->view_matrix.m[3][3] = 1.0 / vw->layout_independent_scale / 2.0;
 }
 
-ivec2 view_hex_round(vec2 v)
+ivec2 view_world_round_hex(vec2 v)
 {
 	double r = v.y;
 	double q = (v.x * 2.0 - v.y) / 2.0;
@@ -122,7 +110,25 @@ ivec2 view_hex_round(vec2 v)
 	};
 }
 
-void view_viewport_to_quad(View *vw, Quad *out_q)
+ivec2 view_world_round_rect(vec2 v)
+{
+	return (ivec2) {
+		lround(v.x),
+		lround(v.y),
+	};
+}
+
+ivec2 view_world_round(View *vw, vec2 v)
+{
+	switch (vw->layout) {
+	case VIEW_LAYOUT_HEX:
+		return view_world_round_hex(v);
+	case VIEW_LAYOUT_RECT:
+		return view_world_round_rect(v);
+	}
+}
+
+void view_viewport_to_quad_hex(View *vw, Quad *out_q)
 {
 	vec2 top_left_point = {-1, -1};
 	vec2 bottom_right_point = {
@@ -147,10 +153,10 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 		vec2 top_right = {bottom_right.x, top_left.y};
 		vec2 bottom_left = {top_left.x, bottom_right.y};
 
-		ivec2 top_left_hex = view_hex_round(top_left);
-		ivec2 top_right_hex = view_hex_round(top_right);
-		ivec2 bottom_left_hex = view_hex_round(bottom_left);
-		ivec2 bottom_right_hex = view_hex_round(bottom_right);
+		ivec2 top_left_hex = view_world_round_hex(top_left);
+		ivec2 top_right_hex = view_world_round_hex(top_right);
+		ivec2 bottom_left_hex = view_world_round_hex(bottom_left);
+		ivec2 bottom_right_hex = view_world_round_hex(bottom_right);
 
 		if (top_left_hex.x == top_right_hex.x) {
 			out_q->min.y = top_left_hex.y;
@@ -170,9 +176,28 @@ void view_viewport_to_quad(View *vw, Quad *out_q)
 	}
 }
 
-void view_screen_points_to_quad(View *vw, Quad *out_q, vec2 v1, vec2 v2)
+void view_viewport_to_quad_rect(View *vw, Quad *out_q)
 {
-	ivec2 h1 = view_hex_round(view_screen_to_world(vw, v1));
-	ivec2 h2 = view_hex_round(view_screen_to_world(vw, v2));
-	quad_from_hexes(out_q, h1, h2);
+	vec2 top_left_point = {-1, -1};
+	vec2 bottom_right_point = {
+		vw->viewport_size.x + 1,
+		vw->viewport_size.y + 1,
+	};
+
+	out_q->min = view_world_round_rect(
+			view_screen_to_world(vw, top_left_point));
+	out_q->max = view_world_round_rect(
+			view_screen_to_world(vw, bottom_right_point));
+}
+
+void view_viewport_to_quad(View *vw, Quad *out_q)
+{
+	switch (vw->layout) {
+	case VIEW_LAYOUT_HEX:
+		view_viewport_to_quad_hex(vw, out_q);
+		break;
+	case VIEW_LAYOUT_RECT:
+		view_viewport_to_quad_rect(vw, out_q);
+		break;
+	}
 }

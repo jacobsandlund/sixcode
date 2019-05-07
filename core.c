@@ -27,7 +27,7 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 {
 	static u8 style = CORE_HEX_FILL_MIN;
 
-	ivec2 h = view_hex_round(view_screen_to_world(vw, v));
+	ivec2 h = view_world_round(vw, view_screen_to_world(vw, v));
 
 	if (!quad_contains(&g->quad, h)) {
 		return;

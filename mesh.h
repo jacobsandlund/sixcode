@@ -2,6 +2,7 @@
 #define __MESH_H__
 
 #include "sixcode.h"
+#include "view.h"
 
 typedef struct {
 	float x;
@@ -30,7 +31,7 @@ typedef struct {
 	int vertices_capacity;
 } InstanceMesh;
 
-void fill_mesh_initialize(FillMesh *m, int size_x, int size_y);
+void fill_mesh_initialize(FillMesh *m, ViewLayout layout, int size_x, int size_y);
 void fill_mesh_terminate(FillMesh *m);
 void instance_mesh_initialize(InstanceMesh *m, int length);
 void instance_mesh_resize(InstanceMesh *m, int length);

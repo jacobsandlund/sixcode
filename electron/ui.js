@@ -26,6 +26,8 @@ const SCALE_LEVELS = [
     2048.0,
 ];
 
+const VIEW_NUM_LAYOUTS = 2;
+
 let canvas;
 let grid;
 let ui;
@@ -78,6 +80,7 @@ function sixcode_initialized() {
     canvas.addEventListener('mousedown', mouseDown);
     window.addEventListener('mousemove', mouseMove);
     window.addEventListener('mouseup', mouseUp);
+    window.addEventListener('keydown', keyDown);
     window.oncontextmenu = function () {
         return false;
     };
@@ -228,6 +231,16 @@ function mouseMove(e) {
         lastMouseY = mouseY;
 
         Module._web_view_translate(view, deltaX, deltaY);
+
+        draw();
+    }
+}
+
+function keyDown(e) {
+    if (e.code === 'Digit1') {
+        let layout = Module._web_view_layout_get(view);
+        layout = (layout + 1) % VIEW_NUM_LAYOUTS;
+        Module._web_view_layout_set(view, layout);
 
         draw();
     }

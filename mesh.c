@@ -4,18 +4,23 @@
 
 #define FILL_MESH_VERTICES_PER_HEX 6
 #define FILL_MESH_INDICES_PER_HEX 12
-#define MESH_FILL_FRACTION 0.95
+#define FILL_MESH_VERTICES_PER_RECT 4
+#define FILL_MESH_INDICES_PER_RECT 6
+#define FILL_MESH_FRACTION 0.95
 
 static vec2 mesh_hex_corner(int corner)
 {
-	double angle = M_PI / 3.0 * (0.5 + corner);
+	double angle = -M_PI / 3.0 * (0.5 + corner);
+	View vw;
+	view_layout(&vw, VIEW_LAYOUT_HEX);
+
 	return (vec2) {
-		cos(angle) * MESH_FILL_FRACTION * 0.5773502691896258,	// 1.0 / sqrt(3)
-		sin(angle) * MESH_FILL_FRACTION * -0.6666666666666666,	// -2.0 / 3.0
+		cos(angle) * FILL_MESH_FRACTION / vw.scale.x,
+		sin(angle) * FILL_MESH_FRACTION / vw.scale.y,
 	};
 }
 
-void fill_mesh_initialize(FillMesh *m, int size_x, int size_y)
+void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
 {
 	int num_hexes = size_x * size_y;
 	m->vertices_length = FILL_MESH_VERTICES_PER_HEX * num_hexes;
@@ -67,6 +72,73 @@ void fill_mesh_initialize(FillMesh *m, int size_x, int size_y)
 
 			vi += FILL_MESH_VERTICES_PER_HEX;
 		}
+	}
+}
+
+void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
+{
+	int num_rects = size_x * size_y;
+	m->vertices_length = FILL_MESH_VERTICES_PER_RECT * num_rects;
+	m->indices_length = FILL_MESH_INDICES_PER_RECT * num_rects;
+	m->size_x = size_x;
+	m->size_y = size_y;
+
+	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
+	m->indices = malloc(m->indices_length * sizeof *m->indices);
+
+	vec2 size = {
+		0.5 * FILL_MESH_FRACTION,
+		0.5 * FILL_MESH_FRACTION,
+	};
+
+	vec2 corners[] = {
+		{size.x, -size.y},
+		{-size.x, -size.y},
+		{-size.x, size.y},
+		{size.x, size.y},
+	};
+
+	u16 indices_single[] = {
+		0, 1, 2,
+		0, 2, 3,
+	};
+
+	ivec2 h;
+	int vi = 0;
+	int ii = 0;
+
+	for (h.y = 0; h.y < size_y; ++h.y) {
+		for (h.x = 0; h.x < size_x; ++h.x) {
+			vec2 center = vec2_from_ivec(h);
+
+			for (int i = 0; i < FILL_MESH_INDICES_PER_RECT; ++i) {
+				m->indices[ii + i] = vi + indices_single[i];
+			}
+
+			ii += FILL_MESH_INDICES_PER_RECT;
+
+			for (int i = 0; i < FILL_MESH_VERTICES_PER_RECT; ++i) {
+				FillMeshVertex *vx = &m->vertices[vi + i];
+				vx->x = corners[i].x + center.x;
+				vx->y = corners[i].y + center.y;
+				vx->hx = h.x;
+				vx->hy = h.y;
+			}
+
+			vi += FILL_MESH_VERTICES_PER_RECT;
+		}
+	}
+}
+
+void fill_mesh_initialize(FillMesh *m, ViewLayout layout, int size_x, int size_y)
+{
+	switch (layout) {
+	case VIEW_LAYOUT_HEX:
+		fill_mesh_initialize_hex(m, size_x, size_y);
+		break;
+	case VIEW_LAYOUT_RECT:
+		fill_mesh_initialize_rect(m, size_x, size_y);
+		break;
 	}
 }
 
