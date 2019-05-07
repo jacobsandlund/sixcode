@@ -22,6 +22,11 @@ typedef struct {
 } vec2;
 
 typedef struct {
+	double x;
+	double y;
+} dvec2;
+
+typedef struct {
 	i32 x;
 	i32 y;
 } ivec2;

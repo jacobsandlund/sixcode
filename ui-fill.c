@@ -1,7 +1,6 @@
 #include "ui-fill.h"
 #include <stdio.h>
 #include <string.h>
-#include "hex-coords.h"
 
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 position;\n"
@@ -191,8 +190,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	glUniform2f(
 			ui->uniforms.gridSize,
-			(float) g->storage_quad.size.x,
-			(float) g->storage_quad.size.y);
+			(float) g->size_quad.size.x,
+			(float) g->size_quad.size.y);
 
 	glUniform1f(
 			ui->uniforms.styleOffset,
@@ -206,9 +205,7 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.fill_colors);
 	glUniform1i(ui->uniforms.fillColors, 1);
 
-	vec2 draw_offset = view_hex_to_world(
-			vec2_from_ivec(
-			hex_coords_from_storage(draw_quad.min)));
+	vec2 draw_offset = vec2_from_ivec(draw_quad.min);
 	view_update_matrix(vw, draw_offset);
 
 	glUniformMatrix4fv(
@@ -229,15 +226,13 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 
 	ivec2 h;
 	int i = 0;
-	ivec2 draw_quad_min_offset = ivec2_sub(draw_quad.min, g->storage_quad.min);
+	ivec2 draw_quad_min_offset = ivec2_sub(draw_quad.min, g->size_quad.min);
 
 	for (h.y = 0; h.y < draw_quad.size.y; h.y += UI_FILL_MESH_MAX_SIZE) {
 		for (h.x = 0; h.x < draw_quad.size.x; h.x += UI_FILL_MESH_MAX_SIZE) {
 			InstanceMeshVertex *vx = &imesh->vertices[i];
 
-			vx->positionOffset = view_hex_to_world(
-					vec2_from_ivec(
-					hex_coords_from_storage(h)));
+			vx->positionOffset = vec2_from_ivec(h);
 
 			ivec2 grid_offset = ivec2_add(h, draw_quad_min_offset);
 			vx->gridPositionOffset.x = grid_offset.x;

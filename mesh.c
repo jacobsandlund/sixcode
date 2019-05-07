@@ -1,8 +1,6 @@
 #include "mesh.h"
 #include <math.h>
 #include <stdlib.h>
-#include "hex-coords.h"
-#include "view.h"
 
 #define FILL_MESH_VERTICES_PER_HEX 6
 #define FILL_MESH_INDICES_PER_HEX 12
@@ -12,8 +10,8 @@ static vec2 mesh_hex_corner(int corner)
 {
 	double angle = M_PI / 3.0 * (0.5 + corner);
 	return (vec2) {
-		cos(angle) * MESH_FILL_FRACTION,
-		sin(angle) * MESH_FILL_FRACTION,
+		cos(angle) * MESH_FILL_FRACTION * 0.5773502691896258,	// 1.0 / sqrt(3)
+		sin(angle) * MESH_FILL_FRACTION * -0.6666666666666666,	// -2.0 / 3.0
 	};
 }
 
@@ -50,9 +48,8 @@ void fill_mesh_initialize(FillMesh *m, int size_x, int size_y)
 
 	for (h.y = 0; h.y < size_y; ++h.y) {
 		for (h.x = 0; h.x < size_x; ++h.x) {
-			vec2 center = view_hex_to_world(
-					vec2_from_ivec(
-					hex_coords_from_storage(h)));
+			vec2 center = vec2_from_ivec(h);
+			center.x += 0.5 * (h.y & 1);
 
 			for (int i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
 				m->indices[ii + i] = vi + indices_single[i];

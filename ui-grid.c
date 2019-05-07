@@ -105,7 +105,7 @@ void ui_grid_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *
 {
 	Quad intersect_quad;
 	quad_intersect(&intersect_quad, viewport_quad, grid_styles_quad);
-	quad_to_storage_size_quad(out_sq, &intersect_quad);
+	quad_to_size_quad(out_sq, &intersect_quad);
 	size_quad_even_align(out_sq, out_sq);
 }
 
@@ -118,8 +118,8 @@ void ui_grid_update_styles(UiGrid *ui, Grid *g)
 			GL_TEXTURE_2D,
 			0,
 			GL_ALPHA,
-			g->storage_quad.size.x,
-			g->storage_quad.size.y,
+			g->size_quad.size.x,
+			g->size_quad.size.y,
 			0,
 			GL_ALPHA,
 			GL_UNSIGNED_BYTE,
@@ -129,7 +129,7 @@ void ui_grid_update_styles(UiGrid *ui, Grid *g)
 void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 {
 	SizeQuad sq;
-	quad_to_storage_size_quad(&sq, quad);
+	quad_to_size_quad(&sq, quad);
 	int need_capacity = size_quad_capacity(&sq);
 
 	if (need_capacity > ui->styles_buffer_capacity) {
@@ -145,8 +145,8 @@ void ui_grid_update_styles_in_quad(UiGrid *ui, Grid *g, Quad *quad)
 		ui->styles_buffer_capacity = need_capacity;
 	}
 
-	ivec2 min = ivec2_sub(sq.min, g->storage_quad.min);
-	int storage_size_x = g->storage_quad.size.x;
+	ivec2 min = ivec2_sub(sq.min, g->size_quad.min);
+	int storage_size_x = g->size_quad.size.x;
 
 	for (int r = 0; r < sq.size.y; ++r) {
 		u8 *dest = &ui->styles_buffer[r * sq.size.x];

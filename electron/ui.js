@@ -1,4 +1,6 @@
 const SCALE_LEVELS = [
+    0.5,
+    0.75,
     1.0,
     1.5,
     2.0,
@@ -6,13 +8,13 @@ const SCALE_LEVELS = [
     4.0,
     6.0,
     8.0,
-    11.0,
+    12.0,
     16.0,
     23.0,
     32.0,
-    45.0,
+    46.0,
     64.0,
-    91.0,
+    90.0,
     128.0,
     181.0,
     256.0,
@@ -22,8 +24,6 @@ const SCALE_LEVELS = [
     1024.0,
     1448.0,
     2048.0,
-    2896.0,
-    4096.0,
 ];
 
 let canvas;
@@ -31,7 +31,7 @@ let grid;
 let ui;
 let view;
 
-let scaleLevel = SCALE_LEVELS.indexOf(32.0);
+let scaleLevel = SCALE_LEVELS.indexOf(16.0);
 
 function sixcode_initialized() {
     canvas = Module['canvas'];
@@ -47,7 +47,7 @@ function sixcode_initialized() {
 
     for (let i = 0; i < count; ++i) {
         let y = Math.floor(Math.random() * size) - 4096/2 + 1;
-        let x = 2 * Math.floor(Math.random() * size) + (y & 1) - 4096 + 2;
+        let x = Math.floor(Math.random() * size) - 4096/2 + 1;
         let style = Math.floor(Math.random() * 15) + 1;
         Module._web_grid_set(grid, x, y, style);
     }
@@ -59,7 +59,7 @@ function sixcode_initialized() {
 
     //for (let i = 0; i < count; ++i) {
     //    let y = Math.floor(Math.random() * size) + 1;
-    //    let x = 2 * Math.floor(Math.random() * size) + (y & 1) + 2;
+    //    let x = Math.floor(Math.random() * size) + 1;
     //    let style = Math.floor(Math.random() * 15) + 1;
     //    Module._web_grid_set(grid, x, y, style);
     //}

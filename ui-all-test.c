@@ -2,7 +2,6 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex-coords.c"
 #include "mesh.c"
 #include "shader.c"
 #include "quad.c"
@@ -15,7 +14,6 @@ TEST(ui_all)
 	vec2 viewport_size = {1000, 600};
 	vec2 translation = {100, 100};
 	float scale = 8.0;
-	Quad quad = {{-126, 1}, {253, 126}};
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
@@ -23,14 +21,14 @@ TEST(ui_all)
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
-	grid_initialize(g, &quad);
+	grid_initialize(g);
 	ui_all_initialize(ui, 0);
 	ui_grid_update_styles(&ui->grid, g);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
 	_qd(viewport_quad);
-	//=> (-116, -34), (174, 67)
+	//=> (63, 75), (136, 125)
 
 	// Zoom 1
 
@@ -42,7 +40,7 @@ TEST(ui_all)
 	//=> 600
 
 	_d(GLmock.draw_elements_count);
-	//=> 131328
+	//=> 53760
 
 	// Zoom 2
 
@@ -54,7 +52,7 @@ TEST(ui_all)
 	ui_all_draw(ui, vw, g);
 
 	_d(GLmock.draw_elements_count);
-	//=> 211968
+	//=> 89856
 
 	// Zoom 3
 
@@ -66,7 +64,7 @@ TEST(ui_all)
 	ui_all_draw(ui, vw, g);
 
 	_d(GLmock.draw_elements_count);
-	//=> 294912
+	//=> 2859264
 
 	ui_all_terminate(ui);
 	grid_terminate(g);
@@ -78,14 +76,12 @@ TEST(ui_all)
 
 TEST(ui_all_initialize_fail)
 {
-	Quad quad = {{-126, 1}, {253, 126}};
-
 	Grid *g = malloc(sizeof *g);
 	UiAll *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	GLmock.shaders[1].force_compile_error = true;
-	grid_initialize(g, &quad);
+	grid_initialize(g);
 
 	_d(ui_all_initialize(ui, 0));
 	//=> 0

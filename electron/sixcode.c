@@ -96,8 +96,7 @@ EMSCRIPTEN_KEEPALIVE void web_ui_grid_update_styles(UiGrid *ui_grid, Grid *g)
 
 EMSCRIPTEN_KEEPALIVE void web_core_grid_initialize(Grid *g)
 {
-	Quad quad = {{-UI_GRID_MAX_TEXTURE_SIZE + 2, -UI_GRID_MAX_TEXTURE_SIZE / 2 + 1}, {UI_GRID_MAX_TEXTURE_SIZE - 3, UI_GRID_MAX_TEXTURE_SIZE / 2 - 2}};
-	core_grid_initialize(g, &quad);
+	core_grid_initialize(g);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_core_tick(UiAll *ui, View *vw, Grid *g)

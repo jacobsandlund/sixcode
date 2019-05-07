@@ -2,7 +2,6 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex-coords.c"
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
@@ -210,7 +209,6 @@ TEST(ui_draw_fill)
 	vec2 viewport_size = {1000, 600};
 	vec2 translation = {100, 100};
 	float scale = 10.0;
-	Quad quad = {{-126, 1}, {253, 126}};
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
@@ -219,7 +217,7 @@ TEST(ui_draw_fill)
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
-	grid_initialize(g, &quad);
+	grid_initialize(g);
 	ui_grid_initialize(ui_grid, 0);
 	ui_grid_update_styles(ui_grid, g);
 	ui_fill_initialize(ui, ui_grid);
@@ -227,7 +225,7 @@ TEST(ui_draw_fill)
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
 	_qd(viewport_quad);
-	//=> (-93, -27), (139, 54)
+	//=> (71, 80), (129, 120)
 
 	ui_fill_draw(ui, vw, g, &viewport_quad);
 
@@ -268,9 +266,9 @@ TEST(ui_draw_fill)
 	GLmockUniform *grid_size = &program->uniforms[ui->uniforms.gridSize];
 
 	_gg(grid_size->fv0, grid_size->fv1);
-	//=> 192, 128
-	_i2(g->storage_quad.size);
-	//=> 192, 128
+	//=> 4096, 4096
+	_i2(g->size_quad.size);
+	//=> 4096, 4096
 
 	_d(program->uniforms[ui->uniforms.styleOffset].iv0);
 	//=> 0
@@ -280,9 +278,9 @@ TEST(ui_draw_fill)
 	//=> 1
 
 	_gg(m->m[0][0], m->m[1][1]);
-	//=> 0.001, 0.00166667
+	//=> 0.00173205, -0.0025
 	_ggg(m->m[3][0], m->m[3][1], m->m[3][3]);
-	//=> -0.101406, 0.0333333, 0.1
+	//=> -0.0502295, 0.05, 0.05
 
 	// Textures
 
@@ -300,21 +298,21 @@ TEST(ui_draw_fill)
 
 	InstanceMesh *imesh = &ui->instance_mesh;
 	_d(imesh->vertices_length);
-	//=> 105
+	//=> 48
 
 	_v2(imesh->vertices[0].positionOffset);
-	//=> 0, -0
+	//=> 0, 0
 	_i2(imesh->vertices[0].gridPositionOffset);
-	//=> 17, 0
+	//=> 2119, 2128
 
-	_v2(imesh->vertices[104].positionOffset);
-	//=> 193.99, -72
-	_i2(imesh->vertices[104].gridPositionOffset);
-	//=> 129, 48
+	_v2(imesh->vertices[imesh->vertices_length - 1].positionOffset);
+	//=> 56, 40
+	_i2(imesh->vertices[imesh->vertices_length - 1].gridPositionOffset);
+	//=> 2175, 2168
 
 	GLmockBuffer *instance_buffer = &GLmock.buffers[ui->instanceBuffer];
 	_d(instance_buffer->size);
-	//=> 1680
+	//=> 768
 	_d(instance_buffer->data == ui->meshes[0].vertices);
 	//=> 0
 	_d(instance_buffer->usage == GL_STREAM_DRAW);
@@ -363,9 +361,9 @@ TEST(ui_draw_fill)
 	_d(GLmock.draw_elements_type == GL_UNSIGNED_SHORT);
 	//=> 1
 	_d(GLmock.draw_elements_count);
-	//=> 80640
+	//=> 36864
 	_d(GLmock.draw_elements_instanced_primcount);
-	//=> 105
+	//=> 48
 
 	grid_terminate(g);
 	ui_grid_terminate(ui_grid);

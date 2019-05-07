@@ -1,6 +1,5 @@
 #include "quad.c"
 #include "test.h"
-#include "hex-coords.c"
 
 TEST(quad_contains)
 {
@@ -22,25 +21,6 @@ TEST(quad_contains)
 	//=> 0
 }
 
-TEST(quad_contains_quad)
-{
-	Quad outer = {{-4, 2}, {7, 6}};
-	Quad inner = {{-1, 2}, {1, 4}};
-
-	_d(quad_contains_quad(&outer, &outer));
-	//=> 1
-	_d(quad_contains_quad(&outer, &inner));
-	//=> 1
-
-	inner.min = (ivec2) {-1, 1};
-	_d(quad_contains_quad(&outer, &inner));
-	//=> 0
-
-	inner = (Quad) {{-4, 2}, {8, 4}};
-	_d(quad_contains_quad(&outer, &inner));
-	//=> 0
-}
-
 TEST(quad_from_hexes)
 {
 	Quad q;
@@ -54,80 +34,6 @@ TEST(quad_from_hexes)
 	quad_from_hexes(&q, h2, h1);
 	_qd(q);
 	//=> (-6, -3), (700, 8)
-}
-
-TEST(quad_expand_for_hex)
-{
-	Quad out_q;
-	Quad q = {{0, 0}, {127, 63}};
-
-	ivec2 h = {-1, 75};
-	quad_expand_for_hex(&out_q, &q, h);
-	_qd(out_q);
-	//=> (-1, 0), (127, 75)
-
-	h = (ivec2) {253, -480};
-	quad_expand_for_hex(&q, &q, h);
-	_qd(q);
-	//=> (0, -480), (253, 63)
-}
-
-TEST(quad_expand_for_quad)
-{
-	Quad out_q;
-	Quad a = {{0, 0}, {127, 63}};
-	Quad b = {{-1, 75}, {500, 76}};
-
-	quad_expand_for_quad(&out_q, &a, &b);
-	_qd(out_q);
-	//=> (-1, 0), (500, 76)
-
-	b = (Quad) {{-100, -3}, {-3, 48}};
-	quad_expand_for_quad(&out_q, &a, &b);
-	_qd(out_q);
-	//=> (-100, -3), (127, 63)
-}
-
-TEST(quad_block_align)
-{
-	Quad out_q;
-	ivec2 block_size = {128, 64};
-
-	Quad q = {{1, 0}, {48, 13}};
-	quad_block_align(&out_q, &q, block_size);
-	_qd(out_q);
-	//=> (0, 0), (127, 63)
-
-	q = (Quad) {{-150, -310}, {-60, -129}};
-	quad_block_align(&q, &q, block_size);
-	_qd(q);
-	//=> (-256, -320), (-1, -129)
-
-	q = (Quad) {{-240, -1}, {500, 1020}};
-	quad_block_align(&out_q, &q, block_size);
-	_qd(out_q);
-	//=> (-256, -64), (511, 1023)
-}
-
-TEST(quad_resize_by_delta)
-{
-	Quad out_q;
-	Quad q = {{4, -8}, {10, 32}};
-	ivec2 delta = {+2, +1};
-
-	quad_resize_by_delta(&out_q, &q, delta);
-	_qd(out_q);
-	//=> (2, -9), (12, 33)
-
-	delta = (ivec2) {-2, -1};
-	quad_resize_by_delta(&out_q, &out_q, delta);
-	_qd(out_q);
-	//=> (4, -8), (10, 32)
-
-	delta = (ivec2) {+4, +4};
-	quad_resize_by_delta(&out_q, &q, delta);
-	_qd(out_q);
-	//=> (0, -12), (14, 36)
 }
 
 TEST(quad_intersect)
@@ -146,23 +52,6 @@ TEST(quad_intersect)
 	//=> (256, 128), (255, 63)
 }
 
-TEST(quad_hex_coords_to_storage)
-{
-	Quad storage_quad;
-	Quad q1 = {{-2, 8}, {5, 18}};
-	Quad q2 = {{3, 2}, {4, 3}};
-
-	quad_hex_coords_to_storage(&storage_quad, &q1);
-
-	_qd(storage_quad);
-	//=> (-1, 8), (2, 18)
-
-	quad_hex_coords_to_storage(&storage_quad, &q2);
-
-	_qd(storage_quad);
-	//=> (1, 2), (2, 3)
-}
-
 TEST(quad_to_size_quad)
 {
 	SizeQuad sq;
@@ -172,17 +61,6 @@ TEST(quad_to_size_quad)
 
 	_sq(sq);
 	//=> (0, 1), (7, 4)
-}
-
-TEST(quad_to_storage_size_quad)
-{
-	SizeQuad storage_quad;
-	Quad quad = {{0, 23}, {125, 63}};
-
-	quad_to_storage_size_quad(&storage_quad, &quad);
-
-	_sq(storage_quad);
-	//=> (0, 23), (63, 41)
 }
 
 TEST(size_quad_even_align)

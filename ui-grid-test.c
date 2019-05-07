@@ -2,7 +2,6 @@
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
-#include "hex-coords.c"
 #include "quad.c"
 #include "shader.c"
 #include "view.c"
@@ -119,7 +118,7 @@ TEST(ui_grid_size_quad_for_draw)
 	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
 	_sq(out_sq);
-	//=> (0, 0), (30, 30)
+	//=> (0, 0), (60, 30)
 
 	viewport_quad.min = (ivec2) {5, 5};
 
@@ -128,18 +127,16 @@ TEST(ui_grid_size_quad_for_draw)
 	ui_grid_size_quad_for_draw(&out_sq, &grid_styles_quad, &viewport_quad);
 
 	_sq(out_sq);
-	//=> (2, 4), (28, 26)
+	//=> (5, 4), (55, 26)
 }
 
 TEST(ui_grid_update_styles)
 {
-	Quad quad = {{2, 1}, {125, 126}};
-
 	Grid *g = malloc(sizeof *g);
 	UiGrid *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	grid_initialize(g, &quad);
+	grid_initialize(g);
 	ui_grid_initialize(ui, 0);
 	GLmock.bound_textures[0] = 0;
 
@@ -148,7 +145,7 @@ TEST(ui_grid_update_styles)
 	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->textures.grid_styles];
 
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
-	//=> 64, 128
+	//=> 4096, 4096
 	_d(grid_styles_texture->format == GL_ALPHA);
 	//=> 1
 	_d(grid_styles_texture->type == GL_UNSIGNED_BYTE);
@@ -170,13 +167,12 @@ TEST(ui_grid_update_styles_in_quad)
 {
 	Quad quad;
 	SizeQuad sq;
-	Quad grid_quad = {{2, 1}, {125, 62}};
 
 	Grid *g = malloc(sizeof *g);
 	UiGrid *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	grid_initialize(g, &grid_quad);
+	grid_initialize(g);
 
 	_d(ui_grid_initialize(ui, 2500));
 	//=> 1
@@ -187,20 +183,20 @@ TEST(ui_grid_update_styles_in_quad)
 
 	// Under the current capacity
 	quad = (Quad) {{10, 20}, {31, 59}};
-	quad_to_storage_size_quad(&sq, &quad);
-	_i2(ivec2_sub(sq.min, g->storage_quad.min));
-	//=> 5, 20
+	quad_to_size_quad(&sq, &quad);
+	_i2(ivec2_sub(sq.min, g->size_quad.min));
+	//=> 2058, 2068
 	_i2(sq.size);
-	//=> 11, 40
+	//=> 22, 40
 	
 	ui_grid_update_styles_in_quad(ui, g, &quad);
 
 	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->textures.grid_styles];
 
 	_dd(grid_styles_texture->xoffset, grid_styles_texture->yoffset);
-	//=> 5, 20
+	//=> 2058, 2068
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
-	//=> 11, 40
+	//=> 22, 40
 	_d(grid_styles_texture->format == GL_ALPHA);
 	//=> 1
 	_d(grid_styles_texture->type == GL_UNSIGNED_BYTE);
@@ -208,39 +204,39 @@ TEST(ui_grid_update_styles_in_quad)
 	_d(grid_styles_texture->data == ui->styles_buffer);
 	//=> 1
 	_d(ui->styles_buffer_capacity);
-	//=> 440
+	//=> 880
 
 	// Under/equal the max capacity
 	quad = (Quad) {{10, 10}, {109, 59}};
-	quad_to_storage_size_quad(&sq, &quad);
+	quad_to_size_quad(&sq, &quad);
 	_i2(sq.size);
-	//=> 50, 50
+	//=> 100, 50
 	_d(size_quad_capacity(&sq));
-	//=> 2500
+	//=> 5000
 
 	ui_grid_update_styles_in_quad(ui, g, &quad);
 
 	_d(ui->styles_buffer_capacity);
-	//=> 2500
+	//=> 880
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
-	//=> 50, 50
+	//=> 4096, 4096
 
 	// Over the max capacity
 	quad = (Quad) {{10, 10}, {109, 60}};
-	quad_to_storage_size_quad(&sq, &quad);
-	_i2(ivec2_sub(sq.min, g->storage_quad.min));
-	//=> 5, 10
+	quad_to_size_quad(&sq, &quad);
+	_i2(ivec2_sub(sq.min, g->size_quad.min));
+	//=> 2058, 2058
 	_i2(sq.size);
-	//=> 50, 51
-	_i2(g->storage_quad.size);
-	//=> 64, 64
+	//=> 100, 51
+	_i2(g->size_quad.size);
+	//=> 4096, 4096
 
 	ui_grid_update_styles_in_quad(ui, g, &quad);
 
 	_d(ui->styles_buffer_capacity);
-	//=> 2500
+	//=> 880
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
-	//=> 64, 64
+	//=> 4096, 4096
 
 	grid_terminate(g);
 	ui_grid_terminate(ui);
