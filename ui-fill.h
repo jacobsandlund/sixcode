@@ -7,7 +7,7 @@
 #include "mesh.h"
 #include "quad.h"
 #include "shader.h"
-#include "ui-grid.h"
+#include "texture.h"
 #include "view.h"
 
 #define UI_FILL_MESH_MAX_SIZE 8
@@ -39,9 +39,9 @@ typedef struct {
 } UiFillLayoutData;
 
 typedef struct {
-	UiGrid *ui_grid;
-
 	ShaderProgram shader;
+	Texture grid_styles_texture;
+	Texture fill_colors_texture;
 
 	UiFillAttributes attributes;
 	UiFillUniforms uniforms;
@@ -51,7 +51,7 @@ typedef struct {
 	InstanceMesh instance_mesh;
 } UiFill;
 
-bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid);
+bool ui_fill_initialize(UiFill *ui);
 void ui_fill_terminate(UiFill *ui);
 void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad);
 

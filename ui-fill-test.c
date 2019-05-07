@@ -5,28 +5,31 @@
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
-#include "ui-grid.c"
+#include "texture.c"
 #include "view.c"
 
 TEST(ui)
 {
-	UiGrid *ui_grid = malloc(sizeof *ui_grid);
 	UiFill *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	ui_grid_initialize(ui_grid, 1024);
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_fill_initialize(ui));
 	//=> 1
 
 	///////////////////////
 	// load/create/link
 
 	_d(ui->shader.vertex);
+	//=> 1
+	_d(ui->shader.fragment);
 	//=> 2
 	
 	GLmockShader *vertex = &GLmock.shaders[ui->shader.vertex];
+	GLmockShader *fragment = &GLmock.shaders[ui->shader.fragment];
 	_dd(vertex->created, vertex->compiled);
+	//=> 1, 1
+	_dd(fragment->created, fragment->compiled);
 	//=> 1, 1
 
 	_d(ui->shader.program);
@@ -37,9 +40,9 @@ TEST(ui)
 	_d(program->created);
 	//=> 1
 	_d(program->attached_vertex_shader);
-	//=> 2
-	_d(program->attached_fragment_shader);
 	//=> 1
+	_d(program->attached_fragment_shader);
+	//=> 2
 
 	_d(program->linked);
 	//=> 1
@@ -89,6 +92,31 @@ TEST(ui)
 	//=> gridStyles
 	_s(program->uniforms[ui->uniforms.fillColors].name);
 	//=> fillColors
+
+	/////////////////////
+	// textures
+
+	_d(ui->grid_styles_texture);
+	//=> 1
+	_d(ui->fill_colors_texture);
+	//=> 2
+
+	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid_styles_texture.texture];
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->fill_colors_texture.texture];
+
+	_d(grid_styles_texture->created);
+	//=> 1
+	_d(fill_colors_texture->created);
+	//=> 1
+
+	_dd(fill_colors_texture->width, fill_colors_texture->height);
+	//=> 256, 1
+	_d(fill_colors_texture->format == GL_RGB);
+	//=> 1
+	_d(fill_colors_texture->type == GL_UNSIGNED_BYTE);
+	//=> 1
+	_d(fill_colors_texture->data == UI_FILL_COLORS);
+	//=> 1
 
 	/////////////////////
 	// mesh + buffers
@@ -184,41 +212,38 @@ TEST(ui)
 	_d(instance_buffer->deleted);
 	//=> 1
 
-	ui_grid_terminate(ui_grid);
-	free(ui_grid);
+	_d(grid_styles_texture->deleted);
+	//=> 1
+	_d(fill_colors_texture->deleted);
+	//=> 1
+
 	free(ui);
 }
 
 TEST(ui_initialize_fail)
 {
-	UiGrid *ui_grid = malloc(sizeof *ui_grid);
 	UiFill *ui = malloc(sizeof *ui);
 
 	// Failures
 
 	glmock_initialize();
-	ui_grid_initialize(ui_grid, 1024);
-	GLmock.shaders[ui_grid->fragment_shader + 1].force_compile_error = true;
+	GLmock.shaders[1].force_compile_error = true;
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_fill_initialize(ui));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error compiling shader. Nothing in info log.
 	//=>
 
-	ui_grid_terminate(ui_grid);
 	glmock_initialize();
-	ui_grid_initialize(ui_grid, 1024);
 	GLmock.programs[1].force_link_error = true;
 
-	_d(ui_fill_initialize(ui, ui_grid));
+	_d(ui_fill_initialize(ui));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error linking program. Nothing in info log.
 	//=>
 
-	ui_grid_terminate(ui_grid);
-	free(ui_grid);
 	free(ui);
 }
 
@@ -230,15 +255,13 @@ TEST(ui_draw_fill)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiGrid *ui_grid = malloc(sizeof *ui_grid);
 	UiFill *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g);
-	ui_grid_initialize(ui_grid, 0);
-	ui_grid_update_styles(ui_grid, g);
-	ui_fill_initialize(ui, ui_grid);
+	ui_fill_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
@@ -307,9 +330,9 @@ TEST(ui_draw_fill)
 	_d(program->uniforms[ui->uniforms.fillColors].iv0);
 	//=> 1
 
-	_d(GLmock.bound_textures[0] == ui_grid->textures.grid_styles);
+	_d(GLmock.bound_textures[0] == ui->grid_styles_texture.texture);
 	//=> 1
-	_d(GLmock.bound_textures[1] == ui_grid->textures.fill_colors);
+	_d(GLmock.bound_textures[1] == ui->fill_colors_texture.texture);
 	//=> 1
 
 	// Instance Buffer
@@ -384,12 +407,10 @@ TEST(ui_draw_fill)
 	//=> 48
 
 	grid_terminate(g);
-	ui_grid_terminate(ui_grid);
 	ui_fill_terminate(ui);
 
 	free(vw);
 	free(g);
-	free(ui_grid);
 	free(ui);
 }
 
@@ -401,16 +422,14 @@ TEST(ui_draw_fill_rect)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiGrid *ui_grid = malloc(sizeof *ui_grid);
 	UiFill *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	view_layout(vw, VIEW_LAYOUT_RECT);
 	grid_initialize(g);
-	ui_grid_initialize(ui_grid, 0);
-	ui_grid_update_styles(ui_grid, g);
-	ui_fill_initialize(ui, ui_grid);
+	ui_fill_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
@@ -436,11 +455,9 @@ TEST(ui_draw_fill_rect)
 	//=> 48
 
 	grid_terminate(g);
-	ui_grid_terminate(ui_grid);
 	ui_fill_terminate(ui);
 
 	free(vw);
 	free(g);
-	free(ui_grid);
 	free(ui);
 }

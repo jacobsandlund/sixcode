@@ -5,9 +5,9 @@
 #include "mesh.c"
 #include "quad.c"
 #include "shader.c"
+#include "texture.c"
 #include "ui-all.c"
 #include "ui-fill.c"
-#include "ui-grid.c"
 #include "view.c"
 
 #define CORE_HEX_FILL_MIN 1
@@ -45,5 +45,5 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 	}
 
 	Quad quad = {h, h};
-	ui_grid_update_styles_in_quad(&ui->grid, g, &quad);
+	texture_update_in_quad(&ui->fill.grid_styles_texture, g, &quad);
 }

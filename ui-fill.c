@@ -1,6 +1,8 @@
 #include "ui-fill.h"
-#include <stdio.h>
-#include <string.h>
+
+#define UI_FILL_COLORS_COUNT 256
+#define UI_FILL_COLOR_COMPONENTS_LENGTH 768  // 256 * 3
+#define UI_FILL_GRID_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
 
 const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 position;\n"
@@ -24,17 +26,52 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "	gl_Position = viewMatrix * vec4(position + positionOffset, 0.0, 1.0);\n"
 "}\n";
 
-bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
-{
-	ui->ui_grid = ui_grid;
+const char UI_FILL_FRAGMENT_SHADER_SOURCE[] =
+"varying lowp vec4 color;\n"
+"\n"
+"void main() {\n"
+"	gl_FragColor = color;\n"
+"}\n";
 
+const u8 UI_FILL_COLORS[UI_FILL_COLOR_COMPONENTS_LENGTH] = {
+	250, 250, 250,
+	64, 239, 233,
+	190, 190, 190,
+	255, 140, 140,
+	
+	140, 255, 140,
+	140, 140, 255,
+	255, 255, 40,
+	255, 40, 255,
+	
+	40, 255, 255,
+	255, 190, 90,
+	255, 90, 190,
+	190, 255, 90,
+	
+	90, 255, 190,
+	190, 90, 255,
+	90, 190, 255,
+	220, 190, 140,
+};
+
+bool ui_fill_initialize(UiFill *ui)
+{
 	////////////////////////
 	// load/create/link
 
 	GLuint vertex_shader = shader_load(GL_VERTEX_SHADER, UI_FILL_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	GLuint fragment_shader = shader_load(GL_FRAGMENT_SHADER, UI_FILL_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+
+	if (!vertex_shader || !fragment_shader) {
+		glDeleteShader(vertex_shader);
+		glDeleteShader(fragment_shader);
+
+		return false;
+	}
 
 	if (
-		!shader_program_create(&ui->shader, vertex_shader, ui_grid->fragment_shader, __FILE__, __LINE__) ||
+		!shader_program_create(&ui->shader, vertex_shader, fragment_shader, __FILE__, __LINE__) ||
 		!shader_program_link(&ui->shader, __FILE__, __LINE__)
 	) {
 		glDeleteShader(vertex_shader);
@@ -83,6 +120,23 @@ bool ui_fill_initialize(UiFill *ui, UiGrid *ui_grid)
 	ui->uniforms.fillColors = glGetUniformLocation(
 			ui->shader.program,
 			"fillColors");
+
+	////////////////
+	// textures
+
+	texture_initialize(&ui->grid_styles_texture, UI_FILL_GRID_STYLES_BUFFER_CAPACITY_MAX);
+	texture_initialize(&ui->fill_colors_texture, 0);
+
+	glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGB,
+			UI_FILL_COLORS_COUNT,
+			1,
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			UI_FILL_COLORS);
 
 	//////////////////
 	// mesh + buffers
@@ -133,6 +187,10 @@ void ui_fill_terminate(UiFill *ui)
 {
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
+	glDeleteShader(ui->shader.fragment);
+
+	texture_terminate(&ui->grid_styles_texture);
+	texture_terminate(&ui->fill_colors_texture);
 
 	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
 		for (int j = 0; j < UI_FILL_NUM_MESHES; j++) {
@@ -145,6 +203,14 @@ void ui_fill_terminate(UiFill *ui)
 
 	instance_mesh_terminate(&ui->instance_mesh);
 	glDeleteBuffers(1, &ui->instanceBuffer);
+}
+
+static void ui_fill_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
+{
+	Quad intersect_quad;
+	quad_intersect(&intersect_quad, viewport_quad, grid_styles_quad);
+	quad_to_size_quad(out_sq, &intersect_quad);
+	size_quad_even_align(out_sq, out_sq);
 }
 
 static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
@@ -163,12 +229,10 @@ static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
 
 void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 {
-	UiGrid *ui_grid = ui->ui_grid;
-
 	glUseProgram(ui->shader.program);
 
 	SizeQuad draw_quad;
-	ui_grid_size_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
+	ui_fill_size_quad_for_draw(&draw_quad, &g->styles_quad, viewport_quad);
 
 	int mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
 	FillMesh *mesh = &ui->layouts[vw->layout].meshes[mesh_index];
@@ -209,11 +273,11 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad)
 			0.0f);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.grid_styles);
+	glBindTexture(GL_TEXTURE_2D, ui->grid_styles_texture.texture);
 	glUniform1i(ui->uniforms.gridStyles, 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, ui_grid->textures.fill_colors);
+	glBindTexture(GL_TEXTURE_2D, ui->fill_colors_texture.texture);
 	glUniform1i(ui->uniforms.fillColors, 1);
 
 	vec2 draw_offset = vec2_from_ivec(draw_quad.min);

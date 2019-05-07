@@ -15,8 +15,8 @@ TEST(core_tick)
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g);
-	ui_all_initialize(ui, 0);
-	ui_grid_update_styles(&ui->grid, g);
+	ui_all_initialize(ui);
+	texture_update(&ui->fill.grid_styles_texture, g);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
@@ -58,8 +58,8 @@ TEST(core_toggle_hex_at_point)
 	_i2(g->size_quad.size);
 	//=> 4096, 4096
 
-	ui_all_initialize(ui, 0);
-	ui_grid_update_styles(&ui->grid, g);
+	ui_all_initialize(ui);
+	texture_update(&ui->fill.grid_styles_texture, g);
 
 	ivec2 h = view_world_round(vw, view_screen_to_world(vw, v));
 	_i2(h);
@@ -70,7 +70,7 @@ TEST(core_toggle_hex_at_point)
 	_d(grid_get(g, h));
 	//=> 1
 
-	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid.textures.grid_styles];
+	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->fill.grid_styles_texture.texture];
 	_dd(grid_styles_texture->xoffset, grid_styles_texture->yoffset);
 	//=> 2149, 2304
 	_dd(grid_styles_texture->width, grid_styles_texture->height);

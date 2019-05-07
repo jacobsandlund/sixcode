@@ -2,14 +2,10 @@
 
 #define UI_ALL_NUM_COMPONENTS 1
 
-bool ui_all_initialize(UiAll *ui, int styles_buffer_capacity_max)
+bool ui_all_initialize(UiAll *ui)
 {
-	if (!ui_grid_initialize(&ui->grid, styles_buffer_capacity_max)) {
-		return false;
-	}
-
 	bool initialized[UI_ALL_NUM_COMPONENTS] = {
-		[0] = ui_fill_initialize(&ui->fill, &ui->grid),
+		[0] = ui_fill_initialize(&ui->fill),
 	};
 
 	int count = 0;
@@ -24,8 +20,6 @@ bool ui_all_initialize(UiAll *ui, int styles_buffer_capacity_max)
 		// Indices need to match above
 		if (initialized[0]) ui_fill_terminate(&ui->fill);
 
-		ui_grid_terminate(&ui->grid);
-
 		return false;
 	}
 
@@ -35,7 +29,6 @@ bool ui_all_initialize(UiAll *ui, int styles_buffer_capacity_max)
 void ui_all_terminate(UiAll *ui)
 {
 	ui_fill_terminate(&ui->fill);
-	ui_grid_terminate(&ui->grid);
 }
 
 void ui_all_draw(UiAll *ui, View *vw, Grid *g)

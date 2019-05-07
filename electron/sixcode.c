@@ -3,8 +3,6 @@
 #include <emscripten/html5.h>
 #include <stdarg.h>
 
-#define WEB_UI_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
-
 
 //////////////////
 // View
@@ -78,12 +76,7 @@ EMSCRIPTEN_KEEPALIVE UiAll *web_ui_all_malloc()
 
 EMSCRIPTEN_KEEPALIVE void web_ui_all_initialize(UiAll *ui)
 {
-	ui_all_initialize(ui, WEB_UI_STYLES_BUFFER_CAPACITY_MAX);
-}
-
-EMSCRIPTEN_KEEPALIVE UiGrid *web_ui_grid(UiAll *ui)
-{
-	return &ui->grid;
+	ui_all_initialize(ui);
 }
 
 EMSCRIPTEN_KEEPALIVE void web_ui_all_draw(UiAll *ui, View *vw, Grid *g)
@@ -91,13 +84,9 @@ EMSCRIPTEN_KEEPALIVE void web_ui_all_draw(UiAll *ui, View *vw, Grid *g)
 	ui_all_draw(ui, vw, g);
 }
 
-
-///////////////
-// Ui Grid
-
-EMSCRIPTEN_KEEPALIVE void web_ui_grid_update_styles(UiGrid *ui_grid, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_texture_update(UiAll *ui, Grid *g)
 {
-	ui_grid_update_styles(ui_grid, g);
+	texture_update(&ui->fill.grid_styles_texture, g);
 }
 
 

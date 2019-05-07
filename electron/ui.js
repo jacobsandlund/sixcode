@@ -72,8 +72,7 @@ function sixcode_initialized() {
 
     ui = Module._web_ui_all_malloc();
     Module._web_ui_all_initialize(ui);
-    let uig = Module._web_ui_grid(ui);
-    Module._web_ui_grid_update_styles(uig, grid);
+    Module._web_texture_update(ui, grid);
 
     window.addEventListener('resize', resize);
     canvas.addEventListener('wheel', wheel, {passive: true});
