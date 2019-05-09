@@ -5,7 +5,6 @@
 #include <GLES3/gl3.h>
 #include "grid.h"
 #include "mesh.h"
-#include "quad.h"
 #include "shader.h"
 #include "texture.h"
 #include "view.h"
@@ -49,10 +48,12 @@ typedef struct {
 
 	UiFillLayoutData layouts[VIEW_NUM_LAYOUTS];
 	InstanceMesh instance_mesh;
+
+	bool blend_enabled;
 } UiFill;
 
 bool ui_fill_initialize(UiFill *ui);
 void ui_fill_terminate(UiFill *ui);
-void ui_fill_draw(UiFill *ui, View *vw, Grid *g, Quad *viewport_quad);
+void ui_fill_draw(UiFill *ui, View *vw, Grid *g);
 
 #endif // __UI_FILL_H__

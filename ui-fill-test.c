@@ -17,6 +17,9 @@ TEST(ui)
 	_d(ui_fill_initialize(ui));
 	//=> 1
 
+	_d(ui->blend_enabled);
+	//=> 1
+
 	///////////////////////
 	// load/create/link
 
@@ -111,7 +114,7 @@ TEST(ui)
 
 	_dd(fill_colors_texture->width, fill_colors_texture->height);
 	//=> 256, 1
-	_d(fill_colors_texture->format == GL_RGB);
+	_d(fill_colors_texture->format == GL_RGBA);
 	//=> 1
 	_d(fill_colors_texture->type == GL_UNSIGNED_BYTE);
 	//=> 1
@@ -263,12 +266,7 @@ TEST(ui_draw_fill)
 	ui_fill_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	Quad viewport_quad;
-	view_viewport_to_quad(vw, &viewport_quad);
-	_qd(viewport_quad);
-	//=> (71, 80), (129, 120)
-
-	ui_fill_draw(ui, vw, g, &viewport_quad);
+	ui_fill_draw(ui, vw, g);
 
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
@@ -334,6 +332,23 @@ TEST(ui_draw_fill)
 	//=> 1
 	_d(GLmock.bound_textures[1] == ui->fill_colors_texture.texture);
 	//=> 1
+
+	// Blend + Fill color
+
+	_d(GLmock.enabled_capability == GL_BLEND);
+	//=> 1
+	_d(GLmock.blend_source_factor == GL_SRC_ALPHA);
+	//=> 1
+	_d(GLmock.blend_destination_factor == GL_ZERO);
+	//=> 1
+
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->fill_colors_texture.texture];
+	_d(fill_colors_texture->data == UI_FILL_COLORS);
+	//=> 1
+	_dd(fill_colors_texture->width, fill_colors_texture->height);
+	//=> 1, 1
+	_dd(fill_colors_texture->xoffset, fill_colors_texture->yoffset);
+	//=> 0, 0
 
 	// Instance Buffer
 
@@ -414,6 +429,53 @@ TEST(ui_draw_fill)
 	free(ui);
 }
 
+TEST(ui_draw_fill_blend_or_not)
+{
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {100, 100};
+	float scale = 6.0;
+
+	View *vw = malloc(sizeof *vw);
+	Grid *g = malloc(sizeof *g);
+	UiFill *ui = malloc(sizeof *ui);
+
+	glmock_initialize();
+	view_initialize(vw, viewport_size, translation, scale);
+	grid_initialize(g);
+	ui_fill_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
+
+	ui_fill_draw(ui, vw, g);
+
+	// Zoomed out == no blend
+
+	_d(GLmock.disabled_capability == GL_BLEND);
+	//=> 1
+
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->fill_colors_texture.texture];
+	_d(fill_colors_texture->data == UI_EMPTY_FILL_COLOR_NO_BLEND);
+	//=> 1
+
+	// Blend disabled
+
+	ui_fill_terminate(ui);
+
+	scale = 10.0;
+	view_initialize(vw, viewport_size, translation, scale);
+	glmock_initialize();
+	ui_fill_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
+	ui->blend_enabled = false;
+
+	ui_fill_draw(ui, vw, g);
+
+	_d(GLmock.disabled_capability == GL_BLEND);
+	//=> 1
+
+	_d(fill_colors_texture->data == UI_EMPTY_FILL_COLOR_NO_BLEND);
+	//=> 1
+}
+
 TEST(ui_draw_fill_rect)
 {
 	vec2 viewport_size = {1000, 600};
@@ -431,12 +493,7 @@ TEST(ui_draw_fill_rect)
 	ui_fill_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	Quad viewport_quad;
-	view_viewport_to_quad(vw, &viewport_quad);
-	_qd(viewport_quad);
-	//=> (71, 80), (129, 120)
-
-	ui_fill_draw(ui, vw, g, &viewport_quad);
+	ui_fill_draw(ui, vw, g);
 
 	// Draw
 

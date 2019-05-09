@@ -89,6 +89,11 @@ EMSCRIPTEN_KEEPALIVE void web_texture_update(UiAll *ui, Grid *g)
 	texture_update(&ui->fill.grid_styles_texture, g);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_ui_blend_enabled(UiAll *ui, bool enabled)
+{
+	ui->fill.blend_enabled = enabled;
+}
+
 
 //////////////////
 // Core

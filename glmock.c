@@ -91,6 +91,11 @@ typedef struct {
 	GLenum draw_arrays_mode;
 	GLsizei draw_arrays_count;
 
+	GLenum enabled_capability;
+	GLenum disabled_capability;
+	GLenum blend_source_factor;
+	GLenum blend_destination_factor;
+
 	GLenum force_gl_error;
 	bool force_create_program_error;
 	bool force_create_shader_error;
@@ -163,6 +168,12 @@ void glBindTexture(GLenum target, GLuint texture)
 void glBindBuffer(GLenum target, GLuint buffer)
 {
 	GLmock.bound_buffers[glmock_buffer_target_i(target)] = buffer;
+}
+
+void glBlendFunc(GLenum sfactor, GLenum dfactor)
+{
+	GLmock.blend_source_factor = sfactor;
+	GLmock.blend_destination_factor = dfactor;
 }
 	
 void glBufferData(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage)
@@ -246,6 +257,11 @@ void glDetachShader(GLuint program, GLuint shader)
 	}
 }
 
+void glDisable(GLenum capability)
+{
+	GLmock.disabled_capability = capability;
+}
+
 void glDrawArrays(GLenum mode, GLint first, GLsizei count)
 {
 	(void) first;
@@ -274,6 +290,11 @@ void glEnableVertexAttribArray(GLuint index)
 {
 	GLmockProgram *p = &GLmock.programs[GLmock.using_program];
 	p->attributes[index].enabled_vertex_attrib_array = true;
+}
+
+void glEnable(GLenum capability)
+{
+	GLmock.enabled_capability = capability;
 }
 
 void glGenBuffers(GLsizei n, GLuint *buffers)
