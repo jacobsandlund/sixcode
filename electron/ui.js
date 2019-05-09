@@ -71,6 +71,8 @@ function sixcode_initialized() {
     canvas = Module['canvas'];
     resizeUI();
     canvas.style.backgroundColor = CANVAS_BACKGROUND_COLOR;
+    mouseX = window.innerWidth / 2;
+    mouseY = window.innerHeight / 2;
     setGradient(scaleLevel, NO_GRADIENT_INDEX);
 
     grid = Module._web_grid_malloc();
@@ -154,7 +156,10 @@ function setGradient(scaleLevel, oldScaleLevel) {
 
     if (gradient !== oldGradient) {
         if (gradient) {
-            canvas.style['background-image'] = 'radial-gradient(' + gradient + ')';
+            canvas.style['background-image'] =
+                    'radial-gradient(farthest-side ellipse at ' +
+                    mouseX + 'px ' + mouseY + 'px, ' +
+                    gradient + ')';
         } else {
             canvas.style['background-image'] = null;
         }
@@ -225,13 +230,13 @@ function wheel(e) {
 let mouseDownTime = 0;
 let isMouseDown = false;
 let draggingMouse = false;
-let lastMouseX = 0.0;
-let lastMouseY = 0.0;
+let mouseX = 0.0;
+let mouseY = 0.0;
 
 function mouseDown(e) {
     let dpr = window.devicePixelRatio;
-    lastMouseX = e.clientX * dpr;
-    lastMouseY = e.clientY * dpr;
+    mouseX = e.clientX * dpr;
+    mouseY = e.clientY * dpr;
     isMouseDown = true;
     mouseDownTime = Date.now();
 }
@@ -262,15 +267,15 @@ function mouseUp(e) {
 
 function mouseMove(e) {
     let dpr = window.devicePixelRatio;
-    let mouseX = e.clientX * dpr;
-    let mouseY = e.clientY * dpr;
-    let deltaX;
-    let deltaY;
+    let newMouseX = e.clientX * dpr;
+    let newMouseY = e.clientY * dpr;
+    let deltaX = mouseX - newMouseX;
+    let deltaY = mouseY - newMouseY;
+
+    mouseX = newMouseX;
+    mouseY = newMouseY;
 
     if (isMouseDown) {
-        deltaX = lastMouseX - mouseX;
-        deltaY = lastMouseY - mouseY;
-
         if (
             Date.now() - mouseDownTime > 100 ||
             deltaX * deltaX + deltaY * deltaY >= 30 * dpr * dpr
@@ -282,12 +287,11 @@ function mouseMove(e) {
     }
 
     if (draggingMouse) {
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-
         Module._web_view_translate(view, deltaX, deltaY);
 
         draw();
+    } else {
+        setGradient(scaleLevel, null);
     }
 }
 

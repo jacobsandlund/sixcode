@@ -255,7 +255,7 @@ void ui_draw(Ui *ui, View *vw, Grid *g)
 
 	glViewport(0, 0, vw->viewport_size.x, vw->viewport_size.y);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(ui->shader.program);
