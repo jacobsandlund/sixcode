@@ -66,32 +66,32 @@ EMSCRIPTEN_KEEPALIVE void web_grid_set(Grid *g, i32 c, i32 r, u8 style)
 
 
 ////////////////
-// Ui All
+// Ui
 
-EMSCRIPTEN_KEEPALIVE UiAll *web_ui_all_malloc()
+EMSCRIPTEN_KEEPALIVE Ui *web_ui_malloc()
 {
-	UiAll *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 	return ui;
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_all_initialize(UiAll *ui)
+EMSCRIPTEN_KEEPALIVE void web_ui_initialize(Ui *ui)
 {
-	ui_all_initialize(ui);
+	ui_initialize(ui);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_all_draw(UiAll *ui, View *vw, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_ui_draw(Ui *ui, View *vw, Grid *g)
 {
-	ui_all_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_texture_update(UiAll *ui, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_texture_update(Ui *ui, Grid *g)
 {
-	texture_update(&ui->fill.grid_styles_texture, g);
+	texture_update(&ui->grid_styles_texture, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_ui_blend_enabled(UiAll *ui, bool enabled)
+EMSCRIPTEN_KEEPALIVE void web_ui_blend_enabled(Ui *ui, bool enabled)
 {
-	ui->fill.blend_enabled = enabled;
+	ui->blend_enabled = enabled;
 }
 
 
@@ -103,12 +103,12 @@ EMSCRIPTEN_KEEPALIVE void web_core_grid_initialize(Grid *g)
 	core_grid_initialize(g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_core_tick(UiAll *ui, View *vw, Grid *g)
+EMSCRIPTEN_KEEPALIVE void web_core_tick(Ui *ui, View *vw, Grid *g)
 {
 	core_tick(ui, vw, g);
 }
 
-EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, float x, float y)
+EMSCRIPTEN_KEEPALIVE void web_core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, float x, float y)
 {
 	vec2 v = {x, y};
 	core_toggle_hex_at_point(ui, vw, g, v);

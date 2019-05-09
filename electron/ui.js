@@ -104,8 +104,8 @@ function sixcode_initialized() {
     view = Module._web_view_malloc();
     Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
 
-    ui = Module._web_ui_all_malloc();
-    Module._web_ui_all_initialize(ui);
+    ui = Module._web_ui_malloc();
+    Module._web_ui_initialize(ui);
     Module._web_texture_update(ui, grid);
 
     window.addEventListener('resize', resize);

@@ -1,12 +1,12 @@
-#include "ui-fill.h"
+#include "ui.h"
 #include "quad.h"
 
-#define UI_FILL_COLORS_COUNT 256
-#define UI_FILL_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
-#define UI_FILL_GRID_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
-#define UI_FILL_ALPHA_SCALE 8.0
+#define UI_COLORS_COUNT 256
+#define UI_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
+#define UI_GRID_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
+#define UI_ALPHA_SCALE 8.0
 
-const char UI_FILL_VERTEX_SHADER_SOURCE[] =
+const char UI_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 position;\n"
 "attribute vec2 gridPosition;\n"
 "attribute vec2 positionOffset;\n"
@@ -28,7 +28,7 @@ const char UI_FILL_VERTEX_SHADER_SOURCE[] =
 "	gl_Position = viewMatrix * vec4(position + positionOffset, 0.0, 1.0);\n"
 "}\n";
 
-const char UI_FILL_FRAGMENT_SHADER_SOURCE[] =
+const char UI_FRAGMENT_SHADER_SOURCE[] =
 "varying lowp vec4 color;\n"
 "\n"
 "void main() {\n"
@@ -39,7 +39,7 @@ const u8 UI_EMPTY_FILL_COLOR_NO_BLEND[] = {
 	88, 88, 88, 255,
 };
 
-const u8 UI_FILL_COLORS[UI_FILL_COLOR_COMPONENTS_LENGTH] = {
+const u8 UI_FILL_COLORS[UI_COLOR_COMPONENTS_LENGTH] = {
 	100, 100, 100, 100,
 	255, 255, 255, 255,
 	255, 255, 255, 255,
@@ -75,15 +75,15 @@ const u8 UI_FILL_COLORS[UI_FILL_COLOR_COMPONENTS_LENGTH] = {
 	//220, 190, 140, 255,
 };
 
-bool ui_fill_initialize(UiFill *ui)
+bool ui_initialize(Ui *ui)
 {
 	ui->blend_enabled = true;
 
 	////////////////////////
 	// load/create/link
 
-	GLuint vertex_shader = shader_load(GL_VERTEX_SHADER, UI_FILL_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
-	GLuint fragment_shader = shader_load(GL_FRAGMENT_SHADER, UI_FILL_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
+	GLuint vertex_shader = shader_load(GL_VERTEX_SHADER, UI_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
+	GLuint fragment_shader = shader_load(GL_FRAGMENT_SHADER, UI_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 
 	if (!vertex_shader || !fragment_shader) {
 		glDeleteShader(vertex_shader);
@@ -146,14 +146,14 @@ bool ui_fill_initialize(UiFill *ui)
 	////////////////
 	// textures
 
-	texture_initialize(&ui->grid_styles_texture, UI_FILL_GRID_STYLES_BUFFER_CAPACITY_MAX);
+	texture_initialize(&ui->grid_styles_texture, UI_GRID_STYLES_BUFFER_CAPACITY_MAX);
 	texture_initialize(&ui->fill_colors_texture, 0);
 
 	glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
 			GL_RGBA,
-			UI_FILL_COLORS_COUNT,
+			UI_COLORS_COUNT,
 			1,
 			0,
 			GL_RGBA,
@@ -169,13 +169,13 @@ bool ui_fill_initialize(UiFill *ui)
 	};
 
 	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
-		UiFillLayoutData *layout = &ui->layouts[i];
+		UiLayoutData *layout = &ui->layouts[i];
 
-		int size = UI_FILL_MESH_MAX_SIZE;
+		int size = UI_MESH_MAX_SIZE;
 
-		for (int j = 0; j < UI_FILL_NUM_MESHES; ++j) {
+		for (int j = 0; j < UI_NUM_MESHES; ++j) {
 			FillMesh *mesh = &layout->meshes[j];
-			UiFillBuffers *buffers = &layout->buffers[j];
+			UiBuffers *buffers = &layout->buffers[j];
 
 			fill_mesh_initialize(mesh, view_layouts[i], size, size);
 
@@ -205,7 +205,7 @@ bool ui_fill_initialize(UiFill *ui)
 	return true;
 }
 
-void ui_fill_terminate(UiFill *ui)
+void ui_terminate(Ui *ui)
 {
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
@@ -215,7 +215,7 @@ void ui_fill_terminate(UiFill *ui)
 	texture_terminate(&ui->fill_colors_texture);
 
 	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
-		for (int j = 0; j < UI_FILL_NUM_MESHES; j++) {
+		for (int j = 0; j < UI_NUM_MESHES; j++) {
 			fill_mesh_terminate(&ui->layouts[i].meshes[j]);
 
 			glDeleteBuffers(1, &ui->layouts[i].buffers[j].vertices);
@@ -227,7 +227,7 @@ void ui_fill_terminate(UiFill *ui)
 	glDeleteBuffers(1, &ui->instanceBuffer);
 }
 
-static void ui_fill_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
+static void ui_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad *viewport_quad)
 {
 	Quad intersect_quad;
 	quad_intersect(&intersect_quad, viewport_quad, grid_styles_quad);
@@ -235,9 +235,9 @@ static void ui_fill_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad,
 	size_quad_even_align(out_sq, out_sq);
 }
 
-static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
+static int ui_draw_mesh_index(Ui *ui, SizeQuad *draw_quad)
 {
-	for (int i = 0; i < UI_FILL_NUM_MESHES; ++i) {
+	for (int i = 0; i < UI_NUM_MESHES; ++i) {
 		if (
 			draw_quad->size.x > ui->layouts[0].meshes[i].size_x ||
 			draw_quad->size.y > ui->layouts[0].meshes[i].size_y
@@ -246,10 +246,10 @@ static int ui_fill_draw_mesh_index(UiFill *ui, SizeQuad *draw_quad)
 		}
 	}
 
-	return UI_FILL_NUM_MESHES - 1;
+	return UI_NUM_MESHES - 1;
 }
 
-void ui_fill_draw(UiFill *ui, View *vw, Grid *g)
+void ui_draw(Ui *ui, View *vw, Grid *g)
 {
 	// Setup
 
@@ -264,11 +264,11 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g)
 	view_viewport_to_quad(vw, &viewport_quad);
 
 	SizeQuad draw_quad;
-	ui_fill_size_quad_for_draw(&draw_quad, &g->styles_quad, &viewport_quad);
+	ui_size_quad_for_draw(&draw_quad, &g->styles_quad, &viewport_quad);
 
-	int mesh_index = ui_fill_draw_mesh_index(ui, &draw_quad);
+	int mesh_index = ui_draw_mesh_index(ui, &draw_quad);
 	FillMesh *mesh = &ui->layouts[vw->layout].meshes[mesh_index];
-	UiFillBuffers *buffers = &ui->layouts[vw->layout].buffers[mesh_index];
+	UiBuffers *buffers = &ui->layouts[vw->layout].buffers[mesh_index];
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
@@ -327,7 +327,7 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g)
 
 	if (
 			ui->blend_enabled &&
-			vw->layout_independent_scale >= UI_FILL_ALPHA_SCALE) {
+			vw->layout_independent_scale >= UI_ALPHA_SCALE) {
 		empty_fill_color = (u8 *) UI_FILL_COLORS;
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
@@ -352,8 +352,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g)
 	InstanceMesh *imesh = &ui->instance_mesh;
 
 	int num_instances = (
-		((draw_quad.size.y - 1) / UI_FILL_MESH_MAX_SIZE + 1) *
-		((draw_quad.size.x - 1) / UI_FILL_MESH_MAX_SIZE + 1)
+		((draw_quad.size.y - 1) / UI_MESH_MAX_SIZE + 1) *
+		((draw_quad.size.x - 1) / UI_MESH_MAX_SIZE + 1)
 	);
 	instance_mesh_resize(imesh, num_instances);
 
@@ -361,8 +361,8 @@ void ui_fill_draw(UiFill *ui, View *vw, Grid *g)
 	int i = 0;
 	ivec2 draw_quad_min_offset = ivec2_sub(draw_quad.min, g->size_quad.min);
 
-	for (h.y = 0; h.y < draw_quad.size.y; h.y += UI_FILL_MESH_MAX_SIZE) {
-		for (h.x = 0; h.x < draw_quad.size.x; h.x += UI_FILL_MESH_MAX_SIZE) {
+	for (h.y = 0; h.y < draw_quad.size.y; h.y += UI_MESH_MAX_SIZE) {
+		for (h.x = 0; h.x < draw_quad.size.x; h.x += UI_MESH_MAX_SIZE) {
 			InstanceMeshVertex *vx = &imesh->vertices[i];
 
 			vx->positionOffset = vec2_from_ivec(h);

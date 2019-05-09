@@ -6,8 +6,7 @@
 #include "quad.c"
 #include "shader.c"
 #include "texture.c"
-#include "ui-all.c"
-#include "ui-fill.c"
+#include "ui.c"
 #include "view.c"
 
 #define CORE_HEX_FILL_MIN 1
@@ -18,12 +17,12 @@ void core_grid_initialize(Grid *g)
 	grid_initialize(g);
 }
 
-void core_tick(UiAll *ui, View *vw, Grid *g)
+void core_tick(Ui *ui, View *vw, Grid *g)
 {
-	ui_all_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 }
 
-void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
+void core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, vec2 v)
 {
 	static u8 style = CORE_HEX_FILL_MIN;
 
@@ -45,5 +44,5 @@ void core_toggle_hex_at_point(UiAll *ui, View *vw, Grid *g, vec2 v)
 	}
 
 	Quad quad = {h, h};
-	texture_update_in_quad(&ui->fill.grid_styles_texture, g, &quad);
+	texture_update_in_quad(&ui->grid_styles_texture, g, &quad);
 }

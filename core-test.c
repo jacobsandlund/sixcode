@@ -10,13 +10,13 @@ TEST(core_tick)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiAll *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g);
-	ui_all_initialize(ui);
-	texture_update(&ui->fill.grid_styles_texture, g);
+	ui_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
 
 	Quad viewport_quad;
 	view_viewport_to_quad(vw, &viewport_quad);
@@ -33,7 +33,7 @@ TEST(core_tick)
 	_d(GLmock.draw_elements_count);
 	//=> 53760
 
-	ui_all_terminate(ui);
+	ui_terminate(ui);
 	grid_terminate(g);
 
 	free(vw);
@@ -50,7 +50,7 @@ TEST(core_toggle_hex_at_point)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiAll *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
@@ -58,8 +58,8 @@ TEST(core_toggle_hex_at_point)
 	_i2(g->size_quad.size);
 	//=> 4096, 4096
 
-	ui_all_initialize(ui);
-	texture_update(&ui->fill.grid_styles_texture, g);
+	ui_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
 
 	ivec2 h = view_world_round(vw, view_screen_to_world(vw, v));
 	_i2(h);
@@ -70,7 +70,7 @@ TEST(core_toggle_hex_at_point)
 	_d(grid_get(g, h));
 	//=> 1
 
-	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->fill.grid_styles_texture.texture];
+	GLmockTexture *grid_styles_texture = &GLmock.textures[ui->grid_styles_texture.texture];
 	_dd(grid_styles_texture->xoffset, grid_styles_texture->yoffset);
 	//=> 2149, 2304
 	_dd(grid_styles_texture->width, grid_styles_texture->height);
@@ -87,7 +87,7 @@ TEST(core_toggle_hex_at_point)
 	//=> 2
 
 	grid_terminate(g);
-	ui_all_terminate(ui);
+	ui_terminate(ui);
 	free(vw);
 	free(g);
 	free(ui);

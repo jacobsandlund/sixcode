@@ -1,5 +1,5 @@
-#ifndef __UI_FILL_H__
-#define __UI_FILL_H__
+#ifndef __UI_H__
+#define __UI_H__
 
 #include "sixcode.h"
 #include <GLES3/gl3.h>
@@ -9,15 +9,15 @@
 #include "texture.h"
 #include "view.h"
 
-#define UI_FILL_MESH_MAX_SIZE 8
-#define UI_FILL_NUM_MESHES 4	// 8, 4, 2, 1
+#define UI_MESH_MAX_SIZE 8
+#define UI_NUM_MESHES 4	// 8, 4, 2, 1
 
 typedef struct {
 	GLint position;
 	GLint gridPosition;
 	GLint positionOffset;
 	GLint gridPositionOffset;
-} UiFillAttributes;
+} UiAttributes;
 
 typedef struct {
 	GLint viewMatrix;
@@ -25,35 +25,35 @@ typedef struct {
 	GLint styleOffset;
 	GLint gridStyles;
 	GLint fillColors;
-} UiFillUniforms;
+} UiUniforms;
 
 typedef struct {
 	GLuint vertices;
 	GLuint indices;
-} UiFillBuffers;
+} UiBuffers;
 
 typedef struct {
-	UiFillBuffers buffers[UI_FILL_NUM_MESHES];
-	FillMesh meshes[UI_FILL_NUM_MESHES];
-} UiFillLayoutData;
+	UiBuffers buffers[UI_NUM_MESHES];
+	FillMesh meshes[UI_NUM_MESHES];
+} UiLayoutData;
 
 typedef struct {
 	ShaderProgram shader;
 	Texture grid_styles_texture;
 	Texture fill_colors_texture;
 
-	UiFillAttributes attributes;
-	UiFillUniforms uniforms;
+	UiAttributes attributes;
+	UiUniforms uniforms;
 	GLuint instanceBuffer;
 
-	UiFillLayoutData layouts[VIEW_NUM_LAYOUTS];
+	UiLayoutData layouts[VIEW_NUM_LAYOUTS];
 	InstanceMesh instance_mesh;
 
 	bool blend_enabled;
-} UiFill;
+} Ui;
 
-bool ui_fill_initialize(UiFill *ui);
-void ui_fill_terminate(UiFill *ui);
-void ui_fill_draw(UiFill *ui, View *vw, Grid *g);
+bool ui_initialize(Ui *ui);
+void ui_terminate(Ui *ui);
+void ui_draw(Ui *ui, View *vw, Grid *g);
 
-#endif // __UI_FILL_H__
+#endif // __UI_H__

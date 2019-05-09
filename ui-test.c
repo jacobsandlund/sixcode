@@ -1,4 +1,4 @@
-#include "ui-fill.c"
+#include "ui.c"
 #include "test.h"
 #include "glmock.c"
 #include "grid.c"
@@ -10,11 +10,11 @@
 
 TEST(ui)
 {
-	UiFill *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 
-	_d(ui_fill_initialize(ui));
+	_d(ui_initialize(ui));
 	//=> 1
 
 	_d(ui->blend_enabled);
@@ -201,7 +201,7 @@ TEST(ui)
 	////////////////////////////
 	// terminate
 
-	ui_fill_terminate(ui);
+	ui_terminate(ui);
 
 	_d(vertex->deleted);
 	//=> 1
@@ -225,14 +225,14 @@ TEST(ui)
 
 TEST(ui_initialize_fail)
 {
-	UiFill *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	// Failures
 
 	glmock_initialize();
 	GLmock.shaders[1].force_compile_error = true;
 
-	_d(ui_fill_initialize(ui));
+	_d(ui_initialize(ui));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error compiling shader. Nothing in info log.
@@ -241,7 +241,7 @@ TEST(ui_initialize_fail)
 	glmock_initialize();
 	GLmock.programs[1].force_link_error = true;
 
-	_d(ui_fill_initialize(ui));
+	_d(ui_initialize(ui));
 	//=> 0
 	_TEST_SIXCODE_ERROR();
 	//=> Error linking program. Nothing in info log.
@@ -258,15 +258,15 @@ TEST(ui_draw_fill)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiFill *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g);
-	ui_fill_initialize(ui);
+	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	ui_fill_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
@@ -422,7 +422,7 @@ TEST(ui_draw_fill)
 	//=> 48
 
 	grid_terminate(g);
-	ui_fill_terminate(ui);
+	ui_terminate(ui);
 
 	free(vw);
 	free(g);
@@ -437,15 +437,15 @@ TEST(ui_draw_fill_blend_or_not)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiFill *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	grid_initialize(g);
-	ui_fill_initialize(ui);
+	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	ui_fill_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 
 	// Zoomed out == no blend
 
@@ -458,22 +458,29 @@ TEST(ui_draw_fill_blend_or_not)
 
 	// Blend disabled
 
-	ui_fill_terminate(ui);
+	ui_terminate(ui);
 
 	scale = 10.0;
 	view_initialize(vw, viewport_size, translation, scale);
 	glmock_initialize();
-	ui_fill_initialize(ui);
+	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 	ui->blend_enabled = false;
 
-	ui_fill_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 
 	_d(GLmock.disabled_capability == GL_BLEND);
 	//=> 1
 
 	_d(fill_colors_texture->data == UI_EMPTY_FILL_COLOR_NO_BLEND);
 	//=> 1
+
+	grid_terminate(g);
+	ui_terminate(ui);
+
+	free(vw);
+	free(g);
+	free(ui);
 }
 
 TEST(ui_draw_fill_rect)
@@ -484,16 +491,16 @@ TEST(ui_draw_fill_rect)
 
 	View *vw = malloc(sizeof *vw);
 	Grid *g = malloc(sizeof *g);
-	UiFill *ui = malloc(sizeof *ui);
+	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
 	view_initialize(vw, viewport_size, translation, scale);
 	view_layout(vw, VIEW_LAYOUT_RECT);
 	grid_initialize(g);
-	ui_fill_initialize(ui);
+	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	ui_fill_draw(ui, vw, g);
+	ui_draw(ui, vw, g);
 
 	// Draw
 
@@ -512,7 +519,7 @@ TEST(ui_draw_fill_rect)
 	//=> 48
 
 	grid_terminate(g);
-	ui_fill_terminate(ui);
+	ui_terminate(ui);
 
 	free(vw);
 	free(g);
