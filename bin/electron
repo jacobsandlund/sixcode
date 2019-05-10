@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+electron/node_modules/.bin/electron electron "$@"

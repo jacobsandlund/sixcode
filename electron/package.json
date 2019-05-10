@@ -2,9 +2,6 @@
   "name": "sixcode",
   "private": true,
   "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
   "devDependencies": {
     "electron": "^6.0.0-beta.2"
   }
