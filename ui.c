@@ -2,7 +2,7 @@
 #include "quad.h"
 
 #define UI_COLORS_COUNT 256
-#define UI_COLOR_COMPONENTS_LENGTH 1024  // 256 * 4
+#define UI_COLOR_COMPONENTS_LENGTH 768  // 256 * 3
 #define UI_GRID_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
 #define UI_ALPHA_SCALE 8.0
 
@@ -35,30 +35,26 @@ const char UI_FRAGMENT_SHADER_SOURCE[] =
 "	gl_FragColor = color;\n"
 "}\n";
 
-const u8 UI_EMPTY_FILL_COLOR_NO_BLEND[] = {
-	88, 88, 88, 255,
-};
-
 const u8 UI_FILL_COLORS[UI_COLOR_COMPONENTS_LENGTH] = {
-	100, 100, 100, 100,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
+	88, 88, 88,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
 
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
 
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	255, 255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
 
-	140, 255, 140, 255,
-	140, 140, 255, 255,
-	255, 255, 40, 255,
-	255, 40, 255, 255,
+	140, 255, 140,
+	140, 140, 255,
+	255, 255, 40,
+	255, 40, 255,
 
 	//64, 239, 233, 255,
 	//190, 190, 190, 255,
@@ -77,8 +73,6 @@ const u8 UI_FILL_COLORS[UI_COLOR_COMPONENTS_LENGTH] = {
 
 bool ui_initialize(Ui *ui)
 {
-	ui->blend_enabled = true;
-
 	////////////////////////
 	// load/create/link
 
@@ -152,11 +146,11 @@ bool ui_initialize(Ui *ui)
 	glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			GL_RGBA,
+			GL_RGB,
 			UI_COLORS_COUNT,
 			1,
 			0,
-			GL_RGBA,
+			GL_RGB,
 			GL_UNSIGNED_BYTE,
 			UI_FILL_COLORS);
 
@@ -320,32 +314,6 @@ void ui_draw(Ui *ui, View *vw, Grid *g)
 			1,
 			GL_FALSE,
 			(GLfloat*) &vw->view_matrix.m[0][0]);
-
-	// Blend + Fill color
-
-	u8 *empty_fill_color;
-
-	if (
-			ui->blend_enabled &&
-			vw->layout_independent_scale >= UI_ALPHA_SCALE) {
-		empty_fill_color = (u8 *) UI_FILL_COLORS;
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
-	} else {
-		empty_fill_color = (u8 *) UI_EMPTY_FILL_COLOR_NO_BLEND;
-		glDisable(GL_BLEND);
-	}
-
-	glTexSubImage2D(
-			GL_TEXTURE_2D,
-			0,
-			0,
-			0,
-			1,
-			1,
-			GL_RGBA,
-			GL_UNSIGNED_BYTE,
-			empty_fill_color);
 
 	// Instance buffer
 

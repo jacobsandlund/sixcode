@@ -1,3 +1,5 @@
+const RENDER_LOOP = true;
+
 const SCALE_LEVELS = [
     0.5,
     0.75,
@@ -26,38 +28,6 @@ const SCALE_LEVELS = [
     2048.0,
 ];
 
-const CANVAS_BACKGROUND_COLOR = 'rgb(48,48,48)';
-
-const GRADIENT_COLOR = [
-    null,                                   // 0.5,
-    null,                                   // 0.75,
-    null,                                   // 1.0,
-    null,                                   // 1.5,
-    null,                                   // 2.0,
-    null,                                   // 3.0,
-    null,                                   // 4.0,
-    null,                                   // 6.0,
-    'rgb(60, 60, 60), rgb(36, 36, 36)',     // 8.0,
-    'rgb(74, 74, 74), rgb(22, 22, 22)',     // 12.0,
-    'rgb(88, 88, 88), rgb(8, 8, 8)',        // 16.0,
-    'rgb(100, 100, 100), rgb(0, 0, 0)',     // 23.0,
-    'rgb(110, 110, 110), rgb(0, 0, 0)',     // 32.0,
-    'rgb(120, 120, 120), rgb(0, 0, 0)',     // 46.0,
-    'rgb(130, 130, 130), rgb(0, 0, 0)',     // 64.0,
-    'rgb(140, 140, 140), rgb(0, 0, 0)',     // 90.0,
-    'rgb(142, 142, 142), rgb(0, 0, 0)',     // 128.0,
-    'rgb(144, 144, 144), rgb(0, 0, 0)',     // 181.0,
-    'rgb(158, 158, 158), rgb(0, 0, 0)',     // 256.0,
-    'rgb(174, 174, 174), rgb(0, 0, 0)',     // 362.0,
-    'rgb(194, 194, 194), rgb(0, 0, 0)',     // 512.0,
-    'rgb(214, 214, 214), rgb(0, 0, 0)',     // 724.0,
-    'rgb(234, 234, 234), rgb(0, 0, 0)',     // 1024.0,
-    'rgb(254, 254, 254), rgb(0, 0, 0)',     // 1448.0,
-    'rgb(254, 254, 254), rgb(0, 0, 0)',     // 2048.0,
-];
-
-const NO_GRADIENT_INDEX = GRADIENT_COLOR.lastIndexOf(null);
-
 const VIEW_NUM_LAYOUTS = 2;
 
 let canvas;
@@ -70,10 +40,8 @@ let scaleLevel = SCALE_LEVELS.indexOf(16.0);
 function sixcode_initialized() {
     canvas = Module['canvas'];
     resizeUI();
-    canvas.style.backgroundColor = CANVAS_BACKGROUND_COLOR;
     mouseX = window.innerWidth / 2;
     mouseY = window.innerHeight / 2;
-    setGradient(scaleLevel, NO_GRADIENT_INDEX);
 
     grid = Module._web_grid_malloc();
     Module._web_core_grid_initialize(grid);
@@ -120,16 +88,22 @@ function sixcode_initialized() {
         return false;
     };
 
-    draw();
+    if (RENDER_LOOP) {
+        window.requestAnimationFrame(drawLoop);
+    } else {
+        draw();
+    }
+}
+
+function drawLoop() {
+    Module._web_core_tick(ui, view, grid);
+    window.requestAnimationFrame(drawLoop);
 }
 
 function draw() {
-    let startTime = performance.now();
-
-    Module._web_core_tick(ui, view, grid);
-
-    let endTime = performance.now();
-    console.log('draw in ' + (endTime - startTime) + ' ms');
+    if (!RENDER_LOOP) {
+        Module._web_core_tick(ui, view, grid);
+    }
 }
 
 function resizeUI() {
@@ -148,22 +122,6 @@ function resize() {
     Module._web_view_resize(view, canvas.width, canvas.height);
 
     draw();
-}
-
-function setGradient(scaleLevel, oldScaleLevel) {
-    let gradient = GRADIENT_COLOR[scaleLevel];
-    let oldGradient = GRADIENT_COLOR[oldScaleLevel];
-
-    if (gradient !== oldGradient) {
-        if (gradient) {
-            canvas.style['background-image'] =
-                    'radial-gradient(farthest-side ellipse at ' +
-                    mouseX + 'px ' + mouseY + 'px, ' +
-                    gradient + ')';
-        } else {
-            canvas.style['background-image'] = null;
-        }
-    }
 }
 
 const CHANGE_SCALE_TIMEOUT = 100;
@@ -204,7 +162,6 @@ function wheel(e) {
     }
 
     if (newScaleLevel !== scaleLevel) {
-        setGradient(newScaleLevel, scaleLevel);
         scaleLevel = newScaleLevel;
 
         let scale = SCALE_LEVELS[newScaleLevel];
@@ -242,21 +199,11 @@ function mouseDown(e) {
 }
 
 function mouseUp(e) {
-    if (draggingMouse) {
-        Module._web_ui_blend_enabled(ui, true);
-        setGradient(scaleLevel, NO_GRADIENT_INDEX);
-
-        draw();
-    } else {
-        let startTime = performance.now();
-
+    if (!draggingMouse) {
         let x = e.clientX * window.devicePixelRatio;
         let y = e.clientY * window.devicePixelRatio;
 
         Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
-
-        let endTime = performance.now();
-        console.log('click in ' + (endTime - startTime) + ' ms');
 
         draw();
     }
@@ -281,8 +228,6 @@ function mouseMove(e) {
             deltaX * deltaX + deltaY * deltaY >= 30 * dpr * dpr
         ) {
             draggingMouse = true;
-            Module._web_ui_blend_enabled(ui, false);
-            setGradient(NO_GRADIENT_INDEX, scaleLevel);
         }
     }
 
@@ -290,8 +235,6 @@ function mouseMove(e) {
         Module._web_view_translate(view, deltaX, deltaY);
 
         draw();
-    } else {
-        setGradient(scaleLevel, null);
     }
 }
 
