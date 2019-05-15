@@ -1,7 +1,7 @@
 #ifndef __CORE_H__
 #define __CORE_H__
 
-#include "sixcode.h"
+#include "6code.h"
 #include "grid.h"
 #include "quad.h"
 #include "ui.h"

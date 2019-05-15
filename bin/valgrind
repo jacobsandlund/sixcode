@@ -9,7 +9,7 @@ valgrind_single() {
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    output_file="valgrind-output/$test_file.txt"
+    output_file="out/valgrind-output/$test_file.txt"
     echo bin/valgrind "$@" > $output_file
     echo >> $output_file
 
@@ -21,13 +21,18 @@ valgrind_single() {
 
 trap "rm -f a.out" EXIT
 
+mkdir -p out/valgrind-output
+
 if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
+    rm -rf out/valgrind-output-old
+    cp -R out/valgrind-output out/valgrind-output-old
+
     for test_file in *-test.c; do
         echo bin/valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done
 
-    for output_file in valgrind-output/*; do
+    for output_file in out/valgrind-output/*; do
         echo "Checking $output_file"
         if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
             echo
@@ -36,7 +41,7 @@ if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
         fi
     done
 
-    git --no-pager diff valgrind-output/
+    git --no-pager diff --no-index out/valgrind-output-old/ out/valgrind-output
 else
     valgrind_single "$@"
 fi

@@ -1,3 +1,4 @@
+out/
 electron/node_modules/
-electron/sixcode.*
-!electron/sixcode.c
+electron/6code.*
+!electron/6code.c

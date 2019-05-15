@@ -1,7 +1,7 @@
 #ifndef __GRID_H__
 #define __GRID_H__
 
-#include "sixcode.h"
+#include "6code.h"
 #include "quad.h"
 
 typedef struct {

@@ -1,7 +1,7 @@
 #ifndef __QUAD_H__
 #define __QUAD_H__
 
-#include "sixcode.h"
+#include "6code.h"
 
 typedef struct {
 	ivec2 min;

@@ -1,4 +1,4 @@
-#include "sixcode.h"
+#include "6code.h"
 #include "test.h"
 
 TEST(vec2_ivec2_conversions)

@@ -1,20 +1,20 @@
-#ifndef __SIXCODE_H__
-#define __SIXCODE_H__
+#ifndef __6CODE_H__
+#define __6CODE_H__
 
 #include <stdbool.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 typedef unsigned int uint;
 
 // Note: prefer int and uint unless explicit size is needed
 typedef int64_t i64;
-typedef u_int64_t u64;
+typedef uint64_t u64;
 typedef int32_t i32;
-typedef u_int32_t u32;
+typedef uint32_t u32;
 typedef int16_t i16;
-typedef u_int16_t u16;
+typedef uint16_t u16;
 typedef int8_t i8;
-typedef u_int8_t u8;
+typedef uint8_t u8;
 
 typedef struct {
 	float x;
@@ -61,4 +61,4 @@ static inline ivec2 ivec2_sub(ivec2 a, ivec2 b)
 void log_error(const char *format, ...);
 #define SIXCODE_ERROR(...) log_error(__VA_ARGS__)
 
-#endif // __SIXCODE_H__
+#endif // __6CODE_H__

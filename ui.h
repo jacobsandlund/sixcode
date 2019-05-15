@@ -1,7 +1,7 @@
 #ifndef __UI_H__
 #define __UI_H__
 
-#include "sixcode.h"
+#include "6code.h"
 #include <GLES3/gl3.h>
 #include "grid.h"
 #include "mesh.h"

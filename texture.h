@@ -1,7 +1,7 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
-#include "sixcode.h"
+#include "6code.h"
 #include <GLES3/gl3.h>
 #include "grid.h"
 #include "quad.h"
