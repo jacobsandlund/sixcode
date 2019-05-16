@@ -1,4 +1,9 @@
-const {app, BrowserWindow} = require('electron');
+const {
+    app,
+    contentTracing,
+    BrowserWindow,
+    ipcMain,
+} = require('electron');
 
 let mainWindow;
 
@@ -34,4 +39,30 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow();
     }
+});
+
+const traceOptions = {
+    categoryFilter: '*',
+    traceOptions: 'record-until-full,enable-sampling',
+};
+
+ipcMain.on('trace', (event, traceTime) => {
+    console.log('Tracing started');
+    contentTracing.startRecording(traceOptions).then(function () {
+        setTimeout(function() {
+            let date = new Date();
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+            let second = date.getSeconds();
+            let millisecond = date.getMilliseconds();
+            let file = `out/traces/trace-${year}-${month}-${day}T${hour}-${minute}-${second}-${millisecond}.json`;
+
+            contentTracing.stopRecording(file).then(function (path) {
+                console.log('Tracing data recorded to ' + path);
+            });
+        }, traceTime);
+    });
 });

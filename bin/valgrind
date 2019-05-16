@@ -24,8 +24,8 @@ trap "rm -f a.out" EXIT
 mkdir -p out/valgrind-output
 
 if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-    rm -rf out/valgrind-output-old
-    cp -R out/valgrind-output out/valgrind-output-old
+    rm -rf out/valgrind-output-previous
+    cp -R out/valgrind-output out/valgrind-output-previous
 
     for test_file in *-test.c; do
         echo bin/valgrind "$@" $test_file
@@ -41,7 +41,7 @@ if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
         fi
     done
 
-    git --no-pager diff --no-index out/valgrind-output-old/ out/valgrind-output
+    git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
 else
     valgrind_single "$@"
 fi

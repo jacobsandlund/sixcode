@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron');
+
 const RENDER_LOOP = true;
 
 const SCALE_LEVELS = [
@@ -239,12 +241,18 @@ function mouseMove(e) {
 }
 
 function keyDown(e) {
-    if (e.code === 'Digit1') {
+    switch (e.code) {
+    case 'Digit1':
         let layout = Module._web_view_layout_get(view);
         layout = (layout + 1) % VIEW_NUM_LAYOUTS;
         Module._web_view_layout_set(view, layout);
 
         draw();
+        break;
+
+    case 'KeyT':
+        ipcRenderer.send('trace', 7000);
+        break;
     }
 }
 
