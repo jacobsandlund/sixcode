@@ -1,7 +1,7 @@
 #ifndef __VIEW_H__
 #define __VIEW_H__
 
-#include "6code.h"
+#include "sixcode.h"
 #include "quad.h"
 
 typedef enum {

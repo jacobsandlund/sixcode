@@ -1,7 +1,7 @@
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include "6code.h"
+#include "sixcode.h"
 #include "view.h"
 
 typedef struct {

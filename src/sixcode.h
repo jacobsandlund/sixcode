@@ -1,5 +1,5 @@
-#ifndef __6CODE_H__
-#define __6CODE_H__
+#ifndef __SIXCODE_H__
+#define __SIXCODE_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -61,4 +61,4 @@ static inline ivec2 ivec2_sub(ivec2 a, ivec2 b)
 void log_error(const char *format, ...);
 #define SIXCODE_ERROR(...) log_error(__VA_ARGS__)
 
-#endif // __6CODE_H__
+#endif // __SIXCODE_H__
