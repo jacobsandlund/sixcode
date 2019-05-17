@@ -1,4 +1,0 @@
-tmp/
-local-dev/nginx.conf
-local-dev/fcgiwrap.sock
-local-dev/*.log
