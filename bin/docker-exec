@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+
+if [ "$#" -eq 0 ]; then
+    command=/bin/bash
+else
+    command=$1
+    shift
+fi
+
+docker exec -it sixcode $command "$@"

@@ -1,0 +1,3 @@
+out/
+electron/sixcode.*
+!electron/sixcode.c

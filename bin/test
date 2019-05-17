@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/test "$@"
+elif [ "$#" -eq 1 ]; then
+    bin/run $1 && git diff --exit-code -- $1
+else
+    for test_file in *-test.c; do
+        echo bin/run $test_file
+        bin/run $test_file
+    done
+
+    git diff --exit-code -- *-test.c
+fi
