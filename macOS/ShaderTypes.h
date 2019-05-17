@@ -1,7 +1,7 @@
 #ifndef ShaderTypes_h
 #define ShaderTypes_h
 
-#include "../src/sixcode.h"
+#include "../src/spacetime.h"
 
 // Buffer index values shared between shader and C code to ensure Metal shader buffer inputs match
 //   Metal API buffer set calls

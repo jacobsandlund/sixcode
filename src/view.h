@@ -1,7 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "sixcode.h"
+#include "spacetime.h"
 #include "quad.h"
 
 typedef enum {

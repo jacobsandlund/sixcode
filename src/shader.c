@@ -8,22 +8,22 @@ void shader_print_gl_error(const char *filename, int line)
 	while ((error = glGetError()) != GL_NO_ERROR) {
 		switch (error) {
 		case GL_INVALID_ENUM:
-			SIXCODE_ERROR("%s:%d - An unacceptable value is specified for an enumerated argument.\n", filename, line);
+			SPACETIME_ERROR("%s:%d - An unacceptable value is specified for an enumerated argument.\n", filename, line);
 			break;
 		case GL_INVALID_VALUE:
-			SIXCODE_ERROR("%s:%d - A numeric argument is out of range.\n", filename, line);
+			SPACETIME_ERROR("%s:%d - A numeric argument is out of range.\n", filename, line);
 			break;
 		case GL_INVALID_OPERATION:
-			SIXCODE_ERROR("%s:%d - The specified operation is not allowed in the current state.\n", filename, line);
+			SPACETIME_ERROR("%s:%d - The specified operation is not allowed in the current state.\n", filename, line);
 			break;
 		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			SIXCODE_ERROR("%s:%d - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.\n", filename, line);
+			SPACETIME_ERROR("%s:%d - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.\n", filename, line);
 			break;
 		case GL_OUT_OF_MEMORY:
-			SIXCODE_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
+			SPACETIME_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
 			break;
 		default:
-			SIXCODE_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (int) error);
+			SPACETIME_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (int) error);
 			break;
 		}
 	}
@@ -52,10 +52,10 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetShaderInfoLog(shader, info_log_length, 0, info_log);
-			SIXCODE_ERROR("Error compiling shader:\n%s\n", info_log);
+			SPACETIME_ERROR("Error compiling shader:\n%s\n", info_log);
 			free(info_log);
 		} else {
-			SIXCODE_ERROR("Error compiling shader. Nothing in info log.\n");
+			SPACETIME_ERROR("Error compiling shader. Nothing in info log.\n");
 		}
 
 		shader_print_gl_error(filename, line);
@@ -79,7 +79,7 @@ bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, con
 
 	if (!s->program) {
 		shader_print_gl_error(filename, line);
-		SIXCODE_ERROR("Error creating program.\n");
+		SPACETIME_ERROR("Error creating program.\n");
 
 		return false;
 	}
@@ -104,10 +104,10 @@ bool shader_program_link(ShaderProgram *s, const char *filename, int line)
 		if (info_log_length > 1) {
 			char *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetProgramInfoLog(s->program, info_log_length, 0, info_log);
-			SIXCODE_ERROR("Error linking program:\n%s\n", info_log);
+			SPACETIME_ERROR("Error linking program:\n%s\n", info_log);
 			free(info_log);
 		} else {
-			SIXCODE_ERROR("Error linking program. Nothing in info log.\n");
+			SPACETIME_ERROR("Error linking program. Nothing in info log.\n");
 		}
 
 		shader_print_gl_error(filename, line);

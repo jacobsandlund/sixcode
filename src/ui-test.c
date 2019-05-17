@@ -231,7 +231,7 @@ TEST(ui_initialize_fail)
 
 	_d(ui_initialize(ui));
 	//=> 0
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> Error compiling shader. Nothing in info log.
 	//=>
 
@@ -240,7 +240,7 @@ TEST(ui_initialize_fail)
 
 	_d(ui_initialize(ui));
 	//=> 0
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> Error linking program. Nothing in info log.
 	//=>
 

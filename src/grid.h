@@ -1,7 +1,7 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "sixcode.h"
+#include "spacetime.h"
 #include "quad.h"
 
 typedef struct {

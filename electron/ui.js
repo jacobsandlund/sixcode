@@ -39,7 +39,7 @@ let view;
 
 let scaleLevel = SCALE_LEVELS.indexOf(16.0);
 
-function sixcode_initialized() {
+function spacetime_initialized() {
     canvas = Module['canvas'];
     resizeUI();
     mouseX = window.innerWidth / 2;
@@ -256,6 +256,6 @@ function keyDown(e) {
     }
 }
 
-if (isSixcodeInitialized) {
-    sixcode_initialized();
+if (isSpacetimeInitialized) {
+    spacetime_initialized();
 }

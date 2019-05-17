@@ -148,7 +148,7 @@ int main()
 	assert(res == EMSCRIPTEN_RESULT_SUCCESS);
 	assert(emscripten_webgl_get_current_context() == context);
 
-	EM_ASM( sixcode_initialized() );
+	EM_ASM( spacetime_initialized() );
 
 	return 0;
 }

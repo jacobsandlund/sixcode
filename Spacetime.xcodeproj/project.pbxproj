@@ -18,7 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		652F0EEA228DE72B00238560 /* Sixcode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sixcode.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		652F0EEA228DE72B00238560 /* Spacetime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spacetime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		652F0EF0228DE72B00238560 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		652F0EF1228DE72B00238560 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		652F0EF3228DE72B00238560 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -30,9 +30,9 @@
 		656A111F228DEBB200DCAD49 /* Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
 		656A1122228DF0E900DCAD49 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		656A1125228DFA2800DCAD49 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
-		656A1127228E082400DCAD49 /* Sixcode.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Sixcode.entitlements; sourceTree = "<group>"; };
 		656A1128228E08F000DCAD49 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		656A112A228E092000DCAD49 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		65B6118B228F3F9C0062EB4C /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 		652F0EEB228DE72B00238560 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				652F0EEA228DE72B00238560 /* Sixcode.app */,
+				652F0EEA228DE72B00238560 /* Spacetime.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,18 +68,18 @@
 		652F0EEC228DE72B00238560 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
+				656A112A228E092000DCAD49 /* AppDelegate.h */,
+				656A1128228E08F000DCAD49 /* AppDelegate.m */,
 				656A111D228DEBB200DCAD49 /* Renderer.h */,
 				656A111F228DEBB200DCAD49 /* Renderer.m */,
 				656A111C228DEBB200DCAD49 /* Shaders.metal */,
 				656A111E228DEBB200DCAD49 /* ShaderTypes.h */,
 				652F0EF0228DE72B00238560 /* ViewController.h */,
 				652F0EF1228DE72B00238560 /* ViewController.m */,
-				652F0EF3228DE72B00238560 /* Assets.xcassets */,
-				652F0EF8228DE72B00238560 /* Info.plist */,
 				652F0EF9228DE72B00238560 /* main.m */,
-				656A1127228E082400DCAD49 /* Sixcode.entitlements */,
-				656A1128228E08F000DCAD49 /* AppDelegate.m */,
-				656A112A228E092000DCAD49 /* AppDelegate.h */,
+				652F0EF3228DE72B00238560 /* Assets.xcassets */,
+				65B6118B228F3F9C0062EB4C /* Spacetime.entitlements */,
+				652F0EF8228DE72B00238560 /* Info.plist */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		652F0EE9228DE72B00238560 /* Sixcode */ = {
+		652F0EE9228DE72B00238560 /* Spacetime */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652F0EFE228DE72B00238560 /* Build configuration list for PBXNativeTarget "Sixcode" */;
+			buildConfigurationList = 652F0EFE228DE72B00238560 /* Build configuration list for PBXNativeTarget "Spacetime" */;
 			buildPhases = (
 				652F0EE6228DE72B00238560 /* Sources */,
 				652F0EE7228DE72B00238560 /* Frameworks */,
@@ -107,9 +107,9 @@
 			);
 			dependencies = (
 			);
-			name = Sixcode;
-			productName = Sixcode;
-			productReference = 652F0EEA228DE72B00238560 /* Sixcode.app */;
+			name = Spacetime;
+			productName = Spacetime;
+			productReference = 652F0EEA228DE72B00238560 /* Spacetime.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +126,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 652F0EE5228DE72B00238560 /* Build configuration list for PBXProject "Sixcode" */;
+			buildConfigurationList = 652F0EE5228DE72B00238560 /* Build configuration list for PBXProject "Spacetime" */;
 			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -139,7 +139,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				652F0EE9228DE72B00238560 /* Sixcode */,
+				652F0EE9228DE72B00238560 /* Spacetime */,
 			);
 		};
 /* End PBXProject section */
@@ -287,7 +287,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = macOS/Sixcode.entitlements;
+				CODE_SIGN_ENTITLEMENTS = macOS/Spacetime.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9497RH3DKW;
@@ -296,7 +296,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.sixcode.Sixcode;
+				PRODUCT_BUNDLE_IDENTIFIER = computer.spacetime.Spacetime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -305,7 +305,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = macOS/Sixcode.entitlements;
+				CODE_SIGN_ENTITLEMENTS = macOS/Spacetime.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9497RH3DKW;
@@ -314,7 +314,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.sixcode.Sixcode;
+				PRODUCT_BUNDLE_IDENTIFIER = computer.spacetime.Spacetime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -322,7 +322,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		652F0EE5228DE72B00238560 /* Build configuration list for PBXProject "Sixcode" */ = {
+		652F0EE5228DE72B00238560 /* Build configuration list for PBXProject "Spacetime" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652F0EFC228DE72B00238560 /* Debug */,
@@ -331,7 +331,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		652F0EFE228DE72B00238560 /* Build configuration list for PBXNativeTarget "Sixcode" */ = {
+		652F0EFE228DE72B00238560 /* Build configuration list for PBXNativeTarget "Spacetime" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652F0EFF228DE72B00238560 /* Debug */,

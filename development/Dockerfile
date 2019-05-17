@@ -1,6 +1,6 @@
 FROM debian:9.6-slim
 
-WORKDIR /sixcode
+WORKDIR /spacetime
 
 ENV EMSCRIPTEN_VERSION 1.38.31
 

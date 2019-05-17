@@ -2,17 +2,17 @@
 
 NSMenu *makeMenu() {
     NSMenu *mainMenu = [[NSMenu alloc] init];
-    NSMenuItem *mainSixcodeMenuItem = [[NSMenuItem alloc] initWithTitle:@"Sixcode"
-                                                                 action:nil
-                                                          keyEquivalent:@""];
-    [mainMenu addItem:mainSixcodeMenuItem];
+    NSMenuItem *mainSpacetimeMenuItem = [[NSMenuItem alloc] initWithTitle:@"Spacetime"
+                                                                   action:nil
+                                                            keyEquivalent:@""];
+    [mainMenu addItem:mainSpacetimeMenuItem];
     
-    NSMenu *mainSixcodeMenu = [[NSMenu alloc] init];
-    mainSixcodeMenuItem.submenu = mainSixcodeMenu;
+    NSMenu *mainSpacetimeMenu = [[NSMenu alloc] init];
+    mainSpacetimeMenuItem.submenu = mainSpacetimeMenu;
     
-    [mainSixcodeMenu addItemWithTitle:@"Quit Sixcode"
-                               action:@selector(terminate:)
-                        keyEquivalent:@"q"];
+    [mainSpacetimeMenu addItemWithTitle:@"Quit Spacetime"
+                                 action:@selector(terminate:)
+                          keyEquivalent:@"q"];
     
     return mainMenu;
 }

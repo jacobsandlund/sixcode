@@ -2,7 +2,7 @@
 #define SHADER_H
 
 #include <GLES3/gl3.h>
-#include "sixcode.h"
+#include "spacetime.h"
 
 typedef struct {
 	GLuint vertex;

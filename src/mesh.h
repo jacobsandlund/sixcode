@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "sixcode.h"
+#include "spacetime.h"
 #include "view.h"
 
 typedef struct {

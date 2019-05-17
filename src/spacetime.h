@@ -1,5 +1,5 @@
-#ifndef SIXCODE_H
-#define SIXCODE_H
+#ifndef SPACETIME_H
+#define SPACETIME_H
 
 // Note: prefer int and uint unless explicit size is needed
 typedef unsigned int uint;
@@ -46,4 +46,4 @@ static inline int2 int2_sub(int2 a, int2 b)
 	return (int2) {a.x - b.x, a.y - b.y};
 }
 
-#endif // SIXCODE_H
+#endif // SPACETIME_H

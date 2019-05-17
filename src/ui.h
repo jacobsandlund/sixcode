@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "sixcode.h"
+#include "spacetime.h"
 #include <GLES3/gl3.h>
 #include "grid.h"
 #include "mesh.h"
