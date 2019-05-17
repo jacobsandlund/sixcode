@@ -1,3 +1,4 @@
 out/
 electron/sixcode.*
-!electron/sixcode.c
+electron/sixcode.c
+xcuserdata/

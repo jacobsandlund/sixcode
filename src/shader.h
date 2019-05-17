@@ -1,5 +1,5 @@
-#ifndef __SHADER_H__
-#define __SHADER_H__
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <GLES3/gl3.h>
 #include "sixcode.h"
@@ -17,4 +17,4 @@ bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, con
 bool shader_program_link(ShaderProgram *s, const char *filename, int line);
 void shader_program_delete(ShaderProgram *s);
 
-#endif // __SHADER_H__
+#endif // SHADER_H

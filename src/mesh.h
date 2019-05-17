@@ -1,5 +1,5 @@
-#ifndef __MESH_H__
-#define __MESH_H__
+#ifndef MESH_H
+#define MESH_H
 
 #include "sixcode.h"
 #include "view.h"
@@ -37,4 +37,4 @@ void instance_mesh_initialize(InstanceMesh *m, int length);
 void instance_mesh_resize(InstanceMesh *m, int length);
 void instance_mesh_terminate(InstanceMesh *m);
 
-#endif // __MESH_H__
+#endif // MESH_H

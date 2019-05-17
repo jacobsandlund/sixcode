@@ -1,5 +1,5 @@
-#ifndef __VIEW_H__
-#define __VIEW_H__
+#ifndef VIEW_H
+#define VIEW_H
 
 #include "sixcode.h"
 #include "quad.h"
@@ -30,4 +30,4 @@ void view_update_matrix(View *vw, vec2 draw_offset);
 ivec2 view_world_round(View *vw, vec2 v);
 void view_viewport_to_quad(View *vw, Quad *out_q);
 
-#endif // __VIEW_H__
+#endif // VIEW_H

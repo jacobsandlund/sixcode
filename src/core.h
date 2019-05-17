@@ -1,5 +1,5 @@
-#ifndef __CORE_H__
-#define __CORE_H__
+#ifndef CORE_H
+#define CORE_H
 
 #include "sixcode.h"
 #include "grid.h"
@@ -11,4 +11,4 @@ void core_grid_initialize(Grid *g);
 void core_tick(Ui *ui, View *vw, Grid *g);
 void core_toggle_hex_at_point(Ui *ui, View *vw, Grid *g, vec2 v);
 
-#endif // __CORE_H__
+#endif // CORE_H

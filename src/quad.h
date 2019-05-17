@@ -1,5 +1,5 @@
-#ifndef __QUAD_H__
-#define __QUAD_H__
+#ifndef QUAD_H
+#define QUAD_H
 
 #include "sixcode.h"
 
@@ -20,4 +20,4 @@ void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
 int size_quad_capacity(SizeQuad *sq);
 
-#endif // __QUAD_H__
+#endif // QUAD_H

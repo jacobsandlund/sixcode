@@ -1,5 +1,5 @@
-#ifndef __TEST_H__
-#define __TEST_H__
+#ifndef TEST_H
+#define TEST_H
 
 #include <errno.h>
 #include <stdarg.h>
@@ -404,4 +404,4 @@ int main()
 	}
 }
 
-#endif // __TEST_H__
+#endif // TEST_H

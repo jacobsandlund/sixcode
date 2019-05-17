@@ -1,5 +1,5 @@
-#ifndef __UI_H__
-#define __UI_H__
+#ifndef UI_H
+#define UI_H
 
 #include "sixcode.h"
 #include <GLES3/gl3.h>
@@ -54,4 +54,4 @@ bool ui_initialize(Ui *ui);
 void ui_terminate(Ui *ui);
 void ui_draw(Ui *ui, View *vw, Grid *g);
 
-#endif // __UI_H__
+#endif // UI_H

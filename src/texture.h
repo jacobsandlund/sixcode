@@ -1,5 +1,5 @@
-#ifndef __TEXTURE_H__
-#define __TEXTURE_H__
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include "sixcode.h"
 #include <GLES3/gl3.h>
@@ -20,4 +20,4 @@ void texture_terminate(Texture *t);
 void texture_update(Texture *t, Grid *g);
 void texture_update_in_quad(Texture *t, Grid *g, Quad *quad);
 
-#endif // __TEXTURE_H__
+#endif // TEXTURE_H
