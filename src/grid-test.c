@@ -4,8 +4,8 @@
 
 TEST(grid_basics)
 {
-	ivec2 h1 = {5, 27};
-	ivec2 h2 = {48, 62};
+	int2 h1 = {5, 27};
+	int2 h2 = {48, 62};
 	Grid *g = malloc(sizeof *g);
 
 	grid_initialize(g);

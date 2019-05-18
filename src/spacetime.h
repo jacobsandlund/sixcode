@@ -4,9 +4,10 @@
 // Note: prefer int and uint unless explicit size is needed
 typedef unsigned int uint;
 
-
 #if __APPLE__
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <simd/simd.h>
 
 typedef int64_t i64;

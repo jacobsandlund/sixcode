@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-../electron-gn/src/out/Release/Electron.app/Contents/MacOS/Electron electron "$@"

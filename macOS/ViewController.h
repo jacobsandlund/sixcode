@@ -5,6 +5,6 @@
 
 @interface ViewController : NSViewController
 
-- (id)initWithFrame:(NSRect)frame;
+- (instancetype)initWithFrame:(NSRect)frame;
 
 @end

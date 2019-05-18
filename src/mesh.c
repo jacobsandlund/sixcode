@@ -8,13 +8,13 @@
 #define FILL_MESH_INDICES_PER_RECT 6
 #define FILL_MESH_FRACTION 0.95
 
-static vec2 mesh_hex_corner(int corner)
+static float2 mesh_hex_corner(int corner)
 {
 	double angle = -M_PI / 3.0 * (0.5 + corner);
 	View vw;
 	view_layout(&vw, VIEW_LAYOUT_HEX);
 
-	return (vec2) {
+	return (float2) {
 		cos(angle) * FILL_MESH_FRACTION / vw.scale.x,
 		sin(angle) * FILL_MESH_FRACTION / vw.scale.y,
 	};
@@ -31,7 +31,7 @@ void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
 	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
 	m->indices = malloc(m->indices_length * sizeof *m->indices);
 
-	vec2 corners[] = {
+	float2 corners[] = {
 		mesh_hex_corner(0),
 		mesh_hex_corner(1),
 		mesh_hex_corner(2),
@@ -47,13 +47,13 @@ void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
 		3, 4, 5,
 	};
 
-	ivec2 h;
+	int2 h;
 	int vi = 0;
 	int ii = 0;
 
 	for (h.y = 0; h.y < size_y; ++h.y) {
 		for (h.x = 0; h.x < size_x; ++h.x) {
-			vec2 center = vec2_from_ivec(h);
+			float2 center = float2_from_int2(h);
 			center.x += 0.5 * (h.y & 1);
 
 			for (int i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
@@ -86,12 +86,12 @@ void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
 	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
 	m->indices = malloc(m->indices_length * sizeof *m->indices);
 
-	vec2 size = {
+	float2 size = {
 		0.5 * FILL_MESH_FRACTION,
 		0.5 * FILL_MESH_FRACTION,
 	};
 
-	vec2 corners[] = {
+	float2 corners[] = {
 		{size.x, -size.y},
 		{-size.x, -size.y},
 		{-size.x, size.y},
@@ -103,13 +103,13 @@ void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
 		0, 2, 3,
 	};
 
-	ivec2 h;
+	int2 h;
 	int vi = 0;
 	int ii = 0;
 
 	for (h.y = 0; h.y < size_y; ++h.y) {
 		for (h.x = 0; h.x < size_x; ++h.x) {
-			vec2 center = vec2_from_ivec(h);
+			float2 center = float2_from_int2(h);
 
 			for (int i = 0; i < FILL_MESH_INDICES_PER_RECT; ++i) {
 				m->indices[ii + i] = vi + indices_single[i];

@@ -1,7 +1,23 @@
 #!/bin/bash -e
 
-if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-    docker exec -it spacetime bin/make "$@"
+if [[ $1 == "release" ]] || [[ $1 == "Release" ]]; then
+    configuration="Release"
+    shift
+elif [[ $1 == "debug" ]] || [[ $1 == "Debug" ]]; then
+    configuration="Debug"
+    shift
+elif [[ $1 == "clean" ]]; then
+    out="$SPACETIME_PATH/out"
+    rm -rf "$out/Debug"
+    rm -rf "$out/Release"
+    rm -rf "$out/Spacetime.build"
+    rm -rf "$out/XCBuildData"
+    exit 0
+elif [ "$#" -eq 0 ]; then
+    configuration="Debug"
 else
-    /emscripten/emscripten/emmake make -f development/Makefile "-j$(nproc --all)" --no-print-directory "$@"
+    echo "Unknown command: $1"
+    exit 1
 fi
+
+xcodebuild -scheme Spacetime build -configuration "$configuration" "$@"

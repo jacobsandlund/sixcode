@@ -4,27 +4,23 @@
 #import "Renderer.h"
 #import "ShaderTypes.h"
 
-@implementation Renderer
-{
+const NSInteger RENDERER_FRAMES_PER_SECOND = 60;
+
+@implementation Renderer {
     id<MTLDevice> _device;
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLCommandQueue> _commandQueue;
-
-    // GPU buffer which will contain our vertex array
     id<MTLBuffer> _vertexBuffer;
 
     uint2 _viewportSize;
-
-    // The number of vertices in our vertex buffer;
     NSUInteger _numVertices;
 }
 
-/// Initialize with the MetalKit view from which we'll obtain our Metal device
-- (nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)mtkView
-{
+- (instancetype)initWithMetalKitView:(MTKView *)mtkView {
     self = [super init];
-    if(self)
-    {
+    if (self) {
+        mtkView.preferredFramesPerSecond = RENDERER_FRAMES_PER_SECOND;
+
         _device = mtkView.device;
         [self loadMetal:mtkView];
     }
@@ -32,20 +28,17 @@
     return self;
 }
 
-/// Creates a grid of 25x15 quads (i.e. 72000 bytes with 2250 vertices are to be loaded into
-///   a vertex buffer)
-+ (nonnull NSData *)generateVertexData
++ (NSData *)generateVertexData
 {
-    const Vertex quadVertices[] =
-    {
+    const Vertex quadVertices[] = {
         // Pixel positions, RGBA colors
-        { { -20,   20 },    { 1, 0, 0, 1 } },
-        { {  20,   20 },    { 0, 0, 1, 1 } },
-        { { -20,  -20 },    { 0, 1, 0, 1 } },
+        {{-20, 20}, {1, 0, 0, 1}},
+        {{20, 20}, {0, 0, 1, 1}},
+        {{-20, -20}, {0, 1, 0, 1}},
 
-        { {  20,  -20 },    { 1, 0, 0, 1 } },
-        { { -20,  -20 },    { 0, 1, 0, 1 } },
-        { {  20,   20 },    { 0, 0, 1, 1 } },
+        {{20, -20}, {1, 0, 0, 1}},
+        {{-20, -20}, {0, 1, 0, 1}},
+        {{20, 20}, {0, 0, 1, 1}},
     };
     const NSUInteger NUM_COLUMNS = 25;
     const NSUInteger NUM_ROWS = 15;
@@ -57,10 +50,8 @@
 
     Vertex* currentQuad = vertexData.mutableBytes;
 
-    for(NSUInteger row = 0; row < NUM_ROWS; row++)
-    {
-        for(NSUInteger column = 0; column < NUM_COLUMNS; column++)
-        {
+    for (NSUInteger row = 0; row < NUM_ROWS; row++) {
+        for (NSUInteger column = 0; column < NUM_COLUMNS; column++) {
             float2 upperLeftPosition;
             upperLeftPosition.x = ((-((float)NUM_COLUMNS) / 2.0) + column) * QUAD_SPACING + QUAD_SPACING/2.0;
             upperLeftPosition.y = ((-((float)NUM_ROWS) / 2.0) + row) * QUAD_SPACING + QUAD_SPACING/2.0;
@@ -78,9 +69,7 @@
     return vertexData;
 }
 
-/// Create our Metal render state objects including our shaders and render state pipeline objects
-- (void)loadMetal:(nonnull MTKView *)mtkView
-{
+- (void)loadMetal:(MTKView *)mtkView {
     mtkView.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 
     id<MTLLibrary> defaultLibrary = [_device newDefaultLibrary];
@@ -97,8 +86,7 @@
     NSError *error = NULL;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
                                                              error:&error];
-    if (!_pipelineState)
-    {
+    if (!_pipelineState) {
         // Pipeline State creation could fail if we haven't properly set up our pipeline descriptor.
         //  If the Metal API validation is enabled, we can find out more information about what
         //  went wrong.  (Metal API validation is enabled by default when a debug build is run
@@ -122,25 +110,22 @@
     _commandQueue = [_device newCommandQueue];
 }
 
-/// Called whenever view changes orientation or is resized
-- (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
-{
+- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
+    (void)view;
+
     // Save the size of the drawable as we'll pass these
     //   values to our vertex shader when we draw
     _viewportSize.x = size.width;
     _viewportSize.y = size.height;
 }
 
-/// Called whenever the view needs to render a frame
-- (void)drawInMTKView:(nonnull MTKView *)view
-{
+- (void)render:(MTKView *)view {
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
     MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
 
-    if(renderPassDescriptor != nil)
-    {
+    if (renderPassDescriptor != nil) {
         id<MTLRenderCommandEncoder> renderEncoder =
         [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"MyRenderEncoder";
@@ -182,6 +167,15 @@
     }
 
     [commandBuffer commit];
+}
+
+- (void)drawInMTKView:(MTKView *)view {
+    @autoreleasepool {
+        NSPoint mouse = [NSEvent mouseLocation];
+        NSUInteger buttons = [NSEvent pressedMouseButtons];
+        NSLog(@"mouse info: at %g, %g - %d", mouse.x, mouse.y, (uint) buttons);
+        [self render:view];
+    }
 }
 
 @end

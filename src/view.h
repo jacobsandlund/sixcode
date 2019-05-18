@@ -12,22 +12,22 @@ typedef enum {
 #define VIEW_NUM_LAYOUTS 2
 
 typedef struct {
-	mat4 view_matrix;
-	vec2 viewport_size;
-	vec2 translation;
-	dvec2 scale;
+	float4x4 view_matrix;
+	float2 viewport_size;
+	float2 translation;
+	double2 scale;
 	float layout_independent_scale;
 	ViewLayout layout;
 } View;
 
-void view_initialize(View *vw, vec2 viewport_size, vec2 translation, float layout_independent_scale);
+void view_initialize(View *vw, float2 viewport_size, float2 translation, float layout_independent_scale);
 void view_layout(View *vw, ViewLayout layout);
-vec2 view_screen_to_world(View *vw, vec2 v);
-void view_zoom_at_screen_point(View *vw, vec2 v, float new_scale);
-void view_resize(View *vw, vec2 viewport_size);
-void view_translate(View *vw, vec2 delta);
-void view_update_matrix(View *vw, vec2 draw_offset);
-ivec2 view_world_round(View *vw, vec2 v);
+float2 view_screen_to_world(View *vw, float2 v);
+void view_zoom_at_screen_point(View *vw, float2 v, float new_scale);
+void view_resize(View *vw, float2 viewport_size);
+void view_translate(View *vw, float2 delta);
+void view_update_matrix(View *vw, float2 draw_offset);
+int2 view_world_round(View *vw, float2 v);
 void view_viewport_to_quad(View *vw, Quad *out_q);
 
 #endif // VIEW_H

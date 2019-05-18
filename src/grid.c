@@ -26,7 +26,7 @@ void grid_terminate(Grid *g)
 	free(g->styles);
 }
 
-static int grid_index(Grid *g, ivec2 h)
+static int grid_index(Grid *g, int2 h)
 {
 	assert(quad_contains(&g->quad, h));
 	int diff_min_x = h.x - g->size_quad.min.x;
@@ -34,20 +34,20 @@ static int grid_index(Grid *g, ivec2 h)
 	return diff_min_x + diff_min_y * g->size_quad.size.x;
 }
 
-u8 grid_get(Grid *g, ivec2 h)
+u8 grid_get(Grid *g, int2 h)
 {
 	assert(quad_contains(&g->quad, h));
 	return g->styles[grid_index(g, h)];
 }
 
-void grid_set(Grid *g, ivec2 h, u8 style)
+void grid_set(Grid *g, int2 h, u8 style)
 {
 	assert(quad_contains(&g->quad, h));
 	int i = grid_index(g, h);
 	g->styles[i] = style;
 }
 
-void grid_clear(Grid *g, ivec2 h)
+void grid_clear(Grid *g, int2 h)
 {
 	assert(quad_contains(&g->quad, h));
 	int i = grid_index(g, h);

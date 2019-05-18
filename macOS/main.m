@@ -2,22 +2,23 @@
 
 NSMenu *makeMenu() {
     NSMenu *mainMenu = [[NSMenu alloc] init];
-    NSMenuItem *mainSpacetimeMenuItem = [[NSMenuItem alloc] initWithTitle:@"Spacetime"
-                                                                   action:nil
-                                                            keyEquivalent:@""];
+    NSMenuItem *mainSpacetimeMenuItem = [[NSMenuItem alloc]
+            initWithTitle:@"Spacetime" action:nil keyEquivalent:@""];
     [mainMenu addItem:mainSpacetimeMenuItem];
-    
+
     NSMenu *mainSpacetimeMenu = [[NSMenu alloc] init];
     mainSpacetimeMenuItem.submenu = mainSpacetimeMenu;
-    
+
     [mainSpacetimeMenu addItemWithTitle:@"Quit Spacetime"
-                                 action:@selector(terminate:)
-                          keyEquivalent:@"q"];
-    
+            action:@selector(terminate:) keyEquivalent:@"q"];
+
     return mainMenu;
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[]) {
+    (void)argc;
+    (void)argv;
+
     @autoreleasepool {
         [NSApplication sharedApplication];
 
@@ -27,6 +28,6 @@ int main(int argc, const char * argv[]) {
         [NSApp setDelegate:appDelegate];
         [NSApp run];
     }
-    
+
     return 0;
 }

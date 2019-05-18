@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
-if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-    docker exec -it spacetime bin/run "$@"
+if [[ $1 == "release" ]] || [[ $1 == "archive" ]]; then
+    out="$SPACETIME_PATH/out/Release"
 else
-    trap "rm -f a.out" EXIT
-    bin/compile "$@" && ./a.out
+    out="$SPACETIME_PATH/out/Debug"
 fi
+
+$SPACETIME_PATH/bin/make "$@" && open $out/Spacetime.app

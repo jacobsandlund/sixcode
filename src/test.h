@@ -55,7 +55,7 @@ typedef struct {
 #define TEST(test_name) \
 void test_case_fn_##test_name(); \
 static TestCase test_case_##test_name \
-__attribute((used, section("test_cases"))) = { \
+__attribute((used, section("data,test_cases"))) = { \
 	.fn = test_case_fn_##test_name, \
 	.sentinel = TEST_CASE_SENTINEL, \
 }; \
@@ -291,8 +291,11 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 	++file_info->num_results;
 }
 
-int main()
+int main(int argc, const char *argv[])
 {
+	(void) argc;
+	(void) argv;
+
 	for (TestCase *test_case = &test_case_start; test_case->sentinel == TEST_CASE_SENTINEL; ++test_case) {
 		test_case->fn();
 		is_focus_on = 0;

@@ -7,16 +7,16 @@ TEST(quad_contains)
 		.min = {-4, 2},
 		.max = {7, 3},
 	};
-	ivec2 h = {-4, 3};
+	int2 h = {-4, 3};
 
 	_d(quad_contains(&q, h));
 	//=> 1
 
-	h = (ivec2) {-5, 3};
+	h = (int2) {-5, 3};
 	_d(quad_contains(&q, h));
 	//=> 0
 
-	h = (ivec2) {7, 4};
+	h = (int2) {7, 4};
 	_d(quad_contains(&q, h));
 	//=> 0
 }
@@ -24,8 +24,8 @@ TEST(quad_contains)
 TEST(quad_from_hexes)
 {
 	Quad q;
-	ivec2 h1 = {700, -3};
-	ivec2 h2 = {-6, 8};
+	int2 h1 = {700, -3};
+	int2 h2 = {-6, 8};
 
 	quad_from_hexes(&q, h1, h2);
 	_qd(q);
@@ -76,13 +76,13 @@ TEST(size_quad_even_align)
 	_sq(out_sq);
 	//=> (-2, 2), (10, 21)
 
-	sq.min = (ivec2) {-5, -21};
+	sq.min = (int2) {-5, -21};
 	size_quad_even_align(&out_sq, &sq);
 
 	_sq(out_sq);
 	//=> (-5, -22), (10, 21)
 
-	sq.min = (ivec2) {-5, -20};
+	sq.min = (int2) {-5, -20};
 	size_quad_even_align(&out_sq, &sq);
 
 	_sq(out_sq);

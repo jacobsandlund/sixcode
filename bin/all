@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-    docker exec -it spacetime bin/all "$@"
-else
-    bin/make
-    bin/test
-    bin/valgrind
-fi
+$SPACETIME_PATH/bin/make
+$SPACETIME_PATH/bin/test
+$SPACETIME_PATH/bin/valgrind

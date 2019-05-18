@@ -12,8 +12,8 @@ typedef struct {
 } FillMeshVertex;
 
 typedef struct {
-	vec2 positionOffset;
-	ivec2 gridPositionOffset;
+	float2 positionOffset;
+	int2 gridPositionOffset;
 } InstanceMeshVertex;
 
 typedef struct {

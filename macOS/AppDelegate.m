@@ -1,27 +1,27 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 
-@interface AppDelegate ()
-
-@end
-
 @implementation AppDelegate
 
-- (id)init {
-    if (self = [super init]) {
+- (instancetype)init {
+    self = [super init];
+    if (self) {
         _window = [[NSWindow alloc] init];
-        _window.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskResizable | NSWindowStyleMaskFullScreen;
-        _window.contentViewController = [[ViewController alloc] initWithFrame:[[_window contentView] frame]];
-        _window.backgroundColor = [NSColor blackColor];
+        _window.styleMask = NSWindowStyleMaskTitled |
+                NSWindowStyleMaskResizable | NSWindowStyleMaskFullScreen;
+        _window.contentViewController = [[ViewController alloc]
+                initWithFrame:[[_window contentView] frame]];
     }
     return self;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-    [_window makeKeyAndOrderFront:self];
+    (void)notification;
+    [self.window makeKeyAndOrderFront:self];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+    (void)sender;
     return YES;
 }
 

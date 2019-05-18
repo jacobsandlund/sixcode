@@ -1,14 +1,21 @@
 #!/bin/bash -e
 
-if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-    docker exec -it spacetime bin/test "$@"
+trap "rm -f a.out" EXIT
+
+run() {
+    $SPACETIME_PATH/bin/compile "$@" && ./a.out
+}
+
+if [ "$#" -gt 1 ] && [[ $1 == "--no-diff" ]]; then
+    shift
+    run "$@"
 elif [ "$#" -eq 1 ]; then
-    bin/run $1 && git diff --exit-code -- $1
+    run "$@" && git diff --exit-code -- $1
 else
-    for test_file in *-test.c; do
-        echo bin/run $test_file
-        bin/run $test_file
+    for test_file in $SPACETIME_PATH/src/*-test.c; do
+        echo bin/test $test_file
+        run $test_file
     done
 
-    git diff --exit-code -- *-test.c
+    git diff --exit-code -- $SPACETIME_PATH/src/*-test.c
 fi

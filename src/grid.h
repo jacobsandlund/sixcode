@@ -13,8 +13,8 @@ typedef struct {
 
 void grid_initialize(Grid *g);
 void grid_terminate(Grid *g);
-u8 grid_get(Grid *g, ivec2 h);
-void grid_set(Grid *g, ivec2 h, u8 style);
-void grid_clear(Grid *g, ivec2 h);
+u8 grid_get(Grid *g, int2 h);
+void grid_set(Grid *g, int2 h, u8 style);
+void grid_clear(Grid *g, int2 h);
 
 #endif // GRID_H

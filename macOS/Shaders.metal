@@ -3,11 +3,11 @@
 using namespace metal;
 
 // Include header shared between this Metal shader code and C code executing Metal API commands
+#import <simd/simd.h>
 #import "ShaderTypes.h"
 
 // Vertex shader outputs and fragment shader inputs
-typedef struct
-{
+typedef struct {
     // The [[position]] attribute qualifier of this member indicates this value is the clip space
     //   position of the vertex wen this structure is returned from the vertex shader
     float4 clipSpacePosition [[position]];
@@ -19,15 +19,13 @@ typedef struct
 
 } RasterizerData;
 
-// Vertex function
 vertex RasterizerData
 vertexShader(uint vertexID [[ vertex_id ]],
              device Vertex *vertices [[ buffer(VertexInputIndexVertices) ]],
-             constant uint2 *viewportSizePointer  [[ buffer(VertexInputIndexViewportSize) ]])
+             constant uint2 *viewportSizePointer [[ buffer(VertexInputIndexViewportSize) ]])
 {
     RasterizerData out;
 
-    // Initialize our output clip space position
     out.clipSpacePosition = float4(0.0, 0.0, 0.0, 1.0);
 
     // Index into our array of positions to get the current vertex
@@ -56,7 +54,6 @@ vertexShader(uint vertexID [[ vertex_id ]],
     return out;
 }
 
-// Fragment function
 fragment float4 fragmentShader(RasterizerData in [[stage_in]])
 {
     // We return the color we just set which will be written to our color attachment.
