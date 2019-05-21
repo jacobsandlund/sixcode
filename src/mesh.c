@@ -11,12 +11,12 @@
 static float2 mesh_hex_corner(int corner)
 {
 	double angle = -M_PI / 3.0 * (0.5 + corner);
-	View vw;
-	view_layout(&vw, VIEW_LAYOUT_HEX);
+	Camera c;
+	camera_layout(&c, camera_LAYOUT_HEX);
 
 	return (float2) {
-		cos(angle) * FILL_MESH_FRACTION / vw.scale.x,
-		sin(angle) * FILL_MESH_FRACTION / vw.scale.y,
+		cos(angle) * FILL_MESH_FRACTION / c.scale.x,
+		sin(angle) * FILL_MESH_FRACTION / c.scale.y,
 	};
 }
 
@@ -130,13 +130,13 @@ void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
 	}
 }
 
-void fill_mesh_initialize(FillMesh *m, ViewLayout layout, int size_x, int size_y)
+void fill_mesh_initialize(FillMesh *m, CameraLayout layout, int size_x, int size_y)
 {
 	switch (layout) {
-	case VIEW_LAYOUT_HEX:
+	case camera_LAYOUT_HEX:
 		fill_mesh_initialize_hex(m, size_x, size_y);
 		break;
-	case VIEW_LAYOUT_RECT:
+	case camera_LAYOUT_RECT:
 		fill_mesh_initialize_rect(m, size_x, size_y);
 		break;
 	}

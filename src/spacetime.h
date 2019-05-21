@@ -20,6 +20,7 @@ typedef int8_t i8;
 typedef uint8_t u8;
 
 typedef vector_float2 float2;
+typedef vector_float3 float3;
 typedef vector_float4 float4;
 typedef vector_double2 double2;
 typedef vector_int2 int2;

@@ -253,17 +253,17 @@ TEST(ui_draw_fill)
 	vec2 translation = {100, 100};
 	float scale = 10.0;
 
-	View *vw = malloc(sizeof *vw);
+	Camera *c = malloc(sizeof *c);
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	view_initialize(vw, viewport_size, translation, scale);
+	camera_initialize(c, viewport_size, translation, scale);
 	grid_initialize(g);
 	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	ui_draw(ui, vw, g);
+	ui_draw(ui, c, g);
 
 	_dd(GLmock.using_program, ui->shader.program);
 	//=> 1, 1
@@ -309,7 +309,7 @@ TEST(ui_draw_fill)
 	_d(program->uniforms[ui->uniforms.styleOffset].iv0);
 	//=> 0
 
-	mat4 *m = &vw->view_matrix;
+	mat4 *m = &c->camera_matrix;
 	_d(program->uniforms[ui->uniforms.viewMatrix].matrix4fv == &m->m[0][0]);
 	//=> 1
 
@@ -404,7 +404,7 @@ TEST(ui_draw_fill)
 	grid_terminate(g);
 	ui_terminate(ui);
 
-	free(vw);
+	free(c);
 	free(g);
 	free(ui);
 }
@@ -415,18 +415,18 @@ TEST(ui_draw_fill_rect)
 	vec2 translation = {100, 100};
 	float scale = 10.0;
 
-	View *vw = malloc(sizeof *vw);
+	Camera *c = malloc(sizeof *c);
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
 
 	glmock_initialize();
-	view_initialize(vw, viewport_size, translation, scale);
-	view_layout(vw, VIEW_LAYOUT_RECT);
+	camera_initialize(c, viewport_size, translation, scale);
+	camera_layout(c, CAMERA_LAYOUT_RECT);
 	grid_initialize(g);
 	ui_initialize(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
-	ui_draw(ui, vw, g);
+	ui_draw(ui, c, g);
 
 	// Draw
 
@@ -447,7 +447,7 @@ TEST(ui_draw_fill_rect)
 	grid_terminate(g);
 	ui_terminate(ui);
 
-	free(vw);
+	free(c);
 	free(g);
 	free(ui);
 }

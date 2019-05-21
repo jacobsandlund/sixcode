@@ -1,7 +1,9 @@
 @import MetalKit;
 
+#import "View.h"
+
 @interface Renderer : NSObject<MTKViewDelegate>
 
-- (instancetype)initWithMetalKitView:(nonnull MTKView *)mtkView;
+- (instancetype)initWithView:(View *)view;
 
 @end

@@ -15,6 +15,7 @@
 		656A1123228DF0E900DCAD49 /* src in Resources */ = {isa = PBXBuildFile; fileRef = 656A1122228DF0E900DCAD49 /* src */; };
 		656A1126228DFA2800DCAD49 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 656A1125228DFA2800DCAD49 /* MetalKit.framework */; };
 		656A1129228E08F000DCAD49 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 656A1128228E08F000DCAD49 /* AppDelegate.m */; };
+		65C5DF812293283C0010CDD1 /* View.m in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DF802293283C0010CDD1 /* View.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,8 @@
 		656A1128228E08F000DCAD49 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		656A112A228E092000DCAD49 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		65B6118B228F3F9C0062EB4C /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
+		65C5DF7F2293283C0010CDD1 /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
+		65C5DF802293283C0010CDD1 /* View.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = View.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,8 @@
 			children = (
 				656A112A228E092000DCAD49 /* AppDelegate.h */,
 				656A1128228E08F000DCAD49 /* AppDelegate.m */,
+				65C5DF7F2293283C0010CDD1 /* View.h */,
+				65C5DF802293283C0010CDD1 /* View.m */,
 				656A111D228DEBB200DCAD49 /* Renderer.h */,
 				656A111F228DEBB200DCAD49 /* Renderer.m */,
 				656A111C228DEBB200DCAD49 /* Shaders.metal */,
@@ -163,6 +168,7 @@
 			files = (
 				656A1120228DEBB300DCAD49 /* Shaders.metal in Sources */,
 				652F0EF2228DE72B00238560 /* ViewController.m in Sources */,
+				65C5DF812293283C0010CDD1 /* View.m in Sources */,
 				652F0EFA228DE72B00238560 /* main.m in Sources */,
 				656A1121228DEBB300DCAD49 /* Renderer.m in Sources */,
 				656A1129228E08F000DCAD49 /* AppDelegate.m in Sources */,
@@ -225,7 +231,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/src";
 				INSTALL_PATH = "$(PROJECT_DIR)/out";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -289,7 +295,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "${PROJECT_DIR}/src";
 				INSTALL_PATH = "$(PROJECT_DIR)/out";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;

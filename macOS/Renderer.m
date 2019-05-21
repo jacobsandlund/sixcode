@@ -1,12 +1,13 @@
 @import MetalKit;
 
-#import "../src/spacetime.h"
+#import "spacetime.h"
 #import "Renderer.h"
 #import "ShaderTypes.h"
 
-const NSInteger RENDERER_FRAMES_PER_SECOND = 60;
+const int RENDERER_FRAMES_PER_SECOND = 60;
 
 @implementation Renderer {
+    View *_view;
     id<MTLDevice> _device;
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLCommandQueue> _commandQueue;
@@ -16,13 +17,15 @@ const NSInteger RENDERER_FRAMES_PER_SECOND = 60;
     NSUInteger _numVertices;
 }
 
-- (instancetype)initWithMetalKitView:(MTKView *)mtkView {
+- (instancetype)initWithView:(View *)view {
     self = [super init];
     if (self) {
-        mtkView.preferredFramesPerSecond = RENDERER_FRAMES_PER_SECOND;
+        _view = view;
+        _device = view.device;
 
-        _device = mtkView.device;
-        [self loadMetal:mtkView];
+        view.preferredFramesPerSecond = RENDERER_FRAMES_PER_SECOND;
+
+        [self loadMetal:view];
     }
 
     return self;
@@ -119,7 +122,8 @@ const NSInteger RENDERER_FRAMES_PER_SECOND = 60;
     _viewportSize.y = size.height;
 }
 
-- (void)render:(MTKView *)view {
+- (void)render: {
+    MTKView *view = _view;
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
@@ -171,10 +175,7 @@ const NSInteger RENDERER_FRAMES_PER_SECOND = 60;
 
 - (void)drawInMTKView:(MTKView *)view {
     @autoreleasepool {
-        NSPoint mouse = [NSEvent mouseLocation];
-        NSUInteger buttons = [NSEvent pressedMouseButtons];
-        NSLog(@"mouse info: at %g, %g - %d", mouse.x, mouse.y, (uint) buttons);
-        [self render:view];
+        world_loop_tick(self);
     }
 }
 

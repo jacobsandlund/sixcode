@@ -1,9 +1,10 @@
 #import "ViewController.h"
 #import "Renderer.h"
+#import "View.h"
 
 @implementation ViewController {
     NSRect _frame;
-    MTKView *_view;
+    View *_view;
 
     Renderer *_renderer;
 }
@@ -17,7 +18,7 @@
 }
 
 - (void)loadView {
-    _view = [[MTKView alloc] initWithFrame:_frame
+    _view = [[View alloc] initWithFrame:_frame
             device:MTLCreateSystemDefaultDevice()];
 
     if (!_view.device) {
@@ -25,7 +26,7 @@
         return;
     }
 
-    _renderer = [[Renderer alloc] initWithMetalKitView:_view];
+    _renderer = [[Renderer alloc] initWithView:_view];
 
     if (!_renderer) {
         NSLog(@"Renderer failed initialization");

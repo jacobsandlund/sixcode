@@ -7,7 +7,7 @@
 #include "mesh.h"
 #include "shader.h"
 #include "texture.h"
-#include "view.h"
+#include "camera.h"
 
 #define UI_MESH_MAX_SIZE 8
 #define UI_NUM_MESHES 4	// 8, 4, 2, 1
@@ -46,12 +46,12 @@ typedef struct {
 	UiUniforms uniforms;
 	GLuint instanceBuffer;
 
-	UiLayoutData layouts[VIEW_NUM_LAYOUTS];
+	UiLayoutData layouts[camera_NUM_LAYOUTS];
 	InstanceMesh instance_mesh;
 } Ui;
 
 bool ui_initialize(Ui *ui);
 void ui_terminate(Ui *ui);
-void ui_draw(Ui *ui, View *vw, Grid *g);
+void ui_draw(Ui *ui, Camera *c, Grid *g);
 
 #endif // UI_H

@@ -157,12 +157,12 @@ bool ui_initialize(Ui *ui)
 	//////////////////
 	// mesh + buffers
 
-	ViewLayout view_layouts[VIEW_NUM_LAYOUTS] = {
-		VIEW_LAYOUT_HEX,
-		VIEW_LAYOUT_RECT,
+	CameraLayout camera_layouts[camera_NUM_LAYOUTS] = {
+		camera_LAYOUT_HEX,
+		camera_LAYOUT_RECT,
 	};
 
-	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
+	for (int i = 0; i < camera_NUM_LAYOUTS; i++) {
 		UiLayoutData *layout = &ui->layouts[i];
 
 		int size = UI_MESH_MAX_SIZE;
@@ -171,7 +171,7 @@ bool ui_initialize(Ui *ui)
 			FillMesh *mesh = &layout->meshes[j];
 			UiBuffers *buffers = &layout->buffers[j];
 
-			fill_mesh_initialize(mesh, view_layouts[i], size, size);
+			fill_mesh_initialize(mesh, camera_layouts[i], size, size);
 
 			glGenBuffers(1, &buffers->vertices);
 			glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
@@ -208,7 +208,7 @@ void ui_terminate(Ui *ui)
 	texture_terminate(&ui->grid_styles_texture);
 	texture_terminate(&ui->fill_colors_texture);
 
-	for (int i = 0; i < VIEW_NUM_LAYOUTS; i++) {
+	for (int i = 0; i < camera_NUM_LAYOUTS; i++) {
 		for (int j = 0; j < UI_NUM_MESHES; j++) {
 			fill_mesh_terminate(&ui->layouts[i].meshes[j]);
 
@@ -243,11 +243,11 @@ static int ui_draw_mesh_index(Ui *ui, SizeQuad *draw_quad)
 	return UI_NUM_MESHES - 1;
 }
 
-void ui_draw(Ui *ui, View *vw, Grid *g)
+void ui_draw(Ui *ui, Camera *c, Grid *g)
 {
 	// Setup
 
-	glViewport(0, 0, vw->viewport_size.x, vw->viewport_size.y);
+	glCameraport(0, 0, c->viewport_size.x, c->viewport_size.y);
 
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -255,14 +255,14 @@ void ui_draw(Ui *ui, View *vw, Grid *g)
 	glUseProgram(ui->shader.program);
 
 	Quad viewport_quad;
-	view_viewport_to_quad(vw, &viewport_quad);
+	camera_viewport_to_quad(c, &viewport_quad);
 
 	SizeQuad draw_quad;
 	ui_size_quad_for_draw(&draw_quad, &g->styles_quad, &viewport_quad);
 
 	int mesh_index = ui_draw_mesh_index(ui, &draw_quad);
-	FillMesh *mesh = &ui->layouts[vw->layout].meshes[mesh_index];
-	UiBuffers *buffers = &ui->layouts[vw->layout].buffers[mesh_index];
+	FillMesh *mesh = &ui->layouts[c->layout].meshes[mesh_index];
+	UiBuffers *buffers = &ui->layouts[c->layout].buffers[mesh_index];
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->indices);
@@ -307,13 +307,13 @@ void ui_draw(Ui *ui, View *vw, Grid *g)
 	glUniform1i(ui->uniforms.fillColors, 1);
 
 	vec2 draw_offset = vec2_from_ivec(draw_quad.min);
-	view_update_matrix(vw, draw_offset);
+	camera_update_matrix(c, draw_offset);
 
 	glUniformMatrix4fv(
 			ui->uniforms.viewMatrix,
 			1,
 			GL_FALSE,
-			(GLfloat*) &vw->view_matrix.m[0][0]);
+			(GLfloat*) &c->camera_matrix.m[0][0]);
 
 	// Instance buffer
 

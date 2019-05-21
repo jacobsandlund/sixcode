@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "valgrind.h"
 
-#define _(...) log_to_file(__FILE__, __LINE__, __VA_ARGS__)
+#define _(...) test_runner_log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)
 #define _dd(...) _("%d, %d\n", __VA_ARGS__)
 #define _ddd(...) _("%d, %d, %d\n", __VA_ARGS__)
@@ -25,32 +25,16 @@
 
 #define _qd(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.max.x, q.max.y);
 #define _sq(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.size.x, q.size.y);
-#define _v2(v) _gg(v.x, v.y)
+#define _f2(v) _gg(v.x, v.y)
+#define _f3(v) _ggg(v.x, v.y, v.z)
 #define _i2(v) _dd(v.x, v.y)
-#define _aq(aq) _("(%g, %g), (%g, %g)\n(%g, %g), (%g, %g)", \
-		aq.top_left.x, aq.top_left.y, \
-		aq.top_right.x, aq.top_right.y, \
-		aq.bottom_left.x, aq.bottom_left.y, \
-		aq.bottom_right.x, aq.bottom_right.y);
 
 #define _TEST_SPACETIME_ERROR() { \
 	_s(test_spacetime_error); \
 	test_reset_spacetime_error(); \
 }
 
-#define MAX_FILE_LEN 1000000
-#define MAX_FILES 10000
-#define MAX_OUTPUT_LEN 10000
-#define MAX_OUTPUT_LINES 200
-#define MAX_LINE_RESULTS 3000
 #define TEST_CASE_SENTINEL 1976020431
-
-typedef void (*TestCaseFn)(void);
-
-typedef struct {
-	TestCaseFn fn;
-	int sentinel;
-} TestCase;
 
 #define TEST(test_name) \
 void test_case_fn_##test_name(); \
@@ -61,9 +45,38 @@ __attribute((used, section("data,test_cases"))) = { \
 }; \
 void test_case_fn_##test_name()
 
+typedef void (*TestCaseFn)(void);
+
+typedef struct {
+	TestCaseFn fn;
+	int sentinel;
+} TestCase;
+
+
 TEST(start)
 {
 }
+
+int test_runner_run(TestCase *start_case);
+
+int main(int argc, const char *argv[])
+{
+	(void) argc;
+	(void) argv;
+
+	return test_runner_run(&test_case_start);
+}
+
+/////////////////////////////////////////////
+//
+// Implementation
+//
+
+#define TEST_MAX_FILE_LEN 1000000
+#define TEST_MAX_FILES 10000
+#define TEST_MAX_OUTPUT_LEN 10000
+#define TEST_MAX_OUTPUT_LINES 200
+#define TEST_MAX_LINE_RESULTS 3000
 
 typedef struct {
 	char **lines;
@@ -83,9 +96,9 @@ typedef struct {
 	int num_results;
 } FileInfo;
 
-static char test_spacetime_error[MAX_OUTPUT_LEN];
-static int test_spacetime_error_i = 0;
-static FileInfo *all_file_info[MAX_FILES];
+char test_runner_spacetime_error[TEST_MAX_OUTPUT_LEN];
+static int test_runner_spacetime_error_i = 0;
+static FileInfo *all_file_info[TEST_MAX_FILES];
 static int num_files;
 static int is_focus_on = 0;
 static const char *LOG_PREFIX = "\t//=>";
@@ -127,24 +140,24 @@ void log_error(const char *format, ...)
 	va_list argptr;
 	va_start(argptr, format);
 
-	int size = MAX_OUTPUT_LEN - test_spacetime_error_i;
+	int size = TEST_MAX_OUTPUT_LEN - test_runner_spacetime_error_i;
 
 	if (size > 0) {
 		int output_len = vsnprintf(
-				&test_spacetime_error[test_spacetime_error_i],
+				&test_runner_spacetime_error[test_runner_spacetime_error_i],
 				size,
 				format,
 				argptr);
 
-		test_spacetime_error_i += output_len;
+		test_runner_spacetime_error_i += output_len;
 	}
 	va_end(argptr);
 }
 
-void test_reset_spacetime_error()
+void test_runner_reset_spacetime_error()
 {
-	test_spacetime_error_i = 0;
-	test_spacetime_error[0] = '\0';
+	test_runner_spacetime_error_i = 0;
+	test_runner_spacetime_error[0] = '\0';
 }
 
 void split_lines(LineData *line_data, char *contents, int len)
@@ -160,20 +173,20 @@ void split_lines(LineData *line_data, char *contents, int len)
 		return;
 	}
 
-	for (int i = 0; i < len; ++i) {
+	for (int i = 0; i < len; i++) {
 		if (contents[i] == '\n') {
-			++num_lines;
+			num_lines++;
 		}
 	}
 
 	if (contents[len - 1] != '\n') {
-		++num_lines;
+		num_lines++;
 	}
 
 	lines = malloc(sizeof(char *) * num_lines);
 	rest_contents = strdup(contents);
 
-	for (int i = 0; i < num_lines; ++i) {
+	for (int i = 0; i < num_lines; i++) {
 		line = strsep(&rest_contents, "\n");
 		lines[i] = line;
 	}
@@ -186,10 +199,10 @@ FileInfo *get_file_info(const char *filename)
 {
 	FileInfo *file_info;
 	size_t file_len;
-	static char contents[MAX_FILE_LEN + 1];
+	static char contents[TEST_MAX_FILE_LEN + 1];
 	FILE *file;
 
-	for (int i = 0; i < num_files; ++i) {
+	for (int i = 0; i < num_files; i++) {
 		if (strcmp(all_file_info[i]->name, filename) == 0) {
 			return all_file_info[i];
 		}
@@ -198,7 +211,7 @@ FileInfo *get_file_info(const char *filename)
 	file_info = malloc(sizeof *file_info);
 	file_info->name = filename;
 	all_file_info[num_files] = file_info;
-	++num_files;
+	num_files++;
 
 	file = fopen(filename, "r");
 
@@ -207,7 +220,7 @@ FileInfo *get_file_info(const char *filename)
 		return 0;
 	}
 
-	file_len = fread(contents, sizeof(char), MAX_FILE_LEN, file);
+	file_len = fread(contents, sizeof(char), TEST_MAX_FILE_LEN, file);
 	if (ferror(file)) {
 		fprintf(stderr, "Error reading file: %s - %s\n", filename, strerror(errno));
 		return 0;
@@ -228,9 +241,9 @@ FileInfo *get_file_info(const char *filename)
 	return file_info;
 }
 
-void log_to_file(const char *filename, int line, const char *format, ...)
+void test_runner_log_to_file(const char *filename, int line, const char *format, ...)
 {
-	static char output_buffer[MAX_OUTPUT_LEN];
+	static char output_buffer[TEST_MAX_OUTPUT_LEN];
 	va_list argptr;
 	int output_len;
 	LineData output_line_data;
@@ -242,7 +255,7 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 	FileInfo *file_info = get_file_info(filename);
 
 	va_start(argptr, format);
-	output_len = vsnprintf(output_buffer, MAX_OUTPUT_LEN, format, argptr);
+	output_len = vsnprintf(output_buffer, TEST_MAX_OUTPUT_LEN, format, argptr);
 	va_end(argptr);
 
 	if (output_len < 0) {
@@ -250,16 +263,16 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 		return;
 	}
 
-	if (output_len >= MAX_OUTPUT_LEN) {
-		output_len = MAX_OUTPUT_LEN - 1;
+	if (output_len >= TEST_MAX_OUTPUT_LEN) {
+		output_len = TEST_MAX_OUTPUT_LEN - 1;
 	}
 
 	split_lines(&output_line_data, output_buffer, output_len);
 
 	num_lines = output_line_data.num_lines;
 
-	if (num_lines > MAX_OUTPUT_LINES) {
-		num_lines = MAX_OUTPUT_LINES;
+	if (num_lines > TEST_MAX_OUTPUT_LINES) {
+		num_lines = TEST_MAX_OUTPUT_LINES;
 	}
 
 	// This is an approximation, which includes prefix plus ending newline per line.
@@ -271,7 +284,7 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 	result_lines = result->line_data.lines = malloc(num_lines * sizeof *result_lines);
 	result->line = line - 1;
 
-	for (int i = 0; i < num_lines; ++i) {
+	for (int i = 0; i < num_lines; i++) {
 		size_t line_len = strlen(output_line_data.lines[i]);
 		result_lines[i] = strcpy(result_content, LOG_PREFIX);
 		result_content += LOG_PREFIX_LEN;
@@ -283,25 +296,22 @@ void log_to_file(const char *filename, int line, const char *format, ...)
 		}
 
 		result_content[0] = '\0';
-		++result_content;
+		result_content++;
 	}
 
 	free_line_data(output_line_data);
 
-	++file_info->num_results;
+	file_info->num_results++;
 }
 
-int main(int argc, const char *argv[])
+int test_runner_run(TestCase *start_case)
 {
-	(void) argc;
-	(void) argv;
-
-	for (TestCase *test_case = &test_case_start; test_case->sentinel == TEST_CASE_SENTINEL; ++test_case) {
+	for (TestCase *test_case = start_case; test_case->sentinel == TEST_CASE_SENTINEL; test_case++) {
 		test_case->fn();
 		is_focus_on = 0;
 	}
 
-	for (int f = 0; f < num_files; ++f) {
+	for (int f = 0; f < num_files; f++) {
 		int num_lines_new;
 		char **lines_new;
 		char *contents_new;
@@ -316,13 +326,13 @@ int main(int argc, const char *argv[])
 		char **lines_old = file_info->line_data.lines;
 		int len_new = 0;
 
-		for (int i = 0; i < num_results; ++i) {
+		for (int i = 0; i < num_results; i++) {
 			num_result_lines_new += results[i].line_data.num_lines;
 		}
 
-		for (int i = 0; i < num_lines_old; ++i) {
+		for (int i = 0; i < num_lines_old; i++) {
 			if (strncmp(LOG_PREFIX, lines_old[i], LOG_PREFIX_LEN) == 0) {
-				++num_result_lines_old;
+				num_result_lines_old++;
 				lines_old[i] = 0;
 			}
 		}
@@ -331,7 +341,7 @@ int main(int argc, const char *argv[])
 
 		lines_new = malloc(num_lines_new * sizeof *lines_new);
 
-		for (int r = 0; r < num_results; ++r) {
+		for (int r = 0; r < num_results; r++) {
 			Results *result = &results[r];
 			char **result_lines = result->line_data.lines;
 			int num_result_lines = result->line_data.num_lines;
@@ -339,37 +349,37 @@ int main(int argc, const char *argv[])
 			while (i <= result->line) {
 				if (lines_old[i] != 0) {
 					lines_new[j] = lines_old[i];
-					++j;
+					j++;
 				}
-				++i;
+				i++;
 			}
 
-			for (int k = 0; k < num_result_lines; ++k) {
+			for (int k = 0; k < num_result_lines; k++) {
 				lines_new[j] = result_lines[k];
-				++j;
+				j++;
 			}
 		}
 
 		while (i < num_lines_old) {
 			if (lines_old[i] != 0) {
 				lines_new[j] = lines_old[i];
-				++j;
+				j++;
 			}
-			++i;
+			i++;
 		}
 
-		for (int i = 0; i < num_lines_new; ++i) {
+		for (int i = 0; i < num_lines_new; i++) {
 			len_new += strlen(lines_new[i]) + 1;
 		}
 
 		contents_new = malloc((len_new + 1) * sizeof *contents_new);
 		j = 0;
 
-		for (int i = 0; i < num_lines_new; ++i) {
+		for (int i = 0; i < num_lines_new; i++) {
 			strcpy(&contents_new[j], lines_new[i]);
 			j += strlen(lines_new[i]);
 			contents_new[j] = '\n';
-			++j;
+			j++;
 		}
 
 		contents_new[j] = '\0';
@@ -396,7 +406,7 @@ int main(int argc, const char *argv[])
 		free(contents_new);
 		free(lines_new);
 
-		for (int r = 0; r < num_results; ++r) {
+		for (int r = 0; r < num_results; r++) {
 			Results *result = &results[r];
 			free_line_data(result->line_data);
 		}
@@ -405,6 +415,8 @@ int main(int argc, const char *argv[])
 		free_line_data(file_info->line_data);
 		free(file_info->contents);
 	}
+
+	return 0;
 }
 
 #endif // TEST_H
