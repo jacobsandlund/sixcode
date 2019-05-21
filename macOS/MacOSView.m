@@ -1,13 +1,45 @@
 @import MetalKit;
 
 #import "spacetime.h"
-#import "View.h"
+#import "MacOSView.h"
+#import "view.h"
 
-const double VIEW_ENTER_DRAG_TIME = 0.1;
-const double VIEW_ENTER_DRAG_DELTA_SQUARED = 30.0;
+const double MACOS_VIEW_ENTER_DRAG_TIME = 0.1;
+const double MACOS_VIEW_ENTER_DRAG_DELTA_SQUARED = 30.0;
 
-@implementation View {
+void view_initialize(View *vw, float2 viewport_size)
+{
+    vw->viewport_size = viewport_size;
+    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+
+    if (!device) {
+        vw->os_view = NULL;
+        NSLog(@"Metal is not supported on this device");
+        return;
+    }
+
+    MacOSView *macOSView = [[MacOSView alloc] initWithView:vw device:device];
+
+    vw->os_view = (void *) CFBridgingRetain(macOSView);
+}
+
+void view_terminate(View *vw)
+{
+    CFRelease(vw->os_view);
+}
+
+@implementation MacOSView {
+    View *_view;
     BOOL _dragging;
+}
+
+- (instancetype) initWithView:(View *)vw device:(id<MTLDevice>)device {
+    NSRect frame = NSMakeRect(0.0, 0.0, vw->viewport_size.x, vw->viewport_size.y);
+    self = [super initWithFrame:frame device:device];
+    if (self) {
+        _view = vw;
+    }
+    return self;
 }
 
 - (BOOL)acceptsFirstResponder {
@@ -33,9 +65,9 @@ const double VIEW_ENTER_DRAG_DELTA_SQUARED = 30.0;
                     location.y - startLocation.y,
                 };
 
-                if (time - startTime >= VIEW_ENTER_DRAG_TIME ||
+                if (time - startTime >= MACOS_VIEW_ENTER_DRAG_TIME ||
                         delta.x * delta.x + delta.y * delta.y >=
-                        VIEW_ENTER_DRAG_DELTA_SQUARED) {
+                        MACOS_VIEW_ENTER_DRAG_DELTA_SQUARED) {
                     _dragging = YES;
                     NSLog(@"Mouse enter drag - loc: %g, %g",
                             location.x, location.y);

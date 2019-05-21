@@ -4,6 +4,7 @@
 #include "spacetime.h"
 #include "grid.h"
 #include "viewport.h"
+#include "view.h"
 
 typedef struct {
 	Grid grid;
@@ -11,7 +12,9 @@ typedef struct {
 } World;
 
 void world_initialize(World *w);
-void world_loop_tick(World *w, Renderer *r);
-void world_toggle_hex_at_point(World *w, vec2 v);
+void world_terminate(World *w);
+void world_load(World *w);
+void world_update(World *w, View *vw);
+//void world_toggle_hex_at_point(World *w, vec2 v);
 
 #endif // WORLD_H

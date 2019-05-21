@@ -94,11 +94,11 @@ typedef struct {
 	char *contents;
 	Results *results;
 	int num_results;
-} FileInfo;
+} TestFileInfo;
 
 char test_runner_spacetime_error[TEST_MAX_OUTPUT_LEN];
 static int test_runner_spacetime_error_i = 0;
-static FileInfo *all_file_info[TEST_MAX_FILES];
+static TestFileInfo *all_file_info[TEST_MAX_FILES];
 static int num_files;
 static int is_focus_on = 0;
 static const char *LOG_PREFIX = "\t//=>";
@@ -195,9 +195,9 @@ void split_lines(LineData *line_data, char *contents, int len)
 	line_data->lines = lines;
 }
 
-FileInfo *get_file_info(const char *filename)
+TestFileInfo *get_file_info(const char *filename)
 {
-	FileInfo *file_info;
+	TestFileInfo *file_info;
 	size_t file_len;
 	static char contents[TEST_MAX_FILE_LEN + 1];
 	FILE *file;
@@ -252,7 +252,7 @@ void test_runner_log_to_file(const char *filename, int line, const char *format,
 	char *result_content;
 	Results *result;
 	char **result_lines;
-	FileInfo *file_info = get_file_info(filename);
+	TestFileInfo *file_info = get_file_info(filename);
 
 	va_start(argptr, format);
 	output_len = vsnprintf(output_buffer, TEST_MAX_OUTPUT_LEN, format, argptr);
@@ -319,7 +319,7 @@ int test_runner_run(TestCase *start_case)
 		int j = 0;
 		int num_result_lines_old = 0;
 		int num_result_lines_new = 0;
-		FileInfo *file_info = all_file_info[f];
+		TestFileInfo *file_info = all_file_info[f];
 		int num_results = file_info->num_results;
 		Results *results = file_info->results;
 		int num_lines_old = file_info->line_data.num_lines;

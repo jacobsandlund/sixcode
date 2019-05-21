@@ -1,31 +1,67 @@
 @import MetalKit;
 
 #import "spacetime.h"
-#import "Renderer.h"
+#import "MacOSRenderer.h"
+#import "MacOSView.h"
+#import "renderer.h"
+#import "view.h"
+#import "world.h"
+#import "core.h"
 #import "ShaderTypes.h"
 
-const int RENDERER_FRAMES_PER_SECOND = 60;
+const int MACOS_RENDERER_FRAMES_PER_SECOND = 60;
 
-@implementation Renderer {
+void renderer_initialize(Renderer *r, View *vw, World *w)
+{
+    MacOSRenderer *macOSRenderer = [[MacOSRenderer alloc]
+            initWithRenderer:r view:vw world:w];
+
+    if (!macOSRenderer) {
+        r->os_renderer = NULL;
+        NSLog(@"Renderer failed initialization");
+        return;
+    }
+
+    r->os_renderer = (void *) CFBridgingRetain(macOSRenderer);
+}
+
+void renderer_terminate(Renderer *r)
+{
+    CFRelease(r->os_renderer);
+}
+
+void renderer_render(Renderer *r, View *vw, World *w)
+{
+    MacOSRenderer *macOSRenderer = (__bridge MacOSRenderer *)r->os_renderer;
+    [macOSRenderer renderWithView:vw world: w];
+}
+
+@implementation MacOSRenderer {
+    Renderer *_renderer;
     View *_view;
+    World *_world;
     id<MTLDevice> _device;
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLCommandQueue> _commandQueue;
     id<MTLBuffer> _vertexBuffer;
 
-    uint2 _viewportSize;
     NSUInteger _numVertices;
 }
 
-- (instancetype)initWithView:(View *)view {
+- (instancetype)initWithRenderer:(Renderer *)r view:(View *)vw world:(World *)w {
     self = [super init];
     if (self) {
-        _view = view;
-        _device = view.device;
+        _renderer = r;
+        _view = vw;
+        _world = w;
+        MTKView *mtkView = (__bridge MTKView *)vw->os_view;
 
-        view.preferredFramesPerSecond = RENDERER_FRAMES_PER_SECOND;
+        [self mtkView:mtkView drawableSizeWillChange:mtkView.drawableSize];
+        _device = mtkView.device;
 
-        [self loadMetal:view];
+        mtkView.preferredFramesPerSecond = MACOS_RENDERER_FRAMES_PER_SECOND;
+
+        [self loadMetal:mtkView];
     }
 
     return self;
@@ -97,7 +133,7 @@ const int RENDERER_FRAMES_PER_SECOND = 60;
         NSLog(@"Failed to created pipeline state, error %@", error);
     }
 
-    NSData *vertexData = [Renderer generateVertexData];
+    NSData *vertexData = [MacOSRenderer generateVertexData];
 
     // Create a vertex buffer by allocating storage that can be read by the GPU
     _vertexBuffer = [_device newBufferWithLength:vertexData.length
@@ -115,15 +151,13 @@ const int RENDERER_FRAMES_PER_SECOND = 60;
 
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
     (void)view;
-
-    // Save the size of the drawable as we'll pass these
-    //   values to our vertex shader when we draw
-    _viewportSize.x = size.width;
-    _viewportSize.y = size.height;
+    _view->viewport_size.x = size.width;
+    _view->viewport_size.y = size.height;
 }
 
-- (void)render: {
-    MTKView *view = _view;
+- (void)renderWithView:(View *)vw world:(World *)world {
+    (void)world;
+    MTKView *view = (__bridge MTKView *)vw->os_view;
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
@@ -135,7 +169,7 @@ const int RENDERER_FRAMES_PER_SECOND = 60;
         renderEncoder.label = @"MyRenderEncoder";
 
         // Set the region of the drawable to which we'll draw.
-        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.x, _viewportSize.y, -1.0, 1.0 }];
+        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, _view->viewport_size.x, _view->viewport_size.y, -1.0, 1.0 }];
 
         [renderEncoder setRenderPipelineState:_pipelineState];
 
@@ -156,8 +190,8 @@ const int RENDERER_FRAMES_PER_SECOND = 60;
                                 offset:0
                                atIndex:VertexInputIndexVertices];
 
-        [renderEncoder setVertexBytes:&_viewportSize
-                               length:sizeof(_viewportSize)
+        [renderEncoder setVertexBytes:&_view->viewport_size
+                               length:sizeof(_view->viewport_size)
                               atIndex:VertexInputIndexViewportSize];
 
         // Draw the vertices of the quads
@@ -174,8 +208,9 @@ const int RENDERER_FRAMES_PER_SECOND = 60;
 }
 
 - (void)drawInMTKView:(MTKView *)view {
+    (void)view;
     @autoreleasepool {
-        world_loop_tick(self);
+        core_loop_tick(_renderer, _view, _world);
     }
 }
 

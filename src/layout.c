@@ -15,9 +15,9 @@ int2 layout_world_vector_round_hex(float2 v)
 	double r = v.y;
 	double q = (v.x * 2.0 - v.y) / 2.0;
 	double s = -q - r;
-	int qi = lround(q);
-	int ri = lround(r);
-	int si = lround(s);
+	int qi = (int) lround(q);
+	int ri = (int) lround(r);
+	int si = (int) lround(s);
 	double q_diff = fabs(qi - q);
 	double r_diff = fabs(ri - r);
 	double s_diff = fabs(si - s);
@@ -37,8 +37,8 @@ int2 layout_world_vector_round_hex(float2 v)
 int2 layout_world_vector_round_rect(float2 v)
 {
 	return (int2) {
-		lround(v.x),
-		lround(v.y),
+		(int) lround(v.x),
+		(int) lround(v.y),
 	};
 }
 

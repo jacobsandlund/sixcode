@@ -1,6 +1,7 @@
-#import <Cocoa/Cocoa.h>
+@import AppKit;
+@import MetalKit;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate>
+@interface AppDelegate : NSViewController <NSApplicationDelegate, NSWindowDelegate>
 
 @property (strong, nonatomic) NSWindow *window;
 

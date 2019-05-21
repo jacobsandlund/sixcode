@@ -1,46 +1,38 @@
-#include "world.c"
+#include "core.c"
 #include "test.h"
 #include "camera.c"
 #include "grid.c"
 #include "layout.c"
 #include "quad.c"
+#include "renderer-mock.c"
 #include "view-mock.c"
 #include "viewport.c"
+#include "world.c"
 
-TEST(world_initialize)
-{
-	World *w = malloc(sizeof *w);
-
-	world_initialize(w);
-
-	_qd(w->grid.quad);
-	//=> (-2047, -2047), (2046, 2046)
-	_f3(w->viewport.camera);
-	//=> 0, 0, 16
-	_d(w->viewport.layout.kind == LAYOUT_HEX);
-	//=> 1
-
-	world_terminate(w);
-
-	free(w);
-}
-
-TEST(world_update)
+TEST(core_loop_tick)
 {
 	World *w = malloc(sizeof *w);
 	View *vw = malloc(sizeof *vw);
+	Renderer *r = malloc(sizeof *r);
 
 	float2 viewport_size = {2560, 1440};
 
 	world_initialize(w);
 	view_mock_initialize(vw, viewport_size);
+	renderer_mock_initialize(r);
 	world_load(w);
 
-	world_update(w, vw);
+	core_loop_tick(r, vw, w);
+
+	RendererMock *rm = renderer_mock(r);
+	_d(rm->num_render_calls);
+	//=> 1
 
 	world_terminate(w);
+	renderer_mock_terminate(r);
 	view_mock_terminate(vw);
 
 	free(w);
+	free(r);
 	free(vw);
 }

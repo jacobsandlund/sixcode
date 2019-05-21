@@ -9,15 +9,26 @@ void world_initialize(World *w)
 	grid_initialize(&w->grid);
 
 	Viewport *vp = &w->viewport;
-	vp.camera = (float3) {0.0, 0.0, 16.0};
-	layout_kind(vp, LAYOUT_HEX);
+	vp->camera = (float3) {0.0, 0.0, 16.0};
+	layout_kind(&vp->layout, LAYOUT_HEX);
 }
 
-void world_loop_tick(World *w, Renderer *r);
+void world_terminate(World *w)
 {
-	[r render];
+	grid_terminate(&w->grid);
 }
 
+void world_load(World *w)
+{
+	(void) w;
+}
+
+void world_update(World *w, View *vw)
+{
+	w->viewport.size = vw->viewport_size;
+}
+
+/*
 void world_toggle_hex_at_point(World *w, vec2 v)
 {
 	static u8 style = WORLD_HEX_FILL_MIN;
@@ -42,3 +53,4 @@ void world_toggle_hex_at_point(World *w, vec2 v)
 	Quad quad = {h, h};
 	texture_update_in_quad(&ui->grid_styles_texture, g, &quad);
 }
+*/

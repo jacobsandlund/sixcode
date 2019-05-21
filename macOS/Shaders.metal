@@ -22,7 +22,7 @@ typedef struct {
 vertex RasterizerData
 vertexShader(uint vertexID [[ vertex_id ]],
              device Vertex *vertices [[ buffer(VertexInputIndexVertices) ]],
-             constant uint2 *viewportSizePointer [[ buffer(VertexInputIndexViewportSize) ]])
+             constant float2 *viewportSizePointer [[ buffer(VertexInputIndexViewportSize) ]])
 {
     RasterizerData out;
 
@@ -34,7 +34,7 @@ vertexShader(uint vertexID [[ vertex_id ]],
     float2 pixelSpacePosition = vertices[vertexID].position.xy;
 
     // Dereference viewportSizePointer and cast to float so we can do floating-point division
-    float2 viewportSize = float2(*viewportSizePointer);
+    float2 viewportSize = *viewportSizePointer;
 
     // The output position of every vertex shader is in clip space (also known as normalized device
     //   coordinate space, or NDC).   A value of (-1.0, -1.0) in clip-space represents the
