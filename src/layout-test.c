@@ -1,18 +1,18 @@
 #include "layout.c"
 #include "test.h"
 
-TEST(layout_kind)
+TEST(layout_type)
 {
 	Layout l;
-	layout_kind(&l, LAYOUT_HEX);
-	_d(l.kind == LAYOUT_HEX);
+	layout_type(&l, LAYOUT_TYPE_HEX);
+	_d(l.type == LAYOUT_TYPE_HEX);
 	//=> 1
 
 	_f2(l.scale);
 	//=> 1.73205, -1.5
 
-	layout_kind(&l, LAYOUT_RECT);
-	_d(l.kind == LAYOUT_RECT);
+	layout_type(&l, LAYOUT_TYPE_RECT);
+	_d(l.type == LAYOUT_TYPE_RECT);
 	//=> 1
 
 	_f2(l.scale);
@@ -22,7 +22,7 @@ TEST(layout_kind)
 TEST(layout_world_vector_round_hex)
 {
 	Layout l;
-	layout_kind(&l, LAYOUT_HEX);
+	layout_type(&l, LAYOUT_TYPE_HEX);
 
 	float2 a = {0, 0};
 	float2 b = {0.5, -1};
@@ -64,7 +64,7 @@ TEST(layout_world_vector_round_hex)
 TEST(layout_world_vector_round_rect)
 {
 	Layout l;
-	layout_kind(&l, LAYOUT_RECT);
+	layout_type(&l, LAYOUT_TYPE_RECT);
 
 	float2 a = {0, 0};
 	float2 b = {1, -1};

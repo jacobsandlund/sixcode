@@ -18,6 +18,6 @@ void quad_from_hexes(Quad *q, int2 h1, int2 h2);
 void quad_intersect(Quad *out_q, Quad *a, Quad *b);
 void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
-int size_quad_capacity(SizeQuad *sq);
+i64 size_quad_capacity(SizeQuad *sq);
 
 #endif // QUAD_H

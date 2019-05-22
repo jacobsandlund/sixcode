@@ -1,9 +1,6 @@
 #ifndef SPACETIME_H
 #define SPACETIME_H
 
-// Note: prefer int and uint unless explicit size is needed
-typedef unsigned int uint;
-
 #if __APPLE__
 
 #include <stdbool.h>

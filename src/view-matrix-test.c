@@ -16,7 +16,7 @@ TEST(view_matrix_update)
 	view_matrix_initialize(&vm);
 
 	Layout l;
-	layout_kind(&l, LAYOUT_HEX);
+	layout_type(&l, LAYOUT_TYPE_HEX);
 	float2 viewport_size = {1000, 600};
 	float3 camera = {100, 100, 10.0};
 	float2 offset = {93.0f, -13.0f};

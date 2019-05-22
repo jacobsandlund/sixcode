@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-clang -O1 -std=gnu11 -lm -Werror -Wall -Wextra "$@"
+clang -arch x86_64 -std=gnu11 -O1 -lm -Werror -Wall -Wextra -Wshorten-64-to-32 "$@"

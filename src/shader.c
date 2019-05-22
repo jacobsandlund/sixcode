@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void shader_print_gl_error(const char *filename, int line)
+void shader_print_gl_error(const char *filename, i64 line)
 {
 	GLenum error;
 	while ((error = glGetError()) != GL_NO_ERROR) {
@@ -23,13 +23,13 @@ void shader_print_gl_error(const char *filename, int line)
 			SPACETIME_ERROR("%s:%d - There is not enough memory left to execute the command.\n", filename, line);
 			break;
 		default:
-			SPACETIME_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (int) error);
+			SPACETIME_ERROR("%s:%d - Unknown GL Error %d\n", filename, line, (i64) error);
 			break;
 		}
 	}
 }
 
-GLuint shader_load(GLenum type, const char *shader_source, const char *filename, int line)
+GLuint shader_load(GLenum type, const char *shader_source, const char *filename, i64 line)
 {
 	GLuint shader = glCreateShader(type);
 
@@ -67,7 +67,7 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 	return shader;
 }
 
-bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, int line)
+bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, i64 line)
 {
 	if (!vertex || !fragment) {
 		return false;
@@ -90,7 +90,7 @@ bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, con
 	return true;
 }
 
-bool shader_program_link(ShaderProgram *s, const char *filename, int line)
+bool shader_program_link(ShaderProgram *s, const char *filename, i64 line)
 {
 	glLinkProgram(s->program);
 

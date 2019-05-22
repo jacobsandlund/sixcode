@@ -162,12 +162,12 @@ bool ui_initialize(Ui *ui)
 		camera_LAYOUT_RECT,
 	};
 
-	for (int i = 0; i < camera_NUM_LAYOUTS; i++) {
+	for (i64 i = 0; i < camera_NUM_LAYOUTS; i++) {
 		UiLayoutData *layout = &ui->layouts[i];
 
-		int size = UI_MESH_MAX_SIZE;
+		i64 size = UI_MESH_MAX_SIZE;
 
-		for (int j = 0; j < UI_NUM_MESHES; ++j) {
+		for (i64 j = 0; j < UI_NUM_MESHES; ++j) {
 			FillMesh *mesh = &layout->meshes[j];
 			UiBuffers *buffers = &layout->buffers[j];
 
@@ -208,8 +208,8 @@ void ui_terminate(Ui *ui)
 	texture_terminate(&ui->grid_styles_texture);
 	texture_terminate(&ui->fill_colors_texture);
 
-	for (int i = 0; i < camera_NUM_LAYOUTS; i++) {
-		for (int j = 0; j < UI_NUM_MESHES; j++) {
+	for (i64 i = 0; i < camera_NUM_LAYOUTS; i++) {
+		for (i64 j = 0; j < UI_NUM_MESHES; j++) {
 			fill_mesh_terminate(&ui->layouts[i].meshes[j]);
 
 			glDeleteBuffers(1, &ui->layouts[i].buffers[j].vertices);
@@ -229,9 +229,9 @@ static void ui_size_quad_for_draw(SizeQuad *out_sq, Quad *grid_styles_quad, Quad
 	size_quad_even_align(out_sq, out_sq);
 }
 
-static int ui_draw_mesh_index(Ui *ui, SizeQuad *draw_quad)
+static i64 ui_draw_mesh_index(Ui *ui, SizeQuad *draw_quad)
 {
-	for (int i = 0; i < UI_NUM_MESHES; ++i) {
+	for (i64 i = 0; i < UI_NUM_MESHES; ++i) {
 		if (
 			draw_quad->size.x > ui->layouts[0].meshes[i].size_x ||
 			draw_quad->size.y > ui->layouts[0].meshes[i].size_y
@@ -260,7 +260,7 @@ void ui_draw(Ui *ui, Camera *c, Grid *g)
 	SizeQuad draw_quad;
 	ui_size_quad_for_draw(&draw_quad, &g->styles_quad, &viewport_quad);
 
-	int mesh_index = ui_draw_mesh_index(ui, &draw_quad);
+	i64 mesh_index = ui_draw_mesh_index(ui, &draw_quad);
 	FillMesh *mesh = &ui->layouts[c->layout].meshes[mesh_index];
 	UiBuffers *buffers = &ui->layouts[c->layout].buffers[mesh_index];
 
@@ -319,14 +319,14 @@ void ui_draw(Ui *ui, Camera *c, Grid *g)
 
 	InstanceMesh *imesh = &ui->instance_mesh;
 
-	int num_instances = (
+	i64 num_instances = (
 		((draw_quad.size.y - 1) / UI_MESH_MAX_SIZE + 1) *
 		((draw_quad.size.x - 1) / UI_MESH_MAX_SIZE + 1)
 	);
 	instance_mesh_resize(imesh, num_instances);
 
 	ivec2 h;
-	int i = 0;
+	i64 i = 0;
 	ivec2 draw_quad_min_offset = ivec2_sub(draw_quad.min, g->size_quad.min);
 
 	for (h.y = 0; h.y < draw_quad.size.y; h.y += UI_MESH_MAX_SIZE) {

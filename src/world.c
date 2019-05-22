@@ -1,3 +1,7 @@
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "world.h"
 #include "layout.h"
 
@@ -10,7 +14,7 @@ void world_initialize(World *w)
 
 	Viewport *vp = &w->viewport;
 	vp->camera = (float3) {0.0, 0.0, 16.0};
-	layout_kind(&vp->layout, LAYOUT_HEX);
+	layout_type(&vp->layout, LAYOUT_TYPE_HEX);
 }
 
 void world_terminate(World *w)
@@ -21,6 +25,26 @@ void world_terminate(World *w)
 void world_load(World *w)
 {
 	(void) w;
+	srand((unsigned int) time(NULL));
+	i64 count = 6000000;
+	double size = 4096.0 - 2.0;
+	i64 style = 0;
+
+	for (i64 i = 0; i < count; i++) {
+		double rand1 = (double) rand() / (double) RAND_MAX;
+		double rand2 = (double) rand() / (double) RAND_MAX;
+		int2 h = {
+			floor(rand1 * size) - 4096/2 + 1,
+			floor(rand2 * size) - 4096/2 + 1,
+		};
+
+		style++;
+		if (style == 16) {
+			style = 1;
+		}
+
+		grid_set(&w->grid, h, style);
+	}
 }
 
 void world_update(World *w, View *vw)

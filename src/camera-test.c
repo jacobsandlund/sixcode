@@ -5,7 +5,7 @@
 TEST(camera_translate)
 {
 	Layout l;
-	layout_kind(&l, LAYOUT_HEX);
+	layout_type(&l, LAYOUT_TYPE_HEX);
 	float3 camera = {500, -2000, 20.0};
 	float2 delta = {300, 400};
 

@@ -45,16 +45,16 @@ void viewport_to_world_quad_hex(Viewport *vp, Quad *out_q)
 	float2 top_left = viewport_screen_to_world_vector(vp, top_left_point);
 	float2 bottom_right = viewport_screen_to_world_vector(vp, bottom_right_point);
 
-	int top = floor(top_left.y);
-	int double_left = floor(2.0 * top_left.x);
-	int bottom = floor(bottom_right.y);
-	int double_right = ceil(2.0 * (double) bottom_right.x + VIEWPORT_DOUBLE_EPSILON);
+	i64 top = floor(top_left.y);
+	i64 double_left = floor(2.0 * top_left.x);
+	i64 bottom = floor(bottom_right.y);
+	i64 double_right = ceil(2.0 * (double) bottom_right.x + VIEWPORT_DOUBLE_EPSILON);
 
 	top += top_left.y - top > VIEWPORT_HEX_BOTTOM_POINT_CUTOFF;
 	bottom += bottom_right.y - bottom > VIEWPORT_HEX_TOP_POINT_CUTOFF;
 
-	out_q->min = (int2) {double_left >> 1, top};
-	out_q->max = (int2) {double_right >> 1, bottom};
+	out_q->min = (int2) {(i32) (double_left >> 1), (i32) top};
+	out_q->max = (int2) {(i32) (double_right >> 1), (i32) bottom};
 
 	if (double_right - double_left <= 2 || bottom - top <= 2) {
 		float2 top_right = {bottom_right.x, top_left.y};
@@ -99,11 +99,11 @@ void viewport_to_world_quad_rect(Viewport *vp, Quad *out_q)
 
 void viewport_to_world_quad(Viewport *vp, Quad *out_q)
 {
-	switch (vp->layout.kind) {
-	case LAYOUT_HEX:
+	switch (vp->layout.type) {
+	case LAYOUT_TYPE_HEX:
 		viewport_to_world_quad_hex(vp, out_q);
 		break;
-	case LAYOUT_RECT:
+	case LAYOUT_TYPE_RECT:
 		viewport_to_world_quad_rect(vp, out_q);
 		break;
 	}

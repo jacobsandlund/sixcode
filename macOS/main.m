@@ -26,7 +26,18 @@ int main(int argc, const char *argv[]) {
         NSApp.mainMenu = makeMenu();
         NSApp.presentationOptions = NSApplicationPresentationHideMenuBar | NSApplicationPresentationHideDock;
         [NSApp setDelegate:appDelegate];
-        [NSApp run];
+        [NSApp finishLaunching];
+
+        NSDate *until = [NSDate distantFuture];
+
+        for (;;) {
+            NSEvent *event = [NSApp nextEventMatchingMask:NSEventMaskAny
+                    untilDate:until inMode:NSDefaultRunLoopMode
+                    dequeue:YES];
+
+            [NSApp sendEvent: event];
+            //NSLog(@"Event: %@", event);
+        }
     }
 
     return 0;

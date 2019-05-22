@@ -6,7 +6,7 @@
 TEST(fill_mesh_initialize_hex)
 {
 	FillMesh *m = malloc(sizeof *m);
-	fill_mesh_initialize(m, VIEW_LAYOUT_HEX, 32, 64);
+	fill_mesh_initialize(m, LAYOUT_TYPE_HEX, 32, 64);
 
 	_d(m->size_x);
 	//=> 32

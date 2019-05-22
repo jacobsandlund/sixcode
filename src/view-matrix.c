@@ -2,8 +2,8 @@
 
 void view_matrix_initialize(float4x4 *vm)
 {
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (i64 i = 0; i < 4; i++) {
+		for (i64 j = 0; j < 4; j++) {
 			vm->columns[i][j] = 0.0f;
 		}
 	}

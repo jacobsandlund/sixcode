@@ -11,11 +11,11 @@
 typedef struct {
 	GLuint texture;
 	u8 *buffer;
-	int buffer_capacity;
-	int buffer_capacity_max;
+	i64 buffer_capacity;
+	i64 buffer_capacity_max;
 } Texture;
 
-void texture_initialize(Texture *t, int buffer_capacity_max);
+void texture_initialize(Texture *t, i64 buffer_capacity_max);
 void texture_terminate(Texture *t);
 void texture_update(Texture *t, Grid *g);
 void texture_update_in_quad(Texture *t, Grid *g, Quad *quad);

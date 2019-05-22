@@ -86,6 +86,11 @@ void view_terminate(View *vw)
     };
 }
 
+- (void)mouseMoved:(NSEvent *)event {
+    (void)event;
+    NSLog(@"mouseMoved");
+}
+
 - (void)mouseUp:(NSEvent *)event {
     (void)event;
     _dragging = NO;

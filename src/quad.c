@@ -36,14 +36,14 @@ void quad_to_size_quad(SizeQuad *out_sq, Quad *q)
 
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq)
 {
-	int odd_row = sq->min.y & 1;
+	i64 odd_row = sq->min.y & 1;
 	out_sq->min.x = sq->min.x;
 	out_sq->min.y = sq->min.y & ~1;
 	out_sq->size.x = sq->size.x;
-	out_sq->size.y = sq->size.y + odd_row;
+	out_sq->size.y = (i32) (sq->size.y + odd_row);
 }
 
-int size_quad_capacity(SizeQuad *sq)
+i64 size_quad_capacity(SizeQuad *sq)
 {
 	return sq->size.x * sq->size.y;
 }

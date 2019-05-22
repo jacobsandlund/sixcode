@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 typedef struct {
-	int num_render_calls;
+	i64 num_render_calls;
 } RendererMock;
 
 RendererMock *renderer_mock(Renderer *r)

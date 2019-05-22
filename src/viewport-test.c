@@ -9,7 +9,7 @@ TEST(viewport_screen_to_world_vector)
 		.size = {1000, 600},
 		.camera = {-100, -200, 10},
 	};
-	layout_kind(&vp.layout, LAYOUT_HEX);
+	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
 
 	float2 v1 = {125.981, 275};
 	float2 v2 = {980.3, 540};
@@ -27,7 +27,7 @@ TEST(viewport_camera_zoom_at_screen_vector)
 		.size = {1000, 600},
 		.camera = {500, -2000, 20.0},
 	};
-	layout_kind(&vp.layout, LAYOUT_HEX);
+	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
 
 	float2 v = vp.size;
 	viewport_camera_zoom_at_screen_vector(&vp, v, 30.0);
@@ -48,7 +48,7 @@ TEST(viewport_to_world_quad_hex)
 		.size = {2000, 1440},
 		.camera = {1.64184, 0.75, 32.0},
 	};
-	layout_kind(&vp.layout, LAYOUT_HEX);
+	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
 
 	// Wide viewport
 	viewport_to_world_quad_hex(&vp, &q);

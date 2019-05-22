@@ -1,9 +1,9 @@
 #include <math.h>
 #include "layout.h"
 
-void layout_kind(Layout *l, LayoutKind kind)
+void layout_type(Layout *l, LayoutType type)
 {
-	l->kind = kind;
+	l->type = type;
 	l->scale = (double2) {
 		1.7320508075688772,	// sqrt(3)
 		-1.5,			// -3.0 / 2.0
@@ -15,9 +15,9 @@ int2 layout_world_vector_round_hex(float2 v)
 	double r = v.y;
 	double q = (v.x * 2.0 - v.y) / 2.0;
 	double s = -q - r;
-	int qi = (int) lround(q);
-	int ri = (int) lround(r);
-	int si = (int) lround(s);
+	i64 qi = (i64) lround(q);
+	i64 ri = (i64) lround(r);
+	i64 si = (i64) lround(s);
 	double q_diff = fabs(qi - q);
 	double r_diff = fabs(ri - r);
 	double s_diff = fabs(si - s);
@@ -29,25 +29,25 @@ int2 layout_world_vector_round_hex(float2 v)
 	}
 
 	return (int2) {
-		qi + (ri - (ri & 1)) / 2,
-		ri,
+		(i32) (qi + (ri - (ri & 1)) / 2),
+		(i32) ri,
 	};
 }
 
 int2 layout_world_vector_round_rect(float2 v)
 {
 	return (int2) {
-		(int) lround(v.x),
-		(int) lround(v.y),
+		(i32) lround(v.x),
+		(i32) lround(v.y),
 	};
 }
 
 int2 layout_world_vector_round(Layout *l, float2 v)
 {
-	switch (l->kind) {
-	case LAYOUT_HEX:
+	switch (l->type) {
+	case LAYOUT_TYPE_HEX:
 		return layout_world_vector_round_hex(v);
-	case LAYOUT_RECT:
+	case LAYOUT_TYPE_RECT:
 		return layout_world_vector_round_rect(v);
 	}
 }

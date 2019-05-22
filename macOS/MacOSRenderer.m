@@ -156,6 +156,7 @@ void renderer_render(Renderer *r, View *vw, World *w)
 }
 
 - (void)renderWithView:(View *)vw world:(World *)world {
+    //NSLog(@"Render");
     (void)world;
     MTKView *view = (__bridge MTKView *)vw->os_view;
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];

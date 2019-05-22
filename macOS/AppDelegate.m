@@ -49,8 +49,8 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
     (void)notification;
-    NSLog(@"AppDelegate applicationWillFinishLaunching");
-    [self.window makeKeyAndOrderFront:self];
+    //_window.acceptsMouseMovedEvents = YES;
+    [_window makeKeyAndOrderFront:self];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {

@@ -8,7 +8,7 @@
 #define FILL_MESH_INDICES_PER_RECT 6
 #define FILL_MESH_FRACTION 0.95
 
-static float2 mesh_hex_corner(int corner)
+static float2 mesh_hex_corner(i64 corner)
 {
 	double angle = -M_PI / 3.0 * (0.5 + corner);
 	Camera c;
@@ -20,9 +20,9 @@ static float2 mesh_hex_corner(int corner)
 	};
 }
 
-void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
+void fill_mesh_initialize_hex(FillMesh *m, i64 size_x, i64 size_y)
 {
-	int num_hexes = size_x * size_y;
+	i64 num_hexes = size_x * size_y;
 	m->vertices_length = FILL_MESH_VERTICES_PER_HEX * num_hexes;
 	m->indices_length = FILL_MESH_INDICES_PER_HEX * num_hexes;
 	m->size_x = size_x;
@@ -48,21 +48,21 @@ void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
 	};
 
 	int2 h;
-	int vi = 0;
-	int ii = 0;
+	i64 vi = 0;
+	i64 ii = 0;
 
-	for (h.y = 0; h.y < size_y; ++h.y) {
-		for (h.x = 0; h.x < size_x; ++h.x) {
+	for (h.y = 0; h.y < size_y; h.y++) {
+		for (h.x = 0; h.x < size_x; h.x++) {
 			float2 center = float2_from_int2(h);
 			center.x += 0.5 * (h.y & 1);
 
-			for (int i = 0; i < FILL_MESH_INDICES_PER_HEX; ++i) {
+			for (i64 i = 0; i < FILL_MESH_INDICES_PER_HEX; i++) {
 				m->indices[ii + i] = vi + indices_single[i];
 			}
 
 			ii += FILL_MESH_INDICES_PER_HEX;
 
-			for (int i = 0; i < FILL_MESH_VERTICES_PER_HEX; ++i) {
+			for (i64 i = 0; i < FILL_MESH_VERTICES_PER_HEX; i++) {
 				FillMeshVertex *vx = &m->vertices[vi + i];
 				vx->x = corners[i].x + center.x;
 				vx->y = corners[i].y + center.y;
@@ -75,9 +75,9 @@ void fill_mesh_initialize_hex(FillMesh *m, int size_x, int size_y)
 	}
 }
 
-void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
+void fill_mesh_initialize_rect(FillMesh *m, i64 size_x, i64 size_y)
 {
-	int num_rects = size_x * size_y;
+	i64 num_rects = size_x * size_y;
 	m->vertices_length = FILL_MESH_VERTICES_PER_RECT * num_rects;
 	m->indices_length = FILL_MESH_INDICES_PER_RECT * num_rects;
 	m->size_x = size_x;
@@ -104,20 +104,20 @@ void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
 	};
 
 	int2 h;
-	int vi = 0;
-	int ii = 0;
+	i64 vi = 0;
+	i64 ii = 0;
 
-	for (h.y = 0; h.y < size_y; ++h.y) {
-		for (h.x = 0; h.x < size_x; ++h.x) {
+	for (h.y = 0; h.y < size_y; h.y++) {
+		for (h.x = 0; h.x < size_x; h.x++) {
 			float2 center = float2_from_int2(h);
 
-			for (int i = 0; i < FILL_MESH_INDICES_PER_RECT; ++i) {
+			for (i64 i = 0; i < FILL_MESH_INDICES_PER_RECT; i++) {
 				m->indices[ii + i] = vi + indices_single[i];
 			}
 
 			ii += FILL_MESH_INDICES_PER_RECT;
 
-			for (int i = 0; i < FILL_MESH_VERTICES_PER_RECT; ++i) {
+			for (i64 i = 0; i < FILL_MESH_VERTICES_PER_RECT; i++) {
 				FillMeshVertex *vx = &m->vertices[vi + i];
 				vx->x = corners[i].x + center.x;
 				vx->y = corners[i].y + center.y;
@@ -130,7 +130,7 @@ void fill_mesh_initialize_rect(FillMesh *m, int size_x, int size_y)
 	}
 }
 
-void fill_mesh_initialize(FillMesh *m, CameraLayout layout, int size_x, int size_y)
+void fill_mesh_initialize(FillMesh *m, CameraLayout layout, i64 size_x, i64 size_y)
 {
 	switch (layout) {
 	case camera_LAYOUT_HEX:
@@ -148,14 +148,14 @@ void fill_mesh_terminate(FillMesh *m)
 	free(m->indices);
 }
 
-void instance_mesh_initialize(InstanceMesh *m, int length)
+void instance_mesh_initialize(InstanceMesh *m, i64 length)
 {
 	m->vertices = malloc(length * sizeof *m->vertices);
 	m->vertices_length = length;
 	m->vertices_capacity = length;
 }
 
-void instance_mesh_resize(InstanceMesh *m, int length)
+void instance_mesh_resize(InstanceMesh *m, i64 length)
 {
 	if (length > m->vertices_capacity) {
 		instance_mesh_terminate(m);

@@ -17,7 +17,7 @@ TEST(world_initialize)
 	//=> (-2047, -2047), (2046, 2046)
 	_f3(w->viewport.camera);
 	//=> 0, 0, 16
-	_d(w->viewport.layout.kind == LAYOUT_HEX);
+	_d(w->viewport.layout.type == LAYOUT_TYPE_HEX);
 	//=> 1
 
 	world_terminate(w);
@@ -34,7 +34,6 @@ TEST(world_update)
 
 	world_initialize(w);
 	view_mock_initialize(vw, viewport_size);
-	world_load(w);
 
 	world_update(w, vw);
 
@@ -43,4 +42,15 @@ TEST(world_update)
 
 	free(w);
 	free(vw);
+}
+
+TEST(world_load)
+{
+	World *w = malloc(sizeof *w);
+
+	world_initialize(w);
+	world_load(w);
+
+	world_terminate(w);
+	free(w);
 }

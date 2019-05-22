@@ -19,22 +19,22 @@ typedef struct {
 typedef struct {
 	FillMeshVertex *vertices;
 	u16 *indices;
-	int vertices_length;
-	int indices_length;
-	int size_x;
-	int size_y;
+	i64 vertices_length;
+	i64 indices_length;
+	i64 size_x;
+	i64 size_y;
 } FillMesh;
 
 typedef struct {
 	InstanceMeshVertex *vertices;
-	int vertices_length;
-	int vertices_capacity;
+	i64 vertices_length;
+	i64 vertices_capacity;
 } InstanceMesh;
 
-void fill_mesh_initialize(FillMesh *m, CameraLayout layout, int size_x, int size_y);
+void fill_mesh_initialize(FillMesh *m, CameraLayout layout, i64 size_x, i64 size_y);
 void fill_mesh_terminate(FillMesh *m);
-void instance_mesh_initialize(InstanceMesh *m, int length);
-void instance_mesh_resize(InstanceMesh *m, int length);
+void instance_mesh_initialize(InstanceMesh *m, i64 length);
+void instance_mesh_resize(InstanceMesh *m, i64 length);
 void instance_mesh_terminate(InstanceMesh *m);
 
 #endif // MESH_H

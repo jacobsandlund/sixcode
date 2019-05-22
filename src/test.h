@@ -233,7 +233,7 @@ TestFileInfo *get_file_info(const char *filename)
 	}
 
 	file_info->contents = strdup(contents);
-	split_lines(&file_info->line_data, file_info->contents, file_len);
+	split_lines(&file_info->line_data, file_info->contents, (int) file_len);
 
 	file_info->results = calloc(file_info->line_data.num_lines, sizeof *file_info->results);
 	file_info->num_results = 0;

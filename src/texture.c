@@ -4,7 +4,7 @@
 
 #define TEXTURE_BUFFER_CAPACITY_MIN 256
 
-void texture_initialize(Texture *t, int buffer_capacity_max)
+void texture_initialize(Texture *t, i64 buffer_capacity_max)
 {
 	//////////////////////
 	// texture
@@ -56,7 +56,7 @@ void texture_update_in_quad(Texture *t, Grid *g, Quad *quad)
 {
 	SizeQuad sq;
 	quad_to_size_quad(&sq, quad);
-	int need_capacity = size_quad_capacity(&sq);
+	i64 need_capacity = size_quad_capacity(&sq);
 
 	if (need_capacity > t->buffer_capacity) {
 		if (need_capacity > t->buffer_capacity_max) {
@@ -72,11 +72,11 @@ void texture_update_in_quad(Texture *t, Grid *g, Quad *quad)
 	}
 
 	ivec2 min = ivec2_sub(sq.min, g->size_quad.min);
-	int storage_size_x = g->size_quad.size.x;
+	i64 storage_size_x = g->size_quad.size.x;
 
-	for (int r = 0; r < sq.size.y; ++r) {
+	for (i64 r = 0; r < sq.size.y; r++) {
 		u8 *dest = &t->buffer[r * sq.size.x];
-		int src_i = (r + min.y) * storage_size_x + min.x;
+		i64 src_i = (r + min.y) * storage_size_x + min.x;
 		const u8 *src = &g->styles[src_i];
 
 		memcpy(dest, src, sq.size.x);
