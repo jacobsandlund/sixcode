@@ -13,15 +13,14 @@
 		656A1126228DFA2800DCAD49 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 656A1125228DFA2800DCAD49 /* MetalKit.framework */; };
 		656A1129228E08F000DCAD49 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 656A1128228E08F000DCAD49 /* AppDelegate.m */; };
 		65C5DF86229491730010CDD1 /* MacOSRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DF82229491730010CDD1 /* MacOSRenderer.m */; };
-		65C5DF87229491730010CDD1 /* MacOSView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DF85229491730010CDD1 /* MacOSView.m */; };
 		65C5DFB82294A5F00010CDD1 /* layout.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DF8C2294A5F00010CDD1 /* layout.c */; };
 		65C5DFC02294A5F00010CDD1 /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DF9B2294A5F00010CDD1 /* world.c */; };
-		65C5DFC32294A5F00010CDD1 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFA52294A5F00010CDD1 /* core.c */; };
 		65C5DFC52294A5F00010CDD1 /* quad.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFA82294A5F00010CDD1 /* quad.c */; };
-		65C5DFC92294A5F00010CDD1 /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFAE2294A5F00010CDD1 /* camera.c */; };
 		65C5DFCB2294A5F00010CDD1 /* viewport.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFB02294A5F00010CDD1 /* viewport.c */; };
 		65C5DFCC2294A5F00010CDD1 /* view-matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFB12294A5F00010CDD1 /* view-matrix.c */; };
 		65C5DFCD2294A5F00010CDD1 /* grid.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFB22294A5F00010CDD1 /* grid.c */; };
+		65C5DFD32295F8360010CDD1 /* event-queue.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFD22295F8360010CDD1 /* event-queue.c */; };
+		65C5DFD52295F84C0010CDD1 /* render-loop.c in Sources */ = {isa = PBXBuildFile; fileRef = 65C5DFD42295F84B0010CDD1 /* render-loop.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,29 +35,26 @@
 		656A112A228E092000DCAD49 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		65B6118B228F3F9C0062EB4C /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
 		65C5DF82229491730010CDD1 /* MacOSRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacOSRenderer.m; sourceTree = "<group>"; };
-		65C5DF83229491730010CDD1 /* MacOSView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacOSView.h; sourceTree = "<group>"; };
 		65C5DF84229491730010CDD1 /* MacOSRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacOSRenderer.h; sourceTree = "<group>"; };
-		65C5DF85229491730010CDD1 /* MacOSView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacOSView.m; sourceTree = "<group>"; };
 		65C5DF8C2294A5F00010CDD1 /* layout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = layout.c; sourceTree = "<group>"; };
-		65C5DF8F2294A5F00010CDD1 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
 		65C5DF942294A5F00010CDD1 /* quad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quad.h; sourceTree = "<group>"; };
 		65C5DF962294A5F00010CDD1 /* viewport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = viewport.h; sourceTree = "<group>"; };
-		65C5DF972294A5F00010CDD1 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		65C5DF9B2294A5F00010CDD1 /* world.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = world.c; sourceTree = "<group>"; };
 		65C5DF9C2294A5F00010CDD1 /* renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = renderer.h; sourceTree = "<group>"; };
 		65C5DF9D2294A5F00010CDD1 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		65C5DFA02294A5F00010CDD1 /* spacetime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spacetime.h; sourceTree = "<group>"; };
-		65C5DFA22294A5F00010CDD1 /* view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view.h; sourceTree = "<group>"; };
 		65C5DFA32294A5F00010CDD1 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grid.h; sourceTree = "<group>"; };
 		65C5DFA42294A5F00010CDD1 /* view-matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "view-matrix.h"; sourceTree = "<group>"; };
-		65C5DFA52294A5F00010CDD1 /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
 		65C5DFA62294A5F00010CDD1 /* layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = layout.h; sourceTree = "<group>"; };
 		65C5DFA82294A5F00010CDD1 /* quad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quad.c; sourceTree = "<group>"; };
 		65C5DFAB2294A5F00010CDD1 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
-		65C5DFAE2294A5F00010CDD1 /* camera.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = camera.c; sourceTree = "<group>"; };
 		65C5DFB02294A5F00010CDD1 /* viewport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = viewport.c; sourceTree = "<group>"; };
 		65C5DFB12294A5F00010CDD1 /* view-matrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "view-matrix.c"; sourceTree = "<group>"; };
 		65C5DFB22294A5F00010CDD1 /* grid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = grid.c; sourceTree = "<group>"; };
+		65C5DFD12295F82F0010CDD1 /* event-queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "event-queue.h"; sourceTree = "<group>"; };
+		65C5DFD22295F8360010CDD1 /* event-queue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "event-queue.c"; sourceTree = "<group>"; };
+		65C5DFD42295F84B0010CDD1 /* render-loop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "render-loop.c"; sourceTree = "<group>"; };
+		65C5DFD62295F8580010CDD1 /* render-loop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "render-loop.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,8 +92,6 @@
 			children = (
 				65C5DF84229491730010CDD1 /* MacOSRenderer.h */,
 				65C5DF82229491730010CDD1 /* MacOSRenderer.m */,
-				65C5DF83229491730010CDD1 /* MacOSView.h */,
-				65C5DF85229491730010CDD1 /* MacOSView.m */,
 				656A112A228E092000DCAD49 /* AppDelegate.h */,
 				656A1128228E08F000DCAD49 /* AppDelegate.m */,
 				656A111C228DEBB200DCAD49 /* Shaders.metal */,
@@ -121,23 +115,22 @@
 		65C5DF892294A5F00010CDD1 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				65C5DFD62295F8580010CDD1 /* render-loop.h */,
+				65C5DFD42295F84B0010CDD1 /* render-loop.c */,
+				65C5DFD22295F8360010CDD1 /* event-queue.c */,
+				65C5DFD12295F82F0010CDD1 /* event-queue.h */,
 				65C5DF8C2294A5F00010CDD1 /* layout.c */,
-				65C5DF8F2294A5F00010CDD1 /* core.h */,
 				65C5DF942294A5F00010CDD1 /* quad.h */,
 				65C5DF962294A5F00010CDD1 /* viewport.h */,
-				65C5DF972294A5F00010CDD1 /* camera.h */,
 				65C5DF9B2294A5F00010CDD1 /* world.c */,
 				65C5DF9C2294A5F00010CDD1 /* renderer.h */,
 				65C5DF9D2294A5F00010CDD1 /* test.h */,
 				65C5DFA02294A5F00010CDD1 /* spacetime.h */,
-				65C5DFA22294A5F00010CDD1 /* view.h */,
 				65C5DFA32294A5F00010CDD1 /* grid.h */,
 				65C5DFA42294A5F00010CDD1 /* view-matrix.h */,
-				65C5DFA52294A5F00010CDD1 /* core.c */,
 				65C5DFA62294A5F00010CDD1 /* layout.h */,
 				65C5DFA82294A5F00010CDD1 /* quad.c */,
 				65C5DFAB2294A5F00010CDD1 /* world.h */,
-				65C5DFAE2294A5F00010CDD1 /* camera.c */,
 				65C5DFB02294A5F00010CDD1 /* viewport.c */,
 				65C5DFB12294A5F00010CDD1 /* view-matrix.c */,
 				65C5DFB22294A5F00010CDD1 /* grid.c */,
@@ -216,15 +209,14 @@
 				65C5DFC02294A5F00010CDD1 /* world.c in Sources */,
 				656A1120228DEBB300DCAD49 /* Shaders.metal in Sources */,
 				65C5DFCC2294A5F00010CDD1 /* view-matrix.c in Sources */,
+				65C5DFD52295F84C0010CDD1 /* render-loop.c in Sources */,
 				65C5DF86229491730010CDD1 /* MacOSRenderer.m in Sources */,
 				652F0EFA228DE72B00238560 /* main.m in Sources */,
-				65C5DF87229491730010CDD1 /* MacOSView.m in Sources */,
-				65C5DFC32294A5F00010CDD1 /* core.c in Sources */,
 				656A1129228E08F000DCAD49 /* AppDelegate.m in Sources */,
-				65C5DFC92294A5F00010CDD1 /* camera.c in Sources */,
 				65C5DFCD2294A5F00010CDD1 /* grid.c in Sources */,
 				65C5DFC52294A5F00010CDD1 /* quad.c in Sources */,
 				65C5DFB82294A5F00010CDD1 /* layout.c in Sources */,
+				65C5DFD32295F8360010CDD1 /* event-queue.c in Sources */,
 				65C5DFCB2294A5F00010CDD1 /* viewport.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

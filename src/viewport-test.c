@@ -9,7 +9,7 @@ TEST(viewport_screen_to_world_vector)
 		.size = {1000, 600},
 		.camera = {-100, -200, 10},
 	};
-	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
 
 	float2 v1 = {125.981, 275};
 	float2 v2 = {980.3, 540};
@@ -21,13 +21,28 @@ TEST(viewport_screen_to_world_vector)
 	//=> -72.2699, -184
 }
 
+TEST(viewport_camera_translate)
+{
+	Viewport vp = {
+		.size = {1000, 600},
+		.camera = {500, -2000, 20.0},
+	};
+	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
+	float2 delta = {300, 400};
+
+	viewport_camera_translate(&vp, delta);
+
+	_f3(vp.camera);
+	//=> 508.66, -1986.67, 20
+}
+
 TEST(viewport_camera_zoom_at_screen_vector)
 {
 	Viewport vp = {
 		.size = {1000, 600},
 		.camera = {500, -2000, 20.0},
 	};
-	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
 
 	float2 v = vp.size;
 	viewport_camera_zoom_at_screen_vector(&vp, v, 30.0);
@@ -48,7 +63,7 @@ TEST(viewport_to_world_quad_hex)
 		.size = {2000, 1440},
 		.camera = {1.64184, 0.75, 32.0},
 	};
-	layout_kind(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
 
 	// Wide viewport
 	viewport_to_world_quad_hex(&vp, &q);
@@ -91,7 +106,7 @@ TEST(viewport_to_world_quad_rect)
 		.size = {2000, 1440},
 		.camera = {1.64184, 0.75, 32.0},
 	};
-	layout_kind(&vp.layout, LAYOUT_RECT);
+	layout_type(&vp.layout, LAYOUT_TYPE_RECT);
 
 	// Wide viewport
 	viewport_to_world_quad(&vp, &q);

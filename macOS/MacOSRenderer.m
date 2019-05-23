@@ -2,27 +2,21 @@
 
 #import "spacetime.h"
 #import "MacOSRenderer.h"
-#import "MacOSView.h"
-#import "renderer.h"
-#import "view.h"
-#import "world.h"
-#import "core.h"
 #import "ShaderTypes.h"
+#import "render-loop.h"
 
 const int MACOS_RENDERER_FRAMES_PER_SECOND = 60;
 
-void renderer_initialize(Renderer *r, View *vw, World *w)
+void renderer_initialize(Renderer *r, MTKView *mtkView, EventQueue *eq, World *w)
 {
     MacOSRenderer *macOSRenderer = [[MacOSRenderer alloc]
-            initWithRenderer:r view:vw world:w];
+            initWithRenderer:r mtkView:mtkView eventQueue:eq world:w];
 
-    if (!macOSRenderer) {
+    if (macOSRenderer) {
+        r->os_renderer = (void *) CFBridgingRetain(macOSRenderer);
+    } else {
         r->os_renderer = NULL;
-        NSLog(@"Renderer failed initialization");
-        return;
     }
-
-    r->os_renderer = (void *) CFBridgingRetain(macOSRenderer);
 }
 
 void renderer_terminate(Renderer *r)
@@ -30,38 +24,40 @@ void renderer_terminate(Renderer *r)
     CFRelease(r->os_renderer);
 }
 
-void renderer_render(Renderer *r, View *vw, World *w)
+void renderer_render(Renderer *r, World *w)
 {
     MacOSRenderer *macOSRenderer = (__bridge MacOSRenderer *)r->os_renderer;
-    [macOSRenderer renderWithView:vw world: w];
+    [macOSRenderer renderWithWorld:w];
 }
 
 @implementation MacOSRenderer {
     Renderer *_renderer;
-    View *_view;
+    EventQueue *_eventQueue;
     World *_world;
+    MTKView *_view;
     id<MTLDevice> _device;
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLCommandQueue> _commandQueue;
     id<MTLBuffer> _vertexBuffer;
 
-    NSUInteger _numVertices;
+    float2 _viewportSize;
+    u64 _numVertices;
 }
 
-- (instancetype)initWithRenderer:(Renderer *)r view:(View *)vw world:(World *)w {
+- (instancetype)initWithRenderer:(Renderer *)r mtkView:(MTKView *)mtkView eventQueue:(EventQueue *)eq world:(World *)w {
     self = [super init];
     if (self) {
         _renderer = r;
-        _view = vw;
+        _eventQueue = eq;
         _world = w;
-        MTKView *mtkView = (__bridge MTKView *)vw->os_view;
+        _view = mtkView;
 
         [self mtkView:mtkView drawableSizeWillChange:mtkView.drawableSize];
         _device = mtkView.device;
 
         mtkView.preferredFramesPerSecond = MACOS_RENDERER_FRAMES_PER_SECOND;
 
-        [self loadMetal:mtkView];
+        [self loadMetal];
     }
 
     return self;
@@ -108,8 +104,8 @@ void renderer_render(Renderer *r, View *vw, World *w)
     return vertexData;
 }
 
-- (void)loadMetal:(MTKView *)mtkView {
-    mtkView.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+- (void)loadMetal {
+    _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 
     id<MTLLibrary> defaultLibrary = [_device newDefaultLibrary];
 
@@ -120,7 +116,7 @@ void renderer_render(Renderer *r, View *vw, World *w)
     pipelineStateDescriptor.label = @"Simple Pipeline";
     pipelineStateDescriptor.vertexFunction = vertexFunction;
     pipelineStateDescriptor.fragmentFunction = fragmentFunction;
-    pipelineStateDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat;
+    pipelineStateDescriptor.colorAttachments[0].pixelFormat = _view.colorPixelFormat;
 
     NSError *error = NULL;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
@@ -149,28 +145,35 @@ void renderer_render(Renderer *r, View *vw, World *w)
     _commandQueue = [_device newCommandQueue];
 }
 
-- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
-    (void)view;
-    _view->viewport_size.x = size.width;
-    _view->viewport_size.y = size.height;
+- (void)mtkView:(MTKView *)mtkView drawableSizeWillChange:(CGSize)size {
+    (void)mtkView;
+    _viewportSize = (float2) {
+        (float)size.width,
+        (float)size.height,
+    };
 }
 
-- (void)renderWithView:(View *)vw world:(World *)world {
-    //NSLog(@"Render");
+- (void)renderWithWorld:(World *)world {
     (void)world;
-    MTKView *view = (__bridge MTKView *)vw->os_view;
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
-    MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
+    MTLRenderPassDescriptor *renderPassDescriptor = _view.currentRenderPassDescriptor;
 
     if (renderPassDescriptor != nil) {
         id<MTLRenderCommandEncoder> renderEncoder =
         [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"MyRenderEncoder";
 
-        // Set the region of the drawable to which we'll draw.
-        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, _view->viewport_size.x, _view->viewport_size.y, -1.0, 1.0 }];
+        MTLViewport viewport = {
+            0.0,
+            0.0,
+            _viewportSize.x,
+            _viewportSize.y,
+            -1.0,
+            1.0,
+        };
+        [renderEncoder setViewport:viewport];
 
         [renderEncoder setRenderPipelineState:_pipelineState];
 
@@ -191,8 +194,8 @@ void renderer_render(Renderer *r, View *vw, World *w)
                                 offset:0
                                atIndex:VertexInputIndexVertices];
 
-        [renderEncoder setVertexBytes:&_view->viewport_size
-                               length:sizeof(_view->viewport_size)
+        [renderEncoder setVertexBytes:&_viewportSize
+                               length:sizeof(_viewportSize)
                               atIndex:VertexInputIndexViewportSize];
 
         // Draw the vertices of the quads
@@ -202,16 +205,16 @@ void renderer_render(Renderer *r, View *vw, World *w)
 
         [renderEncoder endEncoding];
 
-        [commandBuffer presentDrawable:view.currentDrawable];
+        [commandBuffer presentDrawable:_view.currentDrawable];
     }
 
     [commandBuffer commit];
 }
 
-- (void)drawInMTKView:(MTKView *)view {
-    (void)view;
+- (void)drawInMTKView:(MTKView *)mtkView {
+    _view = mtkView;
     @autoreleasepool {
-        core_loop_tick(_renderer, _view, _world);
+        render_loop_one_iteration(_renderer, _eventQueue, _world);
     }
 }
 

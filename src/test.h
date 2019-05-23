@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 #include "valgrind.h"
 
 #define _(...) test_runner_log_to_file(__FILE__, __LINE__, __VA_ARGS__)
@@ -22,6 +23,8 @@
 #define _ggg(...) _("%g, %g, %g\n", __VA_ARGS__)
 #define _gggg(...) _("%g, %g, %g, %g\n", __VA_ARGS__)
 #define _s(...) _("%s\n", __VA_ARGS__)
+#define _i64(...) _("%" PRId64 "\n", __VA_ARGS__)
+#define _u64(...) _("%" PRIu64 "\n", __VA_ARGS__)
 
 #define _qd(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.max.x, q.max.y);
 #define _sq(q) _("(%d, %d), (%d, %d)", q.min.x, q.min.y, q.size.x, q.size.y);

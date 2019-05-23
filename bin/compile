@@ -1,3 +1,10 @@
 #!/bin/bash -e
 
-clang -arch x86_64 -std=gnu11 -O1 -lm -Werror -Wall -Wextra -Wshorten-64-to-32 "$@"
+file="${@: -1}"
+if [[ $file == *".m" ]]; then
+    lang_options="-x objective-c -fobjc-arc -fmodules -I$SPACETIME_PATH/macOS"
+else
+    lang_options="-x c"
+fi
+
+clang -arch x86_64 $lang_options -std=gnu11 -O1 -lm -Werror -Wall -Wextra -Wshorten-64-to-32 -I$SPACETIME_PATH/src "$@"

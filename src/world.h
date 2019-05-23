@@ -2,9 +2,9 @@
 #define WORLD_H
 
 #include "spacetime.h"
-#include "grid.h"   
+#include "event-queue.h"
+#include "grid.h"
 #include "viewport.h"
-#include "view.h"
 
 typedef struct {
 	Grid grid;
@@ -14,7 +14,6 @@ typedef struct {
 void world_initialize(World *w);
 void world_terminate(World *w);
 void world_load(World *w);
-void world_update(World *w, View *vw);
-//void world_toggle_hex_at_point(World *w, vec2 v);
+void world_update(World *w, EventQueue *eq);
 
 #endif // WORLD_H

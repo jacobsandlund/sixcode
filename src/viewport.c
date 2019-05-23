@@ -25,6 +25,17 @@ float2 viewport_screen_to_world_vector(Viewport *vp, float2 v)
 	};
 }
 
+void viewport_camera_translate(Viewport *vp, float2 delta)
+{
+	float2 delta_scaled = {
+		(double) delta.x / vp->layout.scale.x / (double) vp->camera.z,
+		(double) delta.y / vp->layout.scale.y / (double) vp->camera.z,
+	};
+
+	vp->camera.x += delta_scaled.x;
+	vp->camera.y -= delta_scaled.y;
+}
+
 void viewport_camera_zoom_at_screen_vector(Viewport *vp, float2 v, float new_camera_scale)
 {
 	float2 world_vector_old = viewport_screen_to_world_vector(vp, v);

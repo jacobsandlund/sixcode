@@ -1,34 +1,34 @@
 #import "AppDelegate.h"
 #import "MacOSRenderer.h"
-#import "MacOSView.h"
 #import "world.h"
 #import <stdlib.h>
 
 @implementation AppDelegate {
+    EventQueue *_eventQueue;
     World *_world;
-    View *_view;
     Renderer *_renderer;
 }
 
-- (instancetype)init {
+- (instancetype)initWithEventQueue:(EventQueue *)eq {
     self = [super init];
 
     if (self) {
-        NSLog(@"AppDelegate init");
         _window = [[NSWindow alloc] init];
         _window.styleMask = NSWindowStyleMaskTitled |
                 NSWindowStyleMaskResizable | NSWindowStyleMaskFullScreen;
+
+        _eventQueue = eq;
         _world = malloc(sizeof *_world);
-        _view = malloc(sizeof *_view);
         _renderer = malloc(sizeof *_renderer);
 
+        world_initialize(_world);
+
         NSSize size = [_window contentView].frame.size;
-        _view->viewport_size = (float2) {
+        _world->viewport.size = (float2) {
             size.width,
             size.height,
         };
 
-        world_initialize(_world);
         world_load(_world);
 
         _window.contentViewController = self;
@@ -38,18 +38,29 @@
 }
 
 - (void)loadView {
-    NSLog(@"Load view");
-    view_initialize(_view, _view->viewport_size);
-    renderer_initialize(_renderer, _view, _world);
+    NSRect frame = NSMakeRect(0.0, 0.0,
+            _world->viewport.size.x, _world->viewport.size.y);
+    MTKView *mtkView = [[MTKView alloc] initWithFrame: frame
+            device: MTLCreateSystemDefaultDevice()];
 
-    MacOSView *macOSView = (__bridge MacOSView *) _view->os_view;
-    macOSView.delegate = (__bridge MacOSRenderer *) _renderer->os_renderer;
-    self.view = macOSView;
+    if (!mtkView.device) {
+        NSLog(@"Metal is not supported on this device");
+        return;
+    }
+
+    renderer_initialize(_renderer, mtkView, _eventQueue, _world);
+    mtkView.delegate = (__bridge MacOSRenderer *) _renderer->os_renderer;
+
+    if (!mtkView.delegate) {
+        NSLog(@"Renderer failed initialization");
+        return;
+    }
+
+    self.view = mtkView;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
     (void)notification;
-    //_window.acceptsMouseMovedEvents = YES;
     [_window makeKeyAndOrderFront:self];
 }
 
@@ -61,11 +72,9 @@
 - (void)applicationWillTerminate:(NSNotification *)notification {
     (void)notification;
     world_terminate(_world);
-    view_terminate(_view);
     renderer_terminate(_renderer);
 
     free(_world);
-    free(_view);
     free(_renderer);
 }
 

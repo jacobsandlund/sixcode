@@ -22,9 +22,8 @@ void renderer_mock_terminate(Renderer *r)
 	free(r->os_renderer);
 }
 
-void renderer_render(Renderer *r, View *vw, World *w)
+void renderer_render(Renderer *r, World *w)
 {
-	(void) vw;
 	(void) w;
 	renderer_mock(r)->num_render_calls++;
 }

@@ -1,10 +1,9 @@
 #include "world.c"
 #include "test.h"
-#include "camera.c"
+#include "event-queue.c"
 #include "grid.c"
 #include "layout.c"
 #include "quad.c"
-#include "view-mock.c"
 #include "viewport.c"
 
 TEST(world_initialize)
@@ -27,21 +26,19 @@ TEST(world_initialize)
 
 TEST(world_update)
 {
+	EventQueue *eq = malloc(sizeof *eq);
 	World *w = malloc(sizeof *w);
-	View *vw = malloc(sizeof *vw);
 
-	float2 viewport_size = {2560, 1440};
-
+	event_queue_initialize(eq);
 	world_initialize(w);
-	view_mock_initialize(vw, viewport_size);
+	w->viewport.size = (float2) {2560, 1440};
 
-	world_update(w, vw);
+	world_update(w, eq);
 
 	world_terminate(w);
-	view_mock_terminate(vw);
 
+	free(eq);
 	free(w);
-	free(vw);
 }
 
 TEST(world_load)

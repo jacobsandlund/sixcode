@@ -7,7 +7,7 @@
 #include "mesh.h"
 #include "shader.h"
 #include "texture.h"
-#include "camera.h"
+#include "viewport.h"
 
 #define UI_MESH_MAX_SIZE 8
 #define UI_NUM_MESHES 4	// 8, 4, 2, 1

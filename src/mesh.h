@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include "spacetime.h"
-#include "camera.h"
+#include "viewport.h"
 
 typedef struct {
 	float x;
