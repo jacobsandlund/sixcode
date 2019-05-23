@@ -1,3 +1,4 @@
+#include <time.h>
 #include <assert.h>
 #include "event-queue.h"
 
@@ -14,4 +15,11 @@ void event_queue_initialize(EventQueue *eq, i64 length)
 void event_queue_terminate(EventQueue *eq)
 {
 	free(eq->events);
+}
+
+u64 event_queue_clock_time(void)
+{
+#ifdef __APPLE__
+	return clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+#endif
 }

@@ -45,9 +45,9 @@ int2 layout_world_vector_round_rect(float2 v)
 int2 layout_world_vector_round(Layout *l, float2 v)
 {
 	switch (l->type) {
-	case LAYOUT_TYPE_HEX:
+	case LayoutTypeHex:
 		return layout_world_vector_round_hex(v);
-	case LAYOUT_TYPE_RECT:
+	case LayoutTypeRect:
 		return layout_world_vector_round_rect(v);
 	}
 }

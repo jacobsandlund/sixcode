@@ -45,4 +45,14 @@ static inline int2 int2_sub(int2 a, int2 b)
 	return (int2) {a.x - b.x, a.y - b.y};
 }
 
+#ifdef TEST
+
+#define SPACETIME_ERROR(...) test_log_error(__VA_ARGS__)
+
+#else
+
+#define SPACETIME_ERROR(...) NSLog(__VA_ARGS__)
+
+#endif
+
 #endif // SPACETIME_H

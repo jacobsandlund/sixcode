@@ -1,5 +1,5 @@
-#include "spacetime.h"
 #include "test.h"
+#include "spacetime.h"
 
 TEST(vec2_ivec2_conversions)
 {

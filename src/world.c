@@ -15,7 +15,7 @@ void world_initialize(World *w)
 	Viewport *vp = &w->viewport;
 	vp->camera = (float3) {0.0, 0.0, 16.0};
 	vp->size = (float2) {640, 480};
-	layout_type(&vp->layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp->layout, LayoutTypeHex);
 }
 
 void world_terminate(World *w)
@@ -49,6 +49,16 @@ void world_load(World *w)
 
 void world_update(World *w, EventQueue *eq)
 {
+	u64 time = event_queue_clock_time();
+	Event event;
+	i64 num_behind = eq->next_write_event_id - eq->next_read_event_id;
+	if (num_behind >= eq->length) {
+		SPACETIME_ERROR(
+	}
+
+	while (num_behind > 0 && num_behind < eq->length) {
+		event_queue_read(eq, &event);
+	}
 	(void) w;
 	(void) eq;
 }

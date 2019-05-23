@@ -1,5 +1,5 @@
-#include "texture.c"
 #include "test.h"
+#include "texture.c"
 #include "glmock.c"
 #include "grid.c"
 #include "quad.c"

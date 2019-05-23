@@ -1,5 +1,5 @@
-#include "view-matrix.c"
 #include "test.h"
+#include "view-matrix.c"
 #include "viewport.c"
 #include "layout.c"
 
@@ -20,7 +20,7 @@ TEST(view_matrix_update)
 		.size = {1000, 600},
 		.camera = {100, -200, 10.0},
 	};
-	layout_type(&viewport.layout, LAYOUT_TYPE_HEX);
+	layout_type(&viewport.layout, LayoutTypeHex);
 	float2 offset = {93.0f, -13.0f};
 
 	view_matrix_update(&vm, &viewport, offset);

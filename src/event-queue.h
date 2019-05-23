@@ -4,9 +4,9 @@
 #include "spacetime.h"
 
 typedef enum {
-	EVENT_TYPE_MOUSE_MOVE = 1,
-	EVENT_TYPE_MOUSE_DRAG = 2,
-	EVENT_TYPE_MOUSE_CLICK = 4,
+	EventTypeMouseMove = 1,
+	EventTypeMouseDrag = 2,
+	EventTypeMouseClick = 4,
 } EventType;
 
 #define EVENT_TYPE_MOUSE_MOVE_OR_DRAG_MASK 3
@@ -27,6 +27,7 @@ typedef struct {
 
 void event_queue_initialize(EventQueue *eq, i64 length);
 void event_queue_terminate(EventQueue *eq);
+u64 event_queue_clock_time(void);
 
 static inline void event_queue_write(EventQueue *eq, Event *event)
 {

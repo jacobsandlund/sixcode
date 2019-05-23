@@ -1,5 +1,5 @@
-#include "render-loop.c"
 #include "test.h"
+#include "render-loop.c"
 #include "event-queue.c"
 #include "grid.c"
 #include "layout.c"

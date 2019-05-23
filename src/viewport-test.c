@@ -1,5 +1,5 @@
-#include "viewport.c"
 #include "test.h"
+#include "viewport.c"
 #include "layout.c"
 #include "quad.c"
 
@@ -9,7 +9,7 @@ TEST(viewport_screen_to_world_vector)
 		.size = {1000, 600},
 		.camera = {-100, -200, 10},
 	};
-	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LayoutTypeHex);
 
 	float2 v1 = {125.981, 275};
 	float2 v2 = {980.3, 540};
@@ -27,7 +27,7 @@ TEST(viewport_camera_translate)
 		.size = {1000, 600},
 		.camera = {500, -2000, 20.0},
 	};
-	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LayoutTypeHex);
 	float2 delta = {300, 400};
 
 	viewport_camera_translate(&vp, delta);
@@ -42,7 +42,7 @@ TEST(viewport_camera_zoom_at_screen_vector)
 		.size = {1000, 600},
 		.camera = {500, -2000, 20.0},
 	};
-	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LayoutTypeHex);
 
 	float2 v = vp.size;
 	viewport_camera_zoom_at_screen_vector(&vp, v, 30.0);
@@ -63,7 +63,7 @@ TEST(viewport_to_world_quad_hex)
 		.size = {2000, 1440},
 		.camera = {1.64184, 0.75, 32.0},
 	};
-	layout_type(&vp.layout, LAYOUT_TYPE_HEX);
+	layout_type(&vp.layout, LayoutTypeHex);
 
 	// Wide viewport
 	viewport_to_world_quad_hex(&vp, &q);
@@ -106,7 +106,7 @@ TEST(viewport_to_world_quad_rect)
 		.size = {2000, 1440},
 		.camera = {1.64184, 0.75, 32.0},
 	};
-	layout_type(&vp.layout, LAYOUT_TYPE_RECT);
+	layout_type(&vp.layout, LayoutTypeRect);
 
 	// Wide viewport
 	viewport_to_world_quad(&vp, &q);

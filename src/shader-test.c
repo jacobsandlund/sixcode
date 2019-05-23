@@ -1,5 +1,5 @@
-#include "shader.c"
 #include "test.h"
+#include "shader.c"
 #include "glmock.c"
 #include <string.h>
 

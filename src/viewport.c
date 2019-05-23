@@ -111,10 +111,10 @@ void viewport_to_world_quad_rect(Viewport *vp, Quad *out_q)
 void viewport_to_world_quad(Viewport *vp, Quad *out_q)
 {
 	switch (vp->layout.type) {
-	case LAYOUT_TYPE_HEX:
+	case LayoutTypeHex:
 		viewport_to_world_quad_hex(vp, out_q);
 		break;
-	case LAYOUT_TYPE_RECT:
+	case LayoutTypeRect:
 		viewport_to_world_quad_rect(vp, out_q);
 		break;
 	}

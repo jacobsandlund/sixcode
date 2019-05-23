@@ -1,5 +1,5 @@
-#include "quad.c"
 #include "test.h"
+#include "quad.c"
 
 TEST(quad_contains)
 {

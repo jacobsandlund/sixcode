@@ -1,5 +1,5 @@
-#include "world.c"
 #include "test.h"
+#include "world.c"
 #include "event-queue.c"
 #include "grid.c"
 #include "layout.c"
@@ -16,7 +16,7 @@ TEST(world_initialize)
 	//=> (-2047, -2047), (2046, 2046)
 	_f3(w->viewport.camera);
 	//=> 0, 0, 16
-	_d(w->viewport.layout.type == LAYOUT_TYPE_HEX);
+	_d(w->viewport.layout.type == LayoutTypeHex);
 	//=> 1
 
 	world_terminate(w);

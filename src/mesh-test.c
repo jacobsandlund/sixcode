@@ -1,12 +1,12 @@
-#include "mesh.c"
 #include "test.h"
+#include "mesh.c"
 #include "quad.c"
 #include "view.c"
 
 TEST(fill_mesh_initialize_hex)
 {
 	FillMesh *m = malloc(sizeof *m);
-	fill_mesh_initialize(m, LAYOUT_TYPE_HEX, 32, 64);
+	fill_mesh_initialize(m, LayoutTypeHex, 32, 64);
 
 	_d(m->size_x);
 	//=> 32

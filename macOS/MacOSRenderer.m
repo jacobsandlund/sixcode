@@ -1,5 +1,6 @@
 @import MetalKit;
 
+#import <time.h>
 #import "spacetime.h"
 #import "MacOSRenderer.h"
 #import "ShaderTypes.h"

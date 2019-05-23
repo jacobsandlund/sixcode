@@ -1,11 +1,10 @@
 #import <stdlib.h>
-#import <time.h>
 #import "AppDelegate.h"
 #import "event-queue.h"
 
-const i64 EVENT_QUEUE_LENGTH = 64;
-const double ENTER_DRAG_TIME = 0.1;
-const double ENTER_DRAG_DELTA_SQUARED = 30.0;
+const i64 EventQueueLength = 64;
+const double EnterDragTime = 0.1;
+const double EnterDragDeltaSquared = 30.0;
 
 NSMenu *makeMenu() {
     NSMenu *mainMenu = [[NSMenu alloc] init];
@@ -38,7 +37,7 @@ void runLoop(EventQueue *eq) {
                 dequeue:YES];
 
         Event event = {
-            .time = clock_gettime_nsec_np(CLOCK_UPTIME_RAW),
+            .time = event_queue_clock_time(),
         };
 
         switch (nsEvent.type) {
@@ -54,7 +53,7 @@ void runLoop(EventQueue *eq) {
 
         case NSEventTypeLeftMouseUp:
             if (!dragging) {
-                event.type = EVENT_TYPE_MOUSE_CLICK;
+                event.type = EventTypeMouseClick;
                 event.location = (float2) {
                     (float) nsEvent.locationInWindow.x,
                     (float) nsEvent.locationInWindow.y,
@@ -67,7 +66,7 @@ void runLoop(EventQueue *eq) {
             break;
 
         case NSEventTypeMouseMoved:
-            event.type = EVENT_TYPE_MOUSE_MOVE;
+            event.type = EventTypeMouseMove;
             event.location = (float2) {
                 (float) nsEvent.locationInWindow.x,
                 (float) nsEvent.locationInWindow.y,
@@ -87,11 +86,11 @@ void runLoop(EventQueue *eq) {
             };
 
             if (dragging ||
-                    event.time - leftMouseDownTime >= ENTER_DRAG_TIME ||
+                    event.time - leftMouseDownTime >= EnterDragTime ||
                     delta.x * delta.x + delta.y * delta.y >=
-                    ENTER_DRAG_DELTA_SQUARED) {
+                    EnterDragDeltaSquared) {
                 dragging = true;
-                event.type = EVENT_TYPE_MOUSE_DRAG;
+                event.type = EventTypeMouseDrag;
                 event_queue_write(eq, &event);
             }
 
@@ -204,7 +203,7 @@ int main(int argc, const char *argv[]) {
     [NSApplication sharedApplication];
 
     EventQueue *eq = malloc(sizeof *eq);
-    event_queue_initialize(eq, EVENT_QUEUE_LENGTH);
+    event_queue_initialize(eq, EventQueueLength);
 
     AppDelegate *appDelegate = [[AppDelegate alloc] initWithEventQueue:eq];
     NSApp.mainMenu = makeMenu();

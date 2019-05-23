@@ -1,5 +1,5 @@
-#include "grid.c"
 #include "test.h"
+#include "grid.c"
 #include "quad.c"
 
 TEST(grid_basics)

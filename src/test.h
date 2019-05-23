@@ -39,6 +39,8 @@
 
 #define TEST_CASE_SENTINEL 1976020431
 
+#undef TEST
+
 #define TEST(test_name) \
 void test_case_fn_##test_name(); \
 static TestCase test_case_##test_name \
@@ -138,7 +140,7 @@ void TPRINTF(const char *format, ...)
 	}
 }
 
-void log_error(const char *format, ...)
+void test_log_error(const char *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);

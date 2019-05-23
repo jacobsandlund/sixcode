@@ -1,6 +1,5 @@
-#include <time.h>
-#include "event-queue.c"
 #include "test.h"
+#include "event-queue.c"
 
 TEST(event_queue_initialize)
 {
@@ -17,7 +16,7 @@ TEST(event_queue_initialize)
 	_d(eq->length);
 	//=> 64
 
-	eq->events[eq->length - 1].type = EVENT_TYPE_MOUSE_CLICK;
+	eq->events[eq->length - 1].type = EventTypeMouseClick;
 
 	event_queue_terminate(eq);
 	free(eq);
@@ -28,7 +27,7 @@ TEST(event_queue_write)
 	EventQueue *eq = malloc(sizeof *eq);
 
 	Event event = {
-		.type = EVENT_TYPE_MOUSE_CLICK,
+		.type = EventTypeMouseClick,
 		.time = 1234567890,
 		.location = {1000, 800},
 	};
@@ -55,15 +54,15 @@ TEST(event_queue_read)
 	EventQueue *eq = malloc(sizeof *eq);
 
 	Event event = {
-		.type = EVENT_TYPE_MOUSE_CLICK,
+		.type = EventTypeMouseClick,
 		.time = 1234567890,
 		.location = {1000, 800},
 	};
 	Event read_event;
 
 	event_queue_initialize(eq, 16);
-
 	event_queue_write(eq, &event);
+
 	event_queue_read(eq, &read_event);
 
 	_d(eq->next_read_event_id);
@@ -77,4 +76,15 @@ TEST(event_queue_read)
 
 	event_queue_terminate(eq);
 	free(eq);
+}
+
+TEST(event_queue_clock_time)
+{
+	u64 start = event_queue_clock_time();
+	u64 end = event_queue_clock_time();
+
+	_d(start > 0 && end > 0);
+	//=> 1
+	_d(end > start);
+	//=> 1
 }

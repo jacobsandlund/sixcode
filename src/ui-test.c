@@ -1,5 +1,5 @@
-#include "ui.c"
 #include "test.h"
+#include "ui.c"
 #include "glmock.c"
 #include "grid.c"
 #include "mesh.c"
