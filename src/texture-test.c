@@ -4,7 +4,7 @@
 #include "grid.c"
 #include "quad.c"
 
-TEST(texture)
+Test(texture)
 {
 	Texture *t = malloc(sizeof *t);
 
@@ -52,7 +52,7 @@ TEST(texture)
 	free(t);
 }
 
-TEST(texture_update)
+Test(texture_update)
 {
 	Grid *g = malloc(sizeof *g);
 	Texture *t = malloc(sizeof *t);
@@ -84,7 +84,7 @@ TEST(texture_update)
 	free(t);
 }
 
-TEST(texture_update_in_quad)
+Test(texture_update_in_quad)
 {
 	Quad quad;
 	SizeQuad sq;

@@ -1,5 +1,5 @@
-#ifndef SPACETIME_H
-#define SPACETIME_H
+#ifndef Spacetime_h
+#define Spacetime_h
 
 #if __APPLE__
 
@@ -45,14 +45,21 @@ static inline int2 int2_sub(int2 a, int2 b)
 	return (int2) {a.x - b.x, a.y - b.y};
 }
 
-#ifdef TEST
+#ifdef Test
 
-#define SPACETIME_ERROR(...) test_log_error(__VA_ARGS__)
+#define Log(...) test_log(__VA_ARGS__)
+#define DLog(...) /* */
 
 #else
 
-#define SPACETIME_ERROR(...) NSLog(__VA_ARGS__)
+#define Log(...) NSLog(__VA_ARGS__)
 
+#ifdef DEBUG
+#define DLog(...) NSLog(__VA_ARGS__)
+#else
+#define DLog(...) /* */
 #endif
 
-#endif // SPACETIME_H
+#endif  // !TEST
+
+#endif // Spacetime_h

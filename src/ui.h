@@ -1,5 +1,5 @@
-#ifndef UI_H
-#define UI_H
+#ifndef Ui_h
+#define Ui_h
 
 #include "spacetime.h"
 #include <GLES3/gl3.h>
@@ -54,4 +54,4 @@ bool ui_initialize(Ui *ui);
 void ui_terminate(Ui *ui);
 void ui_draw(Ui *ui, Camera *c, Grid *g);
 
-#endif // UI_H
+#endif // Ui_h

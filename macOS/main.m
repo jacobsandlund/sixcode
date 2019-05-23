@@ -102,48 +102,48 @@ void runLoop(EventQueue *eq) {
                 return;
             }
 
-            NSLog(@"Event key down with characters: '%@' - %@", nsEvent.characters, nsEvent);
+            DLog(@"Event key down with characters: '%@' - %@", nsEvent.characters, nsEvent);
 
             break;
 
         case NSEventTypeKeyUp:
-            NSLog(@"Event key up with characters: '%@' - %@", nsEvent.characters, nsEvent);
+            DLog(@"Event key up with characters: '%@' - %@", nsEvent.characters, nsEvent);
 
             break;
 
         case NSEventTypeFlagsChanged:
-            NSLog(@"Event flags changed: %@", nsEvent);
+            DLog(@"Event flags changed: %@", nsEvent);
 
             break;
 
         case NSEventTypeAppKitDefined:
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypeApplicationActivated:
-                NSLog(@"Event with subtype: NSEventSubtypeApplicationActivated - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeApplicationActivated - %@", nsEvent);
                 break;
             case NSEventSubtypeApplicationDeactivated:
-                NSLog(@"Event with subtype: NSEventSubtypeApplicationDeactivated - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeApplicationDeactivated - %@", nsEvent);
                 break;
             case NSEventSubtypeScreenChanged:
-                NSLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
                 break;
             case NSEventSubtypeWindowExposed:
-                NSLog(@"Event with subtype: NSEventSubtypeWindowExposed - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeWindowExposed - %@", nsEvent);
                 break;
             case NSEventSubtypeWindowMoved:
-                NSLog(@"Event with subtype: NSEventSubtypeWindowMoved - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeWindowMoved - %@", nsEvent);
                 break;
             case 9:
-                NSLog(@"Event with subtype 9: activated ??? - %@", nsEvent);
+                DLog(@"Event with subtype 9: activated ??? - %@", nsEvent);
                 break;
             case 22:
-                NSLog(@"Event with subtype 22: booting up ??? - %@", nsEvent);
+                DLog(@"Event with subtype 22: booting up ??? - %@", nsEvent);
                 break;
             case 23:
-                NSLog(@"Event with subtype 23: booting up ??? - %@", nsEvent);
+                DLog(@"Event with subtype 23: booting up ??? - %@", nsEvent);
                 break;
             default:
-                NSLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
+                DLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
                 break;
             }
 
@@ -156,25 +156,24 @@ void runLoop(EventQueue *eq) {
         case NSEventTypePeriodic:
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypePowerOff:
-            // case NSEventSubtypeApplicationActivated:
             // case NSEventSubtypeTabletPoint:
-                NSLog(@"Event with subtype: NSEventSubtypePowerOff - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypePowerOff - %@", nsEvent);
                 break;
             case NSEventSubtypeScreenChanged:
-                NSLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
                 break;
             case NSEventSubtypeTouch:
-                NSLog(@"Event with subtype: NSEventSubtypeTouch - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeTouch - %@", nsEvent);
                 break;
             case NSEventSubtypeMouseEvent:
             // case NSEventSubtypeTabletProximity:
-                NSLog(@"Event with subtype: NSEventSubtypeMouseEvent - %@", nsEvent);
+                DLog(@"Event with subtype: NSEventSubtypeMouseEvent - %@", nsEvent);
                 break;
             case 7:
-                NSLog(@"Event with subtype 7: clicking into/out of ??? - %@", nsEvent);
+                DLog(@"Event with subtype 7: clicking into/out of ??? - %@", nsEvent);
                 break;
             default:
-                NSLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
+                DLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
                 break;
             }
 
@@ -183,7 +182,7 @@ void runLoop(EventQueue *eq) {
             break;
 
         default:
-            NSLog(@"Event other: %@", nsEvent);
+            DLog(@"Event other: %@", nsEvent);
             [NSApp sendEvent:nsEvent];
 
             break;

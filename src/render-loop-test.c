@@ -8,7 +8,7 @@
 #include "viewport.c"
 #include "world.c"
 
-TEST(render_loop_one_iteration)
+Test(render_loop_one_iteration)
 {
 	Renderer *r = malloc(sizeof *r);
 	EventQueue *eq = malloc(sizeof *eq);

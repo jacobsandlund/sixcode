@@ -3,7 +3,7 @@
 #include "viewport.c"
 #include "layout.c"
 
-TEST(view_matrix_initialize)
+Test(view_matrix_initialize)
 {
 	float4x4 vm;
 	view_matrix_initialize(&vm);
@@ -11,7 +11,7 @@ TEST(view_matrix_initialize)
 	//=> 0, 0, 0, 0
 }
 
-TEST(view_matrix_update)
+Test(view_matrix_update)
 {
 	float4x4 vm;
 	view_matrix_initialize(&vm);

@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef Shader_h
+#define Shader_h
 
 #include <GLES3/gl3.h>
 #include "spacetime.h"
@@ -17,4 +17,4 @@ bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, con
 bool shader_program_link(ShaderProgram *s, const char *filename, i64 line);
 void shader_program_delete(ShaderProgram *s);
 
-#endif // SHADER_H
+#endif // Shader_h

@@ -1,5 +1,5 @@
-#ifndef GRID_H
-#define GRID_H
+#ifndef Grid_h
+#define Grid_h
 
 #include "spacetime.h"
 #include "quad.h"
@@ -17,4 +17,4 @@ u8 grid_get(Grid *g, int2 h);
 void grid_set(Grid *g, int2 h, u8 style);
 void grid_clear(Grid *g, int2 h);
 
-#endif // GRID_H
+#endif // Grid_h

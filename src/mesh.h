@@ -1,5 +1,5 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef Mesh_h
+#define Mesh_h
 
 #include "spacetime.h"
 #include "viewport.h"
@@ -37,4 +37,4 @@ void instance_mesh_initialize(InstanceMesh *m, i64 length);
 void instance_mesh_resize(InstanceMesh *m, i64 length);
 void instance_mesh_terminate(InstanceMesh *m);
 
-#endif // MESH_H
+#endif // Mesh_h

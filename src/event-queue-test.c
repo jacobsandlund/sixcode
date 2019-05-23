@@ -1,7 +1,7 @@
 #include "test.h"
 #include "event-queue.c"
 
-TEST(event_queue_initialize)
+Test(event_queue_initialize)
 {
 	EventQueue *eq = malloc(sizeof *eq);
 
@@ -22,7 +22,7 @@ TEST(event_queue_initialize)
 	free(eq);
 }
 
-TEST(event_queue_write)
+Test(event_queue_write)
 {
 	EventQueue *eq = malloc(sizeof *eq);
 
@@ -49,7 +49,7 @@ TEST(event_queue_write)
 	free(eq);
 }
 
-TEST(event_queue_read)
+Test(event_queue_read)
 {
 	EventQueue *eq = malloc(sizeof *eq);
 
@@ -78,7 +78,7 @@ TEST(event_queue_read)
 	free(eq);
 }
 
-TEST(event_queue_clock_time)
+Test(event_queue_clock_time)
 {
 	u64 start = event_queue_clock_time();
 	u64 end = event_queue_clock_time();

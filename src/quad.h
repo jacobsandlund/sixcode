@@ -1,5 +1,5 @@
-#ifndef QUAD_H
-#define QUAD_H
+#ifndef Quad_h
+#define Quad_h
 
 #include "spacetime.h"
 
@@ -20,4 +20,4 @@ void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
 void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
 i64 size_quad_capacity(SizeQuad *sq);
 
-#endif // QUAD_H
+#endif // Quad_h

@@ -1,7 +1,7 @@
 #include "test.h"
 #include "spacetime.h"
 
-TEST(vec2_ivec2_conversions)
+Test(vec2_ivec2_conversions)
 {
 	vec2 v = {3.1, -42.7};
 	_v2(v);
@@ -15,7 +15,7 @@ TEST(vec2_ivec2_conversions)
 	//=> 3, -42
 }
 
-TEST(ivec2_math)
+Test(ivec2_math)
 {
 	ivec2 v1 = {3, -7};
 	ivec2 v2 = {5, 11};

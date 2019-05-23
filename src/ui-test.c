@@ -8,7 +8,7 @@
 #include "texture.c"
 #include "view.c"
 
-TEST(ui)
+Test(ui)
 {
 	Ui *ui = malloc(sizeof *ui);
 
@@ -220,7 +220,7 @@ TEST(ui)
 	free(ui);
 }
 
-TEST(ui_initialize_fail)
+Test(ui_initialize_fail)
 {
 	Ui *ui = malloc(sizeof *ui);
 
@@ -247,7 +247,7 @@ TEST(ui_initialize_fail)
 	free(ui);
 }
 
-TEST(ui_draw_fill)
+Test(ui_draw_fill)
 {
 	vec2 viewport_size = {1000, 600};
 	vec2 translation = {100, 100};
@@ -409,7 +409,7 @@ TEST(ui_draw_fill)
 	free(ui);
 }
 
-TEST(ui_draw_fill_rect)
+Test(ui_draw_fill_rect)
 {
 	vec2 viewport_size = {1000, 600};
 	vec2 translation = {100, 100};

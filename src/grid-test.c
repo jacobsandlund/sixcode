@@ -2,7 +2,7 @@
 #include "grid.c"
 #include "quad.c"
 
-TEST(grid_basics)
+Test(grid_basics)
 {
 	int2 h1 = {5, 27};
 	int2 h2 = {48, 62};

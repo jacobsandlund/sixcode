@@ -6,7 +6,7 @@
 #include "quad.c"
 #include "viewport.c"
 
-TEST(world_initialize)
+Test(world_initialize)
 {
 	World *w = malloc(sizeof *w);
 
@@ -24,7 +24,7 @@ TEST(world_initialize)
 	free(w);
 }
 
-TEST(world_update)
+Test(world_update)
 {
 	EventQueue *eq = malloc(sizeof *eq);
 	World *w = malloc(sizeof *w);
@@ -41,7 +41,7 @@ TEST(world_update)
 	free(w);
 }
 
-TEST(world_load)
+Test(world_load)
 {
 	World *w = malloc(sizeof *w);
 

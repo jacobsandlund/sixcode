@@ -1,5 +1,5 @@
-#ifndef TEST_H
-#define TEST_H
+#ifndef Test_h
+#define Test_h
 
 #include <errno.h>
 #include <stdarg.h>
@@ -32,21 +32,19 @@
 #define _f3(v) _ggg(v.x, v.y, v.z)
 #define _i2(v) _dd(v.x, v.y)
 
-#define _TEST_SPACETIME_ERROR() { \
-	_s(test_spacetime_error); \
-	test_reset_spacetime_error(); \
+#define _Log() { \
+	_s(test_log_buffer); \
+	test_log_reset(); \
 }
 
-#define TEST_CASE_SENTINEL 1976020431
+#define TestCaseSentinel 1976020431
 
-#undef TEST
-
-#define TEST(test_name) \
+#define Test(test_name) \
 void test_case_fn_##test_name(); \
 static TestCase test_case_##test_name \
 __attribute((used, section("data,test_cases"))) = { \
 	.fn = test_case_fn_##test_name, \
-	.sentinel = TEST_CASE_SENTINEL, \
+	.sentinel = TestCaseSentinel, \
 }; \
 void test_case_fn_##test_name()
 
@@ -58,7 +56,7 @@ typedef struct {
 } TestCase;
 
 
-TEST(start)
+Test(start)
 {
 }
 
@@ -101,8 +99,8 @@ typedef struct {
 	int num_results;
 } TestFileInfo;
 
-char test_runner_spacetime_error[TEST_MAX_OUTPUT_LEN];
-static int test_runner_spacetime_error_i = 0;
+char test_log_buffer[TEST_MAX_OUTPUT_LEN];
+static int test_log_i = 0;
 static TestFileInfo *all_file_info[TEST_MAX_FILES];
 static int num_files;
 static int is_focus_on = 0;
@@ -140,29 +138,29 @@ void TPRINTF(const char *format, ...)
 	}
 }
 
-void test_log_error(const char *format, ...)
+void test_log(const char *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);
 
-	int size = TEST_MAX_OUTPUT_LEN - test_runner_spacetime_error_i;
+	int size = TEST_MAX_OUTPUT_LEN - test_log_i;
 
 	if (size > 0) {
 		int output_len = vsnprintf(
-				&test_runner_spacetime_error[test_runner_spacetime_error_i],
+				&test_log_buffer[test_log_i],
 				size,
 				format,
 				argptr);
 
-		test_runner_spacetime_error_i += output_len;
+		test_log_i += output_len;
 	}
 	va_end(argptr);
 }
 
-void test_runner_reset_spacetime_error()
+void test_log_reset()
 {
-	test_runner_spacetime_error_i = 0;
-	test_runner_spacetime_error[0] = '\0';
+	test_log_i = 0;
+	test_log_buffer[0] = '\0';
 }
 
 void split_lines(LineData *line_data, char *contents, int len)
@@ -311,7 +309,7 @@ void test_runner_log_to_file(const char *filename, int line, const char *format,
 
 int test_runner_run(TestCase *start_case)
 {
-	for (TestCase *test_case = start_case; test_case->sentinel == TEST_CASE_SENTINEL; test_case++) {
+	for (TestCase *test_case = start_case; test_case->sentinel == TestCaseSentinel; test_case++) {
 		test_case->fn();
 		is_focus_on = 0;
 	}
@@ -424,4 +422,4 @@ int test_runner_run(TestCase *start_case)
 	return 0;
 }
 
-#endif // TEST_H
+#endif // Test_h

@@ -3,7 +3,7 @@
 #include "quad.c"
 #include "view.c"
 
-TEST(fill_mesh_initialize_hex)
+Test(fill_mesh_initialize_hex)
 {
 	FillMesh *m = malloc(sizeof *m);
 	fill_mesh_initialize(m, LayoutTypeHex, 32, 64);
@@ -62,7 +62,7 @@ TEST(fill_mesh_initialize_hex)
 	free(m);
 }
 
-TEST(fill_mesh_initialize_rect)
+Test(fill_mesh_initialize_rect)
 {
 	FillMesh *m = malloc(sizeof *m);
 	fill_mesh_initialize(m, VIEW_LAYOUT_RECT, 32, 64);
@@ -113,7 +113,7 @@ TEST(fill_mesh_initialize_rect)
 	free(m);
 }
 
-TEST(instance_mesh)
+Test(instance_mesh)
 {
 	InstanceMesh *m = malloc(sizeof *m);
 	instance_mesh_initialize(m, 1);

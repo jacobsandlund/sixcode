@@ -1,12 +1,12 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef Texture_h
+#define Texture_h
 
 #include "spacetime.h"
 #include <GLES3/gl3.h>
 #include "grid.h"
 #include "quad.h"
 
-#define TEXTURE_MAX_SIZE 4096
+#define TextureMaxSize 4096
 
 typedef struct {
 	GLuint texture;
@@ -20,4 +20,4 @@ void texture_terminate(Texture *t);
 void texture_update(Texture *t, Grid *g);
 void texture_update_in_quad(Texture *t, Grid *g, Quad *quad);
 
-#endif // TEXTURE_H
+#endif // Texture_h

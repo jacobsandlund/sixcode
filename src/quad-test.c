@@ -1,7 +1,7 @@
 #include "test.h"
 #include "quad.c"
 
-TEST(quad_contains)
+Test(quad_contains)
 {
 	Quad q = {
 		.min = {-4, 2},
@@ -21,7 +21,7 @@ TEST(quad_contains)
 	//=> 0
 }
 
-TEST(quad_from_hexes)
+Test(quad_from_hexes)
 {
 	Quad q;
 	int2 h1 = {700, -3};
@@ -36,7 +36,7 @@ TEST(quad_from_hexes)
 	//=> (-6, -3), (700, 8)
 }
 
-TEST(quad_intersect)
+Test(quad_intersect)
 {
 	Quad out_q;
 	Quad a = {{-128, -256}, {255, 63}};
@@ -52,7 +52,7 @@ TEST(quad_intersect)
 	//=> (256, 128), (255, 63)
 }
 
-TEST(quad_to_size_quad)
+Test(quad_to_size_quad)
 {
 	SizeQuad sq;
 	Quad q = {{0, 1}, {6, 4}};
@@ -63,7 +63,7 @@ TEST(quad_to_size_quad)
 	//=> (0, 1), (7, 4)
 }
 
-TEST(size_quad_even_align)
+Test(size_quad_even_align)
 {
 	SizeQuad out_sq;
 	SizeQuad sq = {
@@ -89,7 +89,7 @@ TEST(size_quad_even_align)
 	//=> (-5, -20), (10, 20)
 }
 
-TEST(size_quad_capacity)
+Test(size_quad_capacity)
 {
 	SizeQuad sq = {{-3, -1}, {6, 2}};
 

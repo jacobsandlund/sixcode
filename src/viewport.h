@@ -1,5 +1,5 @@
-#ifndef VIEWPORT_H
-#define VIEWPORT_H
+#ifndef Viewport_h
+#define Viewport_h
 
 #include "spacetime.h"
 #include "layout.h"
@@ -18,4 +18,4 @@ void viewport_to_world_quad_hex(Viewport *vp, Quad *out_q);
 void viewport_to_world_quad_rect(Viewport *vp, Quad *out_q);
 void viewport_to_world_quad(Viewport *vp, Quad *out_q);
 
-#endif // VIEWPORT_H
+#endif // Viewport_h

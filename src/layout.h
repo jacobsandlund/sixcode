@@ -1,5 +1,5 @@
-#ifndef LAYOUT_H
-#define LAYOUT_H
+#ifndef Layout_h
+#define Layout_h
 
 #include "spacetime.h"
 
@@ -18,4 +18,4 @@ int2 layout_world_vector_round_hex(float2 v);
 int2 layout_world_vector_round_rect(float2 v);
 int2 layout_world_vector_round(Layout *l, float2 v);
 
-#endif // LAYOUT_H
+#endif // Layout_h

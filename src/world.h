@@ -1,5 +1,5 @@
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef World_h
+#define World_h
 
 #include "spacetime.h"
 #include "event-queue.h"
@@ -16,4 +16,4 @@ void world_terminate(World *w);
 void world_load(World *w);
 void world_update(World *w, EventQueue *eq);
 
-#endif // WORLD_H
+#endif // World_h

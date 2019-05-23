@@ -1,5 +1,5 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef Renderer_h
+#define Renderer_h
 
 #include "spacetime.h"
 #include "world.h"
@@ -10,4 +10,4 @@ typedef struct {
 
 void renderer_render(Renderer *r, World *w);
 
-#endif // RENDERER_H
+#endif // Renderer_h

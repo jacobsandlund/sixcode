@@ -1,5 +1,5 @@
-#ifndef EVENT_QUEUE_H
-#define EVENT_QUEUE_H
+#ifndef EventQueue_h
+#define EventQueue_h
 
 #include "spacetime.h"
 
@@ -9,7 +9,7 @@ typedef enum {
 	EventTypeMouseClick = 4,
 } EventType;
 
-#define EVENT_TYPE_MOUSE_MOVE_OR_DRAG_MASK 3
+#define EventTypeMouseMoveOrDrag 3
 
 typedef struct {
 	EventType type;
@@ -39,4 +39,4 @@ static inline void event_queue_read(EventQueue *eq, Event *event)
 	*event = eq->events[eq->next_read_event_id++ & eq->index_mask];
 }
 
-#endif // EVENT_QUEUE_H
+#endif // EventQueue_h

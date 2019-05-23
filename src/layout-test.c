@@ -1,7 +1,7 @@
 #include "test.h"
 #include "layout.c"
 
-TEST(layout_type)
+Test(layout_type)
 {
 	Layout l;
 	layout_type(&l, LayoutTypeHex);
@@ -19,7 +19,7 @@ TEST(layout_type)
 	//=> 1.73205, -1.5
 }
 
-TEST(layout_world_vector_round_hex)
+Test(layout_world_vector_round_hex)
 {
 	Layout l;
 	layout_type(&l, LayoutTypeHex);
@@ -61,7 +61,7 @@ TEST(layout_world_vector_round_hex)
 	//=> -7, 32
 }
 
-TEST(layout_world_vector_round_rect)
+Test(layout_world_vector_round_rect)
 {
 	Layout l;
 	layout_type(&l, LayoutTypeRect);

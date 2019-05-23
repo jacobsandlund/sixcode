@@ -3,7 +3,7 @@
 #include "layout.c"
 #include "quad.c"
 
-TEST(viewport_screen_to_world_vector)
+Test(viewport_screen_to_world_vector)
 {
 	Viewport vp = {
 		.size = {1000, 600},
@@ -21,7 +21,7 @@ TEST(viewport_screen_to_world_vector)
 	//=> -72.2699, -184
 }
 
-TEST(viewport_camera_translate)
+Test(viewport_camera_translate)
 {
 	Viewport vp = {
 		.size = {1000, 600},
@@ -36,7 +36,7 @@ TEST(viewport_camera_translate)
 	//=> 508.66, -1986.67, 20
 }
 
-TEST(viewport_camera_zoom_at_screen_vector)
+Test(viewport_camera_zoom_at_screen_vector)
 {
 	Viewport vp = {
 		.size = {1000, 600},
@@ -56,7 +56,7 @@ TEST(viewport_camera_zoom_at_screen_vector)
 	//=> 512.509, -2001.11, 10
 }
 
-TEST(viewport_to_world_quad_hex)
+Test(viewport_to_world_quad_hex)
 {
 	Quad q;
 	Viewport vp = {
@@ -99,7 +99,7 @@ TEST(viewport_to_world_quad_hex)
 	//=> (1, -2), (1, -2)
 }
 
-TEST(viewport_to_world_quad_rect)
+Test(viewport_to_world_quad_rect)
 {
 	Quad q;
 	Viewport vp = {

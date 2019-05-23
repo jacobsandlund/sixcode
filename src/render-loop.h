@@ -1,5 +1,5 @@
-#ifndef RENDER_LOOP_H
-#define RENDER_LOOP_H
+#ifndef RenderLoop_h
+#define RenderLoop_h
 
 #include "spacetime.h"
 #include "event-queue.h"
@@ -8,4 +8,4 @@
 
 void render_loop_one_iteration(Renderer *r, EventQueue *eq, World *w);
 
-#endif // RENDER_LOOP_H
+#endif // RenderLoop_h
