@@ -127,7 +127,8 @@ void renderer_render(Renderer *r, World *w)
         //  If the Metal API validation is enabled, we can find out more information about what
         //  went wrong.  (Metal API validation is enabled by default when a debug build is run
         //  from Xcode)
-        NSLog(@"Failed to created pipeline state, error %@", error);
+        Log("Failed to created pipeline state, error %@", error);
+        return;
     }
 
     NSData *vertexData = [MacOSRenderer generateVertexData];

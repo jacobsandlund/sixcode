@@ -48,18 +48,24 @@ static inline int2 int2_sub(int2 a, int2 b)
 #ifdef Test
 
 #define Log(...) test_log(__VA_ARGS__)
+#define ILog(...) test_log(__VA_ARGS__)
 #define DLog(...) /* */
 
-#else
+#elif defined(__APPLE__)
 
-#define Log(...) NSLog(__VA_ARGS__)
+#include <os/log.h>
+
+extern os_log_t os_spacetime_default_log;
+
+#define Log(...) os_log(os_spacetime_default_log, __VA_ARGS__)
+#define ILog(...) os_log_info(os_spacetime_default_log, __VA_ARGS__)
 
 #ifdef DEBUG
-#define DLog(...) NSLog(__VA_ARGS__)
+#define DLog(...) os_log_debug(os_spacetime_default_log, __VA_ARGS__)
 #else
 #define DLog(...) /* */
 #endif
 
-#endif  // !TEST
+#endif  // __APPLE__
 
 #endif // Spacetime_h

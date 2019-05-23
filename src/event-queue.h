@@ -22,10 +22,11 @@ typedef struct {
 	i64 next_write_event_id;
 	i64 index_mask;
 	i64 length;
+	i64 safe_read_behind;
 	Event *events;
 } EventQueue;
 
-void event_queue_initialize(EventQueue *eq, i64 length);
+void event_queue_initialize(EventQueue *eq, i64 length, i64 safe_length_remaining);
 void event_queue_terminate(EventQueue *eq);
 u64 event_queue_clock_time(void);
 
@@ -34,9 +35,6 @@ static inline void event_queue_write(EventQueue *eq, Event *event)
 	eq->events[eq->next_write_event_id++ & eq->index_mask] = *event;
 }
 
-static inline void event_queue_read(EventQueue *eq, Event *event)
-{
-	*event = eq->events[eq->next_read_event_id++ & eq->index_mask];
-}
+i64 event_queue_read(EventQueue *eq, Event *event);
 
 #endif // EventQueue_h

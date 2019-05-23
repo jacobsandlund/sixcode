@@ -5,16 +5,18 @@ Test(event_queue_initialize)
 {
 	EventQueue *eq = malloc(sizeof *eq);
 
-	event_queue_initialize(eq, 64);
+	event_queue_initialize(eq, 64, 4);
 
 	_d(eq->next_read_event_id);
-	//=> 0
+	//=> 1
 	_d(eq->next_write_event_id);
-	//=> 0
+	//=> 1
 	_d(eq->index_mask);
 	//=> 63
 	_d(eq->length);
 	//=> 64
+	_d(eq->safe_read_behind);
+	//=> 60
 
 	eq->events[eq->length - 1].type = EventTypeMouseClick;
 
@@ -32,18 +34,30 @@ Test(event_queue_write)
 		.location = {1000, 800},
 	};
 
-	event_queue_initialize(eq, 16);
+	event_queue_initialize(eq, 4, 1);
 
 	event_queue_write(eq, &event);
 
 	_d(eq->next_write_event_id);
+	//=> 2
+	_d(eq->events[1].type == event.type);
 	//=> 1
-	_d(eq->events[0].type == event.type);
-	//=> 1
-	_u64(eq->events[0].time);
+	_u64(eq->events[1].time);
 	//=> 1234567890
-	_f2(eq->events[0].location);
+	_f2(eq->events[1].location);
 	//=> 1000, 800
+
+	// Write past length
+	event_queue_write(eq, &event);
+	event_queue_write(eq, &event);
+	event_queue_write(eq, &event);
+	event.time = 9876543210;
+	event_queue_write(eq, &event);
+
+	_d(eq->next_write_event_id);
+	//=> 6
+	_u64(eq->events[1].time);
+	//=> 9876543210
 
 	event_queue_terminate(eq);
 	free(eq);
@@ -60,19 +74,40 @@ Test(event_queue_read)
 	};
 	Event read_event;
 
-	event_queue_initialize(eq, 16);
+	event_queue_initialize(eq, 4, 2);
+	event_queue_write(eq, &event);
 	event_queue_write(eq, &event);
 
-	event_queue_read(eq, &read_event);
+	_d(event_queue_read(eq, &read_event));
+	//=> 1
 
 	_d(eq->next_read_event_id);
-	//=> 1
+	//=> 2
 	_d(read_event.type == event.type);
 	//=> 1
 	_u64(read_event.time);
 	//=> 1234567890
 	_f2(read_event.location);
 	//=> 1000, 800
+
+	_d(event_queue_read(eq, &read_event));
+	//=> 2
+
+	// Read far behind
+
+	event_queue_write(eq, &event);	// skip read
+	event.time = 9876543210;
+	event_queue_write(eq, &event);
+	event.time = 1234567890;
+	event_queue_write(eq, &event);
+
+	_d(event_queue_read(eq, &read_event));
+	//=> 4
+
+	_Log();
+	//=> Event queue read behind by 3 above safe level of 2: skipping 1 messages
+	_u64(read_event.time);
+	//=> 9876543210
 
 	event_queue_terminate(eq);
 	free(eq);

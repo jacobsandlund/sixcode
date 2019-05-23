@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo sudo log config --mode "persist:debug" --subsystem computer.spacetime.Spacetime
+    sudo log config --mode "persist:debug" --subsystem computer.spacetime.Spacetime
+fi

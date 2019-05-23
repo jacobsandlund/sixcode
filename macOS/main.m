@@ -2,7 +2,10 @@
 #import "AppDelegate.h"
 #import "event-queue.h"
 
+os_log_t os_spacetime_default_log;
+
 const i64 EventQueueLength = 64;
+const i64 EventQueueSafeLengthRemaining = 16;
 const double EnterDragTime = 0.1;
 const double EnterDragDeltaSquared = 30.0;
 
@@ -31,6 +34,8 @@ void runLoop(EventQueue *eq) {
     for (;;) {
 
         @autoreleasepool {
+
+        os_spacetime_default_log = os_log_create("computer.spacetime.Spacetime", "default");
 
         NSEvent *nsEvent = [NSApp nextEventMatchingMask:NSEventMaskAny
                 untilDate:until inMode:NSDefaultRunLoopMode
@@ -102,48 +107,48 @@ void runLoop(EventQueue *eq) {
                 return;
             }
 
-            DLog(@"Event key down with characters: '%@' - %@", nsEvent.characters, nsEvent);
+            DLog("Event key down with characters: '%{public}@' - %{public}@", nsEvent.characters, nsEvent);
 
             break;
 
         case NSEventTypeKeyUp:
-            DLog(@"Event key up with characters: '%@' - %@", nsEvent.characters, nsEvent);
+            DLog("Event key up with characters: '%{public}@' - %{public}@", nsEvent.characters, nsEvent);
 
             break;
 
         case NSEventTypeFlagsChanged:
-            DLog(@"Event flags changed: %@", nsEvent);
+            DLog("Event flags changed: %{public}@", nsEvent);
 
             break;
 
         case NSEventTypeAppKitDefined:
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypeApplicationActivated:
-                DLog(@"Event with subtype: NSEventSubtypeApplicationActivated - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeApplicationActivated - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeApplicationDeactivated:
-                DLog(@"Event with subtype: NSEventSubtypeApplicationDeactivated - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeApplicationDeactivated - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeScreenChanged:
-                DLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeScreenChanged - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeWindowExposed:
-                DLog(@"Event with subtype: NSEventSubtypeWindowExposed - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeWindowExposed - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeWindowMoved:
-                DLog(@"Event with subtype: NSEventSubtypeWindowMoved - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeWindowMoved - %{public}@", nsEvent);
                 break;
             case 9:
-                DLog(@"Event with subtype 9: activated ??? - %@", nsEvent);
+                DLog("Event with subtype 9: activated ??? - %{public}@", nsEvent);
                 break;
             case 22:
-                DLog(@"Event with subtype 22: booting up ??? - %@", nsEvent);
+                DLog("Event with subtype 22: booting up ??? - %{public}@", nsEvent);
                 break;
             case 23:
-                DLog(@"Event with subtype 23: booting up ??? - %@", nsEvent);
+                DLog("Event with subtype 23: booting up ??? - %{public}@", nsEvent);
                 break;
             default:
-                DLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
+                DLog("Event with unknown subtype: %d - %{public}@", nsEvent.subtype, nsEvent);
                 break;
             }
 
@@ -157,23 +162,23 @@ void runLoop(EventQueue *eq) {
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypePowerOff:
             // case NSEventSubtypeTabletPoint:
-                DLog(@"Event with subtype: NSEventSubtypePowerOff - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypePowerOff - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeScreenChanged:
-                DLog(@"Event with subtype: NSEventSubtypeScreenChanged - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeScreenChanged - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeTouch:
-                DLog(@"Event with subtype: NSEventSubtypeTouch - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeTouch - %{public}@", nsEvent);
                 break;
             case NSEventSubtypeMouseEvent:
             // case NSEventSubtypeTabletProximity:
-                DLog(@"Event with subtype: NSEventSubtypeMouseEvent - %@", nsEvent);
+                DLog("Event with subtype: NSEventSubtypeMouseEvent - %{public}@", nsEvent);
                 break;
             case 7:
-                DLog(@"Event with subtype 7: clicking into/out of ??? - %@", nsEvent);
+                DLog("Event with subtype 7: clicking into/out of ??? - %{public}@", nsEvent);
                 break;
             default:
-                DLog(@"Event with unknown subtype: %d - %@", nsEvent.subtype, nsEvent);
+                DLog("Event with unknown subtype: %d - %{public}@", nsEvent.subtype, nsEvent);
                 break;
             }
 
@@ -182,7 +187,7 @@ void runLoop(EventQueue *eq) {
             break;
 
         default:
-            DLog(@"Event other: %@", nsEvent);
+            DLog("Event other: %{public}@", nsEvent);
             [NSApp sendEvent:nsEvent];
 
             break;
@@ -202,7 +207,7 @@ int main(int argc, const char *argv[]) {
     [NSApplication sharedApplication];
 
     EventQueue *eq = malloc(sizeof *eq);
-    event_queue_initialize(eq, EventQueueLength);
+    event_queue_initialize(eq, EventQueueLength, EventQueueSafeLengthRemaining);
 
     AppDelegate *appDelegate = [[AppDelegate alloc] initWithEventQueue:eq];
     NSApp.mainMenu = makeMenu();

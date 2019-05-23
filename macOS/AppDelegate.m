@@ -44,7 +44,7 @@
             device: MTLCreateSystemDefaultDevice()];
 
     if (!mtkView.device) {
-        NSLog(@"Metal is not supported on this device");
+        Log("Metal is not supported on this device");
         return;
     }
 
@@ -52,7 +52,7 @@
     mtkView.delegate = (__bridge MacOSRenderer *) _renderer->os_renderer;
 
     if (!mtkView.delegate) {
-        NSLog(@"Renderer failed initialization");
+        Log("Renderer failed initialization");
         return;
     }
 
