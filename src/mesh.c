@@ -20,13 +20,12 @@ static float2 mesh_hex_corner(i64 corner)
 	};
 }
 
-void fill_mesh_init_hex(FillMesh *m, i64 size_x, i64 size_y)
+void fill_mesh_init_hex(FillMesh *m, i64 size)
 {
-	i64 num_hexes = size_x * size_y;
+	i64 num_hexes = size * size;
 	m->vertices_length = FillMeshVerticesPerHex * num_hexes;
 	m->indices_length = FillMeshIndicesPerHex * num_hexes;
-	m->size_x = size_x;
-	m->size_y = size_y;
+	m->size = size;
 
 	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
 	m->indices = malloc(m->indices_length * sizeof *m->indices);
@@ -75,13 +74,12 @@ void fill_mesh_init_hex(FillMesh *m, i64 size_x, i64 size_y)
 	}
 }
 
-void fill_mesh_init_rect(FillMesh *m, i64 size_x, i64 size_y)
+void fill_mesh_init_rect(FillMesh *m, i64 size)
 {
-	i64 num_rects = size_x * size_y;
+	i64 num_rects = size * size;
 	m->vertices_length = FillMeshVerticesPerRect * num_rects;
 	m->indices_length = FillMeshIndicesPerRect * num_rects;
-	m->size_x = size_x;
-	m->size_y = size_y;
+	m->size = size;
 
 	m->vertices = malloc(m->vertices_length * sizeof *m->vertices);
 	m->indices = malloc(m->indices_length * sizeof *m->indices);
@@ -130,29 +128,33 @@ void fill_mesh_init_rect(FillMesh *m, i64 size_x, i64 size_y)
 	}
 }
 
-void fill_mesh_init(FillMesh *m, LayoutType layout_type, i64 size_x, i64 size_y)
+void fill_mesh_init(void *pointer, uintptr_t raw_options)
 {
-	switch (layout_type) {
+	FillMesh *m = (FillMesh *) pointer;
+	FillMeshOptions *options = (FillMeshOptions *) raw_options;
+
+	switch (options->layout_type) {
 	case LayoutTypeHex:
-		fill_mesh_init_hex(m, size_x, size_y);
+		fill_mesh_init_hex(m, options->size);
 		break;
 	case LayoutTypeRect:
-		fill_mesh_init_rect(m, size_x, size_y);
+		fill_mesh_init_rect(m, options->size);
 		break;
 	}
 }
 
-void fill_mesh_destroy(FillMesh *m)
+void fill_mesh_destroy(void *pointer)
 {
+	FillMesh *m = (FillMesh *) pointer;
 	free(m->vertices);
 	free(m->indices);
 }
 
-void instance_mesh_init(InstanceMesh *m, i64 length)
+void instance_mesh_init(InstanceMesh *m, i64 capacity)
 {
-	m->vertices = malloc(length * sizeof *m->vertices);
-	m->vertices_length = length;
-	m->vertices_capacity = length;
+	m->vertices = malloc(capacity * sizeof *m->vertices);
+	m->vertices_length = 0;
+	m->vertices_capacity = capacity;
 }
 
 void instance_mesh_destroy(InstanceMesh *m)
@@ -160,12 +162,10 @@ void instance_mesh_destroy(InstanceMesh *m)
 	free(m->vertices);
 }
 
-void instance_mesh_resize(InstanceMesh *m, i64 length)
-{
-	if (length > m->vertices_capacity) {
-		instance_mesh_destroy(m);
-		instance_mesh_init(m, length);
-	} else {
-		m->vertices_length = length;
-	}
-}
+const ResourceLoader FillMeshResourceLoader = {
+	.type = ResourceTypeFillMesh,
+	.size = fill_mesh_size,
+	.init = fill_mesh_init,
+	.destroy = fill_mesh_destroy,
+};
+

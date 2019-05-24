@@ -116,30 +116,14 @@ Test(fill_mesh_init_rect)
 Test(instance_mesh)
 {
 	InstanceMesh *m = malloc(sizeof *m);
-	instance_mesh_init(m, 1);
+	instance_mesh_init(m, 6);
 
 	_d(m->vertices_length);
-	//=> 1
-	_d(m->vertices_capacity);
-	//=> 1
-	m->vertices[0].gridPositionOffset.y = 4;
-
-	instance_mesh_resize(m, 6);
-
-	_d(m->vertices_length);
-	//=> 6
+	//=> 0
 	_d(m->vertices_capacity);
 	//=> 6
-	m->vertices[5].gridPositionOffset.y = 6;
+	m->vertices[5].gridPositionOffset.y = 42;
 
-	instance_mesh_resize(m, 3);
-
-	_d(m->vertices_length);
-	//=> 3
-	_d(m->vertices_capacity);
-	//=> 6
-	_d(m->vertices[5].gridPositionOffset.y);
-	//=> 6
 
 	instance_mesh_destroy(m);
 	free(m);

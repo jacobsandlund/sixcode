@@ -8,6 +8,7 @@ typedef enum {
 	LayoutTypeRect = 1,
 } LayoutType;
 
+// Using a define so that compiler can check all switch cases are present
 #define LayoutTypeNumTypes 2
 
 typedef struct {
