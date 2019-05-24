@@ -12,9 +12,9 @@ Test(ui)
 {
 	Ui *ui = malloc(sizeof *ui);
 
-	glmock_initialize();
+	glmock_init();
 
-	_d(ui_initialize(ui));
+	_d(ui_init(ui));
 	//=> 1
 
 	///////////////////////
@@ -196,9 +196,9 @@ Test(ui)
 	//=> 1
 
 	////////////////////////////
-	// terminate
+	// destroy
 
-	ui_terminate(ui);
+	ui_destroy(ui);
 
 	_d(vertex->deleted);
 	//=> 1
@@ -220,25 +220,25 @@ Test(ui)
 	free(ui);
 }
 
-Test(ui_initialize_fail)
+Test(ui_init_fail)
 {
 	Ui *ui = malloc(sizeof *ui);
 
 	// Failures
 
-	glmock_initialize();
+	glmock_init();
 	GLmock.shaders[1].force_compile_error = true;
 
-	_d(ui_initialize(ui));
+	_d(ui_init(ui));
 	//=> 0
 	_TEST_SPACETIME_ERROR();
 	//=> Error compiling shader. Nothing in info log.
 	//=>
 
-	glmock_initialize();
+	glmock_init();
 	GLmock.programs[1].force_link_error = true;
 
-	_d(ui_initialize(ui));
+	_d(ui_init(ui));
 	//=> 0
 	_TEST_SPACETIME_ERROR();
 	//=> Error linking program. Nothing in info log.
@@ -257,10 +257,10 @@ Test(ui_draw_fill)
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
 
-	glmock_initialize();
-	camera_initialize(c, viewport_size, translation, scale);
-	grid_initialize(g);
-	ui_initialize(ui);
+	glmock_init();
+	camera_init(c, viewport_size, translation, scale);
+	grid_init(g);
+	ui_init(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
 	ui_draw(ui, c, g);
@@ -401,8 +401,8 @@ Test(ui_draw_fill)
 	_d(GLmock.draw_elements_instanced_primcount);
 	//=> 48
 
-	grid_terminate(g);
-	ui_terminate(ui);
+	grid_destroy(g);
+	ui_destroy(ui);
 
 	free(c);
 	free(g);
@@ -419,11 +419,11 @@ Test(ui_draw_fill_rect)
 	Grid *g = malloc(sizeof *g);
 	Ui *ui = malloc(sizeof *ui);
 
-	glmock_initialize();
-	camera_initialize(c, viewport_size, translation, scale);
+	glmock_init();
+	camera_init(c, viewport_size, translation, scale);
 	camera_layout(c, CAMERA_LAYOUT_RECT);
-	grid_initialize(g);
-	ui_initialize(ui);
+	grid_init(g);
+	ui_init(ui);
 	texture_update(&ui->grid_styles_texture, g);
 
 	ui_draw(ui, c, g);
@@ -444,8 +444,8 @@ Test(ui_draw_fill_rect)
 	_d(GLmock.draw_elements_instanced_primcount);
 	//=> 48
 
-	grid_terminate(g);
-	ui_terminate(ui);
+	grid_destroy(g);
+	ui_destroy(ui);
 
 	free(c);
 	free(g);

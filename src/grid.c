@@ -6,7 +6,7 @@
 
 #define GRID_HALF_SIZE 2048
 
-void grid_initialize(Grid *g)
+void grid_init(Grid *g)
 {
 	g->quad = (Quad) {
 		{-GRID_HALF_SIZE + 1, -GRID_HALF_SIZE + 1},
@@ -21,7 +21,7 @@ void grid_initialize(Grid *g)
 	g->styles = calloc(capacity, sizeof *g->styles);
 }
 
-void grid_terminate(Grid *g)
+void grid_destroy(Grid *g)
 {
 	free(g->styles);
 }

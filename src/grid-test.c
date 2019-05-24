@@ -8,7 +8,7 @@ Test(grid_basics)
 	int2 h2 = {48, 62};
 	Grid *g = malloc(sizeof *g);
 
-	grid_initialize(g);
+	grid_init(g);
 
 	_qd(g->quad);
 	//=> (-2047, -2047), (2046, 2046)
@@ -32,6 +32,6 @@ Test(grid_basics)
 	_d(grid_get(g, h2));
 	//=> 0
 
-	grid_terminate(g);
+	grid_destroy(g);
 	free(g);
 }

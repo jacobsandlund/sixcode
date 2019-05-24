@@ -4,7 +4,7 @@
 
 #define TEXTURE_BUFFER_CAPACITY_MIN 256
 
-void texture_initialize(Texture *t, i64 buffer_capacity_max)
+void texture_init(Texture *t, i64 buffer_capacity_max)
 {
 	//////////////////////
 	// texture
@@ -29,7 +29,7 @@ void texture_initialize(Texture *t, i64 buffer_capacity_max)
 	t->buffer_capacity_max = buffer_capacity_max;
 }
 
-void texture_terminate(Texture *t)
+void texture_destroy(Texture *t)
 {
 	glDeleteTextures(1, &t->texture);
 	free(t->buffer);

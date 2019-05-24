@@ -1,6 +1,6 @@
 #include "view-matrix.h"
 
-void view_matrix_initialize(float4x4 *vm)
+void view_matrix_init(float4x4 *vm)
 {
 	for (i64 i = 0; i < 4; i++) {
 		for (i64 j = 0; j < 4; j++) {

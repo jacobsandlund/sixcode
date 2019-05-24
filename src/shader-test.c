@@ -5,7 +5,7 @@
 
 Test(shader_print_gl_error)
 {
-	glmock_initialize();
+	glmock_init();
 
 	GLmock.force_gl_error = GL_INVALID_ENUM;
 	shader_print_gl_error(__FILE__, __LINE__);
@@ -66,7 +66,7 @@ Test(shader_load_and_delete)
 {
 	// Bad create
 
-	glmock_initialize();
+	glmock_init();
 	GLmock.force_create_shader_error = true;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 
@@ -78,7 +78,7 @@ Test(shader_load_and_delete)
 
 	// Bad compile
 
-	glmock_initialize();
+	glmock_init();
 	GLmock.shaders[1].force_compile_error = true;
 	GLmock.force_gl_error = GL_OUT_OF_MEMORY;
 	GLmock.force_info_log = "[Info Log] - Compilation failed";
@@ -93,7 +93,7 @@ Test(shader_load_and_delete)
 
 	// Success
 
-	glmock_initialize();
+	glmock_init();
 	GLuint vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	GLuint fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 	_dd(vertex, fragment);
@@ -145,7 +145,7 @@ Test(shader_program_create_and_delete)
 
 	// Bad create
 
-	glmock_initialize();
+	glmock_init();
 	GLmock.force_create_program_error = true;
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
@@ -160,7 +160,7 @@ Test(shader_program_create_and_delete)
 
 	// Success
 
-	glmock_initialize();
+	glmock_init();
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 
@@ -206,7 +206,7 @@ Test(shader_program_link)
 
 	// Bad link
 
-	glmock_initialize();
+	glmock_init();
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 	shader_program_create(&s, vertex, fragment, __FILE__, __LINE__);
@@ -231,7 +231,7 @@ Test(shader_program_link)
 
 	// Success
 
-	glmock_initialize();
+	glmock_init();
 	vertex = shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__);
 	fragment = shader_load(GL_FRAGMENT_SHADER, TEST_FRAGMENT_SHADER_SOURCE, __FILE__, __LINE__);
 	shader_program_create(&s, vertex, fragment, __FILE__, __LINE__);

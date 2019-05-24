@@ -14,9 +14,9 @@ Test(render_loop_one_iteration)
 	EventQueue *eq = malloc(sizeof *eq);
 	World *w = malloc(sizeof *w);
 
-	renderer_mock_initialize(r);
-	event_queue_initialize(eq);
-	world_initialize(w);
+	renderer_mock_init(r);
+	event_queue_init(eq);
+	world_init(w);
 	world_load(w);
 
 	render_loop_one_iteration(r, eq, w);
@@ -25,8 +25,8 @@ Test(render_loop_one_iteration)
 	_d(rm->num_render_calls);
 	//=> 1
 
-	renderer_mock_terminate(r);
-	world_terminate(w);
+	renderer_mock_destroy(r);
+	world_destroy(w);
 
 	free(eq);
 	free(r);

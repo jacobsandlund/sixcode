@@ -9,7 +9,7 @@ RendererMock *renderer_mock(Renderer *r)
 	return (RendererMock *) r->os_renderer;
 }
 
-void renderer_mock_initialize(Renderer *r)
+void renderer_mock_init(Renderer *r)
 {
 	RendererMock *rm = malloc(sizeof *rm);
 	*rm = (RendererMock) {};
@@ -17,7 +17,7 @@ void renderer_mock_initialize(Renderer *r)
 	r->os_renderer = (void *) rm;
 }
 
-void renderer_mock_terminate(Renderer *r)
+void renderer_mock_destroy(Renderer *r)
 {
 	free(r->os_renderer);
 }

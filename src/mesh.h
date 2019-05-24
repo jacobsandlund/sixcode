@@ -2,7 +2,7 @@
 #define Mesh_h
 
 #include "spacetime.h"
-#include "viewport.h"
+#include "layout.h"
 
 typedef struct {
 	float x;
@@ -31,10 +31,10 @@ typedef struct {
 	i64 vertices_capacity;
 } InstanceMesh;
 
-void fill_mesh_initialize(FillMesh *m, CameraLayout layout, i64 size_x, i64 size_y);
-void fill_mesh_terminate(FillMesh *m);
-void instance_mesh_initialize(InstanceMesh *m, i64 length);
+void fill_mesh_init(FillMesh *m, LayoutType layout_type, i64 size_x, i64 size_y);
+void fill_mesh_destroy(FillMesh *m);
+void instance_mesh_init(InstanceMesh *m, i64 length);
+void instance_mesh_destroy(InstanceMesh *m);
 void instance_mesh_resize(InstanceMesh *m, i64 length);
-void instance_mesh_terminate(InstanceMesh *m);
 
 #endif // Mesh_h

@@ -26,8 +26,8 @@ typedef struct {
 	Event *events;
 } EventQueue;
 
-void event_queue_initialize(EventQueue *eq, i64 length, i64 safe_length_remaining);
-void event_queue_terminate(EventQueue *eq);
+void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining);
+void event_queue_destroy(EventQueue *eq);
 u64 event_queue_clock_time(void);
 
 static inline void event_queue_write(EventQueue *eq, Event *event)

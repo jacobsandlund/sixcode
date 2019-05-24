@@ -11,8 +11,8 @@ typedef struct {
 	Viewport viewport;
 } World;
 
-void world_initialize(World *w);
-void world_terminate(World *w);
+void world_init(World *w);
+void world_destroy(World *w);
 void world_load(World *w);
 void world_update(World *w, EventQueue *eq);
 

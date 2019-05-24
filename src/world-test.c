@@ -6,11 +6,11 @@
 #include "quad.c"
 #include "viewport.c"
 
-Test(world_initialize)
+Test(world_init)
 {
 	World *w = malloc(sizeof *w);
 
-	world_initialize(w);
+	world_init(w);
 
 	_qd(w->grid.quad);
 	//=> (-2047, -2047), (2046, 2046)
@@ -19,7 +19,7 @@ Test(world_initialize)
 	_d(w->viewport.layout.type == LayoutTypeHex);
 	//=> 1
 
-	world_terminate(w);
+	world_destroy(w);
 
 	free(w);
 }
@@ -29,13 +29,13 @@ Test(world_update)
 	EventQueue *eq = malloc(sizeof *eq);
 	World *w = malloc(sizeof *w);
 
-	event_queue_initialize(eq);
-	world_initialize(w);
+	event_queue_init(eq);
+	world_init(w);
 	w->viewport.size = (float2) {2560, 1440};
 
 	world_update(w, eq);
 
-	world_terminate(w);
+	world_destroy(w);
 
 	free(eq);
 	free(w);
@@ -45,9 +45,9 @@ Test(world_load)
 {
 	World *w = malloc(sizeof *w);
 
-	world_initialize(w);
+	world_init(w);
 	world_load(w);
 
-	world_terminate(w);
+	world_destroy(w);
 	free(w);
 }

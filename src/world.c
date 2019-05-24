@@ -8,9 +8,9 @@
 #define WORLD_HEX_FILL_MIN 1
 #define WORLD_HEX_FILL_MAX 15
 
-void world_initialize(World *w)
+void world_init(World *w)
 {
-	grid_initialize(&w->grid);
+	grid_init(&w->grid);
 
 	Viewport *vp = &w->viewport;
 	vp->camera = (float3) {0.0, 0.0, 16.0};
@@ -18,9 +18,9 @@ void world_initialize(World *w)
 	layout_type(&vp->layout, LayoutTypeHex);
 }
 
-void world_terminate(World *w)
+void world_destroy(World *w)
 {
-	grid_terminate(&w->grid);
+	grid_destroy(&w->grid);
 }
 
 void world_load(World *w)

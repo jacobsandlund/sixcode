@@ -3,10 +3,10 @@
 #include "viewport.c"
 #include "layout.c"
 
-Test(view_matrix_initialize)
+Test(view_matrix_init)
 {
 	float4x4 vm;
-	view_matrix_initialize(&vm);
+	view_matrix_init(&vm);
 	_gggg(vm.columns[0][0], vm.columns[1][0], vm.columns[2][2], vm.columns[3][3]);
 	//=> 0, 0, 0, 0
 }
@@ -14,7 +14,7 @@ Test(view_matrix_initialize)
 Test(view_matrix_update)
 {
 	float4x4 vm;
-	view_matrix_initialize(&vm);
+	view_matrix_init(&vm);
 
 	Viewport viewport = {
 		.size = {1000, 600},

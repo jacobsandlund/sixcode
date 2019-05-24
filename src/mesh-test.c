@@ -1,12 +1,12 @@
 #include "test.h"
 #include "mesh.c"
 #include "quad.c"
-#include "view.c"
+#include "layout.c"
 
-Test(fill_mesh_initialize_hex)
+Test(fill_mesh_init_hex)
 {
 	FillMesh *m = malloc(sizeof *m);
-	fill_mesh_initialize(m, LayoutTypeHex, 32, 64);
+	fill_mesh_init(m, LayoutTypeHex, 32, 64);
 
 	_d(m->size_x);
 	//=> 32
@@ -58,14 +58,14 @@ Test(fill_mesh_initialize_hex)
 	_ddd(m->indices[m->indices_length - 3], m->indices[m->indices_length - 1], m->indices[m->indices_length - 1]);
 	//=> 12285, 12287, 12287
 
-	fill_mesh_terminate(m);
+	fill_mesh_destroy(m);
 	free(m);
 }
 
-Test(fill_mesh_initialize_rect)
+Test(fill_mesh_init_rect)
 {
 	FillMesh *m = malloc(sizeof *m);
-	fill_mesh_initialize(m, VIEW_LAYOUT_RECT, 32, 64);
+	fill_mesh_init(m, LayoutTypeRect, 32, 64);
 
 	_d(m->size_x);
 	//=> 32
@@ -109,14 +109,14 @@ Test(fill_mesh_initialize_rect)
 	_ddd(m->indices[m->indices_length - 3], m->indices[m->indices_length - 1], m->indices[m->indices_length - 1]);
 	//=> 8188, 8191, 8191
 
-	fill_mesh_terminate(m);
+	fill_mesh_destroy(m);
 	free(m);
 }
 
 Test(instance_mesh)
 {
 	InstanceMesh *m = malloc(sizeof *m);
-	instance_mesh_initialize(m, 1);
+	instance_mesh_init(m, 1);
 
 	_d(m->vertices_length);
 	//=> 1
@@ -141,6 +141,6 @@ Test(instance_mesh)
 	_d(m->vertices[5].gridPositionOffset.y);
 	//=> 6
 
-	instance_mesh_terminate(m);
+	instance_mesh_destroy(m);
 	free(m);
 }

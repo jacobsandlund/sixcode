@@ -71,7 +71,7 @@ const u8 UI_FILL_COLORS[UI_COLOR_COMPONENTS_LENGTH] = {
 	//220, 190, 140, 255,
 };
 
-bool ui_initialize(Ui *ui)
+bool ui_init(Ui *ui)
 {
 	////////////////////////
 	// load/create/link
@@ -140,8 +140,8 @@ bool ui_initialize(Ui *ui)
 	////////////////
 	// textures
 
-	texture_initialize(&ui->grid_styles_texture, UI_GRID_STYLES_BUFFER_CAPACITY_MAX);
-	texture_initialize(&ui->fill_colors_texture, 0);
+	texture_init(&ui->grid_styles_texture, UI_GRID_STYLES_BUFFER_CAPACITY_MAX);
+	texture_init(&ui->fill_colors_texture, 0);
 
 	glTexImage2D(
 			GL_TEXTURE_2D,
@@ -171,7 +171,7 @@ bool ui_initialize(Ui *ui)
 			FillMesh *mesh = &layout->meshes[j];
 			UiBuffers *buffers = &layout->buffers[j];
 
-			fill_mesh_initialize(mesh, camera_layouts[i], size, size);
+			fill_mesh_init(mesh, camera_layouts[i], size, size);
 
 			glGenBuffers(1, &buffers->vertices);
 			glBindBuffer(GL_ARRAY_BUFFER, buffers->vertices);
@@ -193,31 +193,31 @@ bool ui_initialize(Ui *ui)
 		}
 	}
 
-	instance_mesh_initialize(&ui->instance_mesh, 32);
+	instance_mesh_init(&ui->instance_mesh, 32);
 	glGenBuffers(1, &ui->instanceBuffer);
 	
 	return true;
 }
 
-void ui_terminate(Ui *ui)
+void ui_destroy(Ui *ui)
 {
 	shader_program_delete(&ui->shader);
 	glDeleteShader(ui->shader.vertex);
 	glDeleteShader(ui->shader.fragment);
 
-	texture_terminate(&ui->grid_styles_texture);
-	texture_terminate(&ui->fill_colors_texture);
+	texture_destroy(&ui->grid_styles_texture);
+	texture_destroy(&ui->fill_colors_texture);
 
 	for (i64 i = 0; i < camera_NUM_LAYOUTS; i++) {
 		for (i64 j = 0; j < UI_NUM_MESHES; j++) {
-			fill_mesh_terminate(&ui->layouts[i].meshes[j]);
+			fill_mesh_destroy(&ui->layouts[i].meshes[j]);
 
 			glDeleteBuffers(1, &ui->layouts[i].buffers[j].vertices);
 			glDeleteBuffers(1, &ui->layouts[i].buffers[j].indices);
 		}
 	}
 
-	instance_mesh_terminate(&ui->instance_mesh);
+	instance_mesh_destroy(&ui->instance_mesh);
 	glDeleteBuffers(1, &ui->instanceBuffer);
 }
 

@@ -50,8 +50,8 @@ typedef struct {
 	InstanceMesh instance_mesh;
 } Ui;
 
-bool ui_initialize(Ui *ui);
-void ui_terminate(Ui *ui);
+bool ui_init(Ui *ui);
+void ui_destroy(Ui *ui);
 void ui_draw(Ui *ui, Camera *c, Grid *g);
 
 #endif // Ui_h

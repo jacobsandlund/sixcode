@@ -8,8 +8,8 @@ Test(texture)
 {
 	Texture *t = malloc(sizeof *t);
 
-	glmock_initialize();
-	texture_initialize(t, 1024);
+	glmock_init();
+	texture_init(t, 1024);
 
 	//////////////////////
 	// texture
@@ -42,9 +42,9 @@ Test(texture)
 	//=> 1024
 
 	//////////////////////
-	// terminate
+	// destroy
 
-	texture_terminate(t);
+	texture_destroy(t);
 
 	_d(texture->deleted);
 	//=> 1
@@ -57,9 +57,9 @@ Test(texture_update)
 	Grid *g = malloc(sizeof *g);
 	Texture *t = malloc(sizeof *t);
 
-	glmock_initialize();
-	grid_initialize(g);
-	texture_initialize(t, 0);
+	glmock_init();
+	grid_init(g);
+	texture_init(t, 0);
 
 	texture_update(t, g);
 
@@ -77,8 +77,8 @@ Test(texture_update)
 	_d(GLmock.bound_textures[0] == t->texture);
 	//=> 1
 
-	grid_terminate(g);
-	texture_terminate(t);
+	grid_destroy(g);
+	texture_destroy(t);
 
 	free(g);
 	free(t);
@@ -92,9 +92,9 @@ Test(texture_update_in_quad)
 	Grid *g = malloc(sizeof *g);
 	Texture *t = malloc(sizeof *t);
 
-	glmock_initialize();
-	grid_initialize(g);
-	texture_initialize(t, 2500);
+	glmock_init();
+	grid_init(g);
+	texture_init(t, 2500);
 
 	_d(t->buffer_capacity);
 	//=> 256
@@ -158,8 +158,8 @@ Test(texture_update_in_quad)
 	_dd(texture->width, texture->height);
 	//=> 4096, 4096
 
-	grid_terminate(g);
-	texture_terminate(t);
+	grid_destroy(g);
+	texture_destroy(t);
 
 	free(g);
 	free(t);

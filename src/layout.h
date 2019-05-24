@@ -8,6 +8,8 @@ typedef enum {
 	LayoutTypeRect = 1,
 } LayoutType;
 
+#define LayoutTypeNumTypes 2
+
 typedef struct {
 	double2 scale;
 	LayoutType type;
