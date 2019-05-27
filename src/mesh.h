@@ -2,8 +2,7 @@
 #define Mesh_h
 
 #include "spacetime.h"
-#include "layout.h"
-#include "resource.h"
+#include "resource-manager.h"
 
 typedef struct {
 	float x;
@@ -17,28 +16,10 @@ typedef struct {
 	int2 gridPositionOffset;
 } InstanceMeshVertex;
 
-typedef struct {
-	FillMeshVertex *vertices;
-	u16 *indices;
-	i64 vertices_length;
-	i64 indices_length;
-	i64 size;
-} FillMesh;
-
-typedef struct {
-	InstanceMeshVertex *vertices;
-	i64 vertices_length;
-	i64 vertices_capacity;
-} InstanceMesh;
-
-typedef struct {
-	LayoutType layout_type;
-	i64 size;
-} FillMeshOptions;
-
-extern const ResourceLoader FillMeshResourceLoader;
-
-void instance_mesh_init(InstanceMesh *m, i64 capacity);
-void instance_mesh_destroy(InstanceMesh *m);
+i64 fill_mesh_vertices_hex_length(i64 size);
+void fill_mesh_vertices_hex_set(void *contents, uintptr_t content_init_options);
+void fill_mesh_indices_hex_set(void *contents, uintptr_t content_init_options);
+void fill_mesh_vertices_rect_set(void *contents, uintptr_t content_init_options);
+void fill_mesh_indices_rect_set(void *contents, uintptr_t content_init_options);
 
 #endif // Mesh_h

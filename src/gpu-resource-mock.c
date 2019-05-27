@@ -1,12 +1,38 @@
 #include "gpu-resource.h"
+#include "resource.h"
 
-void gpu_resource_init(GpuResource *resource, GpuResourceOptions options)
+typedef struct {
+	u8 *contents;
+	GpuResourceStorageMode storage_mode;
+} GpuBufferMock;
+
+static void *gpu_resource_buffer_init(uintptr_t raw_options)
 {
-	resource->label = NULL;
-	resource->options = options;
+	GpuBufferOptions *options = (GpuBufferOptions *) raw_options;
+	GpuBufferMock *buffer = malloc(sizeof *buffer);
+	buffer->contents = malloc(options->length);
+	buffer->storage_mode = options->resource.storage_mode;
+	if (options->resource.content_init_fn) {
+		options->resource.content_init_fn(
+				(void *) buffer->contents,
+				options->resource.content_init_options);
+	}
 }
 
-void gpu_buffer_label(GpuBuffer *buffer, const char *label)
+static void gpu_resource_buffer_destroy(void *pointer)
 {
-	buffer->resource.label = label;
+	GpuBufferMock *buffer = (GpuBufferMock *) pointer;
+	free(buffer->contents);
+	free(buffer);
+}
+
+void gpu_resource_register_loaders(ResourceManager *rm)
+{
+	ResourceLoader buffer_loader = {
+		.type = GpuResourceTypeBuffer,
+		.init = gpu_resource_buffer_init,
+		.destroy = gpu_resource_buffer_destroy,
+	};
+
+	resource_manager_register_loader(rm, &buffer_loader);
 }

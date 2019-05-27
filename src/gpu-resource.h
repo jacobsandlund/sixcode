@@ -2,31 +2,34 @@
 #define GpuResource_h
 
 #include "spacetime.h"
+#include "resource-manager.h"
 
 typedef enum {
-	GpuResourceOptionsStoragePrivate = 1,
-	GpuResourceOptionsStorageShared = 2,
-} GpuResourceOptionsStorage;
+	GpuResourceStorageModePrivate = 1,
+	GpuResourceStorageModeShared = 2,
+} GpuResourceStorageMode;
 
 typedef void (*GpuResourceContentInitFn)(void *contents, uintptr_t content_init_options);
 
 typedef struct {
-	GpuResourceOptionsStorage storage_options;
+	GpuResourceStorageMode storage_mode;
 	GpuResourceContentInitFn content_init_fn;
 	uintptr_t content_init_options;
 } GpuResourceOptions;
 
 typedef struct {
-	char *label;
-	GpuResourceOptions options;
-} GpuResource;
+	GpuResourceOptions resource;
+	i64 length;
+} GpuBufferOptions;
 
 typedef struct {
-	GpuResource resource;
-	void *os_buffer;
-} GpuBuffer;
+	char *source;
+} GpuLibraryOptions;
 
-void gpu_resource_init(GpuResource *resource, GpuResourceOptions options);
-void gpu_buffer_label(GpuBuffer *buffer, const char *label);
+typedef struct {
+	char *name;
+} GpuFunctionOptions;
+
+void gpu_resource_register_loaders(ResourceManager *rm);
 
 #endif // GpuResource_h
