@@ -400,7 +400,7 @@ int test_runner_run(TestCase *start_case)
 			len_new += strlen(lines_new[i]) + 1;
 		}
 
-		char *contents_new = test_mem_alloc(len_new++ * sizeof *contents_new);
+		char *contents_new = test_mem_alloc((len_new + 1) * sizeof *contents_new);
 		j = 0;
 
 		for (int i = 0; i < num_lines_new; i++) {

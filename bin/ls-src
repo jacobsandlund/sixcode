@@ -1,3 +1,36 @@
 #!/bin/bash -e
 
-ls -1 src/*.h src/*.c macOS/*.h macOS/*.m macOS/*.metal | grep -Ev '\-test.c|test.h|valgrind.h|glmock.c'
+# Edit this while under going sweeping changes, for selecting only
+# specific modules
+src=$(grep -v '#' <<-SRC
+    src/camera
+    # src/engine
+    # src/macos
+    src/math
+    src/model
+    src/render
+    src/resource
+    src/spacetime.h
+    src/string
+    # src/test.h
+    # src/valgrind.h
+    # src/world
+SRC
+)
+
+exclude='mock\.c'
+include='.'
+
+if [[ $1 == 'all' ]]; then
+    shift
+elif [[ $1 != 'test.c' ]] && [[ $1 != 'test.m' ]] && [[ $1 != test ]]; then
+    exclude="$exclude|-test.c|-test.m"
+fi
+
+if [[ $1 == 'test' ]]; then
+    include='test\.c|test\.m$'
+elif [[ $# -eq 1 ]]; then
+    include="$1$"
+fi
+
+find $src -type f | grep -E '\.[chm]|\.metal$' | grep -E "$include" | grep -Ev "$exclude" | sort

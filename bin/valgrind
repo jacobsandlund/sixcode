@@ -45,6 +45,7 @@ valgrind_single() {
 }
 
 trap "rm -f a.out" EXIT
+mkdir -p out/valgrind-output
 
 if [[ $valgrind_mode == 'help' ]]; then
     valgrind "$@"
@@ -61,8 +62,7 @@ elif [[ $valgrind_mode == 'all' ]]; then
     rm -rf out/valgrind-output-previous
     cp -R out/valgrind-output out/valgrind-output-previous
 
-    #for test_file in $(bin/ls-src | grep '\-test.c'); do
-    for test_file in 'src/string-manager-test.c'; do
+    for test_file in $(bin/ls-src 'test.c'); do
         echo bin/valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done

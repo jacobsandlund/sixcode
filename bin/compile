@@ -2,7 +2,7 @@
 
 file="${@: -1}"
 if [[ $file == *".m" ]]; then
-    lang_options="-x objective-c -fobjc-arc -fmodules -I$SPACETIME_PATH/macOS"
+    lang_options="-x objective-c -fobjc-arc -fmodules"
 else
     lang_options="-x c"
 fi
