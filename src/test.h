@@ -2,11 +2,14 @@
 #define Test_h
 
 #include <errno.h>
+#include <fcntl.h>
+#include <inttypes.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <inttypes.h>
+#include <sys/uio.h>
+#include <unistd.h>
 #include "valgrind.h"
 
 #define _(...) test_runner_log_to_file(__FILE__, __LINE__, __VA_ARGS__)
@@ -60,6 +63,7 @@ Test(start)
 {
 }
 
+void *tmalloc(size_t size);
 int test_runner_run(TestCase *start_case);
 
 int main(int argc, const char *argv[])
@@ -75,11 +79,13 @@ int main(int argc, const char *argv[])
 // Implementation
 //
 
-#define TEST_MAX_FILE_LEN 1000000
-#define TEST_MAX_FILES 10000
+#define TEST_MAX_FILE_LEN 200000
+#define TEST_MAX_FILE_LINES 8000
+#define TEST_MAX_FILES 500
 #define TEST_MAX_OUTPUT_LEN 10000
 #define TEST_MAX_OUTPUT_LINES 200
-#define TEST_MAX_LINE_RESULTS 3000
+#define TEST_RUNNER_MEM_SIZE 20000000
+#define TEST_MEM_SIZE 5000000
 
 typedef struct {
 	char **lines;
@@ -89,30 +95,52 @@ typedef struct {
 typedef struct {
 	LineData line_data;
 	int line;
-} Results;
+} Result;
 
 typedef struct {
 	const char *name;
 	LineData line_data;
 	char *contents;
-	Results *results;
+	Result *results;
 	int num_results;
 } TestFileInfo;
 
 char test_log_buffer[TEST_MAX_OUTPUT_LEN];
 static int test_log_i = 0;
-static TestFileInfo *all_file_info[TEST_MAX_FILES];
+static TestFileInfo all_file_info[TEST_MAX_FILES];
+
+static uint8_t test_runner_mem[TEST_RUNNER_MEM_SIZE];
+static uint8_t *test_runner_mem_p = test_runner_mem;
+static uint8_t tmem[TEST_MEM_SIZE];
+static uint8_t *tmem_p = tmem;
+
 static int num_files;
 static int is_focus_on = 0;
 static const char *LOG_PREFIX = "\t//=>";
 #define LOG_PREFIX_LEN 5
 
-void free_line_data(LineData line_data)
+void *tmalloc(size_t size)
 {
-	if (line_data.num_lines > 0) {
-		free(line_data.lines[0]);
-		free(line_data.lines);
-	}
+	void *p = tmem_p;
+	tmem_p += size;
+	return p;
+}
+
+static inline void *test_mem_alloc(size_t size)
+{
+	void *p = test_runner_mem_p;
+	test_runner_mem_p += size;
+	return p;
+}
+
+static inline void *test_mem_alloc_deferred(void)
+{
+	return (void *) test_runner_mem_p;
+}
+
+static inline void test_mem_alloc_rollback(void *p)
+{
+	test_runner_mem_p = p;
 }
 
 void TFOCUS()
@@ -163,18 +191,14 @@ void test_log_reset()
 	test_log_buffer[0] = '\0';
 }
 
-void split_lines(LineData *line_data, char *contents, int len)
+void split_lines(LineData *line_data, const char *contents, char *contents_output, int len, int max_lines)
 {
-	char **lines;
-	char *line;
-	char *rest_contents;
-	int num_lines = 0;
-
 	if (len == 0) {
 		line_data->num_lines = 0;
-		line_data->lines = 0;
 		return;
 	}
+
+	int num_lines = 0;
 
 	for (int i = 0; i < len; i++) {
 		if (contents[i] == '\n') {
@@ -186,59 +210,69 @@ void split_lines(LineData *line_data, char *contents, int len)
 		num_lines++;
 	}
 
-	lines = malloc(sizeof(char *) * num_lines);
-	rest_contents = strdup(contents);
+	if (num_lines > max_lines) {
+		num_lines = max_lines;
+	}
+	
+	char *rest_contents = contents_output;
 
 	for (int i = 0; i < num_lines; i++) {
-		line = strsep(&rest_contents, "\n");
-		lines[i] = line;
+		line_data->lines[i] = strsep(&rest_contents, "\n");
 	}
 
 	line_data->num_lines = num_lines;
-	line_data->lines = lines;
 }
 
 TestFileInfo *get_file_info(const char *filename)
 {
 	TestFileInfo *file_info;
 	size_t file_len;
-	static char contents[TEST_MAX_FILE_LEN + 1];
-	FILE *file;
 
 	for (int i = 0; i < num_files; i++) {
-		if (strcmp(all_file_info[i]->name, filename) == 0) {
-			return all_file_info[i];
+		if (strcmp(all_file_info[i].name, filename) == 0) {
+			return &all_file_info[i];
 		}
 	}
 
-	file_info = malloc(sizeof *file_info);
+	file_info = &all_file_info[num_files];
 	file_info->name = filename;
-	all_file_info[num_files] = file_info;
 	num_files++;
 
-	file = fopen(filename, "r");
+	int fd = open(filename, O_RDONLY);
 
-	if (!file) {
+	if (fd == -1) {
 		fprintf(stderr, "Error opening file: %s - %s\n", filename, strerror(errno));
-		return 0;
+		abort();
 	}
 
-	file_len = fread(contents, sizeof(char), TEST_MAX_FILE_LEN, file);
-	if (ferror(file)) {
+	char *contents = test_mem_alloc_deferred();
+	contents[0] = 'a';
+	contents[1] = '\n';
+	contents[2] = '\0';
+	file_len = 1;
+	file_len = read(fd, contents, TEST_MAX_FILE_LEN);
+	if (file_len == (size_t) -1) {
 		fprintf(stderr, "Error reading file: %s - %s\n", filename, strerror(errno));
 		return 0;
 	}
 
-	contents[file_len] = '\0';
+	contents[file_len++] = '\0';
+	test_mem_alloc(file_len);
 
-	if (fclose(file) != 0) {
+	if (close(fd) == -1) {
 		fprintf(stderr, "Error closing file: %s - %s\n", filename, strerror(errno));
 	}
 
-	file_info->contents = strdup(contents);
-	split_lines(&file_info->line_data, file_info->contents, (int) file_len);
+	file_info->contents = contents;
+	char *contents_output = test_mem_alloc(file_len);
+	strcpy(contents_output, contents);
+	file_info->line_data.lines = test_mem_alloc_deferred();
 
-	file_info->results = calloc(file_info->line_data.num_lines, sizeof *file_info->results);
+	split_lines(&file_info->line_data, file_info->contents, contents_output, (int) file_len - 1, TEST_MAX_FILE_LINES);
+
+	test_mem_alloc(sizeof(char *) * file_info->line_data.num_lines);
+
+	file_info->results = test_mem_alloc(file_info->line_data.num_lines * sizeof *file_info->results);
 	file_info->num_results = 0;
 
 	return file_info;
@@ -247,18 +281,16 @@ TestFileInfo *get_file_info(const char *filename)
 void test_runner_log_to_file(const char *filename, int line, const char *format, ...)
 {
 	static char output_buffer[TEST_MAX_OUTPUT_LEN];
+	static char *lines[TEST_MAX_OUTPUT_LINES];
+	static LineData output_line_data = {
+		.lines = lines,
+	};
 	va_list argptr;
-	int output_len;
-	LineData output_line_data;
-	int num_lines;
-	size_t output_lines_len;
-	char *result_content;
-	Results *result;
 	char **result_lines;
 	TestFileInfo *file_info = get_file_info(filename);
 
 	va_start(argptr, format);
-	output_len = vsnprintf(output_buffer, TEST_MAX_OUTPUT_LEN, format, argptr);
+	int output_len = vsnprintf(output_buffer, TEST_MAX_OUTPUT_LEN, format, argptr);
 	va_end(argptr);
 
 	if (output_len < 0) {
@@ -270,21 +302,17 @@ void test_runner_log_to_file(const char *filename, int line, const char *format,
 		output_len = TEST_MAX_OUTPUT_LEN - 1;
 	}
 
-	split_lines(&output_line_data, output_buffer, output_len);
+	split_lines(&output_line_data, output_buffer, output_buffer, output_len, TEST_MAX_OUTPUT_LINES);
 
-	num_lines = output_line_data.num_lines;
-
-	if (num_lines > TEST_MAX_OUTPUT_LINES) {
-		num_lines = TEST_MAX_OUTPUT_LINES;
-	}
+	int num_lines = output_line_data.num_lines;
 
 	// This is an approximation, which includes prefix plus ending newline per line.
-	output_lines_len = output_len + num_lines * (LOG_PREFIX_LEN + 2) + 1;
+	size_t output_lines_len = output_len + num_lines * (LOG_PREFIX_LEN + 2) + 1;
 
-	result_content = malloc(output_lines_len * sizeof *result_content);
-	result = &file_info->results[file_info->num_results];
+	char *result_content = test_mem_alloc(output_lines_len * sizeof *result_content);
+	Result *result = &file_info->results[file_info->num_results];
 	result->line_data.num_lines = num_lines;
-	result_lines = result->line_data.lines = malloc(num_lines * sizeof *result_lines);
+	result_lines = result->line_data.lines = test_mem_alloc(num_lines * sizeof *result_lines);
 	result->line = line - 1;
 
 	for (int i = 0; i < num_lines; i++) {
@@ -302,8 +330,6 @@ void test_runner_log_to_file(const char *filename, int line, const char *format,
 		result_content++;
 	}
 
-	free_line_data(output_line_data);
-
 	file_info->num_results++;
 }
 
@@ -312,19 +338,18 @@ int test_runner_run(TestCase *start_case)
 	for (TestCase *test_case = start_case; test_case->sentinel == TestCaseSentinel; test_case++) {
 		test_case->fn();
 		is_focus_on = 0;
+		tmem_p = tmem;	// Free memory allocated during test
 	}
 
 	for (int f = 0; f < num_files; f++) {
-		int num_lines_new;
-		char **lines_new;
-		char *contents_new;
+		void *temp_mem_start = test_mem_alloc_deferred();
 		int i = 0;
 		int j = 0;
 		int num_result_lines_old = 0;
 		int num_result_lines_new = 0;
-		TestFileInfo *file_info = all_file_info[f];
+		TestFileInfo *file_info = &all_file_info[f];
 		int num_results = file_info->num_results;
-		Results *results = file_info->results;
+		Result *results = file_info->results;
 		int num_lines_old = file_info->line_data.num_lines;
 		char **lines_old = file_info->line_data.lines;
 		int len_new = 0;
@@ -336,16 +361,16 @@ int test_runner_run(TestCase *start_case)
 		for (int i = 0; i < num_lines_old; i++) {
 			if (strncmp(LOG_PREFIX, lines_old[i], LOG_PREFIX_LEN) == 0) {
 				num_result_lines_old++;
-				lines_old[i] = 0;
+				lines_old[i] = NULL;
 			}
 		}
 
-		num_lines_new = num_lines_old - num_result_lines_old + num_result_lines_new;
+		int num_lines_new = num_lines_old - num_result_lines_old + num_result_lines_new;
 
-		lines_new = malloc(num_lines_new * sizeof *lines_new);
+		char **lines_new = test_mem_alloc(num_lines_new * sizeof *lines_new);
 
 		for (int r = 0; r < num_results; r++) {
-			Results *result = &results[r];
+			Result *result = &results[r];
 			char **result_lines = result->line_data.lines;
 			int num_result_lines = result->line_data.num_lines;
 
@@ -375,7 +400,7 @@ int test_runner_run(TestCase *start_case)
 			len_new += strlen(lines_new[i]) + 1;
 		}
 
-		contents_new = malloc((len_new + 1) * sizeof *contents_new);
+		char *contents_new = test_mem_alloc(len_new++ * sizeof *contents_new);
 		j = 0;
 
 		for (int i = 0; i < num_lines_new; i++) {
@@ -389,34 +414,24 @@ int test_runner_run(TestCase *start_case)
 
 		if (strcmp(file_info->contents, contents_new) != 0 && !RUNNING_ON_VALGRIND) {
 			const char *filename = file_info->name;
-			FILE *file = fopen(filename, "w");
+			int fd = open(filename, O_WRONLY | O_TRUNC);
 
-			if (!file) {
+			if (fd == -1) {
 				fprintf(stderr, "Error opening file: %s - %s\n", filename, strerror(errno));
 				return 1;
 			}
 
-			if (fputs(contents_new, file) == EOF) {
+			if (write(fd, contents_new, len_new) == -1) {
 				fprintf(stderr, "Error writing file: %s - %s\n", filename, strerror(errno));
 				return 1;
 			}
 
-			if (fclose(file) != 0) {
+			if (close(fd) == -1) {
 				fprintf(stderr, "Error closing file: %s - %s\n", filename, strerror(errno));
 			}
 		}
 
-		free(contents_new);
-		free(lines_new);
-
-		for (int r = 0; r < num_results; r++) {
-			Results *result = &results[r];
-			free_line_data(result->line_data);
-		}
-
-		free(file_info->results);
-		free_line_data(file_info->line_data);
-		free(file_info->contents);
+		test_mem_alloc_rollback(temp_mem_start);
 	}
 
 	return 0;

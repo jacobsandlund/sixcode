@@ -4,9 +4,9 @@
 #include "sid-hash-table.c"
 #include "fnv.c"
 
-Test(string_manager_start_up_and_shut_down)
+Test(string_manager_init)
 {
-	string_manager_start_up(4);
+	string_manager_init(4);
 
 	SidHashTable *sid_table = &gStringManager.string_id_table;
 
@@ -24,5 +24,5 @@ Test(string_manager_start_up_and_shut_down)
 	_s(StringIdString(StringId("foo")));
 	//=> foo
 
-	string_manager_shut_down();
+	string_manager_destroy();
 }

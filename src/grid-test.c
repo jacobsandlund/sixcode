@@ -6,7 +6,7 @@ Test(grid_basics)
 {
 	int2 h1 = {5, 27};
 	int2 h2 = {48, 62};
-	Grid *g = malloc(sizeof *g);
+	Grid *g = tmalloc(sizeof *g);
 
 	grid_init(g);
 
@@ -33,5 +33,4 @@ Test(grid_basics)
 	//=> 0
 
 	grid_destroy(g);
-	free(g);
 }

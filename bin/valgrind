@@ -1,20 +1,24 @@
 #!/bin/bash -e
 
-if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-    valgrind_all=true
+if [[ $1 == '-h' ]] || [[ $1 == '--help' ]] || [[ $1 == '--version' ]] || [[ $1 == '--help-debug' ]]; then
+    valgrind_mode='help'
+elif [[ $1 == '--tool=massif' ]]; then
+    valgrind_mode='massif'
+elif [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
+    valgrind_mode='all'
 else
-    valgrind_all=false
+    valgrind_mode='single'
 fi
 
 if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
     docker exec -it spacetime bin/valgrind "$@"
 
-    if [[ $valgrind_all = 'true' ]]; then
+    if [[ $valgrind_mode = 'all' ]]; then
         git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
 
         for output_file in $(find out/valgrind-output -type f); do
             echo "Checking $output_file"
-            if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
+            if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
                 echo
                 echo '!! NOT CLEAN'
                 exit 1
@@ -42,11 +46,23 @@ valgrind_single() {
 
 trap "rm -f a.out" EXIT
 
-if [[ $valgrind_all = 'true' ]]; then
+if [[ $valgrind_mode == 'help' ]]; then
+    valgrind "$@"
+elif [[ $valgrind_mode == 'massif' ]]; then
+    massif_file='out/valgrind-output.massif'
+    test_file="${@: -1}"
+    options_length=$(($#-1))
+    options=${@:1:$options_length}
+    bin/compile $test_file
+    valgrind --massif-out-file=$massif_file $options ./a.out
+    rm a.out
+    ms_print $massif_file
+elif [[ $valgrind_mode == 'all' ]]; then
     rm -rf out/valgrind-output-previous
     cp -R out/valgrind-output out/valgrind-output-previous
 
-    for test_file in $(bin/ls-src | grep '\-test.c'); do
+    #for test_file in $(bin/ls-src | grep '\-test.c'); do
+    for test_file in 'src/string-manager-test.c'; do
         echo bin/valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done

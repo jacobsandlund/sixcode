@@ -15,7 +15,7 @@ extern StringManager gStringManager;
 #define StringIdIntern(s) string_id_intern_literal(&gStringManager.string_id_table, s)
 #define StringIdString(id) string_id_string(&gStringManager.string_id_table, id)
 
-void string_manager_start_up(i32 string_id_table_size);
-void string_manager_shut_down(void);
+void string_manager_init(i32 string_id_table_size);
+void string_manager_destroy(void);
 
 #endif // StringManager_h
