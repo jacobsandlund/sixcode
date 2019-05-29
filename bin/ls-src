@@ -1,5 +1,3 @@
 #!/bin/bash -e
 
-pushd $SPACETIME_PATH >/dev/null
 ls -1 src/*.h src/*.c macOS/*.h macOS/*.m macOS/*.metal | grep -Ev '\-test.c|test.h|valgrind.h|glmock.c'
-popd >/dev/null

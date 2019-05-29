@@ -1,16 +1,40 @@
 #!/bin/bash -e
 
-out="$SPACETIME_PATH/out"
+if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
+    valgrind_all=true
+else
+    valgrind_all=false
+fi
+
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it spacetime bin/valgrind "$@"
+
+    if [[ $valgrind_all = 'true' ]]; then
+        git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
+
+        for output_file in $(find out/valgrind-output -type f); do
+            echo "Checking $output_file"
+            if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
+                echo
+                echo '!! NOT CLEAN'
+                exit 1
+            fi
+        done
+    fi
+
+    exit
+fi
 
 valgrind_single() {
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    output_file="$out/valgrind-output/$test_file.txt"
+    output_file="out/valgrind-output/$test_file.txt"
+    mkdir -p $(dirname $output_file)
     echo bin/valgrind "$@" > $output_file
     echo >> $output_file
 
-    $SPACETIME_PATH/bin/compile $test_file
+    bin/compile $test_file
     valgrind --log-fd=1 $options ./a.out |
         cut -d' ' -f 2- | tee -a $output_file
     rm a.out
@@ -18,27 +42,14 @@ valgrind_single() {
 
 trap "rm -f a.out" EXIT
 
-mkdir -p $out/valgrind-output
+if [[ $valgrind_all = 'true' ]]; then
+    rm -rf out/valgrind-output-previous
+    cp -R out/valgrind-output out/valgrind-output-previous
 
-if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-    rm -rf $out/valgrind-output-previous
-    cp -R $out/valgrind-output $out/valgrind-output-previous
-
-    for test_file in *-test.c; do
+    for test_file in $(bin/ls-src | grep '\-test.c'); do
         echo bin/valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done
-
-    for output_file in $out/valgrind-output/*; do
-        echo "Checking $output_file"
-        if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
-            echo
-            echo '!! NOT CLEAN'
-            exit 1
-        fi
-    done
-
-    git --no-pager diff --no-index $out/valgrind-output-previous/ $out/valgrind-output
 else
     valgrind_single "$@"
 fi

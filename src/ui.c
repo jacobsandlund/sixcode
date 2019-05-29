@@ -6,7 +6,7 @@
 #define UI_GRID_STYLES_BUFFER_CAPACITY_MAX 1048576	// 1 MB
 #define UI_ALPHA_SCALE 8.0
 
-const char UI_VERTEX_SHADER_SOURCE[] =
+const u8 UI_VERTEX_SHADER_SOURCE[] =
 "attribute vec2 position;\n"
 "attribute vec2 gridPosition;\n"
 "attribute vec2 positionOffset;\n"
@@ -28,7 +28,7 @@ const char UI_VERTEX_SHADER_SOURCE[] =
 "	gl_Position = viewMatrix * vec4(position + positionOffset, 0.0, 1.0);\n"
 "}\n";
 
-const char UI_FRAGMENT_SHADER_SOURCE[] =
+const u8 UI_FRAGMENT_SHADER_SOURCE[] =
 "varying lowp vec4 color;\n"
 "\n"
 "void main() {\n"

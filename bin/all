@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
-$SPACETIME_PATH/bin/make
-$SPACETIME_PATH/bin/test
-$SPACETIME_PATH/bin/valgrind
+bin/make
+bin/test
+bin/valgrind

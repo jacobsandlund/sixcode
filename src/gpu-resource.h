@@ -23,13 +23,13 @@ typedef struct {
 } GpuBufferOptions;
 
 typedef struct {
-	char *source;
+	u8 *source;
 } GpuLibraryOptions;
 
 typedef struct {
-	char *name;
+	u8 *name;
 } GpuFunctionOptions;
 
-void gpu_resource_register_loaders(ResourceManager *rm);
+void gpu_resource_register_loaders(void);
 
 #endif // GpuResource_h

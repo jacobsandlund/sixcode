@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+docker pull jacobsandlund/spacetime:latest

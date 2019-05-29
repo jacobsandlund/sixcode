@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void shader_print_gl_error(const char *filename, i64 line)
+void shader_print_gl_error(const u8 *filename, i64 line)
 {
 	GLenum error;
 	while ((error = glGetError()) != GL_NO_ERROR) {
@@ -29,7 +29,7 @@ void shader_print_gl_error(const char *filename, i64 line)
 	}
 }
 
-GLuint shader_load(GLenum type, const char *shader_source, const char *filename, i64 line)
+GLuint shader_load(GLenum type, const u8 *shader_source, const u8 *filename, i64 line)
 {
 	GLuint shader = glCreateShader(type);
 
@@ -50,7 +50,7 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_log_length);
 
 		if (info_log_length > 1) {
-			char *info_log = malloc(info_log_length * sizeof *info_log);
+			u8 *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetShaderInfoLog(shader, info_log_length, 0, info_log);
 			SPACETIME_ERROR("Error compiling shader:\n%s\n", info_log);
 			free(info_log);
@@ -67,7 +67,7 @@ GLuint shader_load(GLenum type, const char *shader_source, const char *filename,
 	return shader;
 }
 
-bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const char *filename, i64 line)
+bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, const u8 *filename, i64 line)
 {
 	if (!vertex || !fragment) {
 		return false;
@@ -90,7 +90,7 @@ bool shader_program_create(ShaderProgram *s, GLuint vertex, GLuint fragment, con
 	return true;
 }
 
-bool shader_program_link(ShaderProgram *s, const char *filename, i64 line)
+bool shader_program_link(ShaderProgram *s, const u8 *filename, i64 line)
 {
 	glLinkProgram(s->program);
 
@@ -102,7 +102,7 @@ bool shader_program_link(ShaderProgram *s, const char *filename, i64 line)
 		glGetProgramiv(s->program, GL_INFO_LOG_LENGTH, &info_log_length);
 
 		if (info_log_length > 1) {
-			char *info_log = malloc(info_log_length * sizeof *info_log);
+			u8 *info_log = malloc(info_log_length * sizeof *info_log);
 			glGetProgramInfoLog(s->program, info_log_length, 0, info_log);
 			SPACETIME_ERROR("Error linking program:\n%s\n", info_log);
 			free(info_log);

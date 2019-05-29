@@ -44,7 +44,7 @@ Test(shader_print_gl_error)
 	//=>
 }
 
-const char TEST_VERTEX_SHADER_SOURCE[] =
+const u8 TEST_VERTEX_SHADER_SOURCE[] =
 "attribute vec4 position;\n"
 "\n"
 "uniform mat4 viewMatrix;\n"
@@ -55,7 +55,7 @@ const char TEST_VERTEX_SHADER_SOURCE[] =
 "	gl_Position = viewMatrix * position;\n"
 "}\n";
 
-const char TEST_FRAGMENT_SHADER_SOURCE[] =
+const u8 TEST_FRAGMENT_SHADER_SOURCE[] =
 "varying lowp vec4 color;\n"
 "\n"
 "void main() {\n"

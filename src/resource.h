@@ -3,21 +3,23 @@
 
 #include "spacetime.h"
 
-#define ResourceMaxNumDependencies 6
+#define ResourceMaxNumDependencies 2
 
 typedef enum {
+	ResourceTypeList,
 	GpuResourceTypeBuffer,
 	ResourceTypeNumTypes,
 } ResourceType;
 
 typedef struct {
-	void *pointer;
 	sid id;
-	sid dependencies[ResourceMaxNumDependencies];
+	void *pointer;
+	void *dependencies[ResourceMaxNumDependencies];
 } Resource;
 
 typedef struct {
-	Resource resource;
+	sid id;
+	sid dependencies[ResourceMaxNumDependencies];
 	ResourceType type;
 	uintptr_t options;
 } ResourceDescriptor;
@@ -31,7 +33,9 @@ typedef struct {
 	ResourceDestroyFn destroy;
 } ResourceLoader;
 
-extern const ResourceInitFn resource_default_init;
-extern const ResourceDestroyFn resource_default_destroy;
+extern const ResourceInitFn ResourceDefaultInitFn;
+extern const ResourceDestroyFn ResourceDefaultDestroyFn;
+
+void resource_register_loaders(void);
 
 #endif // Resource_h

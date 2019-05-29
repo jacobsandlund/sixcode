@@ -5,7 +5,7 @@
 #include "resource-manager.h"
 #include "layout.h"
 
-extern const char *AllResourceDescriptorsFillMeshIds[LayoutTypeNumTypes];
+extern const u8 *AllResourceDescriptorsFillMeshIds[LayoutTypeNumTypes];
 
 void all_resource_descriptors_load_descriptors(ResourceManager *rm);
 
