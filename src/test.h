@@ -181,6 +181,7 @@ void test_log(const char *format, ...)
 				argptr);
 
 		test_log_i += output_len;
+		test_log_buffer[test_log_i++] = '\n';
 	}
 	va_end(argptr);
 }

@@ -149,7 +149,8 @@ void *resource_manager_get(sid resource_id)
 
 static void resource_manager_unload_inner(sid resource_id)
 {
-	ResourceManagerResource *manager_resource = string_id_table_get(&gResourceManager.resources, resource_id);
+	StringIdTable *resources = &gResourceManager.resources;
+	ResourceManagerResource *manager_resource = string_id_table_get(resources, resource_id);
 
 	if (!manager_resource || (--manager_resource->needed_count) > 0) {
 		return;
@@ -170,6 +171,7 @@ static void resource_manager_unload_inner(sid resource_id)
 	}
 
 	loader->destroy(&resource);
+	string_id_table_delete(resources, resource_id);
 
 	for (i32f i = 0; i < ResourceMaxNumDependencies; i++) {
 		sid dependency_id = descriptor->dependencies[i];

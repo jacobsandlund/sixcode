@@ -101,10 +101,18 @@ static void test_resource_init(Resource *resource, uintptr_t options)
 	TestResource *test_resource = ResourcePointerAlloc(sizeof *test_resource);
 	test_resource->number = (i64) options;
 	resource->pointer = test_resource;
+	Log("Loaded %s", StringIdString(resource->id));
+}
+
+static void test_list_resource_init(Resource *resource, uintptr_t options)
+{
+	(void) options;
+	Log("Loaded %s", StringIdString(resource->id));
 }
 
 static void test_resource_destroy(Resource *resource)
 {
+	Log("Unloaded %s", StringIdString(resource->id));
 	resource->pointer = NULL;
 	test_unloaded_count++;
 }
@@ -119,8 +127,8 @@ Test(resource_manager_load_get_unload)
 		.destroy = test_resource_destroy,
 	};
 	ResourceLoader list_loader = {
-		.init = ResourceDefaultInitFn,
-		.destroy = ResourceDefaultDestroyFn,
+		.init = test_list_resource_init,
+		.destroy = test_resource_destroy,
 	};
 
 	resource_manager_register_loader(StringIdIntern("test"), &test_loader);
@@ -177,13 +185,17 @@ Test(resource_manager_load_get_unload)
 	//=> 1
 	_d(test_unloaded_count);
 	//=> 0
+	_d(string_id_table_get(&gResourceManager.resources, StringId("foo")) != NULL);
+	//=> 1
 
 	resource_manager_unload(StringId("foobar"));
 
 	_d(manager_resource->needed_count);
 	//=> 0
 	_d(test_unloaded_count);
-	//=> 2
+	//=> 3
+	_d(string_id_table_get(&gResourceManager.resources, StringId("foo")) != NULL);
+	//=> 0
 
 	// All resources are unloaded by destroy
 
@@ -192,5 +204,16 @@ Test(resource_manager_load_get_unload)
 	string_manager_destroy();
 
 	_d(test_unloaded_count);
-	//=> 3
+	//=> 4
+
+	_Log();
+	//=> Loaded foo
+	//=> Loaded bar
+	//=> Loaded foobar
+	//=> Unloaded foobar
+	//=> Unloaded foo
+	//=> Unloaded bar
+	//=> Loaded bar
+	//=> Unloaded bar
+	//=>
 }
