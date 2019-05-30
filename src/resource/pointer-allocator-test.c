@@ -41,6 +41,7 @@ Test(resource_pointer_allocator_alloc)
 
 	_Log();
 	//=> Resource pointer_allocator attempt to allocate 6 bytes with only 2 bytes remaining
+	//=>
 
 	// Reset top
 

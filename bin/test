@@ -12,10 +12,10 @@ if [ "$#" -gt 1 ] && [[ $1 == "--no-diff" ]]; then
 elif [ "$#" -eq 1 ]; then
     run "$@" && git diff --exit-code -- $1
 else
-    for test_file in $(bin/ls-src 'test'); do
+    for test_file in $(bin/ls 'test'); do
         echo bin/test $test_file
         run $test_file
     done
 
-    git diff --exit-code -- $(bin/ls-src 'test')
+    git diff --exit-code -- $(bin/ls 'test')
 fi

@@ -34,6 +34,7 @@ void resource_manager_destroy(void)
 	string_id_table_destroy(&gResourceManager.resource_loaders);
 	string_id_table_destroy(&gResourceManager.resource_descriptors);
 	string_id_table_destroy(&gResourceManager.resources);
+	resource_pointer_allocator_destroy(&gResourceManager.pointer_allocator);
 }
 
 void resource_manager_register_loader(sid resource_type, ResourceLoader *loader)

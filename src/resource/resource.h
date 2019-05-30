@@ -29,6 +29,4 @@ typedef struct {
 extern const ResourceInitFn ResourceDefaultInitFn;
 extern const ResourceDestroyFn ResourceDefaultDestroyFn;
 
-void resource_register_loaders(void);
-
 #endif // Resource_h

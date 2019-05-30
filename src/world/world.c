@@ -1,32 +1,24 @@
+#include "world/world.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "engine/world.h"
-#include "render/layout.h"
-
-#define WORLD_HEX_FILL_MIN 1
-#define WORLD_HEX_FILL_MAX 15
+#define WorldHexFillMin 1
+#define WorldHexFillMax 15
 
 void world_init(World *w)
 {
-	grid_init(&w->grid);
-
-	Viewport *vp = &w->viewport;
-	vp->camera = (float3) {0.0, 0.0, 16.0};
-	vp->size = (float2) {640, 480};
-	layout_type(&vp->layout, LayoutTypeHex);
+	world_grid_init(&w->grid);
 }
 
 void world_destroy(World *w)
 {
-	grid_destroy(&w->grid);
+	world_grid_destroy(&w->grid);
 }
 
-void world_load(World *w)
+void world_load_random(World *w, i64 count)
 {
 	srand((unsigned int) time(NULL));
-	i64 count = 6000000;
 	double size = 4096.0 - 2.0;
 	i64 style = 0;
 
@@ -43,24 +35,14 @@ void world_load(World *w)
 			style = 1;
 		}
 
-		grid_set(&w->grid, h, style);
-	}
-}
-
-void world_update(World *w, EventQueue *eq)
-{
-	(void) w;
-
-	Event event;
-	while (event_queue_read(eq, &event)) {
-		// TODO
+		world_grid_set(&w->grid, h, style);
 	}
 }
 
 /*
 void world_toggle_hex_at_point(World *w, vec2 v)
 {
-	static u8 style = WORLD_HEX_FILL_MIN;
+	static u8 style = WorldHexFillMin;
 
 	ivec2 h = camera_world_vector_round(c, camera_screen_to_world_vector(c, v));
 
@@ -68,18 +50,18 @@ void world_toggle_hex_at_point(World *w, vec2 v)
 		return;
 	}
 
-	if (grid_get(g, h)) {
-		grid_clear(g, h);
+	if (world_grid_get(g, h)) {
+		world_grid_clear(g, h);
 	} else {
-		grid_set(g, h, style);
+		world_grid_set(g, h, style);
 
 		++style;
-		if (style > WORLD_HEX_FILL_MAX) {
-			style = WORLD_HEX_FILL_MIN;
+		if (style > WorldHexFillMax) {
+			style = WorldHexFillMin;
 		}
 	}
 
 	Quad quad = {h, h};
-	texture_update_in_quad(&ui->grid_styles_texture, g, &quad);
+	texture_update_in_quad(&ui->world_grid_styles_texture, g, &quad);
 }
 */
