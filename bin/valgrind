@@ -2,6 +2,9 @@
 
 if [[ $1 == '-h' ]] || [[ $1 == '--help' ]] || [[ $1 == '--version' ]] || [[ $1 == '--help-debug' ]]; then
     valgrind_mode='help'
+elif [[ $1 == 'check' ]]; then
+    valgrind_mode='check'
+    shift
 elif [[ $1 == '--tool=massif' ]]; then
     valgrind_mode='massif'
 elif [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
@@ -10,24 +13,29 @@ else
     valgrind_mode='single'
 fi
 
-if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+if [[ $valgrind_mode != 'check' ]] && ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
     docker exec -it spacetime bin/valgrind "$@"
 
-    if [[ $valgrind_mode = 'all' ]]; then
-        git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
-
-        for output_file in $(find out/valgrind-output -type f); do
-            echo "Checking $output_file"
-            if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
-                echo
-                echo '!! NOT CLEAN'
-                exit 1
-            fi
-        done
+    if [[ $valgrind_mode == 'all' ]]; then
+        valgrind_mode='check'
+    else
+        exit
     fi
-
-    exit
 fi
+
+check() {
+    test_file=$1
+    output_file="out/valgrind-output/$test_file.txt"
+    if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
+        echo
+        echo '!! NOT CLEAN'
+        exit 1
+    fi
+}
+
+compile() {
+    bin/compile -I$SPACETIME_PATH/development $1
+}
 
 valgrind_single() {
     test_file="${@: -1}"
@@ -38,7 +46,7 @@ valgrind_single() {
     echo bin/valgrind "$@" > $output_file
     echo >> $output_file
 
-    bin/compile $test_file
+    compile $test_file
     valgrind --log-fd=1 $options ./a.out |
         cut -d' ' -f 2- | tee -a $output_file
     rm a.out
@@ -49,12 +57,23 @@ mkdir -p out/valgrind-output
 
 if [[ $valgrind_mode == 'help' ]]; then
     valgrind "$@"
+elif [[ $valgrind_mode == 'check' ]]; then
+    if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
+        for test_file in $(bin/ls 'test.c'); do
+            echo "bin/valgrind check $test_file"
+            check $test_file
+        done
+
+        git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
+    else
+        check "$@"
+    fi
 elif [[ $valgrind_mode == 'massif' ]]; then
     massif_file='out/valgrind-output.massif'
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    bin/compile $test_file
+    compile $test_file
     valgrind --massif-out-file=$massif_file $options ./a.out
     rm a.out
     ms_print $massif_file

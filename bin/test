@@ -3,7 +3,7 @@
 trap "rm -f a.out" EXIT
 
 run() {
-    $SPACETIME_PATH/bin/compile "$@" && ./a.out
+    $SPACETIME_PATH/bin/compile -I$SPACETIME_PATH/development "$@" && ./a.out
 }
 
 if [ "$#" -gt 1 ] && [[ $1 == "--no-diff" ]]; then

@@ -1,11 +1,11 @@
 #include "test.h"
-#include "engine/event-queue.c"
+#include "os/event-queue.c"
 
-Test(event_queue_init)
+Test(os_event_queue_init)
 {
-	EventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = malloc(sizeof *eq);
 
-	event_queue_init(eq, 64, 4);
+	os_event_queue_init(eq, 64, 4);
 
 	_d(eq->next_read_event_id);
 	//=> 1
@@ -20,13 +20,13 @@ Test(event_queue_init)
 
 	eq->events[eq->length - 1].type = EventTypeMouseClick;
 
-	event_queue_destroy(eq);
+	os_event_queue_destroy(eq);
 	free(eq);
 }
 
-Test(event_queue_write)
+Test(os_event_queue_write)
 {
-	EventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = malloc(sizeof *eq);
 
 	Event event = {
 		.type = EventTypeMouseClick,
@@ -34,9 +34,9 @@ Test(event_queue_write)
 		.location = {1000, 800},
 	};
 
-	event_queue_init(eq, 4, 1);
+	os_event_queue_init(eq, 4, 1);
 
-	event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 
 	_d(eq->next_write_event_id);
 	//=> 2
@@ -48,24 +48,24 @@ Test(event_queue_write)
 	//=> 1000, 800
 
 	// Write past length
-	event_queue_write(eq, &event);
-	event_queue_write(eq, &event);
-	event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 	event.time = 9876543210;
-	event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 
 	_d(eq->next_write_event_id);
 	//=> 6
 	_u64(eq->events[1].time);
 	//=> 9876543210
 
-	event_queue_destroy(eq);
+	os_event_queue_destroy(eq);
 	free(eq);
 }
 
-Test(event_queue_read)
+Test(os_event_queue_read)
 {
-	EventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = malloc(sizeof *eq);
 
 	Event event = {
 		.type = EventTypeMouseClick,
@@ -74,11 +74,11 @@ Test(event_queue_read)
 	};
 	Event read_event;
 
-	event_queue_init(eq, 4, 2);
-	event_queue_write(eq, &event);
-	event_queue_write(eq, &event);
+	os_event_queue_init(eq, 4, 2);
+	os_event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 
-	_d(event_queue_read(eq, &read_event));
+	_d(os_event_queue_read(eq, &read_event));
 	//=> 1
 
 	_d(eq->next_read_event_id);
@@ -90,18 +90,18 @@ Test(event_queue_read)
 	_f2(read_event.location);
 	//=> 1000, 800
 
-	_d(event_queue_read(eq, &read_event));
+	_d(os_event_queue_read(eq, &read_event));
 	//=> 2
 
 	// Read far behind
 
-	event_queue_write(eq, &event);	// skip read
+	os_event_queue_write(eq, &event);	// skip read
 	event.time = 9876543210;
-	event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 	event.time = 1234567890;
-	event_queue_write(eq, &event);
+	os_event_queue_write(eq, &event);
 
-	_d(event_queue_read(eq, &read_event));
+	_d(os_event_queue_read(eq, &read_event));
 	//=> 4
 
 	_Log();
@@ -109,17 +109,6 @@ Test(event_queue_read)
 	_u64(read_event.time);
 	//=> 9876543210
 
-	event_queue_destroy(eq);
+	os_event_queue_destroy(eq);
 	free(eq);
-}
-
-Test(event_queue_clock_time)
-{
-	u64 start = event_queue_clock_time();
-	u64 end = event_queue_clock_time();
-
-	_d(start > 0 && end > 0);
-	//=> 1
-	_d(end > start);
-	//=> 1
 }

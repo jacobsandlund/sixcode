@@ -1,37 +1,40 @@
 #!/bin/bash -e
 
-# Edit this while under going sweeping changes, for selecting only
+# Edit this while undergoing sweeping changes, for selecting only
 # specific modules
 src=$(grep -v '#' <<-SRC
     src/camera
     # src/engine
     # src/gpu
-    # src/macos
     src/math
     src/model
+    # src/os
     src/render
     src/resource
     src/spacetime.h
     src/string
-    # src/test.h
-    # src/valgrind.h
     src/world
 SRC
 )
 
-exclude='mock\.c'
-include='.'
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    exclude='windows/'
+else
+    exclude='mac/'
+fi
+
+include_only='.'
 
 if [[ $1 == 'all' ]]; then
     shift
 elif [[ $1 != 'test.c' ]] && [[ $1 != 'test.m' ]] && [[ $1 != test ]]; then
-    exclude="$exclude|-test.c|-test.m"
+    exclude="$exclude|-test.c|-test.m|mock.c"
 fi
 
 if [[ $1 == 'test' ]]; then
-    include='test\.c|test\.m$'
+    include_only='test\.c|test\.m$'
 elif [[ $# -eq 1 ]]; then
-    include="$1$"
+    include_only="$1$"
 fi
 
-find $src -type f | grep -E '\.[chm]|\.metal$' | grep -E "$include" | grep -Ev "$exclude" | sort
+find $src -type f | grep -E '\.[chm]|\.metal$' | grep -E "$include_only" | grep -Ev "$exclude" | sort

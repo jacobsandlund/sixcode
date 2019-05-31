@@ -1,7 +1,6 @@
-#include <time.h>
+#include "os/event-queue.h"
 #include <inttypes.h>
 #include <assert.h>
-#include "engine/event-queue.h"
 
 void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining)
 {
@@ -17,13 +16,6 @@ void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining)
 void event_queue_destroy(EventQueue *eq)
 {
 	free(eq->events);
-}
-
-u64 event_queue_clock_time(void)
-{
-#ifdef __APPLE__
-	return clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
-#endif
 }
 
 i64 event_queue_read(EventQueue *eq, Event *event)
