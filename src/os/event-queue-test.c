@@ -3,7 +3,7 @@
 
 Test(os_event_queue_init)
 {
-	OsEventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = tmalloc(sizeof *eq);
 
 	os_event_queue_init(eq, 64, 4);
 
@@ -18,18 +18,17 @@ Test(os_event_queue_init)
 	_d(eq->safe_read_behind);
 	//=> 60
 
-	eq->events[eq->length - 1].type = EventTypeMouseClick;
+	eq->events[eq->length - 1].type = OsEventTypeMouseClick;
 
 	os_event_queue_destroy(eq);
-	free(eq);
 }
 
 Test(os_event_queue_write)
 {
-	OsEventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = tmalloc(sizeof *eq);
 
-	Event event = {
-		.type = EventTypeMouseClick,
+	OsEvent event = {
+		.type = OsEventTypeMouseClick,
 		.time = 1234567890,
 		.location = {1000, 800},
 	};
@@ -60,19 +59,18 @@ Test(os_event_queue_write)
 	//=> 9876543210
 
 	os_event_queue_destroy(eq);
-	free(eq);
 }
 
 Test(os_event_queue_read)
 {
-	OsEventQueue *eq = malloc(sizeof *eq);
+	OsEventQueue *eq = tmalloc(sizeof *eq);
 
-	Event event = {
-		.type = EventTypeMouseClick,
+	OsEvent event = {
+		.type = OsEventTypeMouseClick,
 		.time = 1234567890,
 		.location = {1000, 800},
 	};
-	Event read_event;
+	OsEvent read_event;
 
 	os_event_queue_init(eq, 4, 2);
 	os_event_queue_write(eq, &event);
@@ -106,9 +104,9 @@ Test(os_event_queue_read)
 
 	_Log();
 	//=> Event queue read behind by 3 above safe level of 2: skipping 1 messages
+	//=>
 	_u64(read_event.time);
 	//=> 9876543210
 
 	os_event_queue_destroy(eq);
-	free(eq);
 }

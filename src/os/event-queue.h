@@ -1,21 +1,8 @@
-#ifndef EventQueue_h
-#define EventQueue_h
+#ifndef OsEventQueue_h
+#define OsEventQueue_h
 
 #include "spacetime.h"
-
-typedef enum {
-	EventTypeMouseMove = 1,
-	EventTypeMouseDrag = 2,
-	EventTypeMouseClick = 4,
-} EventType;
-
-#define EventTypeMouseMoveOrDrag 3
-
-typedef struct {
-	EventType type;
-	u64 time;
-	float2 location;
-} Event;
+#include "os/event.h"
 
 typedef struct {
 	i64 next_read_event_id;
@@ -23,17 +10,16 @@ typedef struct {
 	i64 index_mask;
 	i64 length;
 	i64 safe_read_behind;
-	Event *events;
-} EventQueue;
+	OsEvent *events;
+} OsEventQueue;
 
-void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining);
-void event_queue_destroy(EventQueue *eq);
+void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining);
+void os_event_queue_destroy(OsEventQueue *eq);
+i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event);
 
-static inline void event_queue_write(EventQueue *eq, Event *event)
+static inline void os_event_queue_write(OsEventQueue *eq, OsEvent *event)
 {
 	eq->events[eq->next_write_event_id++ & eq->index_mask] = *event;
 }
 
-i64 event_queue_read(EventQueue *eq, Event *event);
-
-#endif // EventQueue_h
+#endif // OsEventQueue_h

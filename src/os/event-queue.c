@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include <assert.h>
 
-void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining)
+void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining)
 {
 	assert(length && !(length & (length - 1)));	// Power of 2
 	eq->next_read_event_id = 1;
@@ -13,12 +13,12 @@ void event_queue_init(EventQueue *eq, i64 length, i64 safe_length_remaining)
 	eq->events = malloc(length * sizeof *eq->events);
 }
 
-void event_queue_destroy(EventQueue *eq)
+void os_event_queue_destroy(OsEventQueue *eq)
 {
 	free(eq->events);
 }
 
-i64 event_queue_read(EventQueue *eq, Event *event)
+i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event)
 {
 	i64 behind = eq->next_write_event_id - eq->next_read_event_id;
 
