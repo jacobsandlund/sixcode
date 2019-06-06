@@ -116,8 +116,8 @@ static uint8_t *tmem_p = tmem;
 
 static int num_files;
 static int is_focus_on = 0;
-static const char *LOG_PREFIX = "\t//=>";
-#define LOG_PREFIX_LEN 5
+static const char *LOG_PREFIX = "    //=>";
+#define LOG_PREFIX_LEN 8
 
 void *tmalloc(size_t size)
 {

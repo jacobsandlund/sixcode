@@ -5,10 +5,10 @@
 #include "math/quad.h"
 
 typedef struct {
-	Quad quad;
-	Quad styles_quad;  // quad with extra border
-	SizeQuad size_quad;
-	u8 *styles;
+    Quad quad;
+    Quad styles_quad;  // quad with extra border
+    SizeQuad size_quad;
+    u8 *styles;
 } WorldGrid;
 
 void world_grid_init(WorldGrid *g);

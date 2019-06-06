@@ -9,23 +9,23 @@
 #define ResourceManagerMaxTopLevelResources 4
 
 typedef struct {
-	void *pointer;
-	i8 needed_count;
+    void *pointer;
+    i8 needed_count;
 } ResourceManagerResource;
 
 typedef struct {
-	i32 loader_capacity;
-	i32 resource_capacity;
-	i32 descriptor_capacity;
-	i32 pointer_allocator_capacity;
+    i32 loader_capacity;
+    i32 resource_capacity;
+    i32 descriptor_capacity;
+    i32 pointer_allocator_capacity;
 } ResourceManagerConfiguration;
 
 typedef struct {
-	StringIdTable resource_loaders;
-	StringIdTable resource_descriptors;
-	StringIdTable resources;
-	sid top_level_resource_ids[ResourceManagerMaxTopLevelResources];
-	ResourcePointerAllocator pointer_allocator;
+    StringIdTable resource_loaders;
+    StringIdTable resource_descriptors;
+    StringIdTable resources;
+    sid top_level_resource_ids[ResourceManagerMaxTopLevelResources];
+    ResourcePointerAllocator pointer_allocator;
 } ResourceManager;
 
 extern ResourceManager gResourceManager;

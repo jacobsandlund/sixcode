@@ -4,13 +4,13 @@
 #include "spacetime.h"
 
 typedef struct {
-	int2 min;
-	int2 max;
+    int2 min;
+    int2 max;
 } Quad;
 
 typedef struct {
-	int2 min;
-	int2 size;
+    int2 min;
+    int2 size;
 } SizeQuad;
 
 bool quad_contains(Quad *q, int2 h);

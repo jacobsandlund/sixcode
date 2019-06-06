@@ -5,22 +5,22 @@
 
 Test(world_init)
 {
-	World *w = tmalloc(sizeof *w);
+    World *w = tmalloc(sizeof *w);
 
-	world_init(w);
+    world_init(w);
 
-	_qd(w->grid.quad);
-	//=> (-2047, -2047), (2046, 2046)
+    _qd(w->grid.quad);
+    //=> (-2047, -2047), (2046, 2046)
 
-	world_destroy(w);
+    world_destroy(w);
 }
 
 Test(world_load)
 {
-	World *w = tmalloc(sizeof *w);
+    World *w = tmalloc(sizeof *w);
 
-	world_init(w);
-	world_load_random(w, 256);
+    world_init(w);
+    world_load_random(w, 256);
 
-	world_destroy(w);
+    world_destroy(w);
 }

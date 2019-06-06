@@ -4,14 +4,14 @@
 
 Test(all_resources_load_descriptors)
 {
-	ResourceManager *rm = malloc(sizeof *rm);
-	resource_manager_init(rm, 64);
+    ResourceManager *rm = malloc(sizeof *rm);
+    resource_manager_init(rm, 64);
 
-	all_resource_descriptors_load_descriptors(rm);
+    all_resource_descriptors_load_descriptors(rm);
 
-	_s(rm->resource_ids[0]);
-	_s(rm->resources[0].id);
+    _s(rm->resource_ids[0]);
+    _s(rm->resources[0].id);
 
-	resource_manager_destroy(rm);
-	free(rm);
+    resource_manager_destroy(rm);
+    free(rm);
 }

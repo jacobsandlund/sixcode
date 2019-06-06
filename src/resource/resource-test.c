@@ -3,16 +3,16 @@
 
 Test(ResourceDefault)
 {
-	Resource *resource = tmalloc(sizeof *resource);
-	ResourceDefaultInitFn(resource, 0);
-	_d(resource->pointer == NULL);
-	//=> 1
+    Resource *resource = tmalloc(sizeof *resource);
+    ResourceDefaultInitFn(resource, 0);
+    _d(resource->pointer == NULL);
+    //=> 1
 
-	i64 foo = 42;
-	resource->pointer = &foo;
+    i64 foo = 42;
+    resource->pointer = &foo;
 
-	ResourceDefaultDestroyFn(resource);
+    ResourceDefaultDestroyFn(resource);
 
-	_d(resource->pointer == NULL);
-	//=> 1
+    _d(resource->pointer == NULL);
+    //=> 1
 }

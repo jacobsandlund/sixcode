@@ -6,8 +6,8 @@
 #include "math/quad.h"
 
 typedef struct {
-	RenderLayout layout;
-	float2 size;
+    RenderLayout layout;
+    float2 size;
 } RenderViewport;
 
 #endif // Viewport_h

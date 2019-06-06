@@ -4,10 +4,10 @@ StringManager gStringManager;
 
 void string_manager_init(StringManagerConfiguration *config)
 {
-	string_id_table_init(&gStringManager.string_table, config->string_table_size, sizeof(u8 *));
+    string_id_table_init(&gStringManager.string_table, config->string_table_size, sizeof(u8 *));
 }
 
 void string_manager_destroy(void)
 {
-	string_id_table_destroy(&gStringManager.string_table);
+    string_id_table_destroy(&gStringManager.string_table);
 }

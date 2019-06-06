@@ -4,15 +4,15 @@
 #include "spacetime.h"
 
 typedef enum {
-	RenderLayoutTypeHex = 0,
-	RenderLayoutTypeRect = 1,
+    RenderLayoutTypeHex = 0,
+    RenderLayoutTypeRect = 1,
 } RenderLayoutType;
 
 #define RenderLayoutTypeNumTypes 2
 
 typedef struct {
-	double2 scale;
-	RenderLayoutType type;
+    double2 scale;
+    RenderLayoutType type;
 } RenderLayout;
 
 void render_layout_type(RenderLayout *rl, RenderLayoutType type);

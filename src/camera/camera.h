@@ -5,7 +5,7 @@
 #include "render/viewport.h"
 
 typedef struct {
-	float3 position;
+    float3 position;
 } Camera;
 
 void camera_translate(Camera *c, RenderViewport *vp, float2 delta);

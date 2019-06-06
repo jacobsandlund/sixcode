@@ -7,7 +7,7 @@
 
 static inline sid string_id(const u8 *s, i64 length)
 {
-	return (sid) fnv_hash(s, length);
+    return (sid) fnv_hash(s, length);
 }
 
 sid string_id_literal(const char *s);

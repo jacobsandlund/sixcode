@@ -3,13 +3,13 @@
 
 static void resource_noop_init(Resource *resource, uintptr_t options)
 {
-	(void) options;
-	resource->pointer = NULL;
+    (void) options;
+    resource->pointer = NULL;
 }
 
 static void resource_noop_destroy(Resource *resource)
 {
-	resource->pointer = NULL;
+    resource->pointer = NULL;
 }
 
 const ResourceInitFn ResourceDefaultInitFn = resource_noop_init;

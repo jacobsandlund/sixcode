@@ -6,26 +6,26 @@
 
 Test(string_manager_init)
 {
-	StringManagerConfiguration config = {
-		.string_table_size = 4,
-	};
-	string_manager_init(&config);
+    StringManagerConfiguration config = {
+        .string_table_size = 4,
+    };
+    string_manager_init(&config);
 
-	StringIdTable *string_table = &gStringManager.string_table;
+    StringIdTable *string_table = &gStringManager.string_table;
 
-	_d(string_table->size);
-	//=> 4
-	_d(string_table->sizeof_value);
-	//=> 8
+    _d(string_table->size);
+    //=> 4
+    _d(string_table->sizeof_value);
+    //=> 8
 
-	_u64(StringIdIntern("foo"));
-	//=> 15902901984413996407
+    _u64(StringIdIntern("foo"));
+    //=> 15902901984413996407
 
-	_s(*((u8 **) string_id_table_get(string_table, StringId("foo"))));
-	//=> foo
+    _s(*((u8 **) string_id_table_get(string_table, StringId("foo"))));
+    //=> foo
 
-	_s(StringIdString(StringId("foo")));
-	//=> foo
+    _s(StringIdString(StringId("foo")));
+    //=> foo
 
-	string_manager_destroy();
+    string_manager_destroy();
 }

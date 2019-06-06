@@ -4,9 +4,9 @@
 #include "spacetime.h"
 
 typedef struct {
-	u8 *memory;
-	u64 capacity;
-	u64 allocated;
+    u8 *memory;
+    u64 capacity;
+    u64 allocated;
 } ResourcePointerAllocator;
 
 void resource_pointer_allocator_init(ResourcePointerAllocator *pa, u64 capacity);

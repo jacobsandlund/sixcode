@@ -6,11 +6,11 @@
 #include "string/id-table.h"
 
 typedef struct {
-	i32 string_table_size;
+    i32 string_table_size;
 } StringManagerConfiguration;
 
 typedef struct {
-	StringIdTable string_table;
+    StringIdTable string_table;
 } StringManager;
 
 extern StringManager gStringManager;

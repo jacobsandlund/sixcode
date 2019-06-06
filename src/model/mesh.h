@@ -4,15 +4,15 @@
 #include "spacetime.h"
 
 typedef struct {
-	float x;
-	float y;
-	i8 hx;
-	i8 hy;
+    float x;
+    float y;
+    i8 hx;
+    i8 hy;
 } FillMeshVertex;
 
 typedef struct {
-	float2 positionOffset;
-	int2 gridPositionOffset;
+    float2 positionOffset;
+    int2 gridPositionOffset;
 } InstanceMeshVertex;
 
 i64 fill_mesh_vertices_hex_length(i64 size);

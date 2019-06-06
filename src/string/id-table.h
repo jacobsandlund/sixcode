@@ -6,13 +6,13 @@
 #define StringIdTableTombstone 1
 
 typedef struct {
-	i32 size;
-	i32 count;
-	i32 sizeof_value;
-	u64 mask;
-	u64 shift_bits;
-	sid *keys;
-	void *values;
+    i32 size;
+    i32 count;
+    i32 sizeof_value;
+    u64 mask;
+    u64 shift_bits;
+    sid *keys;
+    void *values;
 } StringIdTable;
 
 void string_id_table_init(StringIdTable *st, i32 size, i64 sizeof_value);

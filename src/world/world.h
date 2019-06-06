@@ -5,7 +5,7 @@
 #include "world/grid.h"
 
 typedef struct {
-	WorldGrid grid;
+    WorldGrid grid;
 } World;
 
 void world_init(World *w);
