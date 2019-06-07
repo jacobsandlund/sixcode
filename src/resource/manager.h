@@ -18,7 +18,7 @@ typedef struct {
     i32 resource_capacity;
     i32 descriptor_capacity;
     i32 pointer_allocator_capacity;
-} ResourceManagerConfiguration;
+} ResourceManagerConfig;
 
 typedef struct {
     StringIdTable resource_loaders;
@@ -32,7 +32,7 @@ extern ResourceManager gResourceManager;
 
 #define ResourcePointerAlloc(size) resource_pointer_allocator_alloc(&gResourceManager.pointer_allocator, size);
 
-void resource_manager_init(ResourceManagerConfiguration *config);
+void resource_manager_init(ResourceManagerConfig *config);
 void resource_manager_destroy(void);
 
 void resource_manager_register_loader(sid resource_type, ResourceLoader *loader);

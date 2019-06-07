@@ -7,14 +7,14 @@
 #include "string/id-table.c"
 #include "string/manager.c"
 
-static ResourceManagerConfiguration test_resource_manager_config = {
+static ResourceManagerConfig test_resource_manager_config = {
     .loader_capacity = 2,
     .resource_capacity = 4,
     .descriptor_capacity = 8,
     .pointer_allocator_capacity = 128,
 };
 
-static StringManagerConfiguration test_string_manager_config = {
+static StringManagerConfig test_string_manager_config = {
     .string_table_size = 8,
 };
 

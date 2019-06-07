@@ -1,29 +1,5 @@
-#import "os.h"
-#import <stdlib.h>
-#import "AppDelegate.h"
-#import "event-queue.h"
-
-os_log_t os_spacetime_default_log;
-
-const i64 EventQueueLength = 64;
-const i64 EventQueueSafeLengthRemaining = 16;
 const double EnterDragTime = 0.1;
 const double EnterDragDeltaSquared = 30.0;
-
-NSMenu *makeMenu() {
-    NSMenu *mainMenu = [[NSMenu alloc] init];
-    NSMenuItem *mainSpacetimeMenuItem = [[NSMenuItem alloc]
-            initWithTitle:@"Spacetime" action:nil keyEquivalent:@""];
-    [mainMenu addItem:mainSpacetimeMenuItem];
-
-    NSMenu *mainSpacetimeMenu = [[NSMenu alloc] init];
-    mainSpacetimeMenuItem.submenu = mainSpacetimeMenu;
-
-    [mainSpacetimeMenu addItemWithTitle:@"Quit Spacetime"
-            action:@selector(terminate:) keyEquivalent:@"q"];
-
-    return mainMenu;
-}
 
 void runLoop(EventQueue *eq) {
     NSDate *until = [NSDate distantFuture];
@@ -35,8 +11,6 @@ void runLoop(EventQueue *eq) {
     for (;;) {
 
         @autoreleasepool {
-
-        os_spacetime_default_log = os_log_create("computer.spacetime.Spacetime", "default");
 
         NSEvent *nsEvent = [NSApp nextEventMatchingMask:NSEventMaskAny
                 untilDate:until inMode:NSDefaultRunLoopMode
@@ -196,32 +170,4 @@ void runLoop(EventQueue *eq) {
 
         } // @autoreleasepool
     }
-}
-
-
-int main(int argc, const char *argv[]) {
-    (void)argc;
-    (void)argv;
-
-    @autoreleasepool {
-
-    [NSApplication sharedApplication];
-
-    EventQueue *eq = malloc(sizeof *eq);
-    event_queue_initialize(eq, EventQueueLength, EventQueueSafeLengthRemaining);
-
-    AppDelegate *appDelegate = [[AppDelegate alloc] initWithEventQueue:eq];
-    NSApp.mainMenu = makeMenu();
-    NSApp.presentationOptions = NSApplicationPresentationHideMenuBar | NSApplicationPresentationHideDock;
-    [NSApp setDelegate:appDelegate];
-    [NSApp finishLaunching];
-
-    runLoop(eq);
-
-    event_queue_terminate(eq);
-    free(eq);
-
-    } // @autoreleasepool
-
-    return 0;
 }

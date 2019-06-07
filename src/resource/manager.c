@@ -5,7 +5,7 @@
 
 ResourceManager gResourceManager;
 
-void resource_manager_init(ResourceManagerConfiguration *config)
+void resource_manager_init(ResourceManagerConfig *config)
 {
     string_id_table_init(&gResourceManager.resource_loaders,
             config->loader_capacity, sizeof(ResourceLoader));

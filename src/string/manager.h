@@ -7,7 +7,7 @@
 
 typedef struct {
     i32 string_table_size;
-} StringManagerConfiguration;
+} StringManagerConfig;
 
 typedef struct {
     StringIdTable string_table;
@@ -19,7 +19,7 @@ extern StringManager gStringManager;
 #define StringIdIntern(s) string_id_intern_literal(&gStringManager.string_table, s)
 #define StringIdString(id) string_id_string(&gStringManager.string_table, id)
 
-void string_manager_init(StringManagerConfiguration *config);
+void string_manager_init(StringManagerConfig *config);
 void string_manager_destroy(void);
 
 #endif // StringManager_h

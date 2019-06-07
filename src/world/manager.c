@@ -1,26 +1,30 @@
-#include "world/world.h"
+#include "world/manager.h"
 #include <math.h>
 #include <stdlib.h>
-#include <time.h>
+#include "os/clock.h"
 
-#define WorldHexFillMin 1
-#define WorldHexFillMax 15
+#define WorldManagerHexFillMin 1
+#define WorldManagerHexFillMax 15
 
-void world_init(World *w)
+WorldManager gWorldManager;
+
+void world_manager_init(void)
 {
-    world_grid_init(&w->grid);
+    world_grid_init(&gWorldManager.grid);
 }
 
-void world_destroy(World *w)
+void world_manager_destroy(void)
 {
-    world_grid_destroy(&w->grid);
+    world_grid_destroy(&gWorldManager.grid);
 }
 
-void world_load_random(World *w, i64 count)
+void world_manager_load_random(i64 count)
 {
-    srand((unsigned int) time(NULL));
+    srand((unsigned int) os_clock_time());
     double size = 4096.0 - 2.0;
     i64 style = 0;
+
+    WorldGrid *g = &gWorldManager.grid;
 
     for (i64 i = 0; i < count; i++) {
         double rand1 = (double) rand() / (double) RAND_MAX;
@@ -35,14 +39,14 @@ void world_load_random(World *w, i64 count)
             style = 1;
         }
 
-        world_grid_set(&w->grid, h, style);
+        world_grid_set(g, h, style);
     }
 }
 
 /*
-void world_toggle_hex_at_point(World *w, vec2 v)
+void world_manager_update(void)
 {
-    static u8 style = WorldHexFillMin;
+    static u8 style = WorldManagerHexFillMin;
 
     ivec2 h = camera_world_vector_round(c, camera_screen_to_world_vector(c, v));
 
@@ -56,8 +60,8 @@ void world_toggle_hex_at_point(World *w, vec2 v)
         world_grid_set(g, h, style);
 
         ++style;
-        if (style > WorldHexFillMax) {
-            style = WorldHexFillMin;
+        if (style > WorldManagerHexFillMax) {
+            style = WorldManagerHexFillMin;
         }
     }
 

@@ -6,7 +6,7 @@
 
 Test(string_manager_init)
 {
-    StringManagerConfiguration config = {
+    StringManagerConfig config = {
         .string_table_size = 4,
     };
     string_manager_init(&config);
