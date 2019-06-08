@@ -8,14 +8,12 @@ Test(world_grid_basics)
     int2 h2 = {48, 62};
     WorldGrid *wg = tmalloc(sizeof *wg);
 
-    world_grid_init(wg);
+    world_grid_init(wg, 128);
 
     _qd(wg->quad);
-    //=> (-2047, -2047), (2046, 2046)
-    _qd(wg->styles_quad);
-    //=> (-2048, -2048), (2047, 2047)
+    //=> (-64, -64), (63, 63)
     _sq(wg->size_quad);
-    //=> (-2048, -2048), (4096, 4096)
+    //=> (-64, -64), (128, 128)
 
     world_grid_set(wg, h1, 1);
     world_grid_set(wg, h2, 2);

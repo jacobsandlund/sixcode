@@ -2,6 +2,7 @@
 #include "resource/manager.c"
 #include "resource/resource.c"
 #include "resource/pointer-allocator.c"
+#include "log/manager-mock.c"
 #include "math/fnv.c"
 #include "string/id.c"
 #include "string/id-table.c"
@@ -101,24 +102,29 @@ static void test_resource_init(Resource *resource, uintptr_t options)
     TestResource *test_resource = ResourcePointerAlloc(sizeof *test_resource);
     test_resource->number = (i64) options;
     resource->pointer = test_resource;
-    Log("Loaded %s", StringIdString(resource->id));
+    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+            "Loaded %s", StringIdString(resource->id));
 }
 
 static void test_list_resource_init(Resource *resource, uintptr_t options)
 {
     (void) options;
-    Log("Loaded %s", StringIdString(resource->id));
+    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+            "Loaded %s", StringIdString(resource->id));
 }
 
 static void test_resource_destroy(Resource *resource)
 {
-    Log("Unloaded %s", StringIdString(resource->id));
+    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+            "Unloaded %s", StringIdString(resource->id));
     resource->pointer = NULL;
     test_unloaded_count++;
 }
 
 Test(resource_manager_load_get_unload)
 {
+    log_manager_init(&gLogManagerMockConfig);
+
     string_manager_init(&test_string_manager_config);
     resource_manager_init(&test_resource_manager_config);
 
@@ -206,14 +212,17 @@ Test(resource_manager_load_get_unload)
     _d(test_unloaded_count);
     //=> 4
 
-    _Log();
-    //=> Loaded foo
-    //=> Loaded bar
-    //=> Loaded foobar
-    //=> Unloaded foobar
-    //=> Unloaded foo
-    //=> Unloaded bar
-    //=> Loaded bar
-    //=> Unloaded bar
+    _Log(&gLogManager.logs.resource);
+    //=> [debug]  Resource allocating 8 bytes (8 bytes total)
+    //=> [default]  Loaded foo
+    //=> [debug]  Resource allocating 8 bytes (16 bytes total)
+    //=> [default]  Loaded bar
+    //=> [default]  Loaded foobar
+    //=> [default]  Unloaded foobar
+    //=> [default]  Unloaded foo
+    //=> [default]  Unloaded bar
+    //=> [debug]  Resource allocating 8 bytes (24 bytes total)
+    //=> [default]  Loaded bar
+    //=> [default]  Unloaded bar
     //=>
 }

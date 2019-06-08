@@ -13,3 +13,8 @@ void render_manager_destroy(void)
 {
     // Do nothing
 }
+
+void render_manager_size_changed(GpuView *view)
+{
+    gRenderManager.viewport.size = view->viewport_size;
+}

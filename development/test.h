@@ -35,9 +35,10 @@
 #define _f3(v) _ggg(v.x, v.y, v.z)
 #define _i2(v) _dd(v.x, v.y)
 
-#define _Log() { \
-	_s(test_log_buffer); \
-	test_log_reset(); \
+#define _Log(log) { \
+    LogMock *mock = (LogMock *) (log)->log_impl; \
+	_s(&mock->buffer[mock->buffer_i_start]); \
+	log_mock_reset(log); \
 }
 
 #define TestCaseSentinel 1976020431
@@ -105,8 +106,6 @@ typedef struct {
 	int num_results;
 } TestFileInfo;
 
-char test_log_buffer[TEST_MAX_OUTPUT_LEN];
-static int test_log_i = 0;
 static TestFileInfo all_file_info[TEST_MAX_FILES];
 
 static uint8_t test_runner_mem[TEST_RUNNER_MEM_SIZE];
@@ -164,32 +163,6 @@ void TPRINTF(const char *format, ...)
 		printf("\n");
 		va_end(argptr);
 	}
-}
-
-void test_log(const char *format, ...)
-{
-	va_list argptr;
-	va_start(argptr, format);
-
-	int size = TEST_MAX_OUTPUT_LEN - test_log_i;
-
-	if (size > 0) {
-		int output_len = vsnprintf(
-				&test_log_buffer[test_log_i],
-				size,
-				format,
-				argptr);
-
-		test_log_i += output_len;
-		test_log_buffer[test_log_i++] = '\n';
-	}
-	va_end(argptr);
-}
-
-void test_log_reset()
-{
-	test_log_i = 0;
-	test_log_buffer[0] = '\0';
 }
 
 void split_lines(LineData *line_data, const char *contents, char *contents_output, int len, int max_lines)

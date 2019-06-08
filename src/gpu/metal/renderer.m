@@ -39,7 +39,8 @@
         //  If the Metal API validation is enabled, we can find out more information about what
         //  went wrong.  (Metal API validation is enabled by default when a debug build is run
         //  from Xcode)
-        Log("Failed to created pipeline state, error %@", error);
+        log_at_level(&gLogManager.logs.gpu, LogLevelDefault,
+                "Failed to created pipeline state, error %@", error);
         return;
     }
 

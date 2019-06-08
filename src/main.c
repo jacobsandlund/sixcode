@@ -4,7 +4,6 @@ int main(int argc, const char *argv[]) {
 	(void)argc;
 	(void)argv;
 
-    engine_manager_init();
+    engine_manager_init(&gEngineConfig);
     engine_manager_run();
-    engine_manager_destroy();
 }

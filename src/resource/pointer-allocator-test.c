@@ -1,8 +1,11 @@
 #include "test.h"
 #include "resource/pointer-allocator.c"
+#include "log/manager-mock.c"
 
 Test(resource_pointer_allocator_alloc)
 {
+    log_manager_init(&gLogManagerMockConfig);
+
     ResourcePointerAllocator *pa = tmalloc(sizeof *pa);
     resource_pointer_allocator_init(pa, 16);
 
@@ -39,8 +42,10 @@ Test(resource_pointer_allocator_alloc)
     _d(resource_pointer_allocator_alloc(pa, 6));
     //=> 0
 
-    _Log();
-    //=> Resource pointer_allocator attempt to allocate 6 bytes with only 2 bytes remaining
+    _Log(&gLogManager.logs.resource);
+    //=> [debug]  Resource allocating 10 bytes (10 bytes total)
+    //=> [debug]  Resource allocating 4 bytes (14 bytes total)
+    //=> [default]  Resource pointer_allocator attempt to allocate 6 bytes with only 2 bytes remaining
     //=>
 
     // Reset top

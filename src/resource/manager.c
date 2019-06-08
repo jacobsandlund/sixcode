@@ -1,5 +1,6 @@
 #include "resource/manager.h"
 #include "string/manager.h"
+#include "log/manager.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -59,7 +60,8 @@ static ResourceDescriptor *resource_manager_get_descriptor(sid resource_id)
 
     if (!descriptor) {
         u8 *string = StringIdString(resource_id);
-        Log("No descriptor found for resource: '%s' (resource_id: %"
+        log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+                "No descriptor found for resource: '%s' (resource_id: %"
                 PRIu64 ")", string, resource_id);
         abort();
     }
@@ -73,7 +75,8 @@ static ResourceLoader *resource_manager_get_loader(sid resource_type)
 
     if (!loader) {
         u8 *string = StringIdString(resource_type);
-        Log("No loader found for resource type: '%s' (resource_type_id: %"
+        log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+                "No loader found for resource type: '%s' (resource_type_id: %"
                 PRIu64 ")", string, resource_type);
         abort();
     }
@@ -128,7 +131,8 @@ void *resource_manager_load(sid resource_id)
     }
 
     u8 *string = StringIdString(resource_id);
-    Log("Attempt to load top level resource: '%s' (resource_id: %"
+    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+            "Attempt to load top level resource: '%s' (resource_id: %"
             PRIu64 "), but maximum of %d top level resources already loaded",
             string, resource_id, ResourceManagerMaxTopLevelResources);
     abort();
@@ -140,7 +144,8 @@ void *resource_manager_get(sid resource_id)
 
     if (!manager_resource) {
         u8 *string = StringIdString(resource_id);
-        Log("Trying to get unloaded resource : '%s' (resource_id: %"
+        log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+                "Trying to get unloaded resource : '%s' (resource_id: %"
                 PRIu64 ")", string, resource_id);
         abort();
     }

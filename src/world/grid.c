@@ -4,19 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define WorldGridHalfSize 2048
-
-void world_grid_init(WorldGrid *wg)
+void world_grid_init(WorldGrid *wg, i32 size)
 {
+    i32 half_size = size / 2;
     wg->quad = (Quad) {
-        {-WorldGridHalfSize + 1, -WorldGridHalfSize + 1},
-        {WorldGridHalfSize - 2, WorldGridHalfSize - 2},
+        {-half_size, -half_size},
+        {half_size - 1, half_size - 1},
     };
-    wg->styles_quad = (Quad) {
-        {-WorldGridHalfSize, -WorldGridHalfSize},
-        {WorldGridHalfSize - 1, WorldGridHalfSize - 1},
-    };
-    quad_to_size_quad(&wg->size_quad, &wg->styles_quad);
+    quad_to_size_quad(&wg->size_quad, &wg->quad);
     i64 capacity = size_quad_capacity(&wg->size_quad);
     wg->styles = calloc(capacity, sizeof *wg->styles);
 }

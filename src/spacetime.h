@@ -79,27 +79,4 @@ typedef struct {
 
 #include "math/inline-basic.h"
 
-#ifdef Test
-
-#define Log(...) test_log(__VA_ARGS__)
-#define ILog(...) test_log(__VA_ARGS__)
-#define DLog(...) /* */
-
-#elif defined(__APPLE__)
-
-#include <os/log.h>
-
-extern os_log_t os_spacetime_default_log;
-
-#define Log(...) os_log(os_spacetime_default_log, __VA_ARGS__)
-#define ILog(...) os_log_info(os_spacetime_default_log, __VA_ARGS__)
-
-#ifdef DEBUG
-#define DLog(...) os_log_debug(os_spacetime_default_log, __VA_ARGS__)
-#else
-#define DLog(...) /* */
-#endif
-
-#endif  // __APPLE__
-
 #endif // Spacetime_h
