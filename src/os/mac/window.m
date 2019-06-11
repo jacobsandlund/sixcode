@@ -1,47 +1,67 @@
-@import AppKit
+#import "os/mac/window.h"
+#import "gpu/metal/view.h"
+#import "log/manager.h"
 
-#import "os/window.h"
+// Look at this for a lot of the boilerplate here:
+//   https://hero.handmade.network/forums/code-discussion/t/1409-main_game_loop_on_os_x
 
-@interface WindowDelegate : NSViewController<NSWindowDelegate>
+@implementation MacWindow
+
+- (void)keyDown:(NSEvent *)nsEvent { (void)nsEvent; }
+- (void)keyUp:(NSEvent *)nsEvent { (void)nsEvent; }
+
+- (BOOL)acceptsFirstResponder { return YES; }
+- (BOOL)canBecomeKeyWindow { return YES; }
+- (BOOL)canBecomeMainWindow { return YES; }
+
 @end
 
 @implementation WindowDelegate
+
+- (instancetype)initWithMacWindow:(MacWindow *)window {
+    self = [super init];
+    if (self) {
+        _window = window;
+    }
+    return self;
+}
+
+- (void)loadView {
+    [super loadView];
+    LogDebug(&gLogManager.logs.os, "loadView called");
+}
+
 @end
 
 void os_window_init(OsWindow *window)
 {
-    NSWindow *ns_window = [[NSWindow alloc] init];
-    ns_window.styleMask = NSWindowStyleMaskTitled |
-            NSWindowStyleMaskResizable | NSWindowStyleMaskFullScreen;
+    MacWindow *mac_window = [[MacWindow alloc] init];
+    mac_window.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskResizable;
 
-    WindowDelegate *delegate = [[WindowDelegate alloc] init];
-    [delegate retain];
-    ns_window.delegate = delegate;
+    WindowDelegate *delegate = [[WindowDelegate alloc]
+            initWithMacWindow:mac_window];
+    mac_window.delegate = delegate;
 
-    window->window_impl = (void *) CFBridgingRetain(ns_window);
+    window->window_impl = (void *) CFBridgingRetain(delegate);
 }
 
 void os_window_destroy(OsWindow *window)
 {
-    NSWindow *ns_window = (__bridge NSWindow *) window->window_impl;
-    WindowDelegate *delegate = (WindowDelegate *) ns_window->delegate;
-    [delegate release];
     CFRelease(window->window_impl);
 }
 
 void os_window_set_view(OsWindow *window, GpuView *view)
 {
-    NSWindow *ns_window = (__bridge NSWindow *) window->window_impl;
-    WindowDelegate *delegate = (WindowDelegate *) ns_window->delegate;
-    NSView *ns_view = (__bridge NSView *) view->view_impl;
-    delegate.view = ns_view;
-    ns_window.contentViewController = delegate;
+    WindowDelegate *delegate = (__bridge WindowDelegate *) window->window_impl;
+    ViewDelegate *view_delegate = (__bridge ViewDelegate *) view->view_impl;
+    delegate.view = view_delegate.mtk_view;
+    delegate.window.contentViewController = delegate;
 }
 
 float2 os_window_size(OsWindow *window)
 {
-    NSWindow *ns_window = (__bridge NSWindow *) window->window_impl;
-    NSSize size = [ns_window contentView].frame.size;
+    WindowDelegate *delegate = (__bridge WindowDelegate *) window->window_impl;
+    NSSize size = [delegate.window contentView].frame.size;
     return (float2) {
         size.width,
         size.height,
@@ -50,6 +70,8 @@ float2 os_window_size(OsWindow *window)
 
 void os_window_show(OsWindow *window)
 {
-    NSWindow *ns_window = (__bridge WindowDelegate *) window->window_impl;
-    [ns_window makeKeyAndOrderFront:ns_window];
+    WindowDelegate *delegate = (__bridge WindowDelegate *) window->window_impl;
+    MacWindow *mac_window = delegate.window;
+    [mac_window makeKeyAndOrderFront:delegate];
+    [mac_window toggleFullScreen:delegate];
 }

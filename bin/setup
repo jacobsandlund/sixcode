@@ -1,6 +1,20 @@
 #!/bin/bash
 
+subsystems=$(cat <<-SRC
+    os
+    gpu
+    engine
+SRC
+)
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo sudo log config --mode "persist:debug" --subsystem computer.spacetime.Spacetime
-    sudo log config --mode "persist:debug" --subsystem computer.spacetime.Spacetime
+    for subsystem in $subsystems; do
+        echo sudo log config --mode "persist:debug" --subsystem "computer.spacetime.$subsystem"
+        sudo log config --mode "persist:debug" --subsystem "computer.spacetime.$subsystem"
+    done
+
+    for subsystem in $subsystems; do
+        echo sudo log config --mode "level:debug" --subsystem "computer.spacetime-test.$subsystem"
+        sudo log config --mode "level:debug" --subsystem "computer.spacetime-test.$subsystem"
+    done
 fi

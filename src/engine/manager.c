@@ -1,13 +1,13 @@
 #include "engine/manager.h"
+#include "engine/profile.h"
 #include "render/layout.h"
 
-EngineConfig engine_config = {
+static void engine_manager_will_terminate(void);
+static void engine_manager_draw_in_view(GpuView *view);
+
+EngineConfig gEngineConfig = {
     .log = {
         .logs = {
-            .log = {
-                .subsystem = "computer.spacetime.log",
-                .category = "default",
-            },
             .os = {
                 .subsystem = "computer.spacetime.os",
                 .category = "default",
@@ -16,24 +16,8 @@ EngineConfig engine_config = {
                 .subsystem = "computer.spacetime.gpu",
                 .category = "default",
             },
-            .string = {
-                .subsystem = "computer.spacetime.string",
-                .category = "default",
-            },
-            .resource = {
-                .subsystem = "computer.spacetime.resource",
-                .category = "default",
-            },
-            .render = {
-                .subsystem = "computer.spacetime.render",
-                .category = "default",
-            },
-            .camera = {
-                .subsystem = "computer.spacetime.camera",
-                .category = "default",
-            },
-            .world = {
-                .subsystem = "computer.spacetime.world",
+            .engine = {
+                .subsystem = "computer.spacetime.engine",
                 .category = "default",
             },
         },
@@ -47,7 +31,7 @@ EngineConfig engine_config = {
     },
     .gpu = {
         .view = {
-            .draw_in_view = gpu_manager_draw_in_view,  // TODO: render_manager_draw_in_view
+            .draw_in_view = engine_manager_draw_in_view,
             .size_changed = render_manager_size_changed,
             .preferred_frames_per_second = 60,
         },
@@ -76,43 +60,77 @@ EngineConfig engine_config = {
 
 void engine_manager_init(EngineConfig *config)
 {
+        EngineProfileStart();
     log_manager_init(&config->log);
+        EngineProfileEnd("log_manager_init");
     os_manager_init(&config->os);
-    gpu_manager_init(&config->gpu);
+        EngineProfileEnd("os_manager_init");
+    float2 size = os_window_size(&gOsManager.window);
+    LogDebug(&gLogManager.logs.os, "os window size: %g, %g", size.x, size.y);
+    size = (float2) {
+        800,
+        600,
+    };
+    gpu_manager_init(&config->gpu, size);
+        EngineProfileEnd("gpu_manager_init");
     string_manager_init(&config->string);
+        EngineProfileEnd("string_manager_init");
     resource_manager_init(&config->resource);
+        EngineProfileEnd("resource_manager_init");
 
     os_manager_window_set_view(&gGpuManager.view);
     config->render.viewport_size = gGpuManager.view.viewport_size;
+        EngineProfileEnd("os_manager_window_set_view");
 
     render_manager_init(&config->render);
+        EngineProfileEnd("render_manager_init");
     camera_manager_init(&config->camera);
+        EngineProfileEnd("camera_manager_init");
     world_manager_init(&config->world);
+        EngineProfileEnd("camera_manager_init");
 
     os_manager_finish_launching();
+        EngineProfileEnd("os_manager_finish_launching");
 
     world_manager_load_random(config->world_grid_random_count);
+        EngineProfileEnd("world_manager_load_random");
 }
 
 void engine_manager_destroy(void)
 {
+        EngineProfileStart();
     world_manager_destroy();
+        EngineProfileEnd("world_manager_destroy");
     camera_manager_destroy();
+        EngineProfileEnd("camera_manager_destroy");
     render_manager_destroy();
+        EngineProfileEnd("render_manager_destroy");
     resource_manager_destroy();
+        EngineProfileEnd("resource_manager_destroy");
     string_manager_destroy();
+        EngineProfileEnd("string_manager_destroy");
     gpu_manager_destroy();
+        EngineProfileEnd("gpu_manager_destroy");
     os_manager_destroy();
+        EngineProfileEnd("os_manager_destroy");
     log_manager_destroy();
+        EngineProfileEnd("log_manager_destroy");
 }
 
-static void engine_manager_will_terminate(OsNotification *notification)
+static void engine_manager_will_terminate(void)
 {
-    (void)notification;
     engine_manager_destroy();
 }
 
 void engine_manager_run(void)
 {
     os_manager_run_event_loop();
+}
+
+static void engine_manager_draw_in_view(GpuView *view)
+{
+        EngineProfileStart();
+    // TODO: render_manager_draw_in_view
+    gpu_manager_draw_in_view(view);
+        EngineProfileEnd("gpu_manager_draw_in_view");
 }

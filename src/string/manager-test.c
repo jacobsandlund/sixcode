@@ -1,4 +1,5 @@
 #include "test.h"
+#include "log/manager-mock.c"
 #include "string/manager.c"
 #include "string/id.c"
 #include "string/id-table.c"
@@ -9,6 +10,7 @@ Test(string_manager_init)
     StringManagerConfig config = {
         .string_table_size = 4,
     };
+    log_manager_init(&gLogManagerMockConfig);
     string_manager_init(&config);
 
     StringIdTable *string_table = &gStringManager.string_table;

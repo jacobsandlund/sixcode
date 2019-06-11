@@ -1,6 +1,6 @@
 #include "os/event-queue.h"
-#include <inttypes.h>
 #include <assert.h>
+#include "log/manager.h"
 
 void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining)
 {
@@ -26,7 +26,7 @@ i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event)
         return 0;
     } else if (behind > eq->safe_read_behind) {
         i64 skipping = behind - eq->safe_read_behind;
-        log_at_level(&gLogManager.logs.os, LogLevelDefault,
+        LogDefault(&gLogManager.logs.os,
                 "Event queue read behind by %" PRId64
                 " above safe level of %" PRId64
                 ": skipping %" PRId64 " messages",

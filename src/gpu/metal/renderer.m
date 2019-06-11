@@ -1,14 +1,7 @@
-@import AppKit
-@import MetalKit
-
+#import "gpu/metal/renderer.h"
 #import "gpu/metal/ShaderTypes.h"
-
-@interface MetalRenderer : NSObject
-
-- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view;
-- (void)renderWithView:(GpuView *)view;
-
-@end
+#import "gpu/metal/view.h"
+#import "log/manager.h"
 
 @implementation MetalRenderer {
     id<MTLRenderPipelineState> _pipelineState;
@@ -17,9 +10,19 @@
     u64 _numVertices;
 }
 
-- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view;
-    MTLDevice *mtl_device = (__bridge MTLDevice *)device->device_impl;
-    MTKView *mtk_view = (__bridge MTLDevice *)view->view_impl;
+- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view {
+    self = [super init];
+    if (self) {
+        [self loadMetalWithDevice:device view:view];
+    }
+    return self;
+}
+
+- (void)loadMetalWithDevice:(GpuDevice *)device view:(GpuView *)view {
+    LogDefault(&gLogManager.logs.gpu, "loadMetal in renderer");
+    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device->device_impl;
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view->view_impl;
+    MTKView *mtk_view = delegate.mtk_view;
     id<MTLLibrary> defaultLibrary = [mtl_device newDefaultLibrary];
 
     id<MTLFunction> vertexFunction = [defaultLibrary newFunctionWithName:@"vertexShader"];
@@ -39,7 +42,7 @@
         //  If the Metal API validation is enabled, we can find out more information about what
         //  went wrong.  (Metal API validation is enabled by default when a debug build is run
         //  from Xcode)
-        log_at_level(&gLogManager.logs.gpu, LogLevelDefault,
+        LogDefault(&gLogManager.logs.gpu,
                 "Failed to created pipeline state, error %@", error);
         return;
     }
@@ -103,7 +106,8 @@
 }
 
 - (void)renderWithView:(GpuView *)view {
-    MTKView *mtk_view = (__bridge MTLDevice *)view->view_impl;
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view->view_impl;
+    MTKView *mtk_view = delegate.mtk_view;
 
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
@@ -168,7 +172,7 @@ void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view)
     MetalRenderer *mtl_renderer = [[MetalRenderer alloc]
             initWithDevice:device view:view];
     renderer->device = device;
-    renderer->renderer_impl = CFBridgingRetain(mtl_renderer);
+    renderer->renderer_impl = (void *) CFBridgingRetain(mtl_renderer);
 }
 
 void gpu_renderer_destroy(GpuRenderer *renderer)

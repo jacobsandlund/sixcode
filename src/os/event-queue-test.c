@@ -1,5 +1,6 @@
 #include "test.h"
 #include "os/event-queue.c"
+#include "log/manager-mock.c"
 
 Test(os_event_queue_init)
 {
@@ -25,6 +26,8 @@ Test(os_event_queue_init)
 
 Test(os_event_queue_write)
 {
+    log_manager_init(&gLogManagerMockConfig);
+
     OsEventQueue *eq = tmalloc(sizeof *eq);
 
     OsEvent event = {
@@ -63,6 +66,8 @@ Test(os_event_queue_write)
 
 Test(os_event_queue_read)
 {
+    log_manager_init(&gLogManagerMockConfig);
+
     OsEventQueue *eq = tmalloc(sizeof *eq);
 
     OsEvent event = {
@@ -103,7 +108,7 @@ Test(os_event_queue_read)
     //=> 4
 
     _Log(&gLogManager.logs.os);
-    //=> Event queue read behind by 3 above safe level of 2: skipping 1 messages
+    //=> [default]  Event queue read behind by 3 above safe level of 2: skipping 1 messages
     //=>
     _u64(read_event.time);
     //=> 9876543210

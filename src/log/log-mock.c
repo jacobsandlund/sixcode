@@ -1,11 +1,11 @@
 #include "log/log.h"
+#include "test.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-#define LogMockBufferLength 65536
+#define LogMockBufferLength 4096
 
 typedef struct {
     char *subsystem;
@@ -32,7 +32,7 @@ void log_mock_reset(Log *log)
 
 void log_init(Log *log, LogConfig *config)
 {
-    LogMock *mock = malloc(sizeof *mock);
+    LogMock *mock = tmalloc(sizeof *mock);
 
     mock->subsystem = strcpy(mock->buffer, config->subsystem);
     mock->buffer_i_start = strlen(config->subsystem) + 1;
@@ -47,7 +47,7 @@ void log_init(Log *log, LogConfig *config)
 
 void log_destroy(Log *log)
 {
-    free(log->log_impl);
+    (void) log;
 }
 
 void log_at_level(Log *log, LogLevel level, const char *format, ...)

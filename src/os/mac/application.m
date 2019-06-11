@@ -1,19 +1,13 @@
-@import AppKit
-#import "os/application.h"
-
-@interface AppDelegate : NSObject<NSApplicationDelegate>
-
-- (instancetype)initWithConfig:(OsApplicationConfig *)config;
-
-@end
+#import "os/mac/application.h"
 
 @implementation AppDelegate {
     OsApplicationNotificationFn _will_terminate;
 }
 
-- (instancetype)initWithConfig:(OsApplicationConfig *)config {
+- (instancetype)initWithNSApp:(NSApplication *)ns_app config:(OsApplicationConfig *)config {
     self = [super init];
     if (self) {
+        _ns_app = ns_app;
         _will_terminate = config->will_terminate;
     }
     return self;
@@ -25,7 +19,8 @@
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
-    _will_terminate((__bridge OsNotfication *) notification);
+    (void)notification;
+    _will_terminate();
 }
 
 @end
@@ -50,27 +45,28 @@ void os_application_init(OsApplication *app, OsApplicationConfig *config)
     @autoreleasepool {
 
     NSApplication *ns_app = [NSApplication sharedApplication];
-    app->application_impl = (void *) CFBridgingRetain(ns_app);
 
+    [ns_app setActivationPolicy:NSApplicationActivationPolicyRegular];
+    ns_app.presentationOptions = NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock;
+    [ns_app activateIgnoringOtherApps:YES];
     ns_app.mainMenu = makeMenu();
-    ns_app.presentationOptions = NSApplicationPresentationHideMenuBar | NSApplicationPresentationHideDock;
 
-    AppDelegate *delegate = [[AppDelegate alloc] initWithConfig:config];
-    [delegate retain];
+    AppDelegate *delegate = [[AppDelegate alloc] initWithNSApp:ns_app
+            config:config];
     [ns_app setDelegate:delegate];
+
+    app->application_impl = (void *) CFBridgingRetain(delegate);
 
     } // @autoreleasepool
 }
 
-void os_application_finish_launching(OsApplication *app)
-{
-    NSApplication *ns_app = (__bridge NSApplication *) app->application_ipml;
-    [ns_app finishLaunching];
-}
-
 void os_application_destroy(OsApplication *app)
 {
-    NSApplication *ns_app = (__bridge NSApplication *) app->application_ipml;
-    [ns_app.delegate release];
-    CFRelease(app->application_ipml);
+    CFRelease(app->application_impl);
+}
+
+void os_application_finish_launching(OsApplication *app)
+{
+    AppDelegate *delegate = (__bridge AppDelegate *)app->application_impl;
+    [delegate.ns_app finishLaunching];
 }

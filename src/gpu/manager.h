@@ -2,7 +2,6 @@
 #define GpuManager_h
 
 #include "spacetime.h"
-#include "os/log.h"
 #include "gpu/device.h"
 #include "gpu/view.h"
 #include "gpu/renderer.h"
@@ -15,7 +14,6 @@ typedef struct {
     GpuDevice device;
     GpuView view;
     GpuRenderer renderer;
-    OsLog log;
 } GpuManager;
 
 extern GpuManager gGpuManager;

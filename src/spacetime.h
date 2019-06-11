@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+#include <inttypes.h>
 
 typedef int_fast32_t i32f;
 typedef uint_fast32_t u32f;

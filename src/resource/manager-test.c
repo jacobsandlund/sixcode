@@ -102,20 +102,20 @@ static void test_resource_init(Resource *resource, uintptr_t options)
     TestResource *test_resource = ResourcePointerAlloc(sizeof *test_resource);
     test_resource->number = (i64) options;
     resource->pointer = test_resource;
-    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+    LogDefault(&gLogManager.logs.engine,
             "Loaded %s", StringIdString(resource->id));
 }
 
 static void test_list_resource_init(Resource *resource, uintptr_t options)
 {
     (void) options;
-    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+    LogDefault(&gLogManager.logs.engine,
             "Loaded %s", StringIdString(resource->id));
 }
 
 static void test_resource_destroy(Resource *resource)
 {
-    log_at_level(&gLogManager.logs.resource, LogLevelDefault,
+    LogDefault(&gLogManager.logs.engine,
             "Unloaded %s", StringIdString(resource->id));
     resource->pointer = NULL;
     test_unloaded_count++;
@@ -212,7 +212,7 @@ Test(resource_manager_load_get_unload)
     _d(test_unloaded_count);
     //=> 4
 
-    _Log(&gLogManager.logs.resource);
+    _Log(&gLogManager.logs.engine);
     //=> [debug]  Resource allocating 8 bytes (8 bytes total)
     //=> [default]  Loaded foo
     //=> [debug]  Resource allocating 8 bytes (16 bytes total)

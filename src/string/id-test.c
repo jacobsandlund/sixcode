@@ -1,6 +1,7 @@
 #include "test.h"
 #include "string/id.c"
 #include <string.h>
+#include "log/manager-mock.c"
 #include "string/id-table.c"
 #include "math/fnv.c"
 
@@ -28,6 +29,7 @@ Test(string_id_intern)
 {
     StringIdTable *st = tmalloc(sizeof *st);
 
+    log_manager_init(&gLogManagerMockConfig);
     string_id_table_init(st, 4, sizeof(u8 *));
 
     _d(st->count);
@@ -68,6 +70,7 @@ Test(string_id_string)
 {
     StringIdTable *st = tmalloc(sizeof *st);
 
+    log_manager_init(&gLogManagerMockConfig);
     string_id_table_init(st, 4, sizeof(u8 *));
 
     sid id = string_id_intern_literal(st, "foobar");

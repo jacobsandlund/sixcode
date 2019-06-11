@@ -5,14 +5,9 @@
 #include "log/log.h"
 
 typedef struct {
-    LogConfig log;
     LogConfig os;
     LogConfig gpu;
-    LogConfig string;
-    LogConfig resource;
-    LogConfig render;
-    LogConfig camera;
-    LogConfig world;
+    LogConfig engine;
 } LogManagerLogsConfig;
 
 typedef struct {
@@ -20,14 +15,9 @@ typedef struct {
 } LogManagerConfig;
 
 typedef struct {
-    Log log;
     Log os;
     Log gpu;
-    Log string;
-    Log resource;
-    Log render;
-    Log camera;
-    Log world;
+    Log engine;
 } LogManagerLogs;
 
 typedef struct {
@@ -35,6 +25,16 @@ typedef struct {
 } LogManager;
 
 extern LogManager gLogManager;
+
+#ifdef DEBUG
+#define LogDebug(log, ...) log_at_level(log, LogLevelDebug, __VA_ARGS__)
+#else
+#define LogDebug(log, ...) /* */
+#endif
+
+#define LogDefault(log, ...) log_at_level(log, LogLevelDefault, __VA_ARGS__)
+#define LogInfo(log, ...) log_at_level(log, LogLevelInfo, __VA_ARGS__)
+#define LogError(log, ...) log_at_level(log, LogLevelError, __VA_ARGS__)
 
 void log_manager_init(LogManagerConfig *config);
 void log_manager_destroy(void);

@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include "valgrind.h"
 
+#define DEBUG 1
 #define _(...) test_runner_log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)
 #define _dd(...) _("%d, %d\n", __VA_ARGS__)

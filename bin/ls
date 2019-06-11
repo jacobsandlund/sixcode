@@ -4,13 +4,13 @@
 # specific modules
 src=$(grep -v '#' <<-SRC
     src/camera
-    src/engine
-    src/gpu
+    # src/engine
+    # src/gpu
     src/log
     src/main.c
     src/math
     src/model
-    src/os
+    # src/os
     src/render
     src/resource
     src/spacetime.h
@@ -19,22 +19,21 @@ src=$(grep -v '#' <<-SRC
 SRC
 )
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    exclude='windows/'
+if [[ $1 == 'all' ]]; then
+    exclude='do_not_exclude_anything'
+    shift
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    exclude='windows/|directx/'
 else
-    exclude='mac/'
+    exclude='mac/|metal/'
 fi
 
 include_only='.'
 
-if [[ $1 == 'all' ]]; then
-    shift
-elif [[ $1 != 'test.c' ]] && [[ $1 != 'test.m' ]] && [[ $1 != test ]]; then
-    exclude="$exclude|-test.c|-test.m|mock.c"
-fi
-
 if [[ $1 == 'test' ]]; then
     include_only='test\.c|test\.m$'
+elif [[ $1 == 'code' ]]; then
+    exclude="$exclude|-test.c|-test.m|-mock.c"
 elif [[ $# -eq 1 ]]; then
     include_only="$1$"
 fi

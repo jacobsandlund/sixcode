@@ -8,11 +8,14 @@ void os_manager_init(OsManagerConfig *config)
             config->event_queue_length,
             config->event_queue_safe_length_remaining);
 
-    os_application_init(&gOsManager.application);
+    os_application_init(&gOsManager.application, &config->application);
+
+    os_event_loop_init(&gOsManager.event_loop);
 }
 
 void os_manager_destroy(void)
 {
+    os_event_loop_destroy(&gOsManager.event_loop);
     os_application_destroy(&gOsManager.application);
     os_event_queue_destroy(&gOsManager.event_queue);
 }
@@ -24,8 +27,8 @@ void os_manager_window_set_view(GpuView *view)
 
 void os_manager_finish_launching(void)
 {
+    os_application_finish_launching(&gOsManager.application);
     os_window_show(&gOsManager.window);
-    os_application_finish_launching(&gOsManager.application, &gOsManager.window);
 }
 
 void os_manager_run_event_loop(void)
