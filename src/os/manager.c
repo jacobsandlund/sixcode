@@ -20,11 +20,6 @@ void os_manager_destroy(void)
     os_event_queue_destroy(&gOsManager.event_queue);
 }
 
-void os_manager_window_set_view(GpuView *view)
-{
-    os_window_set_view(&gOsManager.window, view);
-}
-
 void os_manager_finish_launching(void)
 {
     os_application_finish_launching(&gOsManager.application);

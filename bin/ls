@@ -4,13 +4,13 @@
 # specific modules
 src=$(grep -v '#' <<-SRC
     src/camera
-    # src/engine
-    # src/gpu
+    src/engine
+    src/gpu
     src/log
     src/main.c
     src/math
     src/model
-    # src/os
+    src/os
     src/render
     src/resource
     src/spacetime.h

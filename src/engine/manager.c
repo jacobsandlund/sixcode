@@ -65,20 +65,15 @@ void engine_manager_init(EngineConfig *config)
         EngineProfileEnd("log_manager_init");
     os_manager_init(&config->os);
         EngineProfileEnd("os_manager_init");
-    float2 size = os_window_size(&gOsManager.window);
-    LogDebug(&gLogManager.logs.os, "os window size: %g, %g", size.x, size.y);
-    size = (float2) {
-        800,
-        600,
-    };
-    gpu_manager_init(&config->gpu, size);
+
+    gpu_manager_init(&config->gpu, os_screen_visible_frame());
         EngineProfileEnd("gpu_manager_init");
     string_manager_init(&config->string);
         EngineProfileEnd("string_manager_init");
     resource_manager_init(&config->resource);
         EngineProfileEnd("resource_manager_init");
 
-    os_manager_window_set_view(&gGpuManager.view);
+    os_window_init(&gOsManager.window, &gGpuManager.view);
     config->render.viewport_size = gGpuManager.view.viewport_size;
         EngineProfileEnd("os_manager_window_set_view");
 
@@ -105,6 +100,8 @@ void engine_manager_destroy(void)
         EngineProfileEnd("camera_manager_destroy");
     render_manager_destroy();
         EngineProfileEnd("render_manager_destroy");
+    os_window_destroy(&gOsManager.window);
+        EngineProfileEnd("os_window_destroy");
     resource_manager_destroy();
         EngineProfileEnd("resource_manager_destroy");
     string_manager_destroy();
@@ -129,8 +126,8 @@ void engine_manager_run(void)
 
 static void engine_manager_draw_in_view(GpuView *view)
 {
-        EngineProfileStart();
+        // EngineProfileStart();
     // TODO: render_manager_draw_in_view
     gpu_manager_draw_in_view(view);
-        EngineProfileEnd("gpu_manager_draw_in_view");
+        // EngineProfileEnd("gpu_manager_draw_in_view");
 }

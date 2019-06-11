@@ -13,7 +13,11 @@
 - (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view {
     self = [super init];
     if (self) {
+        @autoreleasepool {
+
         [self loadMetalWithDevice:device view:view];
+
+        } // @autoreleasepool
     }
     return self;
 }

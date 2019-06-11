@@ -39,12 +39,18 @@
 
 @end
 
-void gpu_view_init(GpuView *view, GpuDevice *device, float2 viewport_size, GpuViewConfig *config)
+void gpu_view_init(GpuView *view, GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config)
 {
+    @autoreleasepool {
+
     id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device->device_impl;
 
-    (void) viewport_size;
-    NSRect frame = [NSScreen.mainScreen frame];
+    NSRect frame = NSMakeRect(
+            visible_frame.origin.x,
+            visible_frame.origin.y,
+            visible_frame.size.x,
+            visible_frame.size.y);
+
     MTKView *mtk_view = [[MTKView alloc] initWithFrame: frame
             device: mtl_device];
     mtk_view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
@@ -55,6 +61,8 @@ void gpu_view_init(GpuView *view, GpuDevice *device, float2 viewport_size, GpuVi
     mtk_view.delegate = delegate;
 
     view->view_impl = (void *) CFBridgingRetain(delegate);
+
+    } // @autoreleasepool
 }
 
 void gpu_view_destroy(GpuView *view)

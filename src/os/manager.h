@@ -26,7 +26,6 @@ extern OsManager gOsManager;
 
 void os_manager_init(OsManagerConfig *config);
 void os_manager_destroy(void);
-void os_manager_window_set_view(GpuView *view);
 void os_manager_finish_launching(void);
 void os_manager_run_event_loop(void);
 

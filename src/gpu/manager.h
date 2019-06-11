@@ -2,6 +2,7 @@
 #define GpuManager_h
 
 #include "spacetime.h"
+#include "os/screen.h"
 #include "gpu/device.h"
 #include "gpu/view.h"
 #include "gpu/renderer.h"
@@ -18,7 +19,7 @@ typedef struct {
 
 extern GpuManager gGpuManager;
 
-void gpu_manager_init(GpuManagerConfig *config, float2 viewport_size);
+void gpu_manager_init(GpuManagerConfig *config, OsScreenFrame visible_frame);
 void gpu_manager_destroy(void);
 void gpu_manager_draw_in_view(GpuView *view);
 

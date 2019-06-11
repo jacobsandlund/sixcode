@@ -54,18 +54,26 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             .time = os_clock_time(),
         };
 
+        LogDebug(&gLogManager.logs.os,
+                "location in window: %g, %g", nsEvent.locationInWindow.x, nsEvent.locationInWindow.y);
+
         switch (nsEvent.type) {
 
         case NSEventTypeLeftMouseDown:
+            LogDebug(&gLogManager.logs.os, "Event left mouse down");
             loop->left_mouse_down_time = event.time;
             loop->left_mouse_down_location = (float2) {
                 (float) nsEvent.locationInWindow.x,
                 (float) nsEvent.locationInWindow.y,
             };
 
+            [NSApp sendEvent:nsEvent];
+            [NSApp updateWindows];
+
             break;
 
         case NSEventTypeLeftMouseUp:
+            LogDebug(&gLogManager.logs.os, "Event left mouse up");
             if (!loop->left_mouse_dragging) {
                 event.type = OsEventTypeMouseClick;
                 event.location = (float2) {
@@ -80,6 +88,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeMouseMoved:
+            LogDebug(&gLogManager.logs.os, "Event left mouse moved");
             event.type = OsEventTypeMouseMove;
             event.location = (float2) {
                 (float) nsEvent.locationInWindow.x,
@@ -90,6 +99,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeLeftMouseDragged:
+            LogDebug(&gLogManager.logs.os, "Event left mouse dragged");
             event.location = (float2) {
                 (float) nsEvent.locationInWindow.x,
                 (float) nsEvent.locationInWindow.y,
@@ -111,12 +121,6 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeKeyDown:
-            if (nsEvent.modifierFlags & NSEventModifierFlagCommand) {
-                [NSApp sendEvent:nsEvent];
-                [NSApp updateWindows];
-                break;
-            }
-
             LogDebug(&gLogManager.logs.os,
                     "Event key down with characters: '%s'", nsEvent.characters.UTF8String);
 
@@ -218,6 +222,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
         default:
             LogDebug(&gLogManager.logs.os,
                     "Event other with type: %d", nsEvent.type);
+
             [NSApp sendEvent:nsEvent];
             [NSApp updateWindows];
 

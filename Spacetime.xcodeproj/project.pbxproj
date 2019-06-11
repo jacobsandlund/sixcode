@@ -41,6 +41,7 @@
 		6555417722B01BB200EE6B74 /* resource.c in Sources */ = {isa = PBXBuildFile; fileRef = 6555412F22B01BB200EE6B74 /* resource.c */; };
 		6555417A22B01BB200EE6B74 /* manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6555413522B01BB200EE6B74 /* manager.c */; };
 		6555417D22B01BB200EE6B74 /* manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6555413B22B01BB200EE6B74 /* manager.c */; };
+		6568E7F922B0591300A8BB4E /* screen.m in Sources */ = {isa = PBXBuildFile; fileRef = 6568E7F822B0591200A8BB4E /* screen.m */; };
 		656A1126228DFA2800DCAD49 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 656A1125228DFA2800DCAD49 /* MetalKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -124,6 +125,8 @@
 		6555413822B01BB200EE6B74 /* profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profile.h; sourceTree = "<group>"; };
 		6555413922B01BB200EE6B74 /* manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manager.h; sourceTree = "<group>"; };
 		6555413B22B01BB200EE6B74 /* manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manager.c; sourceTree = "<group>"; };
+		6568E7F722B0590600A8BB4E /* screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = screen.h; sourceTree = "<group>"; };
+		6568E7F822B0591200A8BB4E /* screen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = screen.m; sourceTree = "<group>"; };
 		656A1125228DFA2800DCAD49 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		65B6118B228F3F9C0062EB4C /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -299,6 +302,7 @@
 		6555410C22B01BB200EE6B74 /* os */ = {
 			isa = PBXGroup;
 			children = (
+				6568E7F722B0590600A8BB4E /* screen.h */,
 				6555410E22B01BB200EE6B74 /* event-loop.h */,
 				6555411122B01BB200EE6B74 /* event-queue.c */,
 				6555411222B01BB200EE6B74 /* event.h */,
@@ -317,6 +321,7 @@
 		6555411822B01BB200EE6B74 /* mac */ = {
 			isa = PBXGroup;
 			children = (
+				6568E7F822B0591200A8BB4E /* screen.m */,
 				6555411A22B01BB200EE6B74 /* application.h */,
 				6555411B22B01BB200EE6B74 /* window.h */,
 				6555411C22B01BB200EE6B74 /* clock.c */,
@@ -440,6 +445,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6555415922B01BB200EE6B74 /* quad.c in Sources */,
+				6568E7F922B0591300A8BB4E /* screen.m in Sources */,
 				6555417D22B01BB200EE6B74 /* manager.c in Sources */,
 				6555416822B01BB200EE6B74 /* event-queue.c in Sources */,
 				6555414022B01BB200EE6B74 /* view.m in Sources */,

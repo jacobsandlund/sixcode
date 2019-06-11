@@ -2,6 +2,7 @@
 #define GpuView_h
 
 #include "spacetime.h"
+#include "os/screen.h"
 #include "gpu/device.h"
 
 typedef struct {
@@ -17,7 +18,7 @@ typedef struct {
     i64 preferred_frames_per_second;
 } GpuViewConfig;
 
-void gpu_view_init(GpuView *view, GpuDevice *device, float2 viewport_size, GpuViewConfig *config);
+void gpu_view_init(GpuView *view, GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config);
 void gpu_view_destroy(GpuView *view);
 
 #endif // GpuView_h

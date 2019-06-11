@@ -1,4 +1,5 @@
 #import "os/mac/application.h"
+#import "log/manager.h"
 
 @implementation AppDelegate {
     OsApplicationNotificationFn _will_terminate;
@@ -27,15 +28,30 @@
 
 NSMenu *makeMenu() {
     NSMenu *mainMenu = [[NSMenu alloc] init];
-    NSMenuItem *mainSpacetimeMenuItem = [[NSMenuItem alloc]
-            initWithTitle:@"Spacetime" action:nil keyEquivalent:@""];
-    [mainMenu addItem:mainSpacetimeMenuItem];
 
-    NSMenu *mainSpacetimeMenu = [[NSMenu alloc] init];
-    mainSpacetimeMenuItem.submenu = mainSpacetimeMenu;
+    {
+        NSMenuItem *spacetimeMenuItem = [[NSMenuItem alloc]
+                initWithTitle:@"Spacetime" action:nil keyEquivalent:@""];
+        [mainMenu addItem:spacetimeMenuItem];
 
-    [mainSpacetimeMenu addItemWithTitle:@"Quit Spacetime"
-            action:@selector(terminate:) keyEquivalent:@"q"];
+        NSMenu *spacetimeMenu = [[NSMenu alloc] init];
+        spacetimeMenuItem.submenu = spacetimeMenu;
+
+        [spacetimeMenu addItemWithTitle:@"Quit Spacetime"
+                action:@selector(terminate:) keyEquivalent:@"q"];
+    }
+
+    {
+        NSMenuItem *viewMenuItem = [[NSMenuItem alloc]
+                initWithTitle:@"View" action:nil keyEquivalent:@""];
+        [mainMenu addItem:viewMenuItem];
+
+        NSMenu *viewMenu = [[NSMenu alloc] initWithTitle:@"View"];
+        viewMenuItem.submenu = viewMenu;
+
+        [viewMenu addItemWithTitle:@"Toggle Fullscreen"
+                action:@selector(toggleFullScreen:) keyEquivalent:@"f"];
+    }
 
     return mainMenu;
 }
@@ -47,7 +63,7 @@ void os_application_init(OsApplication *app, OsApplicationConfig *config)
     NSApplication *ns_app = [NSApplication sharedApplication];
 
     [ns_app setActivationPolicy:NSApplicationActivationPolicyRegular];
-    ns_app.presentationOptions = NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock;
+    ns_app.presentationOptions = NSApplicationPresentationDefault; // NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock;
     [ns_app activateIgnoringOtherApps:YES];
     ns_app.mainMenu = makeMenu();
 

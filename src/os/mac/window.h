@@ -1,4 +1,5 @@
 @import AppKit;
+@import MetalKit;
 
 #import "os/window.h"
 
