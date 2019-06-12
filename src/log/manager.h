@@ -15,9 +15,9 @@ typedef struct {
 } LogManagerConfig;
 
 typedef struct {
-    Log os;
-    Log gpu;
-    Log engine;
+    Log *os;
+    Log *gpu;
+    Log *engine;
 } LogManagerLogs;
 
 typedef struct {

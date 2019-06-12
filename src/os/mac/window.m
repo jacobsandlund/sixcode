@@ -41,14 +41,16 @@
 
 @end
 
-void os_window_init(OsWindow *window, GpuView *view)
+OsWindow *os_window_create(GpuView *view)
 {
+    OsWindow *window;
+
     @autoreleasepool {
 
     MacWindow *mac_window = [[MacWindow alloc] init];
     mac_window.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable;
 
-    ViewDelegate *view_delegate = (__bridge ViewDelegate *) view->view_impl;
+    ViewDelegate *view_delegate = (__bridge ViewDelegate *)view;
     WindowDelegate *delegate = [[WindowDelegate alloc]
             initWithMacWindow:mac_window];
 
@@ -56,20 +58,27 @@ void os_window_init(OsWindow *window, GpuView *view)
     mac_window.delegate = delegate;
     mac_window.contentViewController = delegate;
 
-    window->window_impl = (void *) CFBridgingRetain(delegate);
+    window = (__bridge_retained OsWindow *)delegate;
 
     } // @autoreleasepool
+
+    return window;
 }
 
 void os_window_destroy(OsWindow *window)
 {
-    CFRelease(window->window_impl);
+    @autoreleasepool {
+        WindowDelegate *delegate = (__bridge_transfer WindowDelegate *)window;
+        delegate = nil;
+    }
 }
 
 void os_window_show(OsWindow *window)
 {
-    WindowDelegate *delegate = (__bridge WindowDelegate *) window->window_impl;
-    MacWindow *mac_window = delegate.window;
-    [mac_window makeKeyAndOrderFront:delegate];
-    // [mac_window toggleFullScreen:delegate];
+    @autoreleasepool {
+        WindowDelegate *delegate = (__bridge WindowDelegate *) window;
+        MacWindow *mac_window = delegate.window;
+        [mac_window makeKeyAndOrderFront:delegate];
+        [mac_window toggleFullScreen:delegate];
+    }
 }

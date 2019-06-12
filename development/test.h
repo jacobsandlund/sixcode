@@ -37,15 +37,14 @@
 #define _i2(v) _dd(v.x, v.y)
 
 #define _Log(log) { \
-    LogMock *mock = (LogMock *) (log)->log_impl; \
-	_s(&mock->buffer[mock->buffer_i_start]); \
+	_s(&log->buffer[log->buffer_i_start]); \
 	log_mock_reset(log); \
 }
 
 #define TestCaseSentinel 1976020431
 
 #define Test(test_name) \
-void test_case_fn_##test_name(); \
+void test_case_fn_##test_name(void); \
 static TestCase test_case_##test_name \
 __attribute((used, section("data,test_cases"))) = { \
 	.fn = test_case_fn_##test_name, \
@@ -66,6 +65,7 @@ Test(start)
 }
 
 void *tmalloc(size_t size);
+void tfree(void *mem);
 int test_runner_run(TestCase *start_case);
 
 int main(int argc, const char *argv[])
@@ -124,6 +124,12 @@ void *tmalloc(size_t size)
 	void *p = tmem_p;
 	tmem_p += size;
 	return p;
+}
+
+void tfree(void *mem)
+{
+    // Memory gets deallocated at end of test
+    (void)mem;
 }
 
 static inline void *test_mem_alloc(size_t size)

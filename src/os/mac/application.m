@@ -56,33 +56,43 @@ NSMenu *makeMenu() {
     return mainMenu;
 }
 
-void os_application_init(OsApplication *app, OsApplicationConfig *config)
+OsApplication *os_application_create(OsApplicationConfig *config)
 {
+    OsApplication *app;
+
     @autoreleasepool {
 
     NSApplication *ns_app = [NSApplication sharedApplication];
 
     [ns_app setActivationPolicy:NSApplicationActivationPolicyRegular];
-    ns_app.presentationOptions = NSApplicationPresentationDefault; // NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock;
+    ns_app.presentationOptions = NSApplicationPresentationDefault;
     [ns_app activateIgnoringOtherApps:YES];
+
     ns_app.mainMenu = makeMenu();
 
     AppDelegate *delegate = [[AppDelegate alloc] initWithNSApp:ns_app
             config:config];
     [ns_app setDelegate:delegate];
 
-    app->application_impl = (void *) CFBridgingRetain(delegate);
+    app = (__bridge_retained OsApplication *) delegate;
 
     } // @autoreleasepool
+
+    return app;
 }
 
 void os_application_destroy(OsApplication *app)
 {
-    CFRelease(app->application_impl);
+    @autoreleasepool {
+        AppDelegate *delegate = (__bridge_transfer AppDelegate *)app;
+        delegate = nil;
+    }
 }
 
 void os_application_finish_launching(OsApplication *app)
 {
-    AppDelegate *delegate = (__bridge AppDelegate *)app->application_impl;
-    [delegate.ns_app finishLaunching];
+    @autoreleasepool {
+        AppDelegate *delegate = (__bridge AppDelegate *)app;
+        [delegate.ns_app finishLaunching];
+    }
 }

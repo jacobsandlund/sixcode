@@ -5,20 +5,19 @@
 #include "os/screen.h"
 #include "gpu/device.h"
 
-typedef struct {
-    void *view_impl;
-    float2 viewport_size;
-} GpuView;
+typedef struct GpuView GpuView;
 
 typedef void (*GpuViewFn)(GpuView *view);
+typedef void (*GpuViewSizeChangedFn)(GpuView *view, float2 viewport_size);
 
 typedef struct {
-    GpuViewFn size_changed;
     GpuViewFn draw_in_view;
+    GpuViewSizeChangedFn size_changed;
     i64 preferred_frames_per_second;
 } GpuViewConfig;
 
-void gpu_view_init(GpuView *view, GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config);
+GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config);
 void gpu_view_destroy(GpuView *view);
+float2 gpu_view_viewport_size(GpuView *view);
 
 #endif // GpuView_h

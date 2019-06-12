@@ -10,12 +10,9 @@ typedef struct {
     OsApplicationNotificationFn will_terminate;
 } OsApplicationConfig;
 
-typedef struct {
-    void *application_impl;
-    OsApplicationNotificationFn will_terminate;
-} OsApplication;
+typedef struct OsApplication OsApplication;
 
-void os_application_init(OsApplication *app, OsApplicationConfig *config);
+OsApplication *os_application_create(OsApplicationConfig *config);
 void os_application_destroy(OsApplication *app);
 void os_application_finish_launching(OsApplication *app);
 

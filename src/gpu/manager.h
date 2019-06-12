@@ -12,9 +12,9 @@ typedef struct {
 } GpuManagerConfig;
 
 typedef struct {
-    GpuDevice device;
-    GpuView view;
-    GpuRenderer renderer;
+    GpuDevice *device;
+    GpuView *view;
+    GpuRenderer *renderer;
 } GpuManager;
 
 extern GpuManager gGpuManager;

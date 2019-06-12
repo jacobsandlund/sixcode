@@ -13,20 +13,16 @@
 - (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view {
     self = [super init];
     if (self) {
-        @autoreleasepool {
-
         [self loadMetalWithDevice:device view:view];
-
-        } // @autoreleasepool
     }
     return self;
 }
 
 - (void)loadMetalWithDevice:(GpuDevice *)device view:(GpuView *)view {
-    LogDefault(&gLogManager.logs.gpu, "loadMetal in renderer");
-    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device->device_impl;
-    ViewDelegate *delegate = (__bridge ViewDelegate *)view->view_impl;
-    MTKView *mtk_view = delegate.mtk_view;
+    LogDefault(gLogManager.logs.gpu, "loadMetal in renderer");
+    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
+    ViewDelegate *view_delegate = (__bridge ViewDelegate *)view;
+    MTKView *mtk_view = view_delegate.mtk_view;
     id<MTLLibrary> defaultLibrary = [mtl_device newDefaultLibrary];
 
     id<MTLFunction> vertexFunction = [defaultLibrary newFunctionWithName:@"vertexShader"];
@@ -46,7 +42,7 @@
         //  If the Metal API validation is enabled, we can find out more information about what
         //  went wrong.  (Metal API validation is enabled by default when a debug build is run
         //  from Xcode)
-        LogDefault(&gLogManager.logs.gpu,
+        LogDefault(gLogManager.logs.gpu,
                 "Failed to created pipeline state, error %@", error);
         return;
     }
@@ -109,9 +105,10 @@
     return vertexData;
 }
 
-- (void)renderWithView:(GpuView *)view {
-    ViewDelegate *delegate = (__bridge ViewDelegate *)view->view_impl;
-    MTKView *mtk_view = delegate.mtk_view;
+- (void)drawInView:(GpuView *)view {
+    ViewDelegate *view_delegate = (__bridge ViewDelegate *)view;
+    MTKView *mtk_view = view_delegate.mtk_view;
+    float2 viewport_size = view_delegate.viewport_size;
 
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
@@ -126,8 +123,8 @@
         MTLViewport viewport = {
             0.0,
             0.0,
-            view->viewport_size.x,
-            view->viewport_size.y,
+            viewport_size.x,
+            viewport_size.y,
             -1.0,
             1.0,
         };
@@ -152,8 +149,8 @@
                                 offset:0
                                atIndex:VertexInputIndexVertices];
 
-        [renderEncoder setVertexBytes:&view->viewport_size
-                               length:sizeof(view->viewport_size)
+        [renderEncoder setVertexBytes:&viewport_size
+                               length:sizeof(viewport_size)
                               atIndex:VertexInputIndexViewportSize];
 
         // Draw the vertices of the quads
@@ -171,21 +168,31 @@
 
 @end
 
-void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view)
+GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view)
 {
-    MetalRenderer *mtl_renderer = [[MetalRenderer alloc]
-            initWithDevice:device view:view];
-    renderer->device = device;
-    renderer->renderer_impl = (void *) CFBridgingRetain(mtl_renderer);
+    GpuRenderer *renderer;
+
+    @autoreleasepool {
+        MetalRenderer *mtl_renderer = [[MetalRenderer alloc]
+                initWithDevice:device view:view];
+        renderer = (__bridge_retained GpuRenderer *)mtl_renderer;
+    }
+
+    return renderer;
 }
 
 void gpu_renderer_destroy(GpuRenderer *renderer)
 {
-    CFRelease(renderer->renderer_impl);
+    @autoreleasepool {
+        MetalRenderer *mtl_renderer = (__bridge_transfer MetalRenderer *)renderer;
+        mtl_renderer = nil;
+    }
 }
 
 void gpu_renderer_draw_in_view(GpuRenderer *renderer, GpuView *view)
 {
-    MetalRenderer *mtl_renderer = (__bridge MetalRenderer *)renderer->renderer_impl;
-    [mtl_renderer renderWithView:view];
+    @autoreleasepool {
+        MetalRenderer *mtl_renderer = (__bridge MetalRenderer *)renderer;
+        [mtl_renderer drawInView:view];
+    }
 }

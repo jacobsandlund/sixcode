@@ -42,7 +42,7 @@ Test(resource_pointer_allocator_alloc)
     _d(resource_pointer_allocator_alloc(pa, 6));
     //=> 0
 
-    _Log(&gLogManager.logs.engine);
+    _Log(gLogManager.logs.engine);
     //=> [debug]  Resource allocating 10 bytes (10 bytes total)
     //=> [debug]  Resource allocating 4 bytes (14 bytes total)
     //=> [default]  Resource pointer_allocator attempt to allocate 6 bytes with only 2 bytes remaining

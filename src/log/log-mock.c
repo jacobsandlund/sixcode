@@ -7,13 +7,13 @@
 
 #define LogMockBufferLength 4096
 
-typedef struct {
+struct Log {
     char *subsystem;
     char *category;
     i64 buffer_i;
     i64 buffer_i_start;
     char buffer[LogMockBufferLength];
-} LogMock;
+};
 
 // Order of this has to match LogLevel enum in "os/log.h"
 static const char *LogMockLevelStrings[] = {
@@ -25,29 +25,28 @@ static const char *LogMockLevelStrings[] = {
 
 void log_mock_reset(Log *log)
 {
-    LogMock *mock = (LogMock *) log->log_impl;
-    mock->buffer_i = mock->buffer_i_start;
-    mock->buffer[mock->buffer_i_start] = '\0';
+    log->buffer_i = log->buffer_i_start;
+    log->buffer[log->buffer_i_start] = '\0';
 }
 
-void log_init(Log *log, LogConfig *config)
+Log *log_create(LogConfig *config)
 {
-    LogMock *mock = tmalloc(sizeof *mock);
+    Log *log = tmalloc(sizeof *log);
 
-    mock->subsystem = strcpy(mock->buffer, config->subsystem);
-    mock->buffer_i_start = strlen(config->subsystem) + 1;
-    mock->category = strcpy(&mock->buffer[mock->buffer_i_start],
+    log->subsystem = strcpy(log->buffer, config->subsystem);
+    log->buffer_i_start = strlen(config->subsystem) + 1;
+    log->category = strcpy(&log->buffer[log->buffer_i_start],
             config->category);
-    mock->buffer_i_start += strlen(config->category) + 1;
-
-    log->log_impl = (void *) mock;
+    log->buffer_i_start += strlen(config->category) + 1;
 
     log_mock_reset(log);
+
+    return log;
 }
 
 void log_destroy(Log *log)
 {
-    (void) log;
+    tfree(log);
 }
 
 void log_at_level(Log *log, LogLevel level, const char *format, ...)
@@ -55,31 +54,29 @@ void log_at_level(Log *log, LogLevel level, const char *format, ...)
 	va_list argptr;
 	va_start(argptr, format);
 
-    LogMock *mock = (LogMock *) log->log_impl;
-
     const char *level_string = LogMockLevelStrings[(i32) level];
     i32f level_string_length = (i32f) strlen(level_string);
 
-	i64 size = LogMockBufferLength - mock->buffer_i;
+	i64 size = LogMockBufferLength - log->buffer_i;
 
 	if (size > level_string_length) {
         for (i32f i = 0; i < level_string_length; i++) {
-            mock->buffer[mock->buffer_i++] = level_string[i];
+            log->buffer[log->buffer_i++] = level_string[i];
         }
 
         size -= level_string_length;
     }
 
     if (size > 0) {
-		i64 output_length = vsnprintf(&mock->buffer[mock->buffer_i], size,
+		i64 output_length = vsnprintf(&log->buffer[log->buffer_i], size,
                 format, argptr);
         if (output_length >= size) {
             output_length = size - 1;
         }
 
-		mock->buffer_i += output_length;
-		mock->buffer[mock->buffer_i++] = '\n';
-		mock->buffer[mock->buffer_i] = '\0';
+		log->buffer_i += output_length;
+		log->buffer[log->buffer_i++] = '\n';
+		log->buffer[log->buffer_i] = '\0';
 	}
 
     va_end(argptr);

@@ -5,24 +5,22 @@ Test(log_manager_init)
 {
     log_manager_init(&gLogManagerMockConfig);
 
-    LogMock *log_mock = (LogMock *) gLogManager.logs.os.log_impl;
-    _s(log_mock->subsystem);
+    _s(gLogManager.logs.os->subsystem);
     //=> computer.spacetime-test.os
-    _s(log_mock->category);
+    _s(gLogManager.logs.os->category);
     //=> default
 
-    log_mock = (LogMock *) gLogManager.logs.engine.log_impl;
-    _s(log_mock->subsystem);
+    _s(gLogManager.logs.engine->subsystem);
     //=> computer.spacetime-test.engine
-    _s(log_mock->category);
+    _s(gLogManager.logs.engine->category);
     //=> default
 
-    log_at_level(&gLogManager.logs.os, LogLevelDefault,
+    log_at_level(gLogManager.logs.os, LogLevelDefault,
             "This is a test log %s", "foo");
 
-    LogDebug(&gLogManager.logs.os, "Debug this %d", 42);
+    LogDebug(gLogManager.logs.os, "Debug this %d", 42);
 
-    _Log(&gLogManager.logs.os);
+    _Log(gLogManager.logs.os);
     //=> [default]  This is a test log foo
     //=> [debug]  Debug this 42
     //=>

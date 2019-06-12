@@ -2,7 +2,6 @@
 #include "engine/profile.h"
 #include "render/layout.h"
 
-static void engine_manager_will_terminate(void);
 static void engine_manager_draw_in_view(GpuView *view);
 
 EngineConfig gEngineConfig = {
@@ -24,7 +23,7 @@ EngineConfig gEngineConfig = {
     },
     .os = {
         .application = {
-            .will_terminate = engine_manager_will_terminate,
+            .will_terminate = engine_manager_destroy,
         },
         .event_queue_length = 64,
         .event_queue_safe_length_remaining = 16,
@@ -61,6 +60,8 @@ EngineConfig gEngineConfig = {
 void engine_manager_init(EngineConfig *config)
 {
         EngineProfileStart();
+        EngineProfileEnd("EngineProfile empty timing 1");
+        EngineProfileEnd("EngineProfile empty timing 2");
     log_manager_init(&config->log);
         EngineProfileEnd("log_manager_init");
     os_manager_init(&config->os);
@@ -73,9 +74,9 @@ void engine_manager_init(EngineConfig *config)
     resource_manager_init(&config->resource);
         EngineProfileEnd("resource_manager_init");
 
-    os_window_init(&gOsManager.window, &gGpuManager.view);
-    config->render.viewport_size = gGpuManager.view.viewport_size;
-        EngineProfileEnd("os_manager_window_set_view");
+    os_manager_window_init(gGpuManager.view);
+    config->render.viewport_size = gpu_view_viewport_size(gGpuManager.view);
+        EngineProfileEnd("os_manager_window_init");
 
     render_manager_init(&config->render);
         EngineProfileEnd("render_manager_init");
@@ -100,8 +101,8 @@ void engine_manager_destroy(void)
         EngineProfileEnd("camera_manager_destroy");
     render_manager_destroy();
         EngineProfileEnd("render_manager_destroy");
-    os_window_destroy(&gOsManager.window);
-        EngineProfileEnd("os_window_destroy");
+    os_manager_window_destroy();
+        EngineProfileEnd("os_manager_window_destroy");
     resource_manager_destroy();
         EngineProfileEnd("resource_manager_destroy");
     string_manager_destroy();
@@ -114,20 +115,15 @@ void engine_manager_destroy(void)
         EngineProfileEnd("log_manager_destroy");
 }
 
-static void engine_manager_will_terminate(void)
-{
-    engine_manager_destroy();
-}
-
 void engine_manager_run(void)
 {
-    os_manager_run_event_loop();
+    os_manager_event_loop_run();
 }
 
 static void engine_manager_draw_in_view(GpuView *view)
 {
-        // EngineProfileStart();
+        EngineProfileStart();
     // TODO: render_manager_draw_in_view
     gpu_manager_draw_in_view(view);
-        // EngineProfileEnd("gpu_manager_draw_in_view");
+        EngineProfileEnd("gpu_manager_draw_in_view");
 }

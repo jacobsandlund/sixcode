@@ -17,16 +17,18 @@ typedef struct {
 
 typedef struct {
     OsEventQueue event_queue;
-    OsEventLoop event_loop;
-    OsApplication application;
-    OsWindow window;
+    OsEventLoop *event_loop;
+    OsApplication *application;
+    OsWindow *window;
 } OsManager;
 
 extern OsManager gOsManager;
 
 void os_manager_init(OsManagerConfig *config);
 void os_manager_destroy(void);
+void os_manager_window_init(GpuView *view);
+void os_manager_window_destroy(void);
 void os_manager_finish_launching(void);
-void os_manager_run_event_loop(void);
+void os_manager_event_loop_run(void);
 
 #endif // OsManager_h

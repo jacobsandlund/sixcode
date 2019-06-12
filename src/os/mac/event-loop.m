@@ -3,64 +3,57 @@
 @import AppKit;
 
 #import <stdarg.h>
+#import <stdlib.h>
 #import "log/manager.h"
 #import "os/clock.h"
 
 const double EnterDragTime = 0.1;
 const double EnterDragDeltaSquared = 30.0;
 
-typedef struct {
-    NSDate *until_distant_future;
+struct OsEventLoop {
     u64 left_mouse_down_time;
     float2 left_mouse_down_location;
     bool left_mouse_dragging;
-} OsMacEventLoop;
+};
 
-void os_event_loop_init(OsEventLoop *event_loop)
+OsEventLoop *os_event_loop_create(void)
 {
-    OsMacEventLoop *loop = malloc(sizeof *loop);
+    OsEventLoop *loop = malloc(sizeof *loop);
 
-    loop->until_distant_future = [NSDate distantFuture];
     loop->left_mouse_down_time = 0.0;
     loop->left_mouse_down_location = (float2) {0.0f, 0.0f};
     loop->left_mouse_dragging = false;
 
-    event_loop->event_loop_impl = (void *) loop;
+    return loop;
 }
 
-void os_event_loop_destroy(OsEventLoop *event_loop)
+void os_event_loop_destroy(OsEventLoop *loop)
 {
-    free(event_loop->event_loop_impl);
-
-    // Setting this to NULL signals the event loop to end
-    event_loop->event_loop_impl = NULL;
+    free(loop);
 }
 
-void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
+void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
 {
-    OsMacEventLoop *loop;
+    @autoreleasepool {
 
-    LogDebug(&gLogManager.logs.os, "os_event_loop_run");
+    NSDate *until = [NSDate distantFuture];
 
-    while ((loop = (OsMacEventLoop *) event_loop->event_loop_impl)) {
+    for (;;) {
 
         @autoreleasepool {
 
         NSEvent *nsEvent = [NSApp nextEventMatchingMask:NSEventMaskAny
-                untilDate:loop->until_distant_future inMode:NSDefaultRunLoopMode
+                untilDate:until inMode:NSDefaultRunLoopMode
                 dequeue:YES];
 
         OsEvent event = {
             .time = os_clock_time(),
         };
 
-        LogDebug(&gLogManager.logs.os,
-                "location in window: %g, %g", nsEvent.locationInWindow.x, nsEvent.locationInWindow.y);
-
         switch (nsEvent.type) {
 
         case NSEventTypeLeftMouseDown:
-            LogDebug(&gLogManager.logs.os, "Event left mouse down");
+            LogDebug(gLogManager.logs.os, "Event left mouse down");
             loop->left_mouse_down_time = event.time;
             loop->left_mouse_down_location = (float2) {
                 (float) nsEvent.locationInWindow.x,
@@ -73,7 +66,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeLeftMouseUp:
-            LogDebug(&gLogManager.logs.os, "Event left mouse up");
+            LogDebug(gLogManager.logs.os, "Event left mouse up");
             if (!loop->left_mouse_dragging) {
                 event.type = OsEventTypeMouseClick;
                 event.location = (float2) {
@@ -88,7 +81,8 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeMouseMoved:
-            LogDebug(&gLogManager.logs.os, "Event left mouse moved");
+            // Don't spam logs
+
             event.type = OsEventTypeMouseMove;
             event.location = (float2) {
                 (float) nsEvent.locationInWindow.x,
@@ -99,7 +93,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeLeftMouseDragged:
-            LogDebug(&gLogManager.logs.os, "Event left mouse dragged");
+            LogDebug(gLogManager.logs.os, "Event left mouse dragged");
             event.location = (float2) {
                 (float) nsEvent.locationInWindow.x,
                 (float) nsEvent.locationInWindow.y,
@@ -121,58 +115,63 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         case NSEventTypeKeyDown:
-            LogDebug(&gLogManager.logs.os,
+            if (nsEvent.modifierFlags & NSEventModifierFlagCommand) {
+                [NSApp sendEvent:nsEvent];
+                [NSApp updateWindows];
+            }
+
+            LogDebug(gLogManager.logs.os,
                     "Event key down with characters: '%s'", nsEvent.characters.UTF8String);
 
             break;
 
         case NSEventTypeKeyUp:
-            LogDebug(&gLogManager.logs.os,
+            LogDebug(gLogManager.logs.os,
                     "Event key up with characters: '%s'", nsEvent.characters.UTF8String);
 
             break;
 
         case NSEventTypeFlagsChanged:
-            LogDebug(&gLogManager.logs.os, "Event flags changed");
+            LogDebug(gLogManager.logs.os, "Event flags changed");
 
             break;
 
         case NSEventTypeAppKitDefined:
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypeApplicationActivated:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype: NSEventSubtypeApplicationActivated");
                 break;
             case NSEventSubtypeApplicationDeactivated:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype: NSEventSubtypeApplicationDeactivated");
                 break;
             case NSEventSubtypeScreenChanged:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype: NSEventSubtypeScreenChanged");
                 break;
             case NSEventSubtypeWindowExposed:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype: NSEventSubtypeWindowExposed");
                 break;
             case NSEventSubtypeWindowMoved:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype: NSEventSubtypeWindowMoved");
                 break;
             case 9:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype 9: activated ???");
                 break;
             case 22:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype 22: booting up ???");
                 break;
             case 23:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with subtype 23: booting up ???");
                 break;
             default:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeAppKitDefined with unknown subtype: %d", nsEvent.subtype);
                 break;
             }
@@ -188,28 +187,28 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             switch ((i16) nsEvent.subtype) {
             case NSEventSubtypePowerOff:
             // case NSEventSubtypeTabletPoint:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with subtype: NSEventSubtypePowerOff");
                 break;
             case NSEventSubtypeScreenChanged:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with subtype: NSEventSubtypeScreenChanged");
                 break;
             case NSEventSubtypeTouch:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with subtype: NSEventSubtypeTouch");
                 break;
             case NSEventSubtypeMouseEvent:
             // case NSEventSubtypeTabletProximity:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with subtype: NSEventSubtypeMouseEvent");
                 break;
             case 7:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with subtype 7: clicking into/out of ???");
                 break;
             default:
-                LogDebug(&gLogManager.logs.os,
+                LogDebug(gLogManager.logs.os,
                         "Event NSEventTypeSystemDefined with unknown subtype");
                 break;
             }
@@ -220,7 +219,7 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
             break;
 
         default:
-            LogDebug(&gLogManager.logs.os,
+            LogDebug(gLogManager.logs.os,
                     "Event other with type: %d", nsEvent.type);
 
             [NSApp sendEvent:nsEvent];
@@ -232,5 +231,5 @@ void os_event_loop_run(OsEventLoop *event_loop, OsEventQueue *queue)
         } // @autoreleasepool
     }
 
-    LogDebug(&gLogManager.logs.os, "os_event_loop_run end");
+    } // @autoreleasepool
 }

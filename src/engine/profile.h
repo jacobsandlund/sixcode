@@ -13,7 +13,7 @@
 
 #define EngineProfileEnd(block_name) { \
     end_time = os_clock_time(); \
-    LogDebug(&gLogManager.logs.engine, "%s in %" PRIu64 " us",\
+    LogDebug(gLogManager.logs.engine, "%s in %" PRIu64 " us",\
             block_name, (end_time - start_time + 500) / 1000); \
     start_time = end_time; \
 }

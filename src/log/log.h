@@ -15,11 +15,9 @@ typedef struct {
     const char *category;
 } LogConfig;
 
-typedef struct {
-    void *log_impl;
-} Log;
+typedef struct Log Log;
 
-void log_init(Log *log, LogConfig *config);
+Log *log_create(LogConfig *config);
 void log_destroy(Log *log);
 void log_at_level(Log *log, LogLevel level, const char *format, ...);
 

@@ -1,26 +1,35 @@
+#import "gpu/device.h"
+
 @import MetalKit;
 
-#import "gpu/device.h"
+#import <stdlib.h>
 #import "log/manager.h"
 
-void gpu_device_init(GpuDevice *device)
+GpuDevice *gpu_device_create(void)
 {
+    GpuDevice *device;
+
     @autoreleasepool {
 
     id<MTLDevice> mtl_device = MTLCreateSystemDefaultDevice();
     if (!mtl_device) {
-        LogDefault(&gLogManager.logs.gpu,
+        LogDefault(gLogManager.logs.gpu,
                 "Metal is not supported on this device");
-        device->device_impl = NULL;
-        return;
+        abort();
+        return NULL;
     }
 
-    device->device_impl = (void *) CFBridgingRetain(mtl_device);
+    device = (__bridge_retained GpuDevice *)mtl_device;
 
     } // @autoreleasepool
+
+    return device;
 }
 
 void gpu_device_destroy(GpuDevice *device)
 {
-    CFRelease(device->device_impl);
+    @autoreleasepool {
+        id<MTLDevice> mtl_device = (__bridge_transfer id<MTLDevice>)device;
+        mtl_device = nil;
+    }
 }

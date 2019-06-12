@@ -1,12 +1,13 @@
 #ifndef GpuRenderer_h
 #define GpuRenderer_h
 
-typedef struct {
-    void *renderer_impl;
-    GpuDevice *device;
-} GpuRenderer;
+#include "spacetime.h"
+#include "gpu/device.h"
+#include "gpu/view.h"
 
-void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view);
+typedef struct GpuRenderer GpuRenderer;
+
+GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view);
 void gpu_renderer_destroy(GpuRenderer *renderer);
 void gpu_renderer_draw_in_view(GpuRenderer *renderer, GpuView *view);
 

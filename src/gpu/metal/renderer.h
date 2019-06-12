@@ -9,6 +9,6 @@
 @interface MetalRenderer : NSObject
 
 - (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view;
-- (void)renderWithView:(GpuView *)view;
+- (void)drawInView:(GpuView *)view;
 
 @end

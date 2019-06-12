@@ -1,29 +1,35 @@
 #include "gpu/view.h"
+#include "test.h"
 #include <stdlib.h>
 
-typedef struct {
+struct {
     GpuDevice *device;
     float2 viewport_size;
     GpuViewConfig config;
-} GpuViewMock;
+} GpuView;
 
 void gpu_view_mock_size_changed(GpuView *view, float2 viewport_size)
 {
-    GpuViewMock *mock = (GpuViewMock *)view->view_impl;
     view->viewport_size = viewport_size;
-    mock->config.size_changed(view);
+    view->config.size_changed(view, viewport_size);
 }
 
-void gpu_view_init(GpuView *view, GpuDevice *device, float2 viewport_size, GpuViewConfig *config)
+GpuView *gpu_view_create(GpuDevice *device, float2 viewport_size, GpuViewConfig *config)
 {
-    GpuViewMock *mock = malloc(sizeof *mock);
-    view->view_impl = (void *) mock;
-    mock->device = device;
-    mock->config = *config;
+    GpuView *view = tmalloc(sizeof *view);
+    view->device = device;
+    view->config = *config;
     gpu_view_mock_size_changed(view, viewport_size);
+
+    return view;
 }
 
 void gpu_view_destroy(GpuView *view)
 {
-    free(view->view_impl);
+    tfree(view);
+}
+
+float2 gpu_view_viewport_size(GpuView *view)
+{
+    return view->viewport_size;
 }

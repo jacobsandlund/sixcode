@@ -20,6 +20,6 @@ extern RenderManager gRenderManager;
 
 void render_manager_init(RenderManagerConfig *config);
 void render_manager_destroy(void);
-void render_manager_size_changed(GpuView *view);
+void render_manager_size_changed(GpuView *view, float2 viewport_size);
 
 #endif // RenderManager_h

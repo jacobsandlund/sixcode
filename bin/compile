@@ -7,4 +7,6 @@ else
     lang_options="-x c"
 fi
 
-clang $lang_options -std=gnu11 -O1 -lm -Werror -Wall -Wextra -Wshorten-64-to-32 -I$SPACETIME_PATH/src "$@"
+warnings="-Werror -Wall -Wextra -Wshorten-64-to-32 -Wstrict-prototypes"
+
+clang $lang_options -std=gnu11 -O1 -lm $warnings -I$SPACETIME_PATH/src "$@"

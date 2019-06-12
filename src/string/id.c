@@ -14,7 +14,7 @@ sid string_id_intern(StringIdTable *st, const u8 *s, i64 length)
 {
     sid id = string_id(s, length);
     if (id <= StringIdTableTombstone) {
-        LogDefault(&gLogManager.logs.engine,
+        LogDefault(gLogManager.logs.engine,
                 "Found string with sid == %" PRIu64 ": %s", id, s);
         abort();
     }
@@ -22,7 +22,7 @@ sid string_id_intern(StringIdTable *st, const u8 *s, i64 length)
     u8 **other_string = (u8 **) string_id_table_get(st, id);
     if (other_string) {
         if (strcmp((const char *) s, (char *) *other_string) != 0) {
-            LogDefault(&gLogManager.logs.engine,
+            LogDefault(gLogManager.logs.engine,
                     "Found string id (sid) collision with strings: '%s', '%s'",
                     s, *other_string);
             abort();

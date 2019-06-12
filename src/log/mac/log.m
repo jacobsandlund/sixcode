@@ -16,15 +16,22 @@ static const i32 MacLogTypeLookup[] = {
     OS_LOG_TYPE_ERROR,
 };
 
-void log_init(Log *log, LogConfig *config)
+Log *log_create(LogConfig *config)
 {
-    os_log_t os_log = os_log_create(config->subsystem, config->category);
-    log->log_impl = (void *) CFBridgingRetain(os_log);
+    Log *log;
+    @autoreleasepool {
+        os_log_t os_log = os_log_create(config->subsystem, config->category);
+        log = (__bridge_retained Log *)os_log;
+    }
+    return log;
 }
 
 void log_destroy(Log *log)
 {
-    CFRelease(log->log_impl);
+    @autoreleasepool {
+        os_log_t os_log = (__bridge_transfer os_log_t)log;
+        os_log = nil;
+    }
 }
 
 void log_at_level(Log *log, LogLevel level, const char *format, ...)
@@ -33,7 +40,7 @@ void log_at_level(Log *log, LogLevel level, const char *format, ...)
 	va_list argptr;
 	va_start(argptr, format);
 
-    os_log_t os_log = (__bridge os_log_t) log->log_impl;
+    os_log_t os_log = (__bridge os_log_t) log;
     i32 log_type = MacLogTypeLookup[(i32) level];
     vsnprintf(log_buffer, MacLogBufferLength, format, argptr);
     os_log_with_type(os_log, log_type, "%{public}s", log_buffer);

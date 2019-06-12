@@ -19,7 +19,7 @@ void *resource_pointer_allocator_alloc(ResourcePointerAllocator *pa, u64 size)
     void *pointer = &pa->memory[pa->allocated];
     pa->allocated += size;
     if (pa->allocated > pa->capacity) {
-        LogDefault(&gLogManager.logs.engine,
+        LogDefault(gLogManager.logs.engine,
                 "Resource pointer_allocator attempt to allocate %"
                 PRIu64 " bytes with only %" PRIu64 " bytes remaining",
                 size,
@@ -27,7 +27,7 @@ void *resource_pointer_allocator_alloc(ResourcePointerAllocator *pa, u64 size)
         return NULL;
     }
 
-    LogDebug(&gLogManager.logs.engine,
+    LogDebug(gLogManager.logs.engine,
             "Resource allocating %" PRIu64 " bytes (%"
             PRIu64 " bytes total)", size, pa->allocated);
     return pointer;
@@ -42,7 +42,7 @@ void resource_pointer_allocator_reset_top(ResourcePointerAllocator *pa, void *to
 {
     i64 set_allocated = ((u8 *) top) - pa->memory;
     if (set_allocated < 0 || (u64) set_allocated > pa->capacity) {
-        LogDefault(&gLogManager.logs.engine,
+        LogDefault(gLogManager.logs.engine,
                 "Resource pointer_allocator attempt to reset top to invalid address (%"
                 PRIi64 " bytes away from start)",
                 set_allocated);

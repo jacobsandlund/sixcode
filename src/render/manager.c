@@ -14,7 +14,8 @@ void render_manager_destroy(void)
     // Do nothing
 }
 
-void render_manager_size_changed(GpuView *view)
+void render_manager_size_changed(GpuView *view, float2 viewport_size)
 {
-    gRenderManager.viewport.size = view->viewport_size;
+    (void) view;
+    gRenderManager.viewport.size = viewport_size;
 }

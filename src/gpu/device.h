@@ -1,11 +1,11 @@
 #ifndef GpuDevice_h
 #define GpuDevice_h
 
-typedef struct {
-    void *device_impl;
-} GpuDevice;
+#include "spacetime.h"
 
-void gpu_device_init(GpuDevice *device);
+typedef struct GpuDevice GpuDevice;
+
+GpuDevice *gpu_device_create(void);
 void gpu_device_destroy(GpuDevice *device);
 
 #endif // GpuDevice_h

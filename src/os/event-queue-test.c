@@ -107,7 +107,7 @@ Test(os_event_queue_read)
     _d(os_event_queue_read(eq, &read_event));
     //=> 4
 
-    _Log(&gLogManager.logs.os);
+    _Log(gLogManager.logs.os);
     //=> [default]  Event queue read behind by 3 above safe level of 2: skipping 1 messages
     //=>
     _u64(read_event.time);

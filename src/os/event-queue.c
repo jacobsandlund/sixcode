@@ -26,7 +26,7 @@ i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event)
         return 0;
     } else if (behind > eq->safe_read_behind) {
         i64 skipping = behind - eq->safe_read_behind;
-        LogDefault(&gLogManager.logs.os,
+        LogDefault(gLogManager.logs.os,
                 "Event queue read behind by %" PRId64
                 " above safe level of %" PRId64
                 ": skipping %" PRId64 " messages",

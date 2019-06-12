@@ -2,15 +2,13 @@
 #import "log/manager.h"
 
 @implementation ViewDelegate {
-    GpuView *_view;
-    GpuViewFn _size_changed;
     GpuViewFn _draw_in_view;
+    GpuViewSizeChangedFn _size_changed;
 }
 
-- (instancetype)initWithView:(GpuView *)view mtkView:(MTKView *)mtk_view config:(GpuViewConfig *)config {
+- (instancetype)initWithMtkView:(MTKView *)mtk_view config:(GpuViewConfig *)config {
     self = [super init];
     if (self) {
-        _view = view;
         _size_changed = config->size_changed;
         _draw_in_view = config->draw_in_view;
         _mtk_view = mtk_view;
@@ -22,28 +20,30 @@
 }
 
 - (void)mtkView:(MTKView *)mtk_view drawableSizeWillChange:(CGSize)size {
-    (void)mtk_view;
-    LogDebug(&gLogManager.logs.os, "drawableSizeWillChange %g, %g", (float) size.width, (float) size.height);
-    _view->viewport_size = (float2) {
+    _mtk_view = mtk_view;
+    _viewport_size = (float2) {
         (float)size.width,
         (float)size.height,
     };
+    LogDebug(gLogManager.logs.os, "drawableSizeWillChange %g, %g", _viewport_size.x, _viewport_size.y);
 
-    _size_changed(_view);
+    _size_changed((__bridge GpuView *)self, _viewport_size);
 }
 
 - (void)drawInMTKView:(MTKView *)mtk_view {
-    (void)mtk_view;
-    _draw_in_view(_view);
+    _mtk_view = mtk_view;
+    _draw_in_view((__bridge GpuView *)self);
 }
 
 @end
 
-void gpu_view_init(GpuView *view, GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config)
+GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config)
 {
+    GpuView *view;
+
     @autoreleasepool {
 
-    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device->device_impl;
+    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
 
     NSRect frame = NSMakeRect(
             visible_frame.origin.x,
@@ -57,15 +57,26 @@ void gpu_view_init(GpuView *view, GpuDevice *device, OsScreenFrame visible_frame
     mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;
 
     ViewDelegate *delegate = [[ViewDelegate alloc]
-            initWithView:view mtkView:mtk_view config:config];
+            initWithMtkView:mtk_view config:config];
     mtk_view.delegate = delegate;
 
-    view->view_impl = (void *) CFBridgingRetain(delegate);
+    view = (__bridge_retained GpuView *)delegate;
 
     } // @autoreleasepool
+
+    return view;
 }
 
 void gpu_view_destroy(GpuView *view)
 {
-    CFRelease(view->view_impl);
+    @autoreleasepool {
+        ViewDelegate *delegate = (__bridge_transfer ViewDelegate *)view;
+        delegate = nil;
+    }
+}
+
+float2 gpu_view_viewport_size(GpuView *view)
+{
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view;
+    return delegate.viewport_size;
 }
