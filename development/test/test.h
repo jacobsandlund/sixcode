@@ -11,7 +11,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include "valgrind.h"
-#include "test-allocator.h"
+#include "test/allocator.h"
 
 #define _(...) test_runner_log_to_file(__FILE__, __LINE__, __VA_ARGS__)
 #define _d(...) _("%d\n", __VA_ARGS__)

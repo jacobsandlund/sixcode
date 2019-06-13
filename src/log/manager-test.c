@@ -1,5 +1,5 @@
 #include "log/manager-mock.c"
-#include "test.h"
+#include "test/test.h"
 
 Test(log_manager_init)
 {

@@ -1,6 +1,6 @@
 #include "string/id-table.c"
 #include "math/fnv.c"
-#include "test.h"
+#include "test/test.h"
 
 u64 test_hash_literal(const char *s)
 {

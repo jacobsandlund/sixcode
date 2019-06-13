@@ -3,7 +3,7 @@
 #include "string/id-table.c"
 #include "string/id.c"
 #include "string/manager.c"
-#include "test.h"
+#include "test/test.h"
 
 Test(string_manager_init)
 {

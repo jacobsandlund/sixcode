@@ -1,5 +1,5 @@
 #include "log/mac/log.m"
-#include "test.h"
+#include "test/test.h"
 
 Test(log)
 {

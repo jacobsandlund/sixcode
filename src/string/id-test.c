@@ -3,7 +3,7 @@
 #include "math/fnv.c"
 #include "string/id-table.c"
 #include <string.h>
-#include "test.h"
+#include "test/test.h"
 
 Test(string_id)
 {

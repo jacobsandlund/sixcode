@@ -6,6 +6,11 @@ struct OsApplication {
     OsApplicationNotificationFn will_terminate;
 };
 
+void os_application_mock_terminate(OsApplication *app)
+{
+    app->will_terminate();
+}
+
 OsApplication *os_application_create(OsApplicationConfig *config)
 {
     OsApplication *app = tmalloc(sizeof *app);
@@ -22,9 +27,4 @@ void os_application_destroy(OsApplication *app)
 void os_application_finish_launching(OsApplication *app)
 {
     app->finished_launching = true;
-}
-
-void os_application_mock_terminate(OsApplication *app)
-{
-    app->will_terminate();
 }

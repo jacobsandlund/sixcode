@@ -1,7 +1,7 @@
 #include "render/manager.c"
 #include "gpu/view-mock.c"
 #include "render/layout.c"
-#include "test.h"
+#include "test/test.h"
 
 Test(render_manager_init)
 {

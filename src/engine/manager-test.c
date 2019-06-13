@@ -1,6 +1,6 @@
 #include "engine/manager.c"
 
-// From: bin/ls manager-test.c | grep -v 'engine/manager-test.c' | xargs grep -h '#include' | grep -v test.h | sort -u
+// From: bin/ls manager-test.c | grep -v 'engine/manager-test.c' | xargs grep -h '#include' | grep -v test/test.h | sort -u
 #include "camera/camera.c"
 #include "camera/manager.c"
 #include "gpu/manager.c"
@@ -22,4 +22,4 @@
 #include "world/manager.c"
 #include "world/vector.c"
 
-#include "test.h"
+#include "test/test.h"

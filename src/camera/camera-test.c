@@ -3,7 +3,7 @@
 #include "render/vector.c"
 #include "render/viewport.h"
 #include "world/vector.c"
-#include "test.h"
+#include "test/test.h"
 
 Test(camera_translate)
 {

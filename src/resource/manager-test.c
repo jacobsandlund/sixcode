@@ -6,7 +6,7 @@
 #include "string/id-table.c"
 #include "string/id.c"
 #include "string/manager.c"
-#include "test.h"
+#include "test/test.h"
 
 static ResourceManagerConfig test_resource_manager_config = {
     .loader_capacity = 2,
