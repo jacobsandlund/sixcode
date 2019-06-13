@@ -1,5 +1,5 @@
 #include "gpu/view.h"
-#include "test-allocator.h"
+#include "test/allocator.h"
 
 struct GpuView {
     GpuDevice *device;
@@ -18,6 +18,22 @@ void gpu_view_mock_draw_in_view(GpuView *view)
 {
     view->draw_in_view(view);
 }
+
+static void gpu_view_mock_noop_draw_in_view(GpuView *view)
+{
+    (void) view;
+}
+
+static void gpu_view_mock_noop_size_changed(GpuView *view, float2 viewport_size)
+{
+    (void) view;
+    (void) viewport_size;
+}
+
+GpuViewConfig gGpuViewMockConfig = {
+    .draw_in_view = gpu_view_mock_noop_draw_in_view,
+    .size_changed = gpu_view_mock_noop_size_changed,
+};
 
 GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {

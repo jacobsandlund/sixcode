@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 #include "string/id-table.h"
 #include "math/fnv.h"
 #include "math/bit.h"

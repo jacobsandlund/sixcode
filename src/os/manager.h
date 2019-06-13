@@ -6,7 +6,6 @@
 #include "os/event-loop.h"
 #include "os/application.h"
 #include "os/window.h"
-#include "os/log.h"
 #include "gpu/view.h"
 
 typedef struct {

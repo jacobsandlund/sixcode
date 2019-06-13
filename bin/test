@@ -23,5 +23,5 @@ else
         run $test_file
     done
 
-    git diff --exit-code -- $(bin/ls 'test')
+    git diff --exit-code -- $(bin/ls $test_dir 'test')
 fi

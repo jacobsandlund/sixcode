@@ -19,10 +19,13 @@ src=$(grep -v '#' <<-SRC
 SRC
 )
 
+exclude_mac='mac/|metal/'
+exclude_windows='windows/|directx/'
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    exclude='windows/|directx/'
+    exclude=$exclude_windows
 else
-    exclude='mac/|metal/'
+    exclude=$exclude_mac
 fi
 
 include_only='.'
@@ -31,6 +34,9 @@ for arg in "$@"; do
     case "$arg" in
     all)
         exclude='do_not_exclude_anything'
+        ;;
+    docker)
+        exclude="$exclude_mac|$exclude_windows"
         ;;
     test)
         include_only='test\.c|test\.m$'

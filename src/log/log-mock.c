@@ -1,5 +1,5 @@
 #include "log/log.h"
-#include "test-allocator.h"
+#include "test/allocator.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@ struct Log {
     char buffer[LogMockBufferLength];
 };
 
-// Order of this has to match LogLevel enum in "os/log.h"
+// Order of this has to match LogLevel enum in "log/log.h"
 static const char *LogMockLevelStrings[] = {
     "[default]  ",
     "[info]  ",

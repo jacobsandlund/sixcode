@@ -6,7 +6,7 @@
 
 Test(world_manager_init_and_load)
 {
-    gOsClockMock = (OsClockMock) {.time = 12345};
+    os_clock_mock_init(12345, 321);
 
     WorldManagerConfig config = {
         .grid_size = 64,

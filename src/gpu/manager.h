@@ -19,7 +19,7 @@ typedef struct {
 
 extern GpuManager gGpuManager;
 
-void gpu_manager_init(GpuManagerConfig *config, OsScreenFrame visible_frame);
+void gpu_manager_init(OsScreenFrame frame, GpuManagerConfig *config);
 void gpu_manager_destroy(void);
 void gpu_manager_draw_in_view(GpuView *view);
 

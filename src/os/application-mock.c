@@ -1,5 +1,5 @@
 #include "os/application.h"
-#include "test-allocator.h"
+#include "test/allocator.h"
 
 struct OsApplication {
     bool finished_launching;

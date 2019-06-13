@@ -1,5 +1,6 @@
 #include "render/manager.c"
 #include "gpu/view-mock.c"
+#include "gpu/device-mock.c"
 #include "render/layout.c"
 #include "test/test.h"
 
@@ -36,7 +37,8 @@ Test(render_manager_size_changed)
         .origin = {0, 0},
         .size = old_viewport_size,
     };
-    GpuView *view = gpu_view_create(NULL, visible_frame, &view_config);
+    GpuDevice *device = gpu_device_create();
+    GpuView *view = gpu_view_create(device, visible_frame, &view_config);
 
     // Note: gRenderManager.viewport.size is now correct,
     // but prefer explicit initialization

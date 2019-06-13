@@ -3,7 +3,7 @@
 
 Test(os_clock_time)
 {
-    gOsClockMock = (OsClockMock) {.time = 12345, .time_increment = 321};
+    os_clock_mock_init(12345, 321);
     u64 start = os_clock_time();
     u64 end = os_clock_time();
 

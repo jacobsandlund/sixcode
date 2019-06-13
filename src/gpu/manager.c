@@ -2,11 +2,11 @@
 
 GpuManager gGpuManager;
 
-void gpu_manager_init(GpuManagerConfig *config, OsScreenFrame visible_frame)
+void gpu_manager_init(OsScreenFrame frame, GpuManagerConfig *config)
 {
     GpuDevice *device = gpu_device_create();
     gGpuManager.device = device;
-    gGpuManager.view = gpu_view_create(device, visible_frame, &config->view);
+    gGpuManager.view = gpu_view_create(device, frame, &config->view);
     gGpuManager.renderer = gpu_renderer_create(device, gGpuManager.view);
 }
 

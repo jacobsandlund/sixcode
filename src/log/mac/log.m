@@ -8,7 +8,7 @@
 
 #define MacLogBufferLength 4096
 
-// Order of this has to match LogLevel enum in "os/log.h"
+// Order of this has to match LogLevel enum in "log/log.h"
 static const i32 MacLogTypeLookup[] = {
     OS_LOG_TYPE_DEFAULT,
     OS_LOG_TYPE_INFO,

@@ -1,5 +1,6 @@
 #include "os/event-queue.h"
 #include <assert.h>
+#include <stdlib.h>
 #include "log/manager.h"
 
 void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining)

@@ -5,6 +5,9 @@ typedef enum {
     OsEventTypeMouseMove = 1,
     OsEventTypeMouseDrag = 2,
     OsEventTypeMouseClick = 4,
+
+    // Used for mock event loop to end looping
+    OsEventTypeTerminateLoop,
 } OsEventType;
 
 #define OsEventTypeMouseMoveOrDrag 3

@@ -1,5 +1,6 @@
 #include "engine/manager.h"
 #include "engine/profile.h"
+#include "os/screen.h"
 #include "render/layout.h"
 
 EngineConfig gEngineConfig = {
@@ -64,7 +65,7 @@ void engine_manager_init(EngineConfig *config)
     os_manager_init(&config->os);
         EngineProfileEnd("os_manager_init");
 
-    gpu_manager_init(&config->gpu, os_screen_visible_frame());
+    gpu_manager_init(os_screen_visible_frame(), &config->gpu);
         EngineProfileEnd("gpu_manager_init");
     string_manager_init(&config->string);
         EngineProfileEnd("string_manager_init");
