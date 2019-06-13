@@ -3,7 +3,7 @@
 #include "math/fnv.c"
 #include "string/id-table.c"
 #include <string.h>
-#include "test/test.h"
+#include "test.h"
 
 Test(string_id)
 {
@@ -64,6 +64,7 @@ Test(string_id_intern)
     //=> 4
 
     string_id_table_destroy(st);
+    log_manager_destroy();
 }
 
 Test(string_id_string)
@@ -84,4 +85,5 @@ Test(string_id_string)
     //=> !!! Not found !!!
 
     string_id_table_destroy(st);
+    log_manager_destroy();
 }

@@ -1,6 +1,6 @@
 #include "resource/pointer-allocator.c"
 #include "log/manager-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(resource_pointer_allocator_alloc)
 {
@@ -56,4 +56,5 @@ Test(resource_pointer_allocator_alloc)
     //=> 1
 
     resource_pointer_allocator_destroy(pa);
+    log_manager_destroy();
 }

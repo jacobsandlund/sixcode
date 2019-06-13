@@ -1,5 +1,5 @@
 #include "log/log.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@ void log_mock_reset(Log *log)
 
 Log *log_create(LogConfig *config)
 {
-    Log *log = tmalloc(sizeof *log);
+    Log *log = malloc(sizeof *log);
 
     log->subsystem = strcpy(log->buffer, config->subsystem);
     log->buffer_i_start = strlen(config->subsystem) + 1;
@@ -46,7 +46,7 @@ Log *log_create(LogConfig *config)
 
 void log_destroy(Log *log)
 {
-    tfree(log);
+    free(log);
 }
 
 void log_at_level(Log *log, LogLevel level, const char *format, ...)

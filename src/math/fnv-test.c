@@ -1,6 +1,6 @@
 #include "math/fnv.c"
 #include <string.h>
-#include "test/test.h"
+#include "test.h"
 
 u64 test_hash_literal(const char *s)
 {

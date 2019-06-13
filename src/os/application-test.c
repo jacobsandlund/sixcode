@@ -1,5 +1,5 @@
 #include "os/application-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 static bool called_will_terminate = false;
 
@@ -31,7 +31,4 @@ Test(os_application)
     //=> 1
 
     os_application_destroy(app);
-
-    _d(test_allocator_was_freed(app));
-    //=> 1
 }

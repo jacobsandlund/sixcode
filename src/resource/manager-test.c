@@ -6,7 +6,7 @@
 #include "string/id-table.c"
 #include "string/id.c"
 #include "string/manager.c"
-#include "test/test.h"
+#include "test.h"
 
 static ResourceManagerConfig test_resource_manager_config = {
     .loader_capacity = 2,
@@ -225,4 +225,6 @@ Test(resource_manager_load_get_unload)
     //=> [default]  Loaded bar
     //=> [default]  Unloaded bar
     //=>
+
+    log_manager_destroy();
 }

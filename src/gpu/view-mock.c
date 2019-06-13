@@ -1,5 +1,5 @@
 #include "gpu/view.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 struct GpuView {
     GpuDevice *device;
@@ -37,7 +37,7 @@ GpuViewConfig gGpuViewMockConfig = {
 
 GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
-    GpuView *view = tmalloc(sizeof *view);
+    GpuView *view = malloc(sizeof *view);
     view->device = device;
     view->draw_in_view = config->draw_in_view;
     view->size_changed = config->size_changed;
@@ -48,7 +48,7 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *
 
 void gpu_view_destroy(GpuView *view)
 {
-    tfree(view);
+    free(view);
 }
 
 float2 gpu_view_viewport_size(GpuView *view)

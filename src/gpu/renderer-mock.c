@@ -1,5 +1,5 @@
 #include "gpu/renderer.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 struct GpuRenderer {
     GpuDevice *device;
@@ -9,7 +9,7 @@ struct GpuRenderer {
 GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view)
 {
     (void) view;
-    GpuRenderer *renderer = tmalloc(sizeof *renderer);
+    GpuRenderer *renderer = malloc(sizeof *renderer);
     renderer->device = device;
     renderer->drew_in_view = NULL;
     return renderer;
@@ -17,7 +17,7 @@ GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view)
 
 void gpu_renderer_destroy(GpuRenderer *renderer)
 {
-    tfree(renderer);
+    free(renderer);
 }
 
 void gpu_renderer_draw_in_view(GpuRenderer *renderer, GpuView *view)

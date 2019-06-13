@@ -113,7 +113,7 @@ void engine_manager_destroy(void)
     os_manager_destroy();
         EngineProfileEnd("os_manager_destroy");
     log_manager_destroy();
-        EngineProfileEnd("log_manager_destroy");
+        // No more logging allowed
 }
 
 void engine_manager_run(void)

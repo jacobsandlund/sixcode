@@ -2,7 +2,7 @@
 #include "camera/camera.c"
 #include "render/vector.c"
 #include "world/vector.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(camera_manager_init)
 {

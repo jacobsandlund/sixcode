@@ -1,5 +1,5 @@
 #include "spacetime.h"
-#include "test/test.h"
+#include "test.h"
 
 Test(float2_int2_conversions)
 {

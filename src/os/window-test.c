@@ -1,6 +1,6 @@
 #include "os/window-mock.c"
 #include "gpu/view-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(os_window)
 {
@@ -20,7 +20,5 @@ Test(os_window)
     //=> 1
 
     os_window_destroy(window);
-
-    _d(test_allocator_was_freed(window));
-    //=> 1
+    gpu_view_destroy(view);
 }

@@ -2,7 +2,7 @@
 #include "gpu/view-mock.c"
 #include "gpu/device-mock.c"
 #include "gpu/renderer-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 bool test_draw_in_view_called;
 

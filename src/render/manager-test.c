@@ -2,7 +2,7 @@
 #include "gpu/view-mock.c"
 #include "gpu/device-mock.c"
 #include "render/layout.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(render_manager_init)
 {
@@ -57,4 +57,6 @@ Test(render_manager_size_changed)
     //=> 2560, 1920
 
     render_manager_destroy();
+    gpu_view_destroy(view);
+    gpu_device_destroy(device);
 }

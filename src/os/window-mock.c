@@ -1,5 +1,5 @@
 #include "os/window.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 struct OsWindow {
     GpuView *view;
@@ -8,7 +8,7 @@ struct OsWindow {
 
 OsWindow *os_window_create(GpuView *view)
 {
-    OsWindow *window = tmalloc(sizeof *window);
+    OsWindow *window = malloc(sizeof *window);
     window->view = view;
     window->showing = false;
 
@@ -17,7 +17,7 @@ OsWindow *os_window_create(GpuView *view)
 
 void os_window_destroy(OsWindow *window)
 {
-    tfree(window);
+    free(window);
 }
 
 void os_window_show(OsWindow *window)

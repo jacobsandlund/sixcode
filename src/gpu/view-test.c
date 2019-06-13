@@ -1,6 +1,6 @@
 #include "gpu/view-mock.c"
 #include "gpu/device-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 float2 test_view_size;
 bool test_draw_in_view_called;
@@ -53,9 +53,6 @@ Test(gpu_view)
 
     gpu_view_destroy(view);
     gpu_device_destroy(device);
-
-    _d(test_allocator_was_freed(view));
-    //=> 1
 }
 
 Test(gpu_view_mock_config)
@@ -68,4 +65,6 @@ Test(gpu_view_mock_config)
     gpu_view_mock_draw_in_view(view);
     float2 size = {3, 4};
     gpu_view_mock_size_changed(view, size);
+
+    gpu_view_destroy(view);
 }

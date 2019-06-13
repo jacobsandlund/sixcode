@@ -1,5 +1,5 @@
 #include "os/screen-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(os_screen)
 {

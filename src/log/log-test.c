@@ -1,5 +1,5 @@
 #include "log/log-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(log)
 {
@@ -25,4 +25,6 @@ Test(log)
     //=> [default]  This looks bad
     //=> [error]  A Foo error has occurred
     //=>
+
+    log_destroy(log);
 }

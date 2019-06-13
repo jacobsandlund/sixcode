@@ -1,5 +1,5 @@
 #include "os/application.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 struct OsApplication {
     bool finished_launching;
@@ -13,7 +13,7 @@ void os_application_mock_terminate(OsApplication *app)
 
 OsApplication *os_application_create(OsApplicationConfig *config)
 {
-    OsApplication *app = tmalloc(sizeof *app);
+    OsApplication *app = malloc(sizeof *app);
     app->finished_launching = false;
     app->will_terminate = config->will_terminate;
     return app;
@@ -21,7 +21,7 @@ OsApplication *os_application_create(OsApplicationConfig *config)
 
 void os_application_destroy(OsApplication *app)
 {
-    tfree(app);
+    free(app);
 }
 
 void os_application_finish_launching(OsApplication *app)

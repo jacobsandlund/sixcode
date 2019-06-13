@@ -1,6 +1,6 @@
 #include "os/event-loop.h"
+#include <stdlib.h>
 #include "os/clock.h"
-#include "test/allocator.h"
 
 struct OsEventLoop {
     float2 next_incoming_event_location;
@@ -26,7 +26,7 @@ void os_event_loop_mock_event_type(OsEventLoop *loop, OsEventType event_type)
 
 OsEventLoop *os_event_loop_create(void)
 {
-    OsEventLoop *loop = tmalloc(sizeof *loop);
+    OsEventLoop *loop = malloc(sizeof *loop);
     loop->next_incoming_event_location = (float2) {
         0.0,
         0.0,
@@ -41,7 +41,7 @@ OsEventLoop *os_event_loop_create(void)
 void os_event_loop_destroy(OsEventLoop *loop)
 {
     os_event_queue_destroy(&loop->incoming_events);
-    tfree(loop);
+    free(loop);
 }
 
 void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)

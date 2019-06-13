@@ -1,5 +1,5 @@
 #include "gpu/device-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(gpu_device)
 {
@@ -9,7 +9,4 @@ Test(gpu_device)
     //=> 1
 
     gpu_device_destroy(device);
-
-    _d(test_allocator_was_freed(device));
-    //=> 1
 }

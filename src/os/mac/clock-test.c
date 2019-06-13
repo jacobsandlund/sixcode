@@ -1,5 +1,5 @@
 #include "os/mac/clock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(os_clock_time)
 {

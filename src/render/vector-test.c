@@ -3,7 +3,7 @@
 #include "render/layout.c"
 #include "render/viewport.h"
 #include "world/vector.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(render_vector_screen_to_world)
 {

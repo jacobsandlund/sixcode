@@ -1,6 +1,6 @@
 #include "engine/manager.c"
 
-// From: bin/ls manager-test.c | grep -v 'engine/manager-test.c' | xargs grep -h '#include' | grep -v test/test.h | sort -u
+// From: bin/ls manager-test.c | grep -v 'engine/manager-test.c' | xargs grep -h '#include' | grep -v test.h | sort -u
 #include "camera/camera.c"
 #include "camera/manager.c"
 #include "gpu/device-mock.c"
@@ -30,7 +30,7 @@
 #include "world/manager.c"
 #include "world/vector.c"
 
-#include "test/test.h"
+#include "test.h"
 
 Test(engine_manager)
 {
@@ -89,9 +89,4 @@ Test(engine_manager)
     //=> 17481
 
     os_application_mock_terminate(gOsManager.application);
-
-    _d(test_allocator_was_freed(gOsManager.application));
-    //=> 1
-    _d(test_allocator_was_freed(gGpuManager.view));
-    //=> 1
 }

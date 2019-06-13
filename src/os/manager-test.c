@@ -7,7 +7,7 @@
 #include "os/window-mock.c"
 #include "gpu/view-mock.c"
 #include "log/manager-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 bool test_application_will_terminate_called = false;
 
@@ -62,6 +62,7 @@ Test(os_manager_window_init_and_finish_launching)
     //=> 1
 
     os_manager_window_destroy();
+    gpu_view_destroy(view);
     os_manager_destroy();
 }
 
@@ -102,4 +103,5 @@ Test(os_manager_event_loop_run)
     //=> 12666
 
     os_manager_destroy();
+    log_manager_destroy();
 }

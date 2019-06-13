@@ -3,7 +3,7 @@
 #include "string/id-table.c"
 #include "string/id.c"
 #include "string/manager.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(string_manager_init)
 {
@@ -30,4 +30,5 @@ Test(string_manager_init)
     //=> foo
 
     string_manager_destroy();
+    log_manager_destroy();
 }

@@ -45,13 +45,13 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *
 
     id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
 
-    NSRect frame = NSMakeRect(
+    NSRect ns_frame = NSMakeRect(
             frame.origin.x,
             frame.origin.y,
             frame.size.x,
             frame.size.y);
 
-    MTKView *mtk_view = [[MTKView alloc] initWithFrame: frame
+    MTKView *mtk_view = [[MTKView alloc] initWithFrame: ns_frame
             device: mtl_device];
     mtk_view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
     mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;

@@ -2,7 +2,7 @@
 #include "math/quad.c"
 #include "os/clock-mock.c"
 #include "world/grid.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(world_manager_init_and_load)
 {

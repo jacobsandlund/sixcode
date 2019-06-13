@@ -2,7 +2,7 @@
 #include "os/clock-mock.c"
 #include "os/event-queue.c"
 #include "log/manager-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(os_event_loop)
 {
@@ -54,7 +54,5 @@ Test(os_event_loop)
 
     os_event_queue_destroy(&queue);
     os_event_loop_destroy(loop);
-
-    _d(test_allocator_was_freed(loop));
-    //=> 1
+    log_manager_destroy();
 }

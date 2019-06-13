@@ -1,6 +1,6 @@
 #include "os/event-queue.c"
 #include "log/manager-mock.c"
-#include "test/test.h"
+#include "test.h"
 
 Test(os_event_queue_init)
 {
@@ -62,6 +62,7 @@ Test(os_event_queue_write)
     //=> 9876543210
 
     os_event_queue_destroy(eq);
+    log_manager_destroy();
 }
 
 Test(os_event_queue_read)
@@ -114,4 +115,5 @@ Test(os_event_queue_read)
     //=> 9876543210
 
     os_event_queue_destroy(eq);
+    log_manager_destroy();
 }

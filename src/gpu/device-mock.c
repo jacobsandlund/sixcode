@@ -1,5 +1,5 @@
 #include "gpu/device.h"
-#include "test/allocator.h"
+#include <stdlib.h>
 
 struct GpuDevice {
     bool created;
@@ -7,12 +7,12 @@ struct GpuDevice {
 
 GpuDevice *gpu_device_create(void)
 {
-    GpuDevice *device = tmalloc(sizeof *device);
+    GpuDevice *device = malloc(sizeof *device);
     device->created = true;
     return device;
 }
 
 void gpu_device_destroy(GpuDevice *device)
 {
-    tfree(device);
+    free(device);
 }
