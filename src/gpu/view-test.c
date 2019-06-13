@@ -22,8 +22,7 @@ Test(gpu_view)
     float2 old_viewport_size = {1920, 1080};
     float2 new_viewport_size = {2560, 1920};
     GpuViewConfig config = {
-        .draw_in_view = test_draw_in_view,
-        .size_changed = test_size_changed,
+        .preferred_frames_per_second = 60,
     };
     OsScreenFrame visible_frame = {
         .origin = {0, 0},
@@ -36,8 +35,12 @@ Test(gpu_view)
     //=> 1
     _f2(gpu_view_viewport_size(view));
     //=> 1920, 1080
-    _f2(test_view_size);
-    //=> 1920, 1080
+
+    GpuViewCallbacks callbacks = {
+        .draw_in_view = test_draw_in_view,
+        .size_changed = test_size_changed,
+    };
+    gpu_view_register_callbacks(view, &callbacks);
 
     gpu_view_mock_size_changed(view, new_viewport_size);
 

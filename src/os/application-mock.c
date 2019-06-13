@@ -11,17 +11,21 @@ void os_application_mock_terminate(OsApplication *app)
     app->will_terminate();
 }
 
-OsApplication *os_application_create(OsApplicationConfig *config)
+OsApplication *os_application_create(void)
 {
     OsApplication *app = malloc(sizeof *app);
     app->finished_launching = false;
-    app->will_terminate = config->will_terminate;
     return app;
 }
 
 void os_application_destroy(OsApplication *app)
 {
     free(app);
+}
+
+void os_application_register_callbacks(OsApplication *app, OsApplicationCallbacks *callbacks)
+{
+    app->will_terminate = callbacks->will_terminate;
 }
 
 void os_application_finish_launching(OsApplication *app)

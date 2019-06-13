@@ -3,6 +3,20 @@
 #include "os/screen.h"
 #include "render/layout.h"
 
+EngineCallbacks gEngineCallbacks = {
+    .os = {
+        .application = {
+            .will_terminate = engine_manager_destroy,
+        },
+    },
+    .gpu = {
+        .view = {
+            .draw_in_view = gpu_manager_draw_in_view,
+            .size_changed = gpu_manager_size_changed,
+        },
+    },
+};
+
 EngineConfig gEngineConfig = {
     .log = {
         .logs = {
@@ -21,17 +35,11 @@ EngineConfig gEngineConfig = {
         },
     },
     .os = {
-        .application = {
-            .will_terminate = engine_manager_destroy,
-        },
         .event_queue_length = 64,
         .event_queue_safe_length_remaining = 16,
     },
     .gpu = {
         .view = {
-            // TODO: render_manager_draw_in_view
-            .draw_in_view = gpu_manager_draw_in_view,
-            .size_changed = render_manager_size_changed,
             .preferred_frames_per_second = 60,
         },
     },
@@ -57,7 +65,7 @@ EngineConfig gEngineConfig = {
     .world_grid_random_count = 10000000,
 };
 
-void engine_manager_init(EngineConfig *config)
+void engine_manager_init(EngineCallbacks *callbacks, EngineConfig *config)
 {
         EngineProfileStart();
     log_manager_init(&config->log);
@@ -73,7 +81,6 @@ void engine_manager_init(EngineConfig *config)
         EngineProfileEnd("resource_manager_init");
 
     os_manager_window_init(gGpuManager.view);
-    config->render.viewport_size = gpu_view_viewport_size(gGpuManager.view);
         EngineProfileEnd("os_manager_window_init");
 
     render_manager_init(&config->render);
@@ -82,7 +89,11 @@ void engine_manager_init(EngineConfig *config)
         EngineProfileEnd("camera_manager_init");
     world_manager_init(&config->world);
         EngineProfileEnd("camera_manager_init");
+    gpu_manager_register_callbacks(&callbacks->gpu);
+        EngineProfileEnd("gpu_manager_register_callbacks");
 
+    os_manager_register_callbacks(&callbacks->os);
+        EngineProfileEnd("os_manager_register_callbacks");
     os_manager_finish_launching();
         EngineProfileEnd("os_manager_finish_launching");
 

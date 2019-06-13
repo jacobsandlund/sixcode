@@ -10,12 +10,13 @@ void test_will_terminate(void)
 
 Test(os_application)
 {
-    OsApplicationConfig config = {
+    OsApplicationCallbacks callbacks = {
         .will_terminate = test_will_terminate,
     };
     called_will_terminate = false;
 
-    OsApplication *app = os_application_create(&config);
+    OsApplication *app = os_application_create();
+    os_application_register_callbacks(app, &callbacks);
 
     _d(app->finished_launching);
     //=> 0

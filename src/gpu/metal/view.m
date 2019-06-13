@@ -1,22 +1,40 @@
 #import "gpu/metal/view.h"
 #import "log/manager.h"
 
+static void gpu_view_noop_draw_in_view(GpuView *view)
+{
+    (void) view;
+}
+
+static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
+{
+    (void) view;
+    (void) viewport_size;
+}
+
 @implementation ViewDelegate {
     GpuViewFn _draw_in_view;
     GpuViewSizeChangedFn _size_changed;
 }
 
 - (instancetype)initWithMtkView:(MTKView *)mtk_view config:(GpuViewConfig *)config {
+    (void)config;
+
     self = [super init];
     if (self) {
-        _size_changed = config->size_changed;
-        _draw_in_view = config->draw_in_view;
         _mtk_view = mtk_view;
+        _draw_in_view = gpu_view_noop_draw_in_view;
+        _size_changed = gpu_view_noop_size_changed;
 
         [self mtkView:mtk_view drawableSizeWillChange:mtk_view.drawableSize];
     }
 
     return self;
+}
+
+- (void)registerCallbacks:(GpuViewCallbacks *)callbacks {
+    _draw_in_view = callbacks->draw_in_view;
+    _size_changed = callbacks->size_changed;
 }
 
 - (void)mtkView:(MTKView *)mtk_view drawableSizeWillChange:(CGSize)size {
@@ -73,6 +91,12 @@ void gpu_view_destroy(GpuView *view)
         ViewDelegate *delegate = (__bridge_transfer ViewDelegate *)view;
         delegate = nil;
     }
+}
+
+void gpu_view_register_callbacks(GpuView *view, GpuViewCallbacks *callbacks)
+{
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view;
+    [delegate registerCallbacks:callbacks];
 }
 
 float2 gpu_view_viewport_size(GpuView *view)

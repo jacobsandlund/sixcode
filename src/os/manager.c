@@ -8,7 +8,7 @@ void os_manager_init(OsManagerConfig *config)
             config->event_queue_length,
             config->event_queue_safe_length_remaining);
 
-    gOsManager.application = os_application_create(&config->application);
+    gOsManager.application = os_application_create();
 
     gOsManager.event_loop = os_event_loop_create();
 }
@@ -18,6 +18,11 @@ void os_manager_destroy(void)
     os_event_loop_destroy(gOsManager.event_loop);
     os_application_destroy(gOsManager.application);
     os_event_queue_destroy(&gOsManager.event_queue);
+}
+
+void os_manager_register_callbacks(OsManagerCallbacks *callbacks)
+{
+    os_application_register_callbacks(gOsManager.application, &callbacks->application);
 }
 
 void os_manager_window_init(GpuView *view)

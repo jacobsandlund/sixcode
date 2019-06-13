@@ -1,17 +1,26 @@
 #import "os/mac/application.h"
 #import "log/manager.h"
 
+static void os_application_early_will_terminate(void)
+{
+    LogDefault(gLogManager.logs.os, "Application will_terminate called before callbacks registered");
+}
+
 @implementation AppDelegate {
     OsApplicationNotificationFn _will_terminate;
 }
 
-- (instancetype)initWithNSApp:(NSApplication *)ns_app config:(OsApplicationConfig *)config {
+- (instancetype)initWithNSApp:(NSApplication *)ns_app {
     self = [super init];
     if (self) {
         _ns_app = ns_app;
-        _will_terminate = config->will_terminate;
+        _will_terminate = os_application_early_will_terminate;
     }
     return self;
+}
+
+- (void)registerCallbacks:(OsApplicationCallbacks *)callbacks {
+    _will_terminate = callbacks->will_terminate;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
@@ -56,7 +65,7 @@ NSMenu *makeMenu() {
     return mainMenu;
 }
 
-OsApplication *os_application_create(OsApplicationConfig *config)
+OsApplication *os_application_create(void)
 {
     OsApplication *app;
 
@@ -70,8 +79,7 @@ OsApplication *os_application_create(OsApplicationConfig *config)
 
     ns_app.mainMenu = makeMenu();
 
-    AppDelegate *delegate = [[AppDelegate alloc] initWithNSApp:ns_app
-            config:config];
+    AppDelegate *delegate = [[AppDelegate alloc] initWithNSApp:ns_app];
     [ns_app setDelegate:delegate];
 
     app = (__bridge_retained OsApplication *) delegate;
@@ -87,6 +95,12 @@ void os_application_destroy(OsApplication *app)
         AppDelegate *delegate = (__bridge_transfer AppDelegate *)app;
         delegate = nil;
     }
+}
+
+void os_application_register_callbacks(OsApplication *app, OsApplicationCallbacks *callbacks)
+{
+    AppDelegate *delegate = (__bridge AppDelegate *)app;
+    [delegate registerCallbacks:callbacks];
 }
 
 void os_application_finish_launching(OsApplication *app)

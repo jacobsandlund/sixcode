@@ -6,6 +6,7 @@
 
 @property(nonatomic, strong) NSApplication *ns_app;
 
-- (instancetype)initWithNSApp:(NSApplication *)ns_app config:(OsApplicationConfig *)config;
+- (instancetype)initWithNSApp:(NSApplication *)ns_app;
+- (void)registerCallbacks:(OsApplicationCallbacks *)callbacks;
 
 @end

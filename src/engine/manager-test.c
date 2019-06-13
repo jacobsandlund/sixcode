@@ -5,7 +5,7 @@
 #include "camera/manager.c"
 #include "gpu/device-mock.c"
 #include "gpu/manager.c"
-#include "gpu/renderer-mock.c"
+#include "gpu/renderer.c"
 #include "gpu/view-mock.c"
 #include "log/manager-mock.c"
 #include "math/fnv.c"
@@ -41,17 +41,17 @@ Test(engine_manager)
     // Save some time, especially for valgrind
     gEngineConfig.world_grid_random_count = 100;
 
-    engine_manager_init(&gEngineConfig);
+    engine_manager_init(&gEngineCallbacks, &gEngineConfig);
 
     _f2(gRenderManager.viewport.size);
-    //=> 1920, 1080
+    //=> 0, 0
 
     GpuView *view = gGpuManager.view;
     float2 viewport_size = {2560, 1440};
     gpu_view_mock_size_changed(view, viewport_size);
 
     _f2(gRenderManager.viewport.size);
-    //=> 2560, 1440
+    //=> 0, 0
 
     gpu_view_mock_draw_in_view(view);
 
@@ -77,7 +77,7 @@ Test(engine_manager)
     _f2(event.location);
     //=> 1300, 400
     _u64(event.time);
-    //=> 17160
+    //=> 17802
 
     _d(os_event_queue_read(queue, &event));
     //=> 2
@@ -86,7 +86,7 @@ Test(engine_manager)
     _f2(event.location);
     //=> 1300, 400
     _u64(event.time);
-    //=> 17481
+    //=> 18123
 
     os_application_mock_terminate(gOsManager.application);
 }

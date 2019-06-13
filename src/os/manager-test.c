@@ -16,10 +16,13 @@ void test_application_will_terminate(void)
     test_application_will_terminate_called = true;
 }
 
-static OsManagerConfig test_manager_config = {
+static OsManagerCallbacks test_manager_callbacks = {
     .application = {
         .will_terminate = test_application_will_terminate,
     },
+};
+
+static OsManagerConfig test_manager_config = {
     .event_queue_length = 32,
     .event_queue_safe_length_remaining = 8,
 };
@@ -27,6 +30,7 @@ static OsManagerConfig test_manager_config = {
 Test(os_manager_init)
 {
     os_manager_init(&test_manager_config);
+    os_manager_register_callbacks(&test_manager_callbacks);
 
     _d(gOsManager.event_queue.length);
     //=> 32
@@ -46,6 +50,7 @@ Test(os_manager_window_init_and_finish_launching)
     GpuView *view = gpu_view_create(NULL, frame, &gGpuViewMockConfig);
 
     os_manager_init(&test_manager_config);
+    os_manager_register_callbacks(&test_manager_callbacks);
 
     os_manager_window_init(view);
 
@@ -71,6 +76,7 @@ Test(os_manager_event_loop_run)
     os_clock_mock_init(12345, 321);
     log_manager_init(&gLogManagerMockConfig);
     os_manager_init(&test_manager_config);
+    os_manager_register_callbacks(&test_manager_callbacks);
 
     OsEventLoop *loop = gOsManager.event_loop;
     float2 location = {1300, 400};

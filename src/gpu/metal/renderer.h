@@ -8,7 +8,9 @@
 
 @interface MetalRenderer : NSObject
 
-- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view;
+- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view viewportSize:(float2)viewport_size;
 - (void)drawInView:(GpuView *)view;
+
+@property(nonatomic) float2 viewport_size;
 
 @end

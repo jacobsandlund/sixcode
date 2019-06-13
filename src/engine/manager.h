@@ -23,9 +23,15 @@ typedef struct {
     i64 world_grid_random_count;
 } EngineConfig;
 
-extern EngineConfig gEngineConfig;
+typedef struct {
+    OsManagerCallbacks os;
+    GpuManagerCallbacks gpu;
+} EngineCallbacks;
 
-void engine_manager_init(EngineConfig *config);
+extern EngineConfig gEngineConfig;
+extern EngineCallbacks gEngineCallbacks;
+
+void engine_manager_init(EngineCallbacks *callbacks, EngineConfig *config);
 void engine_manager_destroy(void);
 void engine_manager_run(void);
 

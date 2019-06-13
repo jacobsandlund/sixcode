@@ -7,12 +7,13 @@ typedef void (*OsApplicationNotificationFn)(void);
 
 typedef struct {
     OsApplicationNotificationFn will_terminate;
-} OsApplicationConfig;
+} OsApplicationCallbacks;
 
 typedef struct OsApplication OsApplication;
 
-OsApplication *os_application_create(OsApplicationConfig *config);
+OsApplication *os_application_create(void);
 void os_application_destroy(OsApplication *app);
+void os_application_register_callbacks(OsApplication *app, OsApplicationCallbacks *callbacks);
 void os_application_finish_launching(OsApplication *app);
 
 #endif // OsApplication_h

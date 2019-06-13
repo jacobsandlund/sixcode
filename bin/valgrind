@@ -96,8 +96,9 @@ elif [[ $valgrind_mode == 'all' ]]; then
 
     for test_file in $(bin/ls docker 'test.c'); do
         output_file="out/valgrind-output/$test_file.txt"
+        previous_file="out/valgrind-output-previous/$test_file.txt"
         mkdir -p $(dirname $output_file)
-        cp out/valgrind-output-previous/$test_file.txt $output_file
+        test -f $previous_file && cp $previous_file $output_file
     done
 
     for test_file in $(bin/ls docker $test_dir 'test.c'); do

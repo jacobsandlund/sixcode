@@ -9,10 +9,13 @@
 #include "gpu/view.h"
 
 typedef struct {
-    OsApplicationConfig application;
     i64 event_queue_length;
     i64 event_queue_safe_length_remaining;
 } OsManagerConfig;
+
+typedef struct {
+    OsApplicationCallbacks application;
+} OsManagerCallbacks;
 
 typedef struct {
     OsEventQueue event_queue;
@@ -25,6 +28,7 @@ extern OsManager gOsManager;
 
 void os_manager_init(OsManagerConfig *config);
 void os_manager_destroy(void);
+void os_manager_register_callbacks(OsManagerCallbacks *callbacks);
 void os_manager_window_init(GpuView *view);
 void os_manager_window_destroy(void);
 void os_manager_finish_launching(void);

@@ -29,21 +29,13 @@ Test(render_manager_size_changed)
         .layout_type = RenderLayoutTypeRect,
     };
 
-    GpuViewConfig view_config = {
-        .size_changed = render_manager_size_changed,
-    };
-
     OsScreenFrame visible_frame = {
         .origin = {0, 0},
         .size = old_viewport_size,
     };
     GpuDevice *device = gpu_device_create();
-    GpuView *view = gpu_view_create(device, visible_frame, &view_config);
+    GpuView *view = gpu_view_create(device, visible_frame, &gGpuViewMockConfig);
 
-    // Note: gRenderManager.viewport.size is now correct,
-    // but prefer explicit initialization
-    _f2(gRenderManager.viewport.size);
-    //=> 1920, 1080
     render_config.viewport_size = gpu_view_viewport_size(view);
 
     render_manager_init(&render_config);
@@ -51,6 +43,11 @@ Test(render_manager_size_changed)
     _f2(gRenderManager.viewport.size);
     //=> 1920, 1080
 
+    GpuViewCallbacks view_callbacks = {
+        .size_changed = render_manager_size_changed,
+    };
+
+    gpu_view_register_callbacks(view, &view_callbacks);
     gpu_view_mock_size_changed(view, new_viewport_size);
 
     _f2(gRenderManager.viewport.size);

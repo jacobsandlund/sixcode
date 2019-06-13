@@ -10,9 +10,10 @@
     u64 _numVertices;
 }
 
-- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view {
+- (instancetype)initWithDevice:(GpuDevice *)device view:(GpuView *)view viewportSize:(float2)viewport_size {
     self = [super init];
     if (self) {
+        _viewport_size = viewport_size;
         [self loadMetalWithDevice:device view:view];
     }
     return self;
@@ -108,7 +109,6 @@
 - (void)drawInView:(GpuView *)view {
     ViewDelegate *view_delegate = (__bridge ViewDelegate *)view;
     MTKView *mtk_view = view_delegate.mtk_view;
-    float2 viewport_size = view_delegate.viewport_size;
 
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
@@ -123,8 +123,8 @@
         MTLViewport viewport = {
             0.0,
             0.0,
-            viewport_size.x,
-            viewport_size.y,
+            _viewport_size.x,
+            _viewport_size.y,
             -1.0,
             1.0,
         };
@@ -149,8 +149,8 @@
                                 offset:0
                                atIndex:VertexInputIndexVertices];
 
-        [renderEncoder setVertexBytes:&viewport_size
-                               length:sizeof(viewport_size)
+        [renderEncoder setVertexBytes:&_viewport_size
+                               length:sizeof(_viewport_size)
                               atIndex:VertexInputIndexViewportSize];
 
         // Draw the vertices of the quads
@@ -168,13 +168,14 @@
 
 @end
 
-GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view)
+GpuRenderer *gpu_renderer_create(GpuDevice *device, GpuView *view, float2 viewport_size)
 {
     GpuRenderer *renderer;
 
     @autoreleasepool {
         MetalRenderer *mtl_renderer = [[MetalRenderer alloc]
-                initWithDevice:device view:view];
+                initWithDevice:device view:view
+                viewportSize:viewport_size];
         renderer = (__bridge_retained GpuRenderer *)mtl_renderer;
     }
 
@@ -195,4 +196,11 @@ void gpu_renderer_draw_in_view(GpuRenderer *renderer, GpuView *view)
         MetalRenderer *mtl_renderer = (__bridge MetalRenderer *)renderer;
         [mtl_renderer drawInView:view];
     }
+}
+
+void gpu_renderer_size_changed(GpuRenderer *renderer, GpuView *view, float2 viewport_size)
+{
+    (void) view;
+    MetalRenderer *mtl_renderer = (__bridge MetalRenderer *)renderer;
+    mtl_renderer.viewport_size = viewport_size;
 }

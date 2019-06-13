@@ -12,6 +12,10 @@ typedef struct {
 } GpuManagerConfig;
 
 typedef struct {
+    GpuViewCallbacks view;
+} GpuManagerCallbacks;
+
+typedef struct {
     GpuDevice *device;
     GpuView *view;
     GpuRenderer *renderer;
@@ -21,6 +25,8 @@ extern GpuManager gGpuManager;
 
 void gpu_manager_init(OsScreenFrame frame, GpuManagerConfig *config);
 void gpu_manager_destroy(void);
+void gpu_manager_register_callbacks(GpuManagerCallbacks *callbacks);
 void gpu_manager_draw_in_view(GpuView *view);
+void gpu_manager_size_changed(GpuView *view, float2 viewport_size);
 
 #endif // GpuManager_h
