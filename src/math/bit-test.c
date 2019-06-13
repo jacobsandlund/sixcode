@@ -1,5 +1,5 @@
-#include "test.h"
 #include "math/bit.h"
+#include "test.h"
 
 Test(bit_highest_bit)
 {

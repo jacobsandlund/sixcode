@@ -1,5 +1,5 @@
 #include "log/log.h"
-#include "test.h"
+#include "test-allocator.h"
 
 #include <stdarg.h>
 #include <stdio.h>

@@ -37,7 +37,7 @@
 
 @end
 
-GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config)
+GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
     GpuView *view;
 
@@ -46,10 +46,10 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame visible_frame, GpuView
     id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
 
     NSRect frame = NSMakeRect(
-            visible_frame.origin.x,
-            visible_frame.origin.y,
-            visible_frame.size.x,
-            visible_frame.size.y);
+            frame.origin.x,
+            frame.origin.y,
+            frame.size.x,
+            frame.size.y);
 
     MTKView *mtk_view = [[MTKView alloc] initWithFrame: frame
             device: mtl_device];

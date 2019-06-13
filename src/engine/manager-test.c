@@ -1,5 +1,3 @@
-#include "test.h"
-
 #include "engine/manager.c"
 
 // From: bin/ls manager-test.c | grep -v 'engine/manager-test.c' | xargs grep -h '#include' | grep -v test.h | sort -u
@@ -23,3 +21,5 @@
 #include "world/grid.c"
 #include "world/manager.c"
 #include "world/vector.c"
+
+#include "test.h"

@@ -1,5 +1,5 @@
-#include "test.h"
 #include "os/clock-mock.c"
+#include "test.h"
 
 Test(os_clock_time)
 {

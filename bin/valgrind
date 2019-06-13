@@ -49,10 +49,10 @@ valgrind_single() {
     compile $test_file
     valgrind --log-fd=1 $options ./a.out |
         cut -d' ' -f 2- | tee -a $output_file
-    rm a.out
+    rm -rf a.out*
 }
 
-trap "rm -f a.out" EXIT
+trap "rm -rf a.out*" EXIT
 mkdir -p out/valgrind-output
 
 if [[ $valgrind_mode == 'help' ]]; then
@@ -75,7 +75,7 @@ elif [[ $valgrind_mode == 'massif' ]]; then
     options=${@:1:$options_length}
     compile $test_file
     valgrind --massif-out-file=$massif_file $options ./a.out
-    rm a.out
+    rm -rf a.out*
     ms_print $massif_file
 elif [[ $valgrind_mode == 'all' ]]; then
     rm -rf out/valgrind-output-previous

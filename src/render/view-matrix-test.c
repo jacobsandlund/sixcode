@@ -1,7 +1,7 @@
-#include "test.h"
 #include "render/view-matrix.c"
-#include "render/viewport.h"
 #include "render/layout.c"
+#include "render/viewport.h"
+#include "test.h"
 
 Test(render_view_matrix_init)
 {

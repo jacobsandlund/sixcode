@@ -2,8 +2,6 @@
 #include "engine/profile.h"
 #include "render/layout.h"
 
-static void engine_manager_draw_in_view(GpuView *view);
-
 EngineConfig gEngineConfig = {
     .log = {
         .logs = {
@@ -30,7 +28,8 @@ EngineConfig gEngineConfig = {
     },
     .gpu = {
         .view = {
-            .draw_in_view = engine_manager_draw_in_view,
+            // TODO: render_manager_draw_in_view
+            .draw_in_view = gpu_manager_draw_in_view,
             .size_changed = render_manager_size_changed,
             .preferred_frames_per_second = 60,
         },
@@ -60,8 +59,6 @@ EngineConfig gEngineConfig = {
 void engine_manager_init(EngineConfig *config)
 {
         EngineProfileStart();
-        EngineProfileEnd("EngineProfile empty timing 1");
-        EngineProfileEnd("EngineProfile empty timing 2");
     log_manager_init(&config->log);
         EngineProfileEnd("log_manager_init");
     os_manager_init(&config->os);
@@ -90,6 +87,9 @@ void engine_manager_init(EngineConfig *config)
 
     world_manager_load_random(config->world_grid_random_count);
         EngineProfileEnd("world_manager_load_random");
+
+        EngineProfileEnd("EngineProfile empty timing 1");
+        EngineProfileEnd("EngineProfile empty timing 2");
 }
 
 void engine_manager_destroy(void)
@@ -118,12 +118,4 @@ void engine_manager_destroy(void)
 void engine_manager_run(void)
 {
     os_manager_event_loop_run();
-}
-
-static void engine_manager_draw_in_view(GpuView *view)
-{
-        EngineProfileStart();
-    // TODO: render_manager_draw_in_view
-    gpu_manager_draw_in_view(view);
-        EngineProfileEnd("gpu_manager_draw_in_view");
 }

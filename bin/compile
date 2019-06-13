@@ -9,4 +9,4 @@ fi
 
 warnings="-Werror -Wall -Wextra -Wshorten-64-to-32 -Wstrict-prototypes"
 
-clang $lang_options -std=gnu11 -O1 -lm $warnings -I$SPACETIME_PATH/src "$@"
+clang $lang_options -std=gnu11 -O1 -lm $warnings -I$SPACETIME_PATH/src -DDEBUG=1 "$@"

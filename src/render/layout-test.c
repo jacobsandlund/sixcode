@@ -1,5 +1,5 @@
-#include "test.h"
 #include "render/layout.c"
+#include "test.h"
 
 Test(render_layout_type)
 {

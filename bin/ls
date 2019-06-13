@@ -19,10 +19,7 @@ src=$(grep -v '#' <<-SRC
 SRC
 )
 
-if [[ $1 == 'all' ]]; then
-    exclude='do_not_exclude_anything'
-    shift
-elif [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
     exclude='windows/|directx/'
 else
     exclude='mac/|metal/'
@@ -30,12 +27,25 @@ fi
 
 include_only='.'
 
-if [[ $1 == 'test' ]]; then
-    include_only='test\.c|test\.m$'
-elif [[ $1 == 'code' ]]; then
-    exclude="$exclude|-test.c|-test.m|-mock.c"
-elif [[ $# -eq 1 ]]; then
-    include_only="$1$"
-fi
+for arg in "$@"; do
+    case "$arg" in
+    all)
+        exclude='do_not_exclude_anything'
+        ;;
+    test)
+        include_only='test\.c|test\.m$'
+        ;;
+    code)
+        exclude="$exclude|-test.c|-test.m|-mock.c"
+        ;;
+    *)
+        if [ -d "$arg" ]; then
+            src="$arg"
+        else
+            include_only="$arg$"
+        fi
+        ;;
+    esac
+done
 
 find $src -type f | grep -E '\.[chm]|\.metal$' | grep -E "$include_only" | grep -Ev "$exclude" | sort

@@ -1,5 +1,5 @@
-#include "test.h"
 #include "log/log-mock.c"
+#include "test.h"
 
 Test(log)
 {

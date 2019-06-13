@@ -1,9 +1,9 @@
-#include "test.h"
 #include "string/id.c"
-#include <string.h>
 #include "log/manager-mock.c"
-#include "string/id-table.c"
 #include "math/fnv.c"
+#include "string/id-table.c"
+#include <string.h>
+#include "test.h"
 
 Test(string_id)
 {

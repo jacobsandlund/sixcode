@@ -1,9 +1,9 @@
-#include "test.h"
 #include "camera/camera.c"
-#include "render/viewport.h"
-#include "render/vector.c"
 #include "render/layout.c"
+#include "render/vector.c"
+#include "render/viewport.h"
 #include "world/vector.c"
+#include "test.h"
 
 Test(camera_translate)
 {

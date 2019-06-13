@@ -1,8 +1,8 @@
-#include "test.h"
 #include "world/manager.c"
-#include "world/grid.c"
 #include "math/quad.c"
 #include "os/clock-mock.c"
+#include "world/grid.c"
+#include "test.h"
 
 Test(world_manager_init_and_load)
 {

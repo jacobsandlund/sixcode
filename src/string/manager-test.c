@@ -1,9 +1,9 @@
-#include "test.h"
 #include "log/manager-mock.c"
-#include "string/manager.c"
-#include "string/id.c"
-#include "string/id-table.c"
 #include "math/fnv.c"
+#include "string/id-table.c"
+#include "string/id.c"
+#include "string/manager.c"
+#include "test.h"
 
 Test(string_manager_init)
 {

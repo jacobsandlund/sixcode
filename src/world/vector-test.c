@@ -1,6 +1,6 @@
-#include "test.h"
 #include "world/vector.c"
 #include "render/layout.c"
+#include "test.h"
 
 Test(world_vector_round_hex)
 {

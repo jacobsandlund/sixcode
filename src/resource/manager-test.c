@@ -1,12 +1,12 @@
-#include "test.h"
 #include "resource/manager.c"
-#include "resource/resource.c"
-#include "resource/pointer-allocator.c"
 #include "log/manager-mock.c"
 #include "math/fnv.c"
-#include "string/id.c"
+#include "resource/pointer-allocator.c"
+#include "resource/resource.c"
 #include "string/id-table.c"
+#include "string/id.c"
 #include "string/manager.c"
+#include "test.h"
 
 static ResourceManagerConfig test_resource_manager_config = {
     .loader_capacity = 2,

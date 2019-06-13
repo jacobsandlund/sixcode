@@ -1,2 +1,2 @@
-#include "test.h"
 #include "os/manager.c"
+#include "test.h"

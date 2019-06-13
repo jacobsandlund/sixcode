@@ -16,7 +16,7 @@ typedef struct {
     i64 preferred_frames_per_second;
 } GpuViewConfig;
 
-GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame visible_frame, GpuViewConfig *config);
+GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config);
 void gpu_view_destroy(GpuView *view);
 float2 gpu_view_viewport_size(GpuView *view);
 

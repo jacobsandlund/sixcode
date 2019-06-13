@@ -1,12 +1,12 @@
 #include "gpu/view.h"
-#include "test.h"
+#include "test-allocator.h"
 #include <stdlib.h>
 
-struct {
+struct GpuView {
     GpuDevice *device;
     float2 viewport_size;
     GpuViewConfig config;
-} GpuView;
+};
 
 void gpu_view_mock_size_changed(GpuView *view, float2 viewport_size)
 {
@@ -14,12 +14,12 @@ void gpu_view_mock_size_changed(GpuView *view, float2 viewport_size)
     view->config.size_changed(view, viewport_size);
 }
 
-GpuView *gpu_view_create(GpuDevice *device, float2 viewport_size, GpuViewConfig *config)
+GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
     GpuView *view = tmalloc(sizeof *view);
     view->device = device;
     view->config = *config;
-    gpu_view_mock_size_changed(view, viewport_size);
+    gpu_view_mock_size_changed(view, frame.size);
 
     return view;
 }

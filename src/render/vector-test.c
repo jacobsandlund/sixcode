@@ -1,9 +1,9 @@
-#include "test.h"
 #include "render/vector.c"
-#include "render/viewport.h"
-#include "render/layout.c"
-#include "world/vector.c"
 #include "math/quad.c"
+#include "render/layout.c"
+#include "render/viewport.h"
+#include "world/vector.c"
+#include "test.h"
 
 Test(render_vector_screen_to_world)
 {

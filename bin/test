@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-trap "rm -f a.out" EXIT
+trap "rm -rf a.out*" EXIT
 
 run() {
     $SPACETIME_PATH/bin/compile -I$SPACETIME_PATH/development "$@" && ./a.out
@@ -9,10 +9,16 @@ run() {
 if [ "$#" -gt 1 ] && [[ $1 == "--no-diff" ]]; then
     shift
     run "$@"
-elif [ "$#" -eq 1 ]; then
+elif [[ $# -eq 1 ]] && [ -f $1 ]; then
     run "$@" && git diff --exit-code -- $1
 else
-    for test_file in $(bin/ls 'test'); do
+    if [[ $# -eq 1 ]] && [ -d $1 ]; then
+        test_dir="$1"
+    else
+        test_dir=''
+    fi
+
+    for test_file in $(bin/ls $test_dir 'test'); do
         echo bin/test $test_file
         run $test_file
     done

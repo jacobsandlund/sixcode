@@ -1,7 +1,7 @@
-#include "test.h"
 #include "render/manager.c"
-#include "render/layout.c"
 #include "gpu/view-mock.c"
+#include "render/layout.c"
+#include "test.h"
 
 Test(render_manager_init)
 {
@@ -28,18 +28,21 @@ Test(render_manager_size_changed)
         .layout_type = RenderLayoutTypeRect,
     };
 
-    GpuView *view = tmalloc(sizeof *view);
     GpuViewConfig view_config = {
         .size_changed = render_manager_size_changed,
     };
 
-    gpu_view_init(view, NULL, old_viewport_size, &view_config);
+    OsScreenFrame visible_frame = {
+        .origin = {0, 0},
+        .size = old_viewport_size,
+    };
+    GpuView *view = gpu_view_create(NULL, visible_frame, &view_config);
 
     // Note: gRenderManager.viewport.size is now correct,
     // but prefer explicit initialization
     _f2(gRenderManager.viewport.size);
     //=> 1920, 1080
-    render_config.viewport_size = view->viewport_size;
+    render_config.viewport_size = gpu_view_viewport_size(view);
 
     render_manager_init(&render_config);
 

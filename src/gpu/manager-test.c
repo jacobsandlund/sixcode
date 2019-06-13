@@ -1,2 +1,2 @@
-#include "test.h"
 #include "gpu/manager.c"
+#include "test.h"

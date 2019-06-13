@@ -1,6 +1,6 @@
-#include "test.h"
 #include "world/grid.c"
 #include "math/quad.c"
+#include "test.h"
 
 Test(world_grid_basics)
 {

@@ -1,5 +1,5 @@
-#include "test.h"
 #include "resource/resource.c"
+#include "test.h"
 
 Test(ResourceDefault)
 {

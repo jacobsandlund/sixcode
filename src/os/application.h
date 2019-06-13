@@ -2,7 +2,6 @@
 #define OsApplication_h
 
 #include "spacetime.h"
-#include "os/window.h"
 
 typedef void (*OsApplicationNotificationFn)(void);
 

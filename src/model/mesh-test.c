@@ -1,6 +1,6 @@
-#include "test.h"
 #include "model/mesh.c"
 #include "render/layout.c"
+#include "test.h"
 
 Test(fill_mesh_vertices_hex_set)
 {

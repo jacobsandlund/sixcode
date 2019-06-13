@@ -1,6 +1,6 @@
-#include "test.h"
 #include "os/event-queue.c"
 #include "log/manager-mock.c"
+#include "test.h"
 
 Test(os_event_queue_init)
 {
