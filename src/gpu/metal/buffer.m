@@ -1,0 +1,37 @@
+#import "gpu/buffer.h"
+
+@import MetalKit;
+
+// Order must match GpuBufferStorageModeType in buffer.h
+static const i32 MetalResourceStorageModeLookup[] = {
+    MTLResourceStorageModeShared,
+};
+
+GpuBuffer *gpu_buffer_create_with_length(GpuDevice *device, i64 length, GpuBufferStorageModeType storage_mode)
+{
+    GpuBuffer *buffer;
+
+    @autoreleasepool {
+        id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
+        i32 options = MetalResourceStorageModeLookup[storage_mode];
+        id<MTLBuffer> mtl_buffer = [mtl_device newBufferWithLength:length
+                options:options];
+        buffer = (__bridge_retained GpuBuffer *)mtl_buffer;
+    }
+
+    return buffer;
+}
+
+void gpu_buffer_destroy(GpuBuffer *buffer)
+{
+    @autoreleasepool {
+        id<MTLBuffer> mtl_buffer = (__bridge_transfer GpuBuffer *)buffer;
+        mtl_buffer = nil;
+    }
+}
+
+void *gpu_buffer_contents(GpuBuffer *buffer)
+{
+    id<MTLBuffer> mtl_buffer = (__bridge GpuBuffer *)buffer;
+    return mtl_buffer.contents;
+}

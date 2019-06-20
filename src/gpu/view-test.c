@@ -23,6 +23,7 @@ Test(gpu_view)
     float2 new_viewport_size = {2560, 1920};
     GpuViewConfig config = {
         .preferred_frames_per_second = 60,
+        .color_pixel_format = 2,
     };
     OsScreenFrame visible_frame = {
         .origin = {0, 0},
@@ -33,8 +34,14 @@ Test(gpu_view)
 
     _d(view->device == device);
     //=> 1
+    _d(view->preferred_frames_per_second);
+    //=> 60
+    _d(view->color_pixel_format);
+    //=> 2
     _f2(gpu_view_viewport_size(view));
     //=> 1920, 1080
+    _d(gpu_view_color_pixel_format(view));
+    //=> 2
 
     GpuViewCallbacks callbacks = {
         .draw_in_view = test_draw_in_view,
@@ -53,6 +60,12 @@ Test(gpu_view)
 
     _d(test_draw_in_view_called);
     //=> 1
+
+    _d(gpu_view_current_render_pass_config(view) != NULL);
+    //=> 1
+    view->has_current_render_pass = false;
+    _d(gpu_view_current_render_pass_config(view) != NULL);
+    //=> 0
 
     gpu_view_destroy(view);
     gpu_device_destroy(device);

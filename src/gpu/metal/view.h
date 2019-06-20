@@ -1,7 +1,7 @@
+#import "gpu/view.h"
+
 @import AppKit;
 @import MetalKit;
-
-#import "gpu/view.h"
 
 @interface ViewDelegate : NSObject<MTKViewDelegate>
 

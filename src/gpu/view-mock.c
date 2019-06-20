@@ -4,9 +4,11 @@
 struct GpuView {
     GpuDevice *device;
     i64 preferred_frames_per_second;
+    i64 color_pixel_format;
     float2 viewport_size;
     GpuViewFn draw_in_view;
     GpuViewSizeChangedFn size_changed;
+    bool has_current_render_pass;
 };
 
 void gpu_view_mock_size_changed(GpuView *view, float2 viewport_size)
@@ -38,13 +40,18 @@ GpuViewCallbacks gGpuViewMockNoopCallbacks = {
 
 GpuViewConfig gGpuViewMockConfig = {
     .preferred_frames_per_second = 60,
+    .color_pixel_format = 1,
 };
 
 GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
     GpuView *view = malloc(sizeof *view);
+
     view->device = device;
     view->preferred_frames_per_second = config->preferred_frames_per_second;
+    view->color_pixel_format = config->color_pixel_format;
+    view->has_current_render_pass = true;
+
     gpu_view_register_callbacks(view, &gGpuViewMockNoopCallbacks);
     gpu_view_mock_size_changed(view, frame.size);
 
@@ -65,4 +72,19 @@ void gpu_view_register_callbacks(GpuView *view, GpuViewCallbacks *callbacks)
 float2 gpu_view_viewport_size(GpuView *view)
 {
     return view->viewport_size;
+}
+
+i64 gpu_view_color_pixel_format(GpuView *view)
+{
+    return view->color_pixel_format;
+}
+
+GpuRenderPassConfig *gpu_view_current_render_pass_config(GpuView *view)
+{
+    if (view->has_current_render_pass) {
+        // Return an arbitrary pointer
+        return (GpuRenderPassConfig *) view;
+    } else {
+        return NULL;
+    }
 }

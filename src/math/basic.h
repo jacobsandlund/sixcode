@@ -1,7 +1,7 @@
-#ifndef InlineBasic_h
-#define InlineBasic_h
+#ifndef MathBasic_h
+#define MathBasic_h
 
-// #included in spacetime.h
+#include "spacetime.h"
 
 static inline int2 int2_from_float2(float2 v)
 {
@@ -23,4 +23,4 @@ static inline int2 int2_sub(int2 a, int2 b)
     return (int2) {a.x - b.x, a.y - b.y};
 }
 
-#endif // InlineBasic_h
+#endif // MathBasic_h

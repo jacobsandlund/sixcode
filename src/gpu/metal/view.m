@@ -1,6 +1,8 @@
 #import "gpu/metal/view.h"
 #import "log/manager.h"
 
+const i64 MetalViewColorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+
 static void gpu_view_noop_draw_in_view(GpuView *view)
 {
     (void) view;
@@ -71,7 +73,7 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *
 
     MTKView *mtk_view = [[MTKView alloc] initWithFrame: ns_frame
             device: mtl_device];
-    mtk_view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+    mtk_view.colorPixelFormat = config->color_pixel_format;
     mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;
 
     ViewDelegate *delegate = [[ViewDelegate alloc]
@@ -103,4 +105,18 @@ float2 gpu_view_viewport_size(GpuView *view)
 {
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
     return delegate.viewport_size;
+}
+
+i64 gpu_view_color_pixel_format(GpuView *view)
+{
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view;
+    return delegate.mtk_view.colorPixelFormat;
+}
+
+GpuRenderPassConfig *gpu_view_current_render_pass_config(GpuView *view)
+{
+    ViewDelegate *delegate = (__bridge ViewDelegate *)view;
+
+    // TODO: check if needs to be retained
+    return (__bridge GpuRenderPassConfig *)delegate.mtk_view.currentRenderPassDescriptor;
 }

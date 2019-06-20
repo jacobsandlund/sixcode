@@ -4,7 +4,7 @@ using namespace metal;
 
 // Include header shared between this Metal shader code and C code executing Metal API commands
 #import <simd/simd.h>
-#import "ShaderTypes.h"
+#import "../shader-types.h"
 
 // Vertex shader outputs and fragment shader inputs
 typedef struct {
@@ -20,9 +20,9 @@ typedef struct {
 } RasterizerData;
 
 vertex RasterizerData
-vertexShader(uint vertexID [[ vertex_id ]],
-             device Vertex *vertices [[ buffer(VertexInputIndexVertices) ]],
-             constant float2 *viewportSizePointer [[ buffer(VertexInputIndexViewportSize) ]])
+vertex_shader(uint vertexID [[ vertex_id ]],
+             device GpuVertex *vertices [[ buffer(GpuVertexIndexVertices) ]],
+             constant float2 *viewportSizePointer [[ buffer(GpuVertexIndexViewportSize) ]])
 {
     RasterizerData out;
 
@@ -54,7 +54,7 @@ vertexShader(uint vertexID [[ vertex_id ]],
     return out;
 }
 
-fragment float4 fragmentShader(RasterizerData in [[stage_in]])
+fragment float4 fragment_shader(RasterizerData in [[stage_in]])
 {
     // We return the color we just set which will be written to our color attachment.
     return in.color;

@@ -6,6 +6,7 @@
 #include "gpu/device.h"
 #include "gpu/view.h"
 #include "gpu/renderer.h"
+#include "gpu/command-queue.h"
 
 typedef struct {
     GpuViewConfig view;
@@ -18,7 +19,8 @@ typedef struct {
 typedef struct {
     GpuDevice *device;
     GpuView *view;
-    GpuRenderer *renderer;
+    GpuCommandQueue *command_queue;
+    GpuRenderer renderer;
 } GpuManager;
 
 extern GpuManager gGpuManager;

@@ -77,6 +77,4 @@ typedef struct {
 
 #endif
 
-#include "math/inline-basic.h"
-
 #endif // Spacetime_h

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include "math/basic.h"
 #include "model/mesh.h"
 #include "render/layout.h"
 

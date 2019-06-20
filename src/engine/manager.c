@@ -41,6 +41,9 @@ EngineConfig gEngineConfig = {
     .gpu = {
         .view = {
             .preferred_frames_per_second = 60,
+#ifdef __APPLE__
+            .color_pixel_format = MTLPixelFormatBGRA8Unorm_sRGB,
+#endif
         },
     },
     .string = {

@@ -2,7 +2,6 @@
 #define GpuDevice_h
 
 #include "spacetime.h"
-#include "gpu/command-queue.h"
 
 typedef struct GpuDevice GpuDevice;
 

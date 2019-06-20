@@ -4,12 +4,6 @@
 #include "spacetime.h"
 #include "gpu/device.h"
 
-typedef enum {
-    GpuCommandQueueTypeRender,
-    GpuCommandQueueTypeCompute,
-    GpuCommandQueueTypeCopy,
-};
-
 typedef struct GpuCommandQueue GpuCommandQueue;
 
 GpuCommandQueue *gpu_command_queue_create(GpuDevice *device);
