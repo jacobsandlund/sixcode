@@ -1,6 +1,27 @@
 #!/bin/bash -e
 
-mkdir -p out/valgrind-output
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st valgrind [opts] [dir|foo.c] Run valgrind on all|dir|file'
+    echo 'Usage: st valgrind check [dir|foo.c]  Check results for hazards'
+    echo 'Usage: st valgrind summary            See summary of valgrind results'
+    echo 'Usage: st valgrind --tool=massif <foo.c> Run massif tool on file'
+    echo 'Usage: st valgrind -h|--help          See valgrind help'
+    exit 0
+fi
+
+if [[ $PWD != "$SPACETIME_PATH"* ]]; then
+    echo 'Must be run from $SPACETIME_PATH or descendants'
+    echo "(\$SPACETIME_PATH=$SPACETIME_PATH)"
+    exit 1
+fi
+
+if [[ $1 == '--dir' ]]; then
+    shift
+    cd $1
+    shift
+else
+    dir="${PWD/$SPACETIME_PATH//spacetime}"
+fi
 
 if [[ $1 == '-h' ]] || [[ $1 == '--help' ]] || [[ $1 == '--version' ]] || [[ $1 == '--help-debug' ]]; then
     valgrind_mode='help'
@@ -8,8 +29,8 @@ elif [[ $1 == 'check' ]]; then
     valgrind_mode='check'
     shift
 elif [[ $1 == 'summary' ]]; then
-    find out/valgrind-output -type f | xargs cat | grep -E 'valgrind|heap usage'
-    exit 0
+    valgrind_mode='summary'
+    shift
 elif [[ $1 == '--tool=massif' ]]; then
     valgrind_mode='massif'
 elif [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
@@ -18,8 +39,11 @@ else
     valgrind_mode='single'
 fi
 
-if [[ $valgrind_mode != 'check' ]] && ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
-    docker exec -it spacetime bin/valgrind "$@"
+if      [[ $valgrind_mode != 'check' ]] && \
+        [[ $valgrind_mode != 'summary' ]] && \
+        ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null
+then
+    docker exec -it spacetime bin/valgrind --dir "$dir" "$@"
 
     if [[ $valgrind_mode == 'all' ]]; then
         valgrind_mode='check'
@@ -28,9 +52,9 @@ if [[ $valgrind_mode != 'check' ]] && ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/
     fi
 fi
 
-check() {
+check_single() {
     test_file=$1
-    output_file="out/valgrind-output/$test_file.txt"
+    output_file="$out/valgrind-output/$test_file.txt"
     if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
         echo
         echo '!! NOT CLEAN'
@@ -39,16 +63,16 @@ check() {
 }
 
 compile() {
-    bin/compile -I$SPACETIME_PATH/development $1
+    $bin/compile -I$SPACETIME_PATH/development $1
 }
 
 valgrind_single() {
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    output_file="out/valgrind-output/$test_file.txt"
+    output_file="$out/valgrind-output/$test_file.txt"
     mkdir -p $(dirname $output_file)
-    echo bin/valgrind "$@" > $output_file
+    echo st valgrind "$@" > $output_file
     echo >> $output_file
 
     compile $test_file
@@ -58,6 +82,9 @@ valgrind_single() {
 }
 
 trap "rm -rf a.out*" EXIT
+out="$SPACETIME_PATH/out"
+bin="$SPACETIME_PATH/bin"
+mkdir -p $out/valgrind-output
 
 if [[ $# -ge 1 ]] && [ -d $1 ]; then
     test_dir="$1"
@@ -67,21 +94,23 @@ else
 fi
 
 if [[ $valgrind_mode == 'help' ]]; then
-    echo bin/valgrind [src/directory] [options] [test-file.c]
+    echo st valgrind [src/directory] [options] [test-file.c]
     valgrind "$@"
+elif [[ $valgrind_mode == 'summary' ]]; then
+    find $out/valgrind-output -type f | xargs cat | grep -E 'valgrind|heap usage'
 elif [[ $valgrind_mode == 'check' ]]; then
     if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-        for test_file in $(bin/ls docker $test_dir 'test.c'); do
-            echo "bin/valgrind check $test_file"
-            check $test_file
+        for test_file in $($bin/ls docker $test_dir 'test.c'); do
+            echo "st valgrind check $test_file"
+            check_single $test_file
         done
 
-        git --no-pager diff --no-index out/valgrind-output-previous/$test_dir out/valgrind-output/$test_dir
+        git --no-pager diff --no-index $out/valgrind-output-previous/$test_dir $out/valgrind-output/$test_dir
     else
-        check "$@"
+        check_single "$@"
     fi
 elif [[ $valgrind_mode == 'massif' ]]; then
-    massif_file='out/valgrind-output.massif'
+    massif_file="$out/valgrind-output.massif"
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
@@ -91,20 +120,20 @@ elif [[ $valgrind_mode == 'massif' ]]; then
     ms_print $massif_file
 elif [[ $valgrind_mode == 'all' ]]; then
 
-    rm -rf out/valgrind-output-previous
-    mv -f out/valgrind-output out/valgrind-output-previous
+    rm -rf $out/valgrind-output-previous
+    mv -f $out/valgrind-output $out/valgrind-output-previous
 
-    for test_file in $(bin/ls docker 'test.c'); do
-        output_file="out/valgrind-output/$test_file.txt"
-        previous_file="out/valgrind-output-previous/$test_file.txt"
+    for test_file in $($bin/ls docker 'test.c'); do
+        output_file="$out/valgrind-output/$test_file.txt"
+        previous_file="$out/valgrind-output-previous/$test_file.txt"
         mkdir -p $(dirname $output_file)
         test -f $previous_file && cp $previous_file $output_file
     done
 
-    for test_file in $(bin/ls docker $test_dir 'test.c'); do
-        echo bin/valgrind "$@" $test_file
+    for test_file in $($bin/ls docker $test_dir 'test.c'); do
+        echo st valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done
-else
+elif [[ $valgrind_mode == 'single' ]]; then
     valgrind_single "$@"
 fi

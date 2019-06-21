@@ -1,8 +1,13 @@
 #!/bin/bash -e
 
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st ls [all] [test|code|.c|.h]  List source files'
+    exit 0
+fi
+
 # Edit this while undergoing sweeping changes, for selecting only
 # specific modules
-src='src'
+src="$SPACETIME_PATH/src"
 
 exclude_mac='mac/|metal/'
 exclude_windows='windows/|directx/'

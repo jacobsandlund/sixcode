@@ -1,3 +1,8 @@
 #!/bin/bash -e
 
-sed -i '' -E '/-test\.c|-test\.m|-mock\.c/d' Spacetime.xcodeproj/project.pbxproj
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st xcodeproj-fixup             Fix xcodeproj after importing files'
+    exit 0
+fi
+
+sed -i '' -E '/-test\.c|-test\.m|-mock\.c/d' $SPACETIME_PATH/Spacetime.xcodeproj/project.pbxproj

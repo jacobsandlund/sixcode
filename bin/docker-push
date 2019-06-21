@@ -1,3 +1,8 @@
 #!/bin/bash -e
 
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st docker-push                 Push docker image'
+    exit 0
+fi
+
 docker push jacobsandlund/spacetime:latest

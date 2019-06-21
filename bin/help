@@ -1,11 +1,17 @@
 #!/bin/bash -e
 
-echo "Usage: bin/<command> [<args>*]"
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st help [command]              Display this help, or help for command'
+    exit 0
+fi
+
+if [[ $# -eq 1 ]]; then
+    $SPACETIME_PATH/bin/$1 help
+    exit 0
+fi
+
+echo 'Usage:' 'st <command> [args*]'
 echo
-echo "Commands:"
-echo "    bin/all                Make, test, and run valgrind"
-echo "    bin/make               Make out/Debug/Spacetime.app"
-echo "    bin/run                Make and then run Spacetime.app"
-echo "    bin/test [<file>]      Test all files (or specified file)"
-echo "    bin/valgrind [<file>]  Run files (or file) through Valgrind"
-echo "    bin/help               Display this help"
+echo 'Commands:'
+
+grep 'Usage:[ ]' $(ls $SPACETIME_PATH/bin/* | sort) | sed -e 's#.*Usage:[ ]st #    #' -e "s/'$//"

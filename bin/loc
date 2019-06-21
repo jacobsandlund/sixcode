@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-wc -l $(bin/ls all code "$@")

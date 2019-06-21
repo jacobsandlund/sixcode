@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st test [dir|test.c]           Test all|dir|file'
+    exit 0
+fi
+
 trap "rm -rf a.out*" EXIT
 
 run() {
@@ -18,10 +23,10 @@ else
         test_dir=''
     fi
 
-    for test_file in $(bin/ls $test_dir 'test'); do
-        echo bin/test $test_file
+    for test_file in $($SPACETIME_PATH/bin/ls $test_dir 'test'); do
+        echo st test $test_file
         run $test_file
     done
 
-    git diff --exit-code -- $(bin/ls $test_dir 'test')
+    git diff --exit-code -- $($SPACETIME_PATH/bin/ls $test_dir 'test')
 fi

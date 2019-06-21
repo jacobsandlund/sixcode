@@ -1,3 +1,8 @@
 #!/bin/bash -e
 
-docker build -f development/Dockerfile -t jacobsandlund/spacetime .
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st docker-build                Build docker image'
+    exit 0
+fi
+
+docker build -f $SPACETIME_PATH/development/Dockerfile -t jacobsandlund/spacetime $SPACETIME_PATH

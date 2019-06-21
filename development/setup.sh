@@ -1,13 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 
-subsystems=$(cat <<-SRC
-    os
-    gpu
-    engine
-SRC
-)
+if [ "x$1" == 'xhelp' ]; then
+    echo 'Usage: development/setup.sh           One time setup'
+    exit 0
+fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+subsystems='os gpu engine'
+
+case "$OSTYPE" in
+darwin*)
     for subsystem in $subsystems; do
         echo sudo log config --mode "persist:debug" --subsystem "computer.spacetime.$subsystem"
         sudo log config --mode "persist:debug" --subsystem "computer.spacetime.$subsystem"
@@ -17,4 +18,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         echo sudo log config --mode "level:debug" --subsystem "computer.spacetime-test.$subsystem"
         sudo log config --mode "level:debug" --subsystem "computer.spacetime-test.$subsystem"
     done
-fi
+    ;;
+esac

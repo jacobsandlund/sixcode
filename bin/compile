@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+if [[ $1 == 'all' ]]; then
+    echo 'Usage: st compile <file.c>            Compile source file'
+    exit 0
+fi
+
 file="${@: -1}"
 if [[ $file == *".m" ]]; then
     lang_options="-x objective-c -fobjc-arc -fmodules"

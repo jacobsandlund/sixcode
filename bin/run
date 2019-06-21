@@ -1,9 +1,14 @@
 #!/bin/bash -e
 
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st run [release|debug]         Build and then run Spacetime'
+    exit 0
+fi
+
 if [[ $1 == "release" ]] || [[ $1 == "archive" ]]; then
     out="$SPACETIME_PATH/out/Release"
 else
     out="$SPACETIME_PATH/out/Debug"
 fi
 
-$SPACETIME_PATH/bin/make "$@" && open $out/Spacetime.app
+$SPACETIME_PATH/bin/build "$@" && open $out/Spacetime.app

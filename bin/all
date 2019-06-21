@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
-bin/make
-bin/test
-bin/valgrind
+if [[ $1 == 'help' ]]; then
+    echo 'Usage: st all                         Build, test, and run valgrind'
+    exit 0
+fi
+
+$SPACETIME_PATH/bin/build
+$SPACETIME_PATH/bin/test
+$SPACETIME_PATH/bin/valgrind
