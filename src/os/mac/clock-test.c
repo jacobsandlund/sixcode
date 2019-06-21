@@ -1,12 +1,12 @@
 #include "os/mac/clock.c"
 #include "test.h"
 
-Test(os_clock_time)
+Test(OsClockTime)
 {
-    u64 start = os_clock_time();
-    u64 end = os_clock_time();
+    u64 start = OsClockTime();
+    u64 end = OsClockTime();
 
-    printf("os_clock_time: %" PRIu64 "\n", end);
+    printf("OsClockTime: %" PRIu64 "\n", end);
 
     _d(start > 0 && end > 0);
     //=> 1

@@ -29,8 +29,8 @@ Test(gpu_view)
         .origin = {0, 0},
         .size = old_viewport_size,
     };
-    GpuDevice *device = gpu_device_create();
-    GpuView *view = gpu_view_create(device, visible_frame, &config);
+    GpuDevice *device = GpuDeviceCreate();
+    GpuView *view = GpuViewCreate(device, visible_frame, &config);
 
     _d(view->device == device);
     //=> 1
@@ -38,20 +38,18 @@ Test(gpu_view)
     //=> 60
     _d(view->color_pixel_format);
     //=> 2
-    _f2(gpu_view_viewport_size(view));
+    _f2(GpuViewViewportSize(view));
     //=> 1920, 1080
-    _d(gpu_view_color_pixel_format(view));
-    //=> 2
 
     GpuViewCallbacks callbacks = {
         .draw_in_view = test_draw_in_view,
         .size_changed = test_size_changed,
     };
-    gpu_view_register_callbacks(view, &callbacks);
+    GpuViewRegisterCallbacks(view, &callbacks);
 
     gpu_view_mock_size_changed(view, new_viewport_size);
 
-    _f2(gpu_view_viewport_size(view));
+    _f2(GpuViewViewportSize(view));
     //=> 2560, 1920
     _f2(test_view_size);
     //=> 2560, 1920
@@ -61,20 +59,20 @@ Test(gpu_view)
     _d(test_draw_in_view_called);
     //=> 1
 
-    _d(gpu_view_current_render_pass_config(view) != NULL);
+    _d(GpuViewCurrentRenderPassConfig(view) != NULL);
     //=> 1
     view->has_current_render_pass = false;
-    _d(gpu_view_current_render_pass_config(view) != NULL);
+    _d(GpuViewCurrentRenderPassConfig(view) != NULL);
     //=> 0
 
-    gpu_view_destroy(view);
-    gpu_device_destroy(device);
+    GpuViewDestroy(view);
+    GpuDeviceDestroy(device);
 }
 
 Test(gpu_view_mock_config)
 {
     OsScreenFrame frame = {};
-    GpuView *view = gpu_view_create(NULL, frame, &gGpuViewMockConfig);
+    GpuView *view = GpuViewCreate(NULL, frame, &gGpuViewMockConfig);
 
     // Doesn't blow up
 
@@ -82,5 +80,5 @@ Test(gpu_view_mock_config)
     float2 size = {3, 4};
     gpu_view_mock_size_changed(view, size);
 
-    gpu_view_destroy(view);
+    GpuViewDestroy(view);
 }

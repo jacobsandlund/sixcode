@@ -1,8 +1,8 @@
-#ifndef GpuPixelFormat_h
-#define GpuPixelFormat_h
+#ifndef _GpuPixelFormat_h
+#define _GpuPixelFormat_h
 
 typedef enum {
     GpuPixelFormatBGRA8Unorm_sRGB,
 } GpuPixelFormat;
 
-#endif // GpuPixelFormat_h
+#endif // _GpuPixelFormat_h

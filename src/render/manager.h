@@ -1,5 +1,5 @@
-#ifndef RenderManager_h
-#define RenderManager_h
+#ifndef _RenderManager_h
+#define _RenderManager_h
 
 #include "spacetime.h"
 #include "render/layout.h"
@@ -18,8 +18,8 @@ typedef struct {
 
 extern RenderManager gRenderManager;
 
-void render_manager_init(RenderManagerConfig *config);
-void render_manager_destroy(void);
-void render_manager_size_changed(GpuView *view, float2 viewport_size);
+void RenderManagerInit(RenderManagerConfig *config);
+void RenderManagerDestroy(void);
+void RenderManagerSizeChanged(GpuView *view, float2 viewport_size);
 
-#endif // RenderManager_h
+#endif // _RenderManager_h

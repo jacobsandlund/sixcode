@@ -1,7 +1,7 @@
 #include "world/vector.h"
 #include <math.h>
 
-int2 world_vector_round_hex(float2 v)
+int2 WorldVectorRoundHex(float2 v)
 {
     double r = v.y;
     double q = (v.x * 2.0 - v.y) / 2.0;
@@ -25,7 +25,7 @@ int2 world_vector_round_hex(float2 v)
     };
 }
 
-int2 world_vector_round_rect(float2 v)
+int2 WorldVectorRoundRect(float2 v)
 {
     return (int2) {
         (i32) lround(v.x),
@@ -33,12 +33,12 @@ int2 world_vector_round_rect(float2 v)
     };
 }
 
-int2 world_vector_round(RenderLayout *rl, float2 v)
+int2 WorldVectorRound(RenderLayout *rl, float2 v)
 {
     switch (rl->type) {
     case RenderLayoutTypeHex:
-        return world_vector_round_hex(v);
+        return WorldVectorRoundHex(v);
     case RenderLayoutTypeRect:
-        return world_vector_round_rect(v);
+        return WorldVectorRoundRect(v);
     }
 }

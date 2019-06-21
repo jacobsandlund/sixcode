@@ -2,12 +2,12 @@
 
 @import MetalKit;
 
-// Order must match GpuBufferStorageModeType in buffer.h
+// Order must match GpuBufferStorageMode in buffer.h
 static const i32 MetalResourceStorageModeLookup[] = {
     MTLResourceStorageModeShared,
 };
 
-GpuBuffer *gpu_buffer_create_with_length(GpuDevice *device, i64 length, GpuBufferStorageModeType storage_mode)
+GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device, i64 length, GpuBufferStorageMode storage_mode)
 {
     GpuBuffer *buffer;
 
@@ -22,7 +22,7 @@ GpuBuffer *gpu_buffer_create_with_length(GpuDevice *device, i64 length, GpuBuffe
     return buffer;
 }
 
-void gpu_buffer_destroy(GpuBuffer *buffer)
+void GpuBufferDestroy(GpuBuffer *buffer)
 {
     @autoreleasepool {
         id<MTLBuffer> mtl_buffer = (__bridge_transfer GpuBuffer *)buffer;
@@ -30,7 +30,7 @@ void gpu_buffer_destroy(GpuBuffer *buffer)
     }
 }
 
-void *gpu_buffer_contents(GpuBuffer *buffer)
+void *GpuBufferContents(GpuBuffer *buffer)
 {
     id<MTLBuffer> mtl_buffer = (__bridge GpuBuffer *)buffer;
     return mtl_buffer.contents;

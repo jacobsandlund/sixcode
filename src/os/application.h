@@ -1,5 +1,5 @@
-#ifndef OsApplication_h
-#define OsApplication_h
+#ifndef _OsApplication_h
+#define _OsApplication_h
 
 #include "spacetime.h"
 
@@ -11,9 +11,9 @@ typedef struct {
 
 typedef struct OsApplication OsApplication;
 
-OsApplication *os_application_create(void);
-void os_application_destroy(OsApplication *app);
-void os_application_register_callbacks(OsApplication *app, OsApplicationCallbacks *callbacks);
-void os_application_finish_launching(OsApplication *app);
+OsApplication *OsApplicationCreate(void);
+void OsApplicationDestroy(OsApplication *app);
+void OsApplicationRegisterCallbacks(OsApplication *app, OsApplicationCallbacks *callbacks);
+void OsApplicationFinishLaunching(OsApplication *app);
 
-#endif // OsApplication_h
+#endif // _OsApplication_h

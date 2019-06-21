@@ -14,7 +14,7 @@ static float2 mesh_hex_corner(i64 corner)
 {
     double angle = -M_PI / 3.0 * (0.5 + corner);
     RenderLayout l;
-    render_layout_type(&l, RenderLayoutTypeHex);
+    RenderLayoutSetType(&l, RenderLayoutTypeHex);
 
     return (float2) {
         cos(angle) * FillMeshFraction / l.scale.x,
@@ -22,12 +22,12 @@ static float2 mesh_hex_corner(i64 corner)
     };
 }
 
-i64 fill_mesh_vertices_hex_length(i64 size)
+i64 FillMeshVerticesHexLength(i64 size)
 {
     return size * size * FillMeshVerticesPerHex * sizeof(FillMeshVertex);
 }
 
-void fill_mesh_vertices_hex_set(void *contents, uintptr_t content_init_options)
+void FillMeshVerticesHexSet(void *contents, uintptr_t content_init_options)
 {
     FillMeshVertex *vertices = (FillMeshVertex *) contents;
     i64 size = (i64) content_init_options;
@@ -46,7 +46,7 @@ void fill_mesh_vertices_hex_set(void *contents, uintptr_t content_init_options)
 
     for (h.y = 0; h.y < size; h.y++) {
         for (h.x = 0; h.x < size; h.x++) {
-            float2 center = float2_from_int2(h);
+            float2 center = Float2FromInt2(h);
             center.x += 0.5 * (h.y & 1);
 
             for (i64 i = 0; i < FillMeshVerticesPerHex; i++) {
@@ -62,7 +62,7 @@ void fill_mesh_vertices_hex_set(void *contents, uintptr_t content_init_options)
     }
 }
 
-void fill_mesh_indices_hex_set(void *contents, uintptr_t content_init_options)
+void FillMeshIndicesHexSet(void *contents, uintptr_t content_init_options)
 {
     u16 *indices = (u16 *) contents;
     i64 size = (i64) content_init_options;
@@ -90,7 +90,7 @@ void fill_mesh_indices_hex_set(void *contents, uintptr_t content_init_options)
     }
 }
 
-void fill_mesh_vertices_rect_set(void *contents, uintptr_t content_init_options)
+void FillMeshVerticesRectSet(void *contents, uintptr_t content_init_options)
 {
     FillMeshVertex *vertices = (FillMeshVertex *) contents;
     i64 size = (i64) content_init_options;
@@ -113,7 +113,7 @@ void fill_mesh_vertices_rect_set(void *contents, uintptr_t content_init_options)
 
     for (h.y = 0; h.y < size; h.y++) {
         for (h.x = 0; h.x < size; h.x++) {
-            float2 center = float2_from_int2(h);
+            float2 center = Float2FromInt2(h);
 
             for (i64 i = 0; i < FillMeshVerticesPerRect; i++) {
                 FillMeshVertex *vx = &vertices[vi + i];
@@ -128,7 +128,7 @@ void fill_mesh_vertices_rect_set(void *contents, uintptr_t content_init_options)
     }
 }
 
-void fill_mesh_indices_rect_set(void *contents, uintptr_t content_init_options)
+void FillMeshIndicesRectSet(void *contents, uintptr_t content_init_options)
 {
     u16 *indices = (u16 *) contents;
     i64 size = (i64) content_init_options;

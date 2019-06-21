@@ -2,12 +2,12 @@
 
 CameraManager gCameraManager;
 
-void camera_manager_init(CameraManagerConfig *config)
+void CameraManagerInit(CameraManagerConfig *config)
 {
     gCameraManager.camera.position = config->position;
 }
 
-void camera_manager_destroy(void)
+void CameraManagerDestroy(void)
 {
     // Nothing to do
 }

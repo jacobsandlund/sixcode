@@ -20,12 +20,6 @@
 #include "render/layout.c"
 #include "render/manager.c"
 #include "render/vector.c"
-#include "resource/manager.c"
-#include "resource/pointer-allocator.c"
-#include "resource/resource.c"
-#include "string/id-table.c"
-#include "string/id.c"
-#include "string/manager.c"
 #include "world/grid.c"
 #include "world/manager.c"
 #include "world/vector.c"
@@ -39,9 +33,9 @@ Test(engine_manager)
     os_clock_mock_init(12345, 321);
 
     // Save some time, especially for valgrind
-    gEngineConfig.world_grid_random_count = 100;
+    gEngineManagerConfig.world_grid_random_count = 100;
 
-    engine_manager_init(&gEngineCallbacks, &gEngineConfig);
+    EngineManagerInit(&gEngineManagerCallbacks, &gEngineManagerConfig);
 
     _f2(gRenderManager.viewport.size);
     //=> 0, 0
@@ -70,7 +64,7 @@ Test(engine_manager)
     OsEventQueue *queue = &gOsManager.event_queue;
     OsEvent event;
 
-    _d(os_event_queue_read(queue, &event));
+    _d(OsEventQueueRead(queue, &event));
     //=> 1
     _d(event.type == OsEventTypeMouseMove);
     //=> 1
@@ -79,7 +73,7 @@ Test(engine_manager)
     _u64(event.time);
     //=> 17802
 
-    _d(os_event_queue_read(queue, &event));
+    _d(OsEventQueueRead(queue, &event));
     //=> 2
     _d(event.type == OsEventTypeMouseClick);
     //=> 1

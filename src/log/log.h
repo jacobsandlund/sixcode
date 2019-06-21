@@ -1,5 +1,5 @@
-#ifndef Log_h
-#define Log_h
+#ifndef _Log_h
+#define _Log_h
 
 #include "spacetime.h"
 
@@ -17,8 +17,8 @@ typedef struct {
 
 typedef struct Log Log;
 
-Log *log_create(LogConfig *config);
-void log_destroy(Log *log);
-void log_at_level(Log *log, LogLevel level, const char *format, ...);
+Log *LogCreate(LogConfig *config);
+void LogDestroy(Log *log);
+void LogAtLevel(Log *log, LogLevel level, const char *format, ...);
 
-#endif // Log_h
+#endif // _Log_h

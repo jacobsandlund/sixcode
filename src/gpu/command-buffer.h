@@ -1,5 +1,5 @@
-#ifndef GpuCommandBuffer_h
-#define GpuCommandBuffer_h
+#ifndef _GpuCommandBuffer_h
+#define _GpuCommandBuffer_h
 
 #include "spacetime.h"
 #include "gpu/device.h"
@@ -8,9 +8,9 @@
 
 typedef struct GpuCommandBuffer GpuCommandBuffer;
 
-GpuCommandBuffer *gpu_command_buffer_create(GpuCommandQueue *queue);
-void gpu_command_buffer_destroy(GpuCommandBuffer *buffer);
-void gpu_command_buffer_present_drawable(GpuCommandBuffer *buffer, GpuView *view);
-void gpu_command_buffer_commit(GpuCommandBuffer *buffer);
+GpuCommandBuffer *GpuCommandBufferCreate(GpuCommandQueue *queue);
+void GpuCommandBufferDestroy(GpuCommandBuffer *buffer);
+void GpuCommandBufferPresentDrawable(GpuCommandBuffer *buffer, GpuView *view);
+void GpuCommandBufferCommit(GpuCommandBuffer *buffer);
 
-#endif // GpuCommandBuffer_h
+#endif // _GpuCommandBuffer_h

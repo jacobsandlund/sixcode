@@ -5,7 +5,7 @@
 #import <stdlib.h>
 #import "log/manager.h"
 
-GpuDevice *gpu_device_create(void)
+GpuDevice *GpuDeviceCreate(void)
 {
     GpuDevice *device;
 
@@ -26,7 +26,7 @@ GpuDevice *gpu_device_create(void)
     return device;
 }
 
-void gpu_device_destroy(GpuDevice *device)
+void GpuDeviceDestroy(GpuDevice *device)
 {
     @autoreleasepool {
         id<MTLDevice> mtl_device = (__bridge_transfer id<MTLDevice>)device;

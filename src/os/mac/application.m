@@ -65,7 +65,7 @@ NSMenu *makeMenu() {
     return mainMenu;
 }
 
-OsApplication *os_application_create(void)
+OsApplication *OsApplicationCreate(void)
 {
     OsApplication *app;
 
@@ -89,7 +89,7 @@ OsApplication *os_application_create(void)
     return app;
 }
 
-void os_application_destroy(OsApplication *app)
+void OsApplicationDestroy(OsApplication *app)
 {
     @autoreleasepool {
         AppDelegate *delegate = (__bridge_transfer AppDelegate *)app;
@@ -97,13 +97,13 @@ void os_application_destroy(OsApplication *app)
     }
 }
 
-void os_application_register_callbacks(OsApplication *app, OsApplicationCallbacks *callbacks)
+void OsApplicationRegisterCallbacks(OsApplication *app, OsApplicationCallbacks *callbacks)
 {
     AppDelegate *delegate = (__bridge AppDelegate *)app;
     [delegate registerCallbacks:callbacks];
 }
 
-void os_application_finish_launching(OsApplication *app)
+void OsApplicationFinishLaunching(OsApplication *app)
 {
     @autoreleasepool {
         AppDelegate *delegate = (__bridge AppDelegate *)app;

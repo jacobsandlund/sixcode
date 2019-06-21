@@ -16,17 +16,17 @@ static const i32 MacLogTypeLookup[] = {
     OS_LOG_TYPE_ERROR,
 };
 
-Log *log_create(LogConfig *config)
+Log *LogCreate(LogConfig *config)
 {
     Log *log;
     @autoreleasepool {
-        os_log_t os_log = os_log_create(config->subsystem, config->category);
+        ;cn
         log = (__bridge_retained Log *)os_log;
     }
     return log;
 }
 
-void log_destroy(Log *log)
+void LogDestroy(Log *log)
 {
     @autoreleasepool {
         os_log_t os_log = (__bridge_transfer os_log_t)log;
@@ -34,7 +34,7 @@ void log_destroy(Log *log)
     }
 }
 
-void log_at_level(Log *log, LogLevel level, const char *format, ...)
+void LogAtLevel(Log *log, LogLevel level, const char *format, ...)
 {
     static char log_buffer[MacLogBufferLength];
 	va_list argptr;

@@ -57,7 +57,7 @@ static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
 
 @end
 
-GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
+GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
     GpuView *view;
 
@@ -87,7 +87,7 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *
     return view;
 }
 
-void gpu_view_destroy(GpuView *view)
+void GpuViewDestroy(GpuView *view)
 {
     @autoreleasepool {
         ViewDelegate *delegate = (__bridge_transfer ViewDelegate *)view;
@@ -95,25 +95,19 @@ void gpu_view_destroy(GpuView *view)
     }
 }
 
-void gpu_view_register_callbacks(GpuView *view, GpuViewCallbacks *callbacks)
+void GpuViewRegisterCallbacks(GpuView *view, GpuViewCallbacks *callbacks)
 {
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
     [delegate registerCallbacks:callbacks];
 }
 
-float2 gpu_view_viewport_size(GpuView *view)
+float2 GpuViewViewportSize(GpuView *view)
 {
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
     return delegate.viewport_size;
 }
 
-i64 gpu_view_color_pixel_format(GpuView *view)
-{
-    ViewDelegate *delegate = (__bridge ViewDelegate *)view;
-    return delegate.mtk_view.colorPixelFormat;
-}
-
-GpuRenderPassConfig *gpu_view_current_render_pass_config(GpuView *view)
+GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
 {
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
 

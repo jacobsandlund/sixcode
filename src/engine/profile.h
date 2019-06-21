@@ -1,5 +1,5 @@
-#ifndef EngineProfile_h
-#define EngineProfile_h
+#ifndef _EngineProfile_h
+#define _EngineProfile_h
 
 #include "spacetime.h"
 #include "os/clock.h"
@@ -7,12 +7,12 @@
 
 #ifdef DEBUG
 
-#define EngineProfileStart() \
+#define ENGINE_PROFILE_START() \
     u64 end_time; \
-    u64 start_time = os_clock_time();
+    u64 start_time = OsClockTime();
 
-#define EngineProfileEnd(block_name) { \
-    end_time = os_clock_time(); \
+#define ENGINE_PROFILE_END(block_name) { \
+    end_time = OsClockTime(); \
     LogDebug(gLogManager.logs.engine, "%s in %" PRIu64 " us",\
             block_name, (end_time - start_time + 500) / 1000); \
     start_time = end_time; \
@@ -20,10 +20,10 @@
 
 #else
 
-#define EngineProfileStart() /* */
-#define EngineProfileEnd() /* */
+#define ENGINE_PROFILE_START() /* */
+#define ENGINE_PROFILE_END() /* */
 
 #endif // DEBUG
 
 
-#endif // EngineProfile_h
+#endif // _EngineProfile_h

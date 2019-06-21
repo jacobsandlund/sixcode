@@ -1,5 +1,5 @@
-#ifndef GpuView_h
-#define GpuView_h
+#ifndef _GpuView_h
+#define _GpuView_h
 
 #include "spacetime.h"
 #include "os/screen.h"
@@ -22,13 +22,10 @@ typedef struct {
     GpuViewSizeChangedFn size_changed;
 } GpuViewCallbacks;
 
-GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config);
-void gpu_view_destroy(GpuView *view);
-void gpu_view_register_callbacks(GpuView *view, GpuViewCallbacks *callbacks);
-float2 gpu_view_viewport_size(GpuView *view);
+GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config);
+void GpuViewDestroy(GpuView *view);
+void GpuViewRegisterCallbacks(GpuView *view, GpuViewCallbacks *callbacks);
+float2 GpuViewViewportSize(GpuView *view);
+GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view);
 
-// Note: this will be the native color pixel format
-i64 gpu_view_color_pixel_format(GpuView *view);
-GpuRenderPassConfig *gpu_view_current_render_pass_config(GpuView *view);
-
-#endif // GpuView_h
+#endif // _GpuView_h

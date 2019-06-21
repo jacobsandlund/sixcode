@@ -2,11 +2,11 @@
 #include "log/manager-mock.c"
 #include "test.h"
 
-Test(os_event_queue_init)
+Test(OsEventQueueInit)
 {
     OsEventQueue *eq = tmalloc(sizeof *eq);
 
-    os_event_queue_init(eq, 64, 4);
+    OsEventQueueInit(eq, 64, 4);
 
     _d(eq->next_read_event_id);
     //=> 1
@@ -21,12 +21,12 @@ Test(os_event_queue_init)
 
     eq->events[eq->length - 1].type = OsEventTypeMouseClick;
 
-    os_event_queue_destroy(eq);
+    OsEventQueueDestroy(eq);
 }
 
-Test(os_event_queue_write)
+Test(OsEventQueueWrite)
 {
-    log_manager_init(&gLogManagerMockConfig);
+    LogManagerInit(&gLogManagerMockConfig);
 
     OsEventQueue *eq = tmalloc(sizeof *eq);
 
@@ -36,9 +36,9 @@ Test(os_event_queue_write)
         .location = {1000, 800},
     };
 
-    os_event_queue_init(eq, 4, 1);
+    OsEventQueueInit(eq, 4, 1);
 
-    os_event_queue_write(eq, &event);
+    OsEventQueueWrite(eq, &event);
 
     _d(eq->next_write_event_id);
     //=> 2
@@ -50,24 +50,24 @@ Test(os_event_queue_write)
     //=> 1000, 800
 
     // Write past length
-    os_event_queue_write(eq, &event);
-    os_event_queue_write(eq, &event);
-    os_event_queue_write(eq, &event);
+    OsEventQueueWrite(eq, &event);
+    OsEventQueueWrite(eq, &event);
+    OsEventQueueWrite(eq, &event);
     event.time = 9876543210;
-    os_event_queue_write(eq, &event);
+    OsEventQueueWrite(eq, &event);
 
     _d(eq->next_write_event_id);
     //=> 6
     _u64(eq->events[1].time);
     //=> 9876543210
 
-    os_event_queue_destroy(eq);
+    OsEventQueueDestroy(eq);
     log_manager_destroy();
 }
 
-Test(os_event_queue_read)
+Test(OsEventQueueRead)
 {
-    log_manager_init(&gLogManagerMockConfig);
+    LogManagerInit(&gLogManagerMockConfig);
 
     OsEventQueue *eq = tmalloc(sizeof *eq);
 
@@ -78,11 +78,11 @@ Test(os_event_queue_read)
     };
     OsEvent read_event;
 
-    os_event_queue_init(eq, 4, 2);
-    os_event_queue_write(eq, &event);
-    os_event_queue_write(eq, &event);
+    OsEventQueueInit(eq, 4, 2);
+    OsEventQueueWrite(eq, &event);
+    OsEventQueueWrite(eq, &event);
 
-    _d(os_event_queue_read(eq, &read_event));
+    _d(OsEventQueueRead(eq, &read_event));
     //=> 1
 
     _d(eq->next_read_event_id);
@@ -94,18 +94,18 @@ Test(os_event_queue_read)
     _f2(read_event.location);
     //=> 1000, 800
 
-    _d(os_event_queue_read(eq, &read_event));
+    _d(OsEventQueueRead(eq, &read_event));
     //=> 2
 
     // Read far behind
 
-    os_event_queue_write(eq, &event);    // skip read
+    OsEventQueueWrite(eq, &event);    // skip read
     event.time = 9876543210;
-    os_event_queue_write(eq, &event);
+    OsEventQueueWrite(eq, &event);
     event.time = 1234567890;
-    os_event_queue_write(eq, &event);
+    OsEventQueueWrite(eq, &event);
 
-    _d(os_event_queue_read(eq, &read_event));
+    _d(OsEventQueueRead(eq, &read_event));
     //=> 4
 
     _Log(gLogManager.logs.os);
@@ -114,6 +114,6 @@ Test(os_event_queue_read)
     _u64(read_event.time);
     //=> 9876543210
 
-    os_event_queue_destroy(eq);
+    OsEventQueueDestroy(eq);
     log_manager_destroy();
 }

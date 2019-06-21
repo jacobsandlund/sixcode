@@ -3,7 +3,7 @@
 
 @import MetalKit;
 
-GpuPipelineState *gpu_pipeline_state_create(GpuDevice *device, GpuPipelineStateConfig *config)
+GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device, GpuPipelineStateConfig *config)
 {
     GpuPipelineState *state;
 
@@ -34,7 +34,7 @@ GpuPipelineState *gpu_pipeline_state_create(GpuDevice *device, GpuPipelineStateC
     return state;
 }
 
-void gpu_pipeline_state_destroy(GpuPipelineState *state)
+void GpuPipelineStateDestroy(GpuPipelineState *state)
 {
     @autoreleasepool {
         id<MTLRenderPipelineState> mtl_pipeline_state = (__bridge_transfer id<MTLRenderPipelineState>)state;

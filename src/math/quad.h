@@ -1,5 +1,5 @@
-#ifndef Quad_h
-#define Quad_h
+#ifndef _Quad_h
+#define _Quad_h
 
 #include "spacetime.h"
 
@@ -13,10 +13,10 @@ typedef struct {
     int2 size;
 } SizeQuad;
 
-bool quad_contains(Quad *q, int2 h);
-void quad_intersect(Quad *out_q, Quad *a, Quad *b);
-void quad_to_size_quad(SizeQuad *out_sq, Quad *q);
-void size_quad_even_align(SizeQuad *out_sq, SizeQuad *sq);
-i64 size_quad_capacity(SizeQuad *sq);
+bool QuadContains(Quad *q, int2 h);
+void QuadIntersect(Quad *out_q, Quad *a, Quad *b);
+void QuadToSizeQuad(SizeQuad *out_sq, Quad *q);
+void SizeQuadEvenAlign(SizeQuad *out_sq, SizeQuad *sq);
+i64 SizeQuadCapacity(SizeQuad *sq);
 
-#endif // Quad_h
+#endif // _Quad_h

@@ -1,5 +1,5 @@
-#ifndef WorldManager_h
-#define WorldManager_h
+#ifndef _WorldManager_h
+#define _WorldManager_h
 
 #include "spacetime.h"
 #include "world/grid.h"
@@ -14,9 +14,9 @@ typedef struct {
 
 extern WorldManager gWorldManager;
 
-void world_manager_init(WorldManagerConfig *config);
-void world_manager_destroy(void);
-void world_manager_load_random(i64 count);
-//void world_manager_update(void);
+void WorldManagerInit(WorldManagerConfig *config);
+void WorldManagerDestroy(void);
+void WorldManagerLoadRandom(i64 count);
+//void WorldManagerUpdate(void);
 
-#endif // WorldManager_h
+#endif // _WorldManager_h

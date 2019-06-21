@@ -43,7 +43,7 @@ GpuViewConfig gGpuViewMockConfig = {
     .color_pixel_format = 1,
 };
 
-GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
+GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
 {
     GpuView *view = malloc(sizeof *view);
 
@@ -52,34 +52,29 @@ GpuView *gpu_view_create(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *
     view->color_pixel_format = config->color_pixel_format;
     view->has_current_render_pass = true;
 
-    gpu_view_register_callbacks(view, &gGpuViewMockNoopCallbacks);
+    GpuViewRegisterCallbacks(view, &gGpuViewMockNoopCallbacks);
     gpu_view_mock_size_changed(view, frame.size);
 
     return view;
 }
 
-void gpu_view_destroy(GpuView *view)
+void GpuViewDestroy(GpuView *view)
 {
     free(view);
 }
 
-void gpu_view_register_callbacks(GpuView *view, GpuViewCallbacks *callbacks)
+void GpuViewRegisterCallbacks(GpuView *view, GpuViewCallbacks *callbacks)
 {
     view->draw_in_view = callbacks->draw_in_view;
     view->size_changed = callbacks->size_changed;
 }
 
-float2 gpu_view_viewport_size(GpuView *view)
+float2 GpuViewViewportSize(GpuView *view)
 {
     return view->viewport_size;
 }
 
-i64 gpu_view_color_pixel_format(GpuView *view)
-{
-    return view->color_pixel_format;
-}
-
-GpuRenderPassConfig *gpu_view_current_render_pass_config(GpuView *view)
+GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
 {
     if (view->has_current_render_pass) {
         // Return an arbitrary pointer

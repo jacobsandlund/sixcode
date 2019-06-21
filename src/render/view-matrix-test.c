@@ -3,27 +3,27 @@
 #include "render/viewport.h"
 #include "test.h"
 
-Test(render_view_matrix_init)
+Test(RenderViewMatrixInit)
 {
     float4x4 vm;
-    render_view_matrix_init(&vm);
+    RenderViewMatrixInit(&vm);
     _gggg(vm.columns[0][0], vm.columns[1][0], vm.columns[2][2], vm.columns[3][3]);
     //=> 0, 0, 0, 0
 }
 
-Test(render_view_matrix_update)
+Test(RenderViewMatrixUpdate)
 {
     float4x4 vm;
-    render_view_matrix_init(&vm);
+    RenderViewMatrixInit(&vm);
 
     float3 camera = {100, -200, 10.0};
     RenderViewport viewport = {
         .size = {1000, 600},
     };
-    render_layout_type(&viewport.layout, RenderLayoutTypeHex);
+    RenderLayoutSetType(&viewport.layout, RenderLayoutTypeHex);
     float2 offset = {93.0f, -13.0f};
 
-    render_view_matrix_update(&vm, &viewport, &camera, offset);
+    RenderViewMatrixUpdate(&vm, &viewport, &camera, offset);
 
     _gggg(vm.columns[0][0], vm.columns[0][1], vm.columns[0][2], vm.columns[0][3]);
     //=> 0.00173205, 0, 0, 0

@@ -1,5 +1,5 @@
-#ifndef RenderLayout_h
-#define RenderLayout_h
+#ifndef _RenderLayout_h
+#define _RenderLayout_h
 
 #include "spacetime.h"
 
@@ -15,6 +15,6 @@ typedef struct {
     RenderLayoutType type;
 } RenderLayout;
 
-void render_layout_type(RenderLayout *rl, RenderLayoutType type);
+void RenderLayoutSetType(RenderLayout *rl, RenderLayoutType type);
 
-#endif // RenderLayout_h
+#endif // _RenderLayout_h

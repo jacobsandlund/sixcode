@@ -41,7 +41,7 @@
 
 @end
 
-OsWindow *os_window_create(GpuView *view)
+OsWindow *OsWindowCreate(GpuView *view)
 {
     OsWindow *window;
 
@@ -65,7 +65,7 @@ OsWindow *os_window_create(GpuView *view)
     return window;
 }
 
-void os_window_destroy(OsWindow *window)
+void OsWindowDestroy(OsWindow *window)
 {
     @autoreleasepool {
         WindowDelegate *delegate = (__bridge_transfer WindowDelegate *)window;
@@ -73,7 +73,7 @@ void os_window_destroy(OsWindow *window)
     }
 }
 
-void os_window_show(OsWindow *window)
+void OsWindowShow(OsWindow *window)
 {
     @autoreleasepool {
         WindowDelegate *delegate = (__bridge WindowDelegate *) window;

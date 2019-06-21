@@ -1,6 +1,6 @@
 #include "render/layout.h"
 
-void render_layout_type(RenderLayout *rl, RenderLayoutType type)
+void RenderLayoutSetType(RenderLayout *rl, RenderLayoutType type)
 {
     rl->type = type;
     rl->scale = (double2) {

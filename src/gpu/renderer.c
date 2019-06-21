@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view, float2 viewport_size)
+void GpuRendererInit(GpuRenderer *renderer, GpuDevice *device, GpuView *view, GpuRendererConfig *config)
 {
-    renderer->viewport_size = viewport_size;
+    renderer->viewport_size = config->viewport_size;
     renderer->vertex_function = gpu_function_create_with_name(device, "vertex_shader");
     renderer->fragment_function = gpu_function_create_with_name(device, "fragment_shader");
 
@@ -13,10 +13,10 @@ void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view, 
         .label = "Simple Pipeline",
         .vertex_function = renderer->vertex_function,
         .fragment_function = renderer->fragment_function,
-        .pixel_format = gpu_view_color_pixel_format(view),
+        .pixel_format = config->pixel_format,
     };
 
-    renderer->pipeline_state = gpu_pipeline_state_create(device, &pipeline_state_config);
+    renderer->pipeline_state = GpuPipelineStateCreate(device, &pipeline_state_config);
 
     // Generate vertex buffer
     {
@@ -36,11 +36,11 @@ void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view, 
         const float QuadSpacing = 50.0;
         const i64 DataLength = sizeof(QuadVertices) * NumRows * NumColumns;
 
-        renderer->vertex_buffer = gpu_buffer_create_with_length(device,
-                DataLength, GpuBufferStorageModeTypeShared);
+        renderer->vertex_buffer = GpuBufferCreateWithLength(device,
+                DataLength, GpuBufferStorageModeShared);
         renderer->num_vertices = DataLength / sizeof(GpuVertex);
 
-        GpuVertex *current_quad = gpu_buffer_contents(renderer->vertex_buffer);
+        GpuVertex *current_quad = GpuBufferContents(renderer->vertex_buffer);
 
         for (i32f row = 0; row < NumRows; row++) {
             for (i32f column = 0; column < NumColumns; column++) {
@@ -61,44 +61,45 @@ void gpu_renderer_init(GpuRenderer *renderer, GpuDevice *device, GpuView *view, 
     }
 }
 
-void gpu_renderer_destroy(GpuRenderer *renderer)
+void GpuRendererDestroy(GpuRenderer *renderer)
 {
-    gpu_buffer_destroy(renderer->vertex_buffer);
-    gpu_pipeline_state_destroy(renderer->pipeline_state);
+    GpuBufferDestroy(renderer->vertex_buffer);
+    GpuPipelineStateDestroy(renderer->pipeline_state);
     gpu_function_destroy(renderer->fragment_function);
     gpu_function_destroy(renderer->vertex_function);
 }
 
-void gpu_renderer_draw_in_view(GpuRenderer *renderer, GpuView *view, GpuCommandQueue *queue)
+void GpuRendererDrawInView(GpuRenderer *renderer, GpuView *view, GpuCommandQueue *queue)
 {
-    GpuCommandBuffer *command_buffer = gpu_command_buffer_create(queue);
-    GpuRenderPassConfig *render_pass_config = gpu_view_current_render_pass_config(view);
+    GpuCommandBuffer *command_buffer = GpuCommandBufferCreate(queue);
+    GpuRenderPassConfig *render_pass_config = GpuViewCurrentRenderPassConfig(view);
 
     if (render_pass_config) {
-        GpuCommandEncoder *encoder = gpu_command_encoder_create(command_buffer, render_pass_config);
-        gpu_command_encoder_label(encoder, "MyRenderEncoder");
+        GpuCommandEncoder *encoder;
+        GpuCommandEncoderBeginRenderEncoding(&encoder, command_buffer, render_pass_config);
+        GpuCommandEncoderLabel(encoder, "MyRenderEncoder");
 
-        gpu_command_encoder_set_viewport(encoder, renderer->viewport_size);
+        GpuCmdSetViewport(encoder, renderer->viewport_size);
 
-        gpu_command_encoder_set_pipeline_state(encoder, renderer->pipeline_state);
+        GpuCmdSetPipelineState(encoder, renderer->pipeline_state);
 
-        gpu_command_encoder_set_vertex_buffer(encoder, renderer->vertex_buffer,
+        GpuCmdBindVertexBuffer(encoder, renderer->vertex_buffer,
                 0, GpuVertexIndexVertices);
 
-        gpu_command_encoder_set_vertex_bytes(encoder, &renderer->viewport_size,
+        GpuCmdBindVertexBytes(encoder, &renderer->viewport_size,
                 sizeof(renderer->viewport_size), GpuVertexIndexViewportSize);
 
-        gpu_command_encoder_draw_primitives(encoder,
+        GpuCmdDrawPrimitives(encoder,
                 GpuPrimitiveTypeTriangle, 0, renderer->num_vertices);
 
-        gpu_command_encoder_end_encoding(encoder);
-        gpu_command_buffer_present_drawable(command_buffer, view);
+        GpuCommandEncoderEndEncoding(encoder);
+        GpuCommandBufferPresentDrawable(command_buffer, view);
     }
 
-    gpu_command_buffer_commit(command_buffer);
+    GpuCommandBufferCommit(command_buffer);
 }
 
-void gpu_renderer_size_changed(GpuRenderer *renderer, GpuView *view, float2 viewport_size)
+void GpuRendererSizeChanged(GpuRenderer *renderer, GpuView *view, float2 viewport_size)
 {
     (void) view;
     renderer->viewport_size = viewport_size;

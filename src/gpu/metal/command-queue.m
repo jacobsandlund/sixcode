@@ -2,7 +2,7 @@
 
 @import MetalKit;
 
-GpuCommandQueue *gpu_command_queue_create(GpuDevice *device)
+GpuCommandQueue *GpuCommandQueueCreate(GpuDevice *device)
 {
     GpuCommandQueue *queue;
 
@@ -15,7 +15,7 @@ GpuCommandQueue *gpu_command_queue_create(GpuDevice *device)
     return queue;
 }
 
-void gpu_command_queue_destroy(GpuCommandQueue *queue)
+void GpuCommandQueueDestroy(GpuCommandQueue *queue)
 {
     @autoreleasepool {
         id<MTLCommandQueue> mtl_queue = (__bridge_transfer id<MTLCommandQueue>)queue;

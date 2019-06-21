@@ -4,15 +4,15 @@
 #include "world/vector.c"
 #include "test.h"
 
-Test(camera_manager_init)
+Test(CameraManagerInit)
 {
     CameraManagerConfig config = {
         .position = {300,400,20},
     };
-    camera_manager_init(&config);
+    CameraManagerInit(&config);
 
     _f3(gCameraManager.camera.position);
     //=> 300, 400, 20
 
-    camera_manager_destroy();
+    CameraManagerDestroy();
 }

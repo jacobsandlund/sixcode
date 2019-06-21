@@ -3,12 +3,12 @@
 
 struct GpuBuffer {
     GpuDevice *device;
-    GpuBufferStorageModeType storage_mode;
+    GpuBufferStorageMode storage_mode;
     void *bytes;
     i64 length;
 };
 
-GpuBuffer *gpu_buffer_create_with_length(GpuDevice *device, i64 length, GpuBufferStorageModeType storage_mode)
+GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device, i64 length, GpuBufferStorageMode storage_mode)
 {
     GpuBuffer *buffer = malloc(sizeof *buffer);
 
@@ -20,13 +20,13 @@ GpuBuffer *gpu_buffer_create_with_length(GpuDevice *device, i64 length, GpuBuffe
     return buffer;
 }
 
-void gpu_buffer_destroy(GpuBuffer *buffer)
+void GpuBufferDestroy(GpuBuffer *buffer)
 {
     free(buffer->bytes);
     free(buffer);
 }
 
-void *gpu_buffer_contents(GpuBuffer *buffer)
+void *GpuBufferContents(GpuBuffer *buffer)
 {
     return buffer->bytes;
 }

@@ -1,5 +1,5 @@
-#ifndef GpuShaderTypes_h
-#define GpuShaderTypes_h
+#ifndef _GpuShaderTypes_h
+#define _GpuShaderTypes_h
 
 // Needs "spacetime.h" in c/m files
 
@@ -13,4 +13,4 @@ typedef struct {
     float4 color;
 } GpuVertex;
 
-#endif /* GpuShaderTypes_h */
+#endif // _GpuShaderTypes_h

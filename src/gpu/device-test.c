@@ -3,10 +3,10 @@
 
 Test(gpu_device)
 {
-    GpuDevice *device = gpu_device_create();
+    GpuDevice *device = GpuDeviceCreate();
 
     _d(device->created);
     //=> 1
 
-    gpu_device_destroy(device);
+    GpuDeviceDestroy(device);
 }

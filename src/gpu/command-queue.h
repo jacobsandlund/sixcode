@@ -1,12 +1,12 @@
-#ifndef GpuCommandQueue_h
-#define GpuCommandQueue_h
+#ifndef _GpuCommandQueue_h
+#define _GpuCommandQueue_h
 
 #include "spacetime.h"
 #include "gpu/device.h"
 
 typedef struct GpuCommandQueue GpuCommandQueue;
 
-GpuCommandQueue *gpu_command_queue_create(GpuDevice *device);
-void gpu_command_queue_destroy(GpuCommandQueue *queue);
+GpuCommandQueue *GpuCommandQueueCreate(GpuDevice *device);
+void GpuCommandQueueDestroy(GpuCommandQueue *queue);
 
-#endif // GpuCommandQueue_h
+#endif // _GpuCommandQueue_h

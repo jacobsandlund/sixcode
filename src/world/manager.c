@@ -8,19 +8,19 @@
 
 WorldManager gWorldManager;
 
-void world_manager_init(WorldManagerConfig *config)
+void WorldManagerInit(WorldManagerConfig *config)
 {
-    world_grid_init(&gWorldManager.grid, config->grid_size);
+    WorldGridInit(&gWorldManager.grid, config->grid_size);
 }
 
-void world_manager_destroy(void)
+void WorldManagerDestroy(void)
 {
-    world_grid_destroy(&gWorldManager.grid);
+    WorldGridDestroy(&gWorldManager.grid);
 }
 
-void world_manager_load_random(i64 count)
+void WorldManagerLoadRandom(i64 count)
 {
-    srand((unsigned int) os_clock_time());
+    srand((unsigned int) OsClockTime());
     i64 style = 0;
 
     WorldGrid *g = &gWorldManager.grid;
@@ -47,25 +47,25 @@ void world_manager_load_random(i64 count)
             style = 1;
         }
 
-        world_grid_set(g, h, style);
+        WorldGridSet(g, h, style);
     }
 }
 
 /*
-void world_manager_update(void)
+void WorldManagerUpdate(void)
 {
     static u8 style = WorldManagerHexFillMin;
 
     ivec2 h = camera_world_vector_round(c, camera_screen_to_world_vector(c, v));
 
-    if (!quad_contains(&g->quad, h)) {
+    if (!QuadContains(&g->quad, h)) {
         return;
     }
 
-    if (world_grid_get(g, h)) {
-        world_grid_clear(g, h);
+    if (WorldGridGet(g, h)) {
+        WorldGridClear(g, h);
     } else {
-        world_grid_set(g, h, style);
+        WorldGridSet(g, h, style);
 
         ++style;
         if (style > WorldManagerHexFillMax) {

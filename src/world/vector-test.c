@@ -2,10 +2,10 @@
 #include "render/layout.c"
 #include "test.h"
 
-Test(world_vector_round_hex)
+Test(WorldVectorRoundHex)
 {
     RenderLayout l;
-    render_layout_type(&l, RenderLayoutTypeHex);
+    RenderLayoutSetType(&l, RenderLayoutTypeHex);
 
     float2 a = {0, 0};
     float2 b = {0.5, -1};
@@ -32,22 +32,22 @@ Test(world_vector_round_hex)
         a.y * 0.449 + d.y * 0.501,
     };
 
-    _i2(world_vector_round_hex(closer_to_a));
+    _i2(WorldVectorRoundHex(closer_to_a));
     //=> 0, 0
-    _i2(world_vector_round_hex(closer_to_b));
+    _i2(WorldVectorRoundHex(closer_to_b));
     //=> 0, -1
-    _i2(world_vector_round_hex(closer_to_c));
+    _i2(WorldVectorRoundHex(closer_to_c));
     //=> -1, -1
-    _i2(world_vector_round(&l, between_c_and_d_1));
+    _i2(WorldVectorRound(&l, between_c_and_d_1));
     //=> -8, 31
-    _i2(world_vector_round(&l, between_c_and_d_2));
+    _i2(WorldVectorRound(&l, between_c_and_d_2));
     //=> -7, 32
 }
 
-Test(world_vector_round_rect)
+Test(WorldVectorRoundRect)
 {
     RenderLayout l;
-    render_layout_type(&l, RenderLayoutTypeRect);
+    RenderLayoutSetType(&l, RenderLayoutTypeRect);
 
     float2 a = {0, 0};
     float2 b = {1, -1};
@@ -74,14 +74,14 @@ Test(world_vector_round_rect)
         a.y * 0.449 + d.y * 0.501,
     };
 
-    _i2(world_vector_round_rect(closer_to_a));
+    _i2(WorldVectorRoundRect(closer_to_a));
     //=> 0, 0
-    _i2(world_vector_round_rect(closer_to_b));
+    _i2(WorldVectorRoundRect(closer_to_b));
     //=> 1, -1
-    _i2(world_vector_round_rect(closer_to_c));
+    _i2(WorldVectorRoundRect(closer_to_c));
     //=> 0, -1
-    _i2(world_vector_round(&l, between_c_and_d_1));
+    _i2(WorldVectorRound(&l, between_c_and_d_1));
     //=> -7, 31
-    _i2(world_vector_round(&l, between_c_and_d_2));
+    _i2(WorldVectorRound(&l, between_c_and_d_2));
     //=> -8, 32
 }

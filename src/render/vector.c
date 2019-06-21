@@ -8,7 +8,7 @@
 
 static const double RenderVectorDoubleEpsilon = 1e-9;
 
-float2 render_vector_screen_to_world(RenderViewport *vp, float3 *camera, float2 v)
+float2 RenderVectorScreenToWorld(RenderViewport *vp, float3 *camera, float2 v)
 {
     float2 v_moved = {
          v.x - vp->size.x / 2.0f,
@@ -26,15 +26,15 @@ float2 render_vector_screen_to_world(RenderViewport *vp, float3 *camera, float2 
     };
 }
 
-static void render_vector_viewport_to_world_quad_hex(RenderViewport *vp, float3 *camera, Quad *out_q)
+static void RenderVectorViewportToWorldQuadHex(RenderViewport *vp, float3 *camera, Quad *out_q)
 {
     float2 top_left_point = {-1, -1};
     float2 bottom_right_point = {
         vp->size.x + 1,
         vp->size.y + 1,
     };
-    float2 top_left = render_vector_screen_to_world(vp, camera, top_left_point);
-    float2 bottom_right = render_vector_screen_to_world(vp, camera, bottom_right_point);
+    float2 top_left = RenderVectorScreenToWorld(vp, camera, top_left_point);
+    float2 bottom_right = RenderVectorScreenToWorld(vp, camera, bottom_right_point);
 
     i64 top = floor(top_left.y);
     i64 double_left = floor(2.0 * top_left.x);
@@ -51,10 +51,10 @@ static void render_vector_viewport_to_world_quad_hex(RenderViewport *vp, float3 
         float2 top_right = {bottom_right.x, top_left.y};
         float2 bottom_left = {top_left.x, bottom_right.y};
 
-        int2 top_left_hex = world_vector_round_hex(top_left);
-        int2 top_right_hex = world_vector_round_hex(top_right);
-        int2 bottom_left_hex = world_vector_round_hex(bottom_left);
-        int2 bottom_right_hex = world_vector_round_hex(bottom_right);
+        int2 top_left_hex = WorldVectorRoundHex(top_left);
+        int2 top_right_hex = WorldVectorRoundHex(top_right);
+        int2 bottom_left_hex = WorldVectorRoundHex(bottom_left);
+        int2 bottom_right_hex = WorldVectorRoundHex(bottom_right);
 
         if (top_left_hex.x == top_right_hex.x) {
             out_q->min.y = top_left_hex.y;
@@ -74,7 +74,7 @@ static void render_vector_viewport_to_world_quad_hex(RenderViewport *vp, float3 
     }
 }
 
-static void render_vector_viewport_to_world_quad_rect(RenderViewport *vp, float3 *camera, Quad *out_q)
+static void RenderVectorViewportToWorldQuadRect(RenderViewport *vp, float3 *camera, Quad *out_q)
 {
     float2 top_left_point = {-1, -1};
     float2 bottom_right_point = {
@@ -82,20 +82,20 @@ static void render_vector_viewport_to_world_quad_rect(RenderViewport *vp, float3
         vp->size.y + 1,
     };
 
-    out_q->min = world_vector_round_rect(
-            render_vector_screen_to_world(vp, camera, top_left_point));
-    out_q->max = world_vector_round_rect(
-            render_vector_screen_to_world(vp, camera, bottom_right_point));
+    out_q->min = WorldVectorRoundRect(
+            RenderVectorScreenToWorld(vp, camera, top_left_point));
+    out_q->max = WorldVectorRoundRect(
+            RenderVectorScreenToWorld(vp, camera, bottom_right_point));
 }
 
-void render_vector_viewport_to_world_quad(RenderViewport *vp, float3 *camera, Quad *out_q)
+void RenderVectorViewportToWorldQuad(RenderViewport *vp, float3 *camera, Quad *out_q)
 {
     switch (vp->layout.type) {
     case RenderLayoutTypeHex:
-        render_vector_viewport_to_world_quad_hex(vp, camera, out_q);
+        RenderVectorViewportToWorldQuadHex(vp, camera, out_q);
         break;
     case RenderLayoutTypeRect:
-        render_vector_viewport_to_world_quad_rect(vp, camera, out_q);
+        RenderVectorViewportToWorldQuadRect(vp, camera, out_q);
         break;
     }
 }

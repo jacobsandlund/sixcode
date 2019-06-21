@@ -1,44 +1,44 @@
 #include "math/bit.h"
 #include "test.h"
 
-Test(bit_highest_bit)
+Test(BitHighestBit)
 {
-    _u64(bit_highest_bit(0));
+    _u64(BitHighestBit(0));
     //=> 0
-    _u64(bit_highest_bit(1));
+    _u64(BitHighestBit(1));
     //=> 1
-    _u64(bit_highest_bit(2));
+    _u64(BitHighestBit(2));
     //=> 2
-    _u64(bit_highest_bit(3));
+    _u64(BitHighestBit(3));
     //=> 2
-    _u64(bit_highest_bit(63));
+    _u64(BitHighestBit(63));
     //=> 6
-    _u64(bit_highest_bit(64));
+    _u64(BitHighestBit(64));
     //=> 7
-    _u64(bit_highest_bit(4294967295));
+    _u64(BitHighestBit(4294967295));
     //=> 32
-    _u64(bit_highest_bit(4294967296));
+    _u64(BitHighestBit(4294967296));
     //=> 33
 }
 
-Test(bit_next_power_of_two)
+Test(BitNextPowerOfTwo)
 {
-    _u64(bit_next_power_of_two(0));
+    _u64(BitNextPowerOfTwo(0));
     //=> 1
-    _u64(bit_next_power_of_two(1));
+    _u64(BitNextPowerOfTwo(1));
     //=> 1
-    _u64(bit_next_power_of_two(2));
+    _u64(BitNextPowerOfTwo(2));
     //=> 2
-    _u64(bit_next_power_of_two(3));
+    _u64(BitNextPowerOfTwo(3));
     //=> 4
-    _u64(bit_next_power_of_two(17));
+    _u64(BitNextPowerOfTwo(17));
     //=> 32
-    _u64(bit_next_power_of_two(64));
+    _u64(BitNextPowerOfTwo(64));
     //=> 64
-    _u64(bit_next_power_of_two(4294967295));
+    _u64(BitNextPowerOfTwo(4294967295));
     //=> 4294967296
-    _u64(bit_next_power_of_two(4294967296));
+    _u64(BitNextPowerOfTwo(4294967296));
     //=> 4294967296
-    _u64(bit_next_power_of_two(4294967297));
+    _u64(BitNextPowerOfTwo(4294967297));
     //=> 8589934592
 }

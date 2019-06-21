@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "log/manager.h"
 
-void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining)
+void OsEventQueueInit(OsEventQueue *eq, i64 length, i64 safe_length_remaining)
 {
     assert(length && !(length & (length - 1)));    // Power of 2
     eq->next_read_event_id = 1;
@@ -14,12 +14,12 @@ void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining
     eq->events = malloc(length * sizeof *eq->events);
 }
 
-void os_event_queue_destroy(OsEventQueue *eq)
+void OsEventQueueDestroy(OsEventQueue *eq)
 {
     free(eq->events);
 }
 
-i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event)
+i64 OsEventQueueRead(OsEventQueue *eq, OsEvent *event)
 {
     i64 behind = eq->next_write_event_id - eq->next_read_event_id;
 

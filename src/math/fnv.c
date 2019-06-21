@@ -3,7 +3,7 @@
 #define FnvOffsetBasis 14695981039346656037U
 #define FnvPrime 1099511628211
 
-u64 fnv_hash(const u8 *s, i64 length)
+u64 FnvHash(const u8 *s, i64 length)
 {
     u64 hash = (u64) FnvOffsetBasis;
 

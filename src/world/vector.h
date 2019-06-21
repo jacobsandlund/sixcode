@@ -1,11 +1,11 @@
-#ifndef WorldVector_h
-#define WorldVector_h
+#ifndef _WorldVector_h
+#define _WorldVector_h
 
 #include "spacetime.h"
 #include "render/layout.h"
 
-int2 world_vector_round_hex(float2 v);
-int2 world_vector_round_rect(float2 v);
-int2 world_vector_round(RenderLayout *rl, float2 v);
+int2 WorldVectorRoundHex(float2 v);
+int2 WorldVectorRoundRect(float2 v);
+int2 WorldVectorRound(RenderLayout *rl, float2 v);
 
-#endif // WorldVector_h
+#endif // _WorldVector_h

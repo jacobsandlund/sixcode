@@ -8,7 +8,7 @@ void os_screen_mock_init(float2 size)
     gOsScreenFrameMock.size = size;
 }
 
-OsScreenFrame os_screen_visible_frame(void)
+OsScreenFrame OsScreenVisibleFrame(void)
 {
     return gOsScreenFrameMock;
 }

@@ -4,13 +4,13 @@
 
 u64 test_hash_literal(const char *s)
 {
-    return fnv_hash((const u8 *) s, strlen(s));
+    return FnvHash((const u8 *) s, strlen(s));
 }
 
-Test(fnv_hash)
+Test(FnvHash)
 {
     u8 s[] = "foo";
-    _u64(fnv_hash(s, strlen((char *) s)));
+    _u64(FnvHash(s, strlen((char *) s)));
     //=> 15902901984413996407
 
     _u64(test_hash_literal("foo"));
@@ -27,12 +27,12 @@ Test(fnv_hash)
     //=> 17580284887202820368
 }
 
-Test(fnv_fold)
+Test(FnvFold)
 {
-    _u64(fnv_fold(test_hash_literal("foo"), 6, 63));
+    _u64(FnvFold(test_hash_literal("foo"), 6, 63));
     //=> 34
-    _u64(fnv_fold(test_hash_literal("foo"), 7, 127));
+    _u64(FnvFold(test_hash_literal("foo"), 7, 127));
     //=> 93
-    _u64(fnv_fold(test_hash_literal("foobar"), 16, 65535));
+    _u64(FnvFold(test_hash_literal("foobar"), 16, 65535));
     //=> 37073
 }

@@ -16,7 +16,7 @@ struct OsEventLoop {
     bool left_mouse_dragging;
 };
 
-OsEventLoop *os_event_loop_create(void)
+OsEventLoop *OsEventLoopCreate(void)
 {
     OsEventLoop *loop = malloc(sizeof *loop);
 
@@ -27,12 +27,12 @@ OsEventLoop *os_event_loop_create(void)
     return loop;
 }
 
-void os_event_loop_destroy(OsEventLoop *loop)
+void OsEventLoopDestroy(OsEventLoop *loop)
 {
     free(loop);
 }
 
-void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
+void OsEventLoopRun(OsEventLoop *loop, OsEventQueue *queue)
 {
     @autoreleasepool {
 
@@ -47,7 +47,7 @@ void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
                 dequeue:YES];
 
         OsEvent event = {
-            .time = os_clock_time(),
+            .time = OsClockTime(),
         };
 
         switch (nsEvent.type) {
@@ -73,7 +73,7 @@ void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
                     (float) nsEvent.locationInWindow.x,
                     (float) nsEvent.locationInWindow.y,
                 };
-                os_event_queue_write(queue, &event);
+                OsEventQueueWrite(queue, &event);
             }
 
             loop->left_mouse_dragging = false;
@@ -88,7 +88,7 @@ void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
                 (float) nsEvent.locationInWindow.x,
                 (float) nsEvent.locationInWindow.y,
             };
-            os_event_queue_write(queue, &event);
+            OsEventQueueWrite(queue, &event);
 
             break;
 
@@ -109,7 +109,7 @@ void os_event_loop_run(OsEventLoop *loop, OsEventQueue *queue)
                     EnterDragDeltaSquared) {
                 loop->left_mouse_dragging = true;
                 event.type = OsEventTypeMouseDrag;
-                os_event_queue_write(queue, &event);
+                OsEventQueueWrite(queue, &event);
             }
 
             break;

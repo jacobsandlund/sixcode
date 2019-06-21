@@ -1,5 +1,5 @@
-#ifndef Mesh_h
-#define Mesh_h
+#ifndef _Mesh_h
+#define _Mesh_h
 
 #include "spacetime.h"
 
@@ -15,10 +15,10 @@ typedef struct {
     int2 gridPositionOffset;
 } InstanceMeshVertex;
 
-i64 fill_mesh_vertices_hex_length(i64 size);
-void fill_mesh_vertices_hex_set(void *contents, uintptr_t content_init_options);
-void fill_mesh_indices_hex_set(void *contents, uintptr_t content_init_options);
-void fill_mesh_vertices_rect_set(void *contents, uintptr_t content_init_options);
-void fill_mesh_indices_rect_set(void *contents, uintptr_t content_init_options);
+i64 FillMeshVerticesHexLength(i64 size);
+void FillMeshVerticesHexSet(void *contents, uintptr_t content_init_options);
+void FillMeshIndicesHexSet(void *contents, uintptr_t content_init_options);
+void FillMeshVerticesRectSet(void *contents, uintptr_t content_init_options);
+void FillMeshIndicesRectSet(void *contents, uintptr_t content_init_options);
 
-#endif // Mesh_h
+#endif // _Mesh_h

@@ -2,15 +2,15 @@
 #include "render/layout.c"
 #include "test.h"
 
-Test(fill_mesh_vertices_hex_set)
+Test(FillMeshVerticesHexSet)
 {
     i64 size = 32;
-    i64 byte_length = fill_mesh_vertices_hex_length(size);
+    i64 byte_length = FillMeshVerticesHexLength(size);
     _d(byte_length);
     //=> 73728
 
     FillMeshVertex *vertices = tmalloc(byte_length);
-    fill_mesh_vertices_hex_set((void *) vertices, (uintptr_t) size);
+    FillMeshVerticesHexSet((void *) vertices, (uintptr_t) size);
 
     i64 length = byte_length / sizeof(FillMeshVertex);
 
@@ -39,12 +39,12 @@ Test(fill_mesh_vertices_hex_set)
     //=> 31, 31
 }
 
-Test(fill_mesh_indices_hex_set)
+Test(FillMeshIndicesHexSet)
 {
     i64 size = 32;
     i64 length = size * size * FillMeshIndicesPerHex;
     u16 *indices = tmalloc(length * sizeof *indices);
-    fill_mesh_indices_hex_set((void *) indices, (uintptr_t) size);
+    FillMeshIndicesHexSet((void *) indices, (uintptr_t) size);
 
     _ddd(indices[0], indices[1], indices[2]);
     //=> 1, 2, 0
@@ -58,12 +58,12 @@ Test(fill_mesh_indices_hex_set)
     //=> 6141, 6142, 6143
 }
 
-Test(fill_mesh_vertices_rect_set)
+Test(FillMeshVerticesRectSet)
 {
     i64 size = 32;
     i64 length = size * size * FillMeshVerticesPerRect;
     FillMeshVertex *vertices = tmalloc(length * sizeof *vertices);
-    fill_mesh_vertices_rect_set((void *) vertices, (uintptr_t) size);
+    FillMeshVerticesRectSet((void *) vertices, (uintptr_t) size);
 
     _gg(vertices[0].x, vertices[0].y);
     //=> 0.475, -0.475
@@ -86,12 +86,12 @@ Test(fill_mesh_vertices_rect_set)
     //=> 31, 31
 }
 
-Test(fill_mesh_indices_rect_set)
+Test(FillMeshIndicesRectSet)
 {
     i64 size = 32;
     i64 length = size * size * FillMeshIndicesPerRect;
     u16 *indices = tmalloc(length * sizeof *indices);
-    fill_mesh_indices_rect_set((void *) indices, (uintptr_t) size);
+    FillMeshIndicesRectSet((void *) indices, (uintptr_t) size);
 
     _ddd(indices[0], indices[1], indices[2]);
     //=> 0, 1, 2

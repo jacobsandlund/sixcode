@@ -1,5 +1,5 @@
-#ifndef LogManager_h
-#define LogManager_h
+#ifndef _LogManager_h
+#define _LogManager_h
 
 #include "spacetime.h"
 #include "log/log.h"
@@ -27,16 +27,16 @@ typedef struct {
 extern LogManager gLogManager;
 
 #ifdef DEBUG
-#define LogDebug(log, ...) log_at_level(log, LogLevelDebug, __VA_ARGS__)
+#define LogDebug(log, ...) LogAtLevel(log, LogLevelDebug, __VA_ARGS__)
 #else
 #define LogDebug(log, ...) /* */
 #endif
 
-#define LogDefault(log, ...) log_at_level(log, LogLevelDefault, __VA_ARGS__)
-#define LogInfo(log, ...) log_at_level(log, LogLevelInfo, __VA_ARGS__)
-#define LogError(log, ...) log_at_level(log, LogLevelError, __VA_ARGS__)
+#define LogDefault(log, ...) LogAtLevel(log, LogLevelDefault, __VA_ARGS__)
+#define LogInfo(log, ...) LogAtLevel(log, LogLevelInfo, __VA_ARGS__)
+#define LogError(log, ...) LogAtLevel(log, LogLevelError, __VA_ARGS__)
 
-void log_manager_init(LogManagerConfig *config);
+void LogManagerInit(LogManagerConfig *config);
 void log_manager_destroy(void);
 
-#endif // LogManager_h
+#endif // _LogManager_h

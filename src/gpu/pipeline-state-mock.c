@@ -8,7 +8,7 @@ struct GpuPipelineState {
     i64 pixel_format;
 };
 
-GpuPipelineState *gpu_pipeline_state_create(GpuDevice *device, GpuPipelineStateConfig *config)
+GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device, GpuPipelineStateConfig *config)
 {
     GpuPipelineState *state = malloc(sizeof *state);
     state->label = config->label;
@@ -18,7 +18,7 @@ GpuPipelineState *gpu_pipeline_state_create(GpuDevice *device, GpuPipelineStateC
     return state;
 }
 
-void gpu_pipeline_state_destroy(GpuPipelineState *state)
+void GpuPipelineStateDestroy(GpuPipelineState *state)
 {
     free(state);
 }

@@ -6,7 +6,7 @@ Test(os_screen)
     float2 size = {2560, 1440};
     os_screen_mock_init(size);
 
-    OsScreenFrame frame = os_screen_visible_frame();
+    OsScreenFrame frame = OsScreenVisibleFrame();
 
     _f2(frame.origin);
     //=> 0, 0

@@ -1,9 +1,9 @@
 #include "log/manager-mock.c"
 #include "test.h"
 
-Test(log_manager_init)
+Test(LogManagerInit)
 {
-    log_manager_init(&gLogManagerMockConfig);
+    LogManagerInit(&gLogManagerMockConfig);
 
     _s(gLogManager.logs.os->subsystem);
     //=> computer.spacetime-test.os
@@ -15,7 +15,7 @@ Test(log_manager_init)
     _s(gLogManager.logs.engine->category);
     //=> default
 
-    log_at_level(gLogManager.logs.os, LogLevelDefault,
+    LogAtLevel(gLogManager.logs.os, LogLevelDefault,
             "This is a test log %s", "foo");
 
     LogDebug(gLogManager.logs.os, "Debug this %d", 42);

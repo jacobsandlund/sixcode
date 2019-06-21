@@ -7,12 +7,12 @@ GpuRenderer *renderer;
 
 void test_gpu_renderer_draw_in_view(GpuView *view)
 {
-    gpu_renderer_draw_in_view(renderer, view);
+    GpuRendererDrawInView(renderer, view);
 }
 
 void test_gpu_renderer_size_changed(GpuView *view, float2 viewport_size)
 {
-    gpu_renderer_size_changed(renderer, view, viewport_size);
+    GpuRendererSizeChanged(renderer, view, viewport_size);
 }
 
 GpuViewCallbacks test_callbacks = {
@@ -27,16 +27,16 @@ Test(gpu_renderer)
         .size = {640, 480},
     };
 
-    GpuDevice *device = gpu_device_create();
-    GpuView *view = gpu_view_create(device, frame, &gGpuViewMockConfig);
+    GpuDevice *device = GpuDeviceCreate();
+    GpuView *view = GpuViewCreate(device, frame, &gGpuViewMockConfig);
 
-    float2 viewport_size = gpu_view_viewport_size(view);
+    float2 viewport_size = GpuViewViewportSize(view);
     renderer = gpu_renderer_create(device, view, viewport_size);
 
-    gpu_view_register_callbacks(view, &test_callbacks);
+    GpuViewRegisterCallbacks(view, &test_callbacks);
 
-    gpu_renderer_destroy(renderer);
+    GpuRendererDestroy(renderer);
 
-    gpu_view_destroy(view);
-    gpu_device_destroy(device);
+    GpuViewDestroy(view);
+    GpuDeviceDestroy(device);
 }

@@ -1,5 +1,5 @@
-#ifndef OsManager_h
-#define OsManager_h
+#ifndef _OsManager_h
+#define _OsManager_h
 
 #include "spacetime.h"
 #include "os/event-queue.h"
@@ -26,12 +26,12 @@ typedef struct {
 
 extern OsManager gOsManager;
 
-void os_manager_init(OsManagerConfig *config);
-void os_manager_destroy(void);
-void os_manager_register_callbacks(OsManagerCallbacks *callbacks);
-void os_manager_window_init(GpuView *view);
-void os_manager_window_destroy(void);
-void os_manager_finish_launching(void);
-void os_manager_event_loop_run(void);
+void OsManagerInit(OsManagerConfig *config);
+void OsManagerDestroy(void);
+void OsManagerRegisterCallbacks(OsManagerCallbacks *callbacks);
+void OsManagerWindowInit(GpuView *view);
+void OsManagerWindowDestroy(void);
+void OsManagerFinishLaunching(void);
+void OsManagerEventLoopRun(void);
 
-#endif // OsManager_h
+#endif // _OsManager_h

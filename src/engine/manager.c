@@ -3,21 +3,21 @@
 #include "os/screen.h"
 #include "render/layout.h"
 
-EngineCallbacks gEngineCallbacks = {
+EngineCallbacks gEngineManagerCallbacks = {
     .os = {
         .application = {
-            .will_terminate = engine_manager_destroy,
+            .will_terminate = EngineManagerDestroy,
         },
     },
     .gpu = {
         .view = {
-            .draw_in_view = gpu_manager_draw_in_view,
-            .size_changed = gpu_manager_size_changed,
+            .draw_in_view = GpuManagerDrawInView,
+            .size_changed = GpuManagerSizeChanged,
         },
     },
 };
 
-EngineConfig gEngineConfig = {
+EngineConfig gEngineManagerConfig = {
     .log = {
         .logs = {
             .os = {
@@ -41,23 +41,11 @@ EngineConfig gEngineConfig = {
     .gpu = {
         .view = {
             .preferred_frames_per_second = 60,
-#ifdef __APPLE__
             .color_pixel_format = MTLPixelFormatBGRA8Unorm_sRGB,
-#endif
         },
-    },
-    .string = {
-        .string_table_size = 256,
-    },
-    .resource = {
-        .loader_capacity = 64,
-        .resource_capacity = 128,
-        .descriptor_capacity = 256,
-        .pointer_allocator_capacity = 4096,
     },
     .render = {
         .layout_type = RenderLayoutTypeHex,
-        .viewport_size = {0.0, 0.0},        // Set after GpuView initialization
     },
     .camera = {
         .position = {0.0, 0.0, 32.0},
@@ -68,69 +56,61 @@ EngineConfig gEngineConfig = {
     .world_grid_random_count = 10000000,
 };
 
-void engine_manager_init(EngineCallbacks *callbacks, EngineConfig *config)
+void EngineManagerInit(EngineCallbacks *callbacks, EngineConfig *config)
 {
-        EngineProfileStart();
-    log_manager_init(&config->log);
-        EngineProfileEnd("log_manager_init");
-    os_manager_init(&config->os);
-        EngineProfileEnd("os_manager_init");
+        ENGINE_PROFILE_START();
+    LogManagerInit(&config->log);
+        ENGINE_PROFILE_END("LogManagerInit");
+    OsManagerInit(&config->os);
+        ENGINE_PROFILE_END("OsManagerInit");
 
-    gpu_manager_init(os_screen_visible_frame(), &config->gpu);
-        EngineProfileEnd("gpu_manager_init");
-    string_manager_init(&config->string);
-        EngineProfileEnd("string_manager_init");
-    resource_manager_init(&config->resource);
-        EngineProfileEnd("resource_manager_init");
+    GpuManagerInit(OsScreenVisibleFrame(), &config->gpu);
+        ENGINE_PROFILE_END("GpuManagerInit");
 
-    os_manager_window_init(gGpuManager.view);
-        EngineProfileEnd("os_manager_window_init");
+    OsManagerWindowInit(gGpuManager.view);
+        ENGINE_PROFILE_END("OsManagerWindowInit");
 
-    render_manager_init(&config->render);
-        EngineProfileEnd("render_manager_init");
-    camera_manager_init(&config->camera);
-        EngineProfileEnd("camera_manager_init");
-    world_manager_init(&config->world);
-        EngineProfileEnd("camera_manager_init");
-    gpu_manager_register_callbacks(&callbacks->gpu);
-        EngineProfileEnd("gpu_manager_register_callbacks");
+    RenderManagerInit(&config->render);
+        ENGINE_PROFILE_END("RenderManagerInit");
+    CameraManagerInit(&config->camera);
+        ENGINE_PROFILE_END("CameraManagerInit");
+    WorldManagerInit(&config->world);
+        ENGINE_PROFILE_END("WorldManagerInit");
+    GpuManagerRegisterCallbacks(&callbacks->gpu);
+        ENGINE_PROFILE_END("GpuManagerRegisterCallbacks");
 
-    os_manager_register_callbacks(&callbacks->os);
-        EngineProfileEnd("os_manager_register_callbacks");
-    os_manager_finish_launching();
-        EngineProfileEnd("os_manager_finish_launching");
+    OsManagerRegisterCallbacks(&callbacks->os);
+        ENGINE_PROFILE_END("OsManagerRegisterCallbacks");
+    OsManagerFinishLaunching();
+        ENGINE_PROFILE_END("OsManagerFinishLaunching");
 
-    world_manager_load_random(config->world_grid_random_count);
-        EngineProfileEnd("world_manager_load_random");
+    WorldManagerLoadRandom(config->world_grid_random_count);
+        ENGINE_PROFILE_END("WorldManagerLoadRandom");
 
-        EngineProfileEnd("EngineProfile empty timing 1");
-        EngineProfileEnd("EngineProfile empty timing 2");
+        ENGINE_PROFILE_END("EngineProfile empty timing 1");
+        ENGINE_PROFILE_END("EngineProfile empty timing 2");
 }
 
-void engine_manager_destroy(void)
+void EngineManagerDestroy(void)
 {
-        EngineProfileStart();
-    world_manager_destroy();
-        EngineProfileEnd("world_manager_destroy");
-    camera_manager_destroy();
-        EngineProfileEnd("camera_manager_destroy");
-    render_manager_destroy();
-        EngineProfileEnd("render_manager_destroy");
-    os_manager_window_destroy();
-        EngineProfileEnd("os_manager_window_destroy");
-    resource_manager_destroy();
-        EngineProfileEnd("resource_manager_destroy");
-    string_manager_destroy();
-        EngineProfileEnd("string_manager_destroy");
-    gpu_manager_destroy();
-        EngineProfileEnd("gpu_manager_destroy");
-    os_manager_destroy();
-        EngineProfileEnd("os_manager_destroy");
+        ENGINE_PROFILE_START();
+    WorldManagerDestroy();
+        ENGINE_PROFILE_END("WorldManagerDestroy");
+    CameraManagerDestroy();
+        ENGINE_PROFILE_END("CameraManagerDestroy");
+    RenderManagerDestroy();
+        ENGINE_PROFILE_END("RenderManagerDestroy");
+    OsManagerWindowDestroy();
+        ENGINE_PROFILE_END("OsManagerWindowDestroy");
+    GpuManagerDestroy();
+        ENGINE_PROFILE_END("GpuManagerDestroy");
+    OsManagerDestroy();
+        ENGINE_PROFILE_END("OsManagerDestroy");
     log_manager_destroy();
         // No more logging allowed
 }
 
-void engine_manager_run(void)
+void EngineManagerRun(void)
 {
-    os_manager_event_loop_run();
+    OsManagerEventLoopRun();
 }

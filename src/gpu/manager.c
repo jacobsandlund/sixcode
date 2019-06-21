@@ -2,35 +2,39 @@
 
 GpuManager gGpuManager;
 
-void gpu_manager_init(OsScreenFrame frame, GpuManagerConfig *config)
+void GpuManagerInit(OsScreenFrame frame, GpuManagerConfig *config)
 {
-    GpuDevice *device = gpu_device_create();
+    GpuDevice *device = GpuDeviceCreate();
     gGpuManager.device = device;
-    gGpuManager.view = gpu_view_create(device, frame, &config->view);
-    gGpuManager.command_queue = gpu_command_queue_create(device);
-    float2 viewport_size = gpu_view_viewport_size(gGpuManager.view);
-    gpu_renderer_init(&gGpuManager.renderer, device, gGpuManager.view, viewport_size);
+    gGpuManager.view = GpuViewCreate(device, frame, &config->view);
+    gGpuManager.command_queue = GpuCommandQueueCreate(device);
+
+    GpuRendererConfig renderer_config = {
+        .viewport_size = GpuViewViewportSize(gGpuManager.view),
+        .pixel_format = config->view.color_pixel_format,
+    };
+    GpuRendererInit(&gGpuManager.renderer, device, gGpuManager.view, &renderer_config);
 }
 
-void gpu_manager_destroy(void)
+void GpuManagerDestroy(void)
 {
-    gpu_renderer_destroy(&gGpuManager.renderer);
-    gpu_command_queue_destroy(gGpuManager.command_queue);
-    gpu_view_destroy(gGpuManager.view);
-    gpu_device_destroy(gGpuManager.device);
+    GpuRendererDestroy(&gGpuManager.renderer);
+    GpuCommandQueueDestroy(gGpuManager.command_queue);
+    GpuViewDestroy(gGpuManager.view);
+    GpuDeviceDestroy(gGpuManager.device);
 }
 
-void gpu_manager_register_callbacks(GpuManagerCallbacks *callbacks)
+void GpuManagerRegisterCallbacks(GpuManagerCallbacks *callbacks)
 {
-    gpu_view_register_callbacks(gGpuManager.view, &callbacks->view);
+    GpuViewRegisterCallbacks(gGpuManager.view, &callbacks->view);
 }
 
-void gpu_manager_draw_in_view(GpuView *view)
+void GpuManagerDrawInView(GpuView *view)
 {
-    gpu_renderer_draw_in_view(&gGpuManager.renderer, view, gGpuManager.command_queue);
+    GpuRendererDrawInView(&gGpuManager.renderer, view, gGpuManager.command_queue);
 }
 
-void gpu_manager_size_changed(GpuView *view, float2 viewport_size)
+void GpuManagerSizeChanged(GpuView *view, float2 viewport_size)
 {
-    gpu_renderer_size_changed(&gGpuManager.renderer, view, viewport_size);
+    GpuRendererSizeChanged(&gGpuManager.renderer, view, viewport_size);
 }

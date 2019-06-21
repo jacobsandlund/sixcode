@@ -1,5 +1,5 @@
-#ifndef OsScreen_h
-#define OsScreen_h
+#ifndef _OsScreen_h
+#define _OsScreen_h
 
 #include "spacetime.h"
 
@@ -8,6 +8,6 @@ typedef struct {
     float2 size;
 } OsScreenFrame;
 
-OsScreenFrame os_screen_visible_frame(void);
+OsScreenFrame OsScreenVisibleFrame(void);
 
-#endif // OsScreen_h
+#endif // _OsScreen_h

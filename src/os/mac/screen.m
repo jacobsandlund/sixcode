@@ -2,7 +2,7 @@
 
 #import "os/screen.h"
 
-OsScreenFrame os_screen_visible_frame(void)
+OsScreenFrame OsScreenVisibleFrame(void)
 {
     NSRect frame = [NSScreen mainScreen].visibleFrame;
     return (OsScreenFrame) {

@@ -1,5 +1,5 @@
-#ifndef RenderViewport_h
-#define RenderViewport_h
+#ifndef _RenderViewport_h
+#define _RenderViewport_h
 
 #include "spacetime.h"
 #include "render/layout.h"
@@ -10,4 +10,4 @@ typedef struct {
     float2 size;
 } RenderViewport;
 
-#endif // Viewport_h
+#endif // _Viewport_h

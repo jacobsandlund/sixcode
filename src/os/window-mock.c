@@ -6,7 +6,7 @@ struct OsWindow {
     bool showing;
 };
 
-OsWindow *os_window_create(GpuView *view)
+OsWindow *OsWindowCreate(GpuView *view)
 {
     OsWindow *window = malloc(sizeof *window);
     window->view = view;
@@ -15,12 +15,12 @@ OsWindow *os_window_create(GpuView *view)
     return window;
 }
 
-void os_window_destroy(OsWindow *window)
+void OsWindowDestroy(OsWindow *window)
 {
     free(window);
 }
 
-void os_window_show(OsWindow *window)
+void OsWindowShow(OsWindow *window)
 {
     window->showing = true;
 }

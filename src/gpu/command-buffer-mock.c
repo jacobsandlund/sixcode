@@ -6,7 +6,7 @@ struct GpuCommandBuffer {
     bool committed;
 };
 
-GpuCommandBuffer *gpu_command_buffer_create(GpuCommandQueue *queue)
+GpuCommandBuffer *GpuCommandBufferCreate(GpuCommandQueue *queue)
 {
     GpuCommandBuffer *buffer = malloc(sizeof *buffer);
     buffer->queue = queue;
@@ -14,17 +14,17 @@ GpuCommandBuffer *gpu_command_buffer_create(GpuCommandQueue *queue)
     return buffer;
 }
 
-void gpu_command_buffer_destroy(GpuCommandBuffer *buffer)
+void GpuCommandBufferDestroy(GpuCommandBuffer *buffer)
 {
     free(buffer);
 }
 
-void gpu_command_buffer_present_drawable(GpuCommandBuffer *buffer, GpuView *view)
+void GpuCommandBufferPresentDrawable(GpuCommandBuffer *buffer, GpuView *view)
 {
     buffer->presented_drawable_view = view;
 }
 
-void gpu_command_buffer_commit(GpuCommandBuffer *buffer)
+void GpuCommandBufferCommit(GpuCommandBuffer *buffer)
 {
     buffer->committed = true;
 }

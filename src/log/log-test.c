@@ -7,17 +7,17 @@ Test(log)
         .subsystem = "computer.spacetime-test.test",
         .category = "default",
     };
-    Log *log = log_create(&config);
+    Log *log = LogCreate(&config);
 
     _s(log->subsystem);
     //=> computer.spacetime-test.test
     _s(log->category);
     //=> default
 
-    log_at_level(log, LogLevelDebug, "Just for debugging, you should know...");
-    log_at_level(log, LogLevelInfo, "Got some info");
-    log_at_level(log, LogLevelDefault, "This looks bad");
-    log_at_level(log, LogLevelError, "A Foo error has occurred");
+    LogAtLevel(log, LogLevelDebug, "Just for debugging, you should know...");
+    LogAtLevel(log, LogLevelInfo, "Got some info");
+    LogAtLevel(log, LogLevelDefault, "This looks bad");
+    LogAtLevel(log, LogLevelError, "A Foo error has occurred");
 
     _Log(log);
     //=> [debug]  Just for debugging, you should know...
@@ -26,5 +26,5 @@ Test(log)
     //=> [error]  A Foo error has occurred
     //=>
 
-    log_destroy(log);
+    LogDestroy(log);
 }

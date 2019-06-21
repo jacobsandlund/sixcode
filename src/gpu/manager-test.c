@@ -13,8 +13,8 @@ Test(gpu_manager)
     };
     GpuManagerCallbacks callbacks = {
         .view = {
-            .draw_in_view = gpu_manager_draw_in_view,
-            .size_changed = gpu_manager_size_changed,
+            .draw_in_view = GpuManagerDrawInView,
+            .size_changed = GpuManagerSizeChanged,
         }
     };
     OsScreenFrame visible_frame = {
@@ -22,20 +22,20 @@ Test(gpu_manager)
         .size = {640, 480},
     };
 
-    gpu_manager_init(visible_frame, &config);
+    GpuManagerInit(visible_frame, &config);
 
     _d(gGpuManager.renderer->device == gGpuManager.device);
     //=> 1
 
-    gpu_manager_register_callbacks(&callbacks);
+    GpuManagerRegisterCallbacks(&callbacks);
 
-    _d(gGpuManager.view->draw_in_view == gpu_manager_draw_in_view);
+    _d(gGpuManager.view->draw_in_view == GpuManagerDrawInView);
     //=> 1
 
-    gpu_manager_draw_in_view(gGpuManager.view);
+    GpuManagerDrawInView(gGpuManager.view);
 
     _d(gGpuManager.renderer->drew_in_view == gGpuManager.view);
     //=> 1
 
-    gpu_manager_destroy();
+    GpuManagerDestroy();
 }

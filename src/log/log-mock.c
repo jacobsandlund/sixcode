@@ -29,7 +29,7 @@ void log_mock_reset(Log *log)
     log->buffer[log->buffer_i_start] = '\0';
 }
 
-Log *log_create(LogConfig *config)
+Log *LogCreate(LogConfig *config)
 {
     Log *log = malloc(sizeof *log);
 
@@ -44,12 +44,12 @@ Log *log_create(LogConfig *config)
     return log;
 }
 
-void log_destroy(Log *log)
+void LogDestroy(Log *log)
 {
     free(log);
 }
 
-void log_at_level(Log *log, LogLevel level, const char *format, ...)
+void LogAtLevel(Log *log, LogLevel level, const char *format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);

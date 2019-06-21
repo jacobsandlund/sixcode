@@ -1,5 +1,5 @@
-#ifndef GpuManager_h
-#define GpuManager_h
+#ifndef _GpuManager_h
+#define _GpuManager_h
 
 #include "spacetime.h"
 #include "os/screen.h"
@@ -25,10 +25,10 @@ typedef struct {
 
 extern GpuManager gGpuManager;
 
-void gpu_manager_init(OsScreenFrame frame, GpuManagerConfig *config);
-void gpu_manager_destroy(void);
-void gpu_manager_register_callbacks(GpuManagerCallbacks *callbacks);
-void gpu_manager_draw_in_view(GpuView *view);
-void gpu_manager_size_changed(GpuView *view, float2 viewport_size);
+void GpuManagerInit(OsScreenFrame frame, GpuManagerConfig *config);
+void GpuManagerDestroy(void);
+void GpuManagerRegisterCallbacks(GpuManagerCallbacks *callbacks);
+void GpuManagerDrawInView(GpuView *view);
+void GpuManagerSizeChanged(GpuView *view, float2 viewport_size);
 
-#endif // GpuManager_h
+#endif // _GpuManager_h

@@ -1,16 +1,16 @@
-#ifndef OsEvent_h
-#define OsEvent_h
+#ifndef _OsEvent_h
+#define _OsEvent_h
 
 typedef enum {
-    OsEventTypeMouseMove = 1,
-    OsEventTypeMouseDrag = 2,
-    OsEventTypeMouseClick = 4,
+    OsEventTypeMouseMove = 0x00000001,
+    OsEventTypeMouseDrag = 0x00000002,
+    OsEventTypeMouseClick = 0x00000004,
 
     // Used for mock event loop to end looping
     OsEventTypeTerminateLoop,
 } OsEventType;
 
-#define OsEventTypeMouseMoveOrDrag 3
+enum { OsEventTypeMouseMoveOrDrag = 3 };
 
 typedef struct {
     OsEventType type;
@@ -18,4 +18,4 @@ typedef struct {
     float2 location;
 } OsEvent;
 
-#endif // OsEvent_h
+#endif // _OsEvent_h

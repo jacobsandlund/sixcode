@@ -1,6 +1,6 @@
 #include "render/view-matrix.h"
 
-void render_view_matrix_init(float4x4 *vm)
+void RenderViewMatrixInit(float4x4 *vm)
 {
     for (i64 i = 0; i < 4; i++) {
         for (i64 j = 0; j < 4; j++) {
@@ -9,7 +9,7 @@ void render_view_matrix_init(float4x4 *vm)
     }
 }
 
-void render_view_matrix_update(float4x4 *vm, RenderViewport *viewport, float3 *camera, float2 draw_offset)
+void RenderViewMatrixUpdate(float4x4 *vm, RenderViewport *viewport, float3 *camera, float2 draw_offset)
 {
     double scale_x = viewport->layout.scale.x / viewport->size.x;
     double scale_y = viewport->layout.scale.y / viewport->size.y;

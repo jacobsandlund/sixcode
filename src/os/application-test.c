@@ -15,13 +15,13 @@ Test(os_application)
     };
     called_will_terminate = false;
 
-    OsApplication *app = os_application_create();
-    os_application_register_callbacks(app, &callbacks);
+    OsApplication *app = OsApplicationCreate();
+    OsApplicationRegisterCallbacks(app, &callbacks);
 
     _d(app->finished_launching);
     //=> 0
 
-    os_application_finish_launching(app);
+    OsApplicationFinishLaunching(app);
 
     _d(app->finished_launching);
     //=> 1
@@ -31,5 +31,5 @@ Test(os_application)
     _d(called_will_terminate);
     //=> 1
 
-    os_application_destroy(app);
+    OsApplicationDestroy(app);
 }

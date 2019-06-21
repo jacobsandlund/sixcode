@@ -7,9 +7,9 @@
 Test(os_event_loop)
 {
     os_clock_mock_init(12345, 321);
-    log_manager_init(&gLogManagerMockConfig);
+    LogManagerInit(&gLogManagerMockConfig);
 
-    OsEventLoop *loop = os_event_loop_create();
+    OsEventLoop *loop = OsEventLoopCreate();
 
     _f2(loop->next_incoming_event_location);
     //=> 0, 0
@@ -28,13 +28,13 @@ Test(os_event_loop)
     os_event_loop_mock_event_type(loop, OsEventTypeTerminateLoop);
 
     OsEventQueue queue;
-    os_event_queue_init(&queue, 32, 4);
+    OsEventQueueInit(&queue, 32, 4);
 
-    os_event_loop_run(loop, &queue);
+    OsEventLoopRun(loop, &queue);
 
     OsEvent event;
 
-    _d(os_event_queue_read(&queue, &event));
+    _d(OsEventQueueRead(&queue, &event));
     //=> 1
     _d(event.type == OsEventTypeMouseMove);
     //=> 1
@@ -43,7 +43,7 @@ Test(os_event_loop)
     _u64(event.time);
     //=> 12345
 
-    _d(os_event_queue_read(&queue, &event));
+    _d(OsEventQueueRead(&queue, &event));
     //=> 2
     _d(event.type == OsEventTypeMouseClick);
     //=> 1
@@ -52,7 +52,7 @@ Test(os_event_loop)
     _u64(event.time);
     //=> 12666
 
-    os_event_queue_destroy(&queue);
-    os_event_loop_destroy(loop);
+    OsEventQueueDestroy(&queue);
+    OsEventLoopDestroy(loop);
     log_manager_destroy();
 }

@@ -1,10 +1,10 @@
-#ifndef RenderViewMatrix_h
-#define RenderViewMatrix_h
+#ifndef _RenderViewMatrix_h
+#define _RenderViewMatrix_h
 
 #include "spacetime.h"
 #include "render/viewport.h"
 
-void render_view_matrix_init(float4x4 *vm);
-void render_view_matrix_update(float4x4 *vm, RenderViewport *viewport, float3 *camera, float2 draw_offset);
+void RenderViewMatrixInit(float4x4 *vm);
+void RenderViewMatrixUpdate(float4x4 *vm, RenderViewport *viewport, float3 *camera, float2 draw_offset);
 
-#endif // RenderViewMatrix_h
+#endif // _RenderViewMatrix_h

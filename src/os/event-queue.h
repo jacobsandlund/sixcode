@@ -1,5 +1,5 @@
-#ifndef OsEventQueue_h
-#define OsEventQueue_h
+#ifndef _OsEventQueue_h
+#define _OsEventQueue_h
 
 #include "spacetime.h"
 #include "os/event.h"
@@ -13,13 +13,13 @@ typedef struct {
     OsEvent *events;
 } OsEventQueue;
 
-void os_event_queue_init(OsEventQueue *eq, i64 length, i64 safe_length_remaining);
-void os_event_queue_destroy(OsEventQueue *eq);
-i64 os_event_queue_read(OsEventQueue *eq, OsEvent *event);
+void OsEventQueueInit(OsEventQueue *eq, i64 length, i64 safe_length_remaining);
+void OsEventQueueDestroy(OsEventQueue *eq);
+i64 OsEventQueueRead(OsEventQueue *eq, OsEvent *event);
 
-static inline void os_event_queue_write(OsEventQueue *eq, OsEvent *event)
+static inline void OsEventQueueWrite(OsEventQueue *eq, OsEvent *event)
 {
     eq->events[eq->next_write_event_id++ & eq->index_mask] = *event;
 }
 
-#endif // OsEventQueue_h
+#endif // _OsEventQueue_h

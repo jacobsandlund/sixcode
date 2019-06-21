@@ -5,14 +5,14 @@ struct GpuCommandQueue {
     GpuDevice *device;
 };
 
-GpuCommandQueue *gpu_command_queue_create(GpuDevice *device)
+GpuCommandQueue *GpuCommandQueueCreate(GpuDevice *device)
 {
     GpuCommandQueue *queue = malloc(sizeof *queue);
     queue->device = device;
     return queue;
 }
 
-void gpu_command_queue_destroy(GpuCommandQueue *queue)
+void GpuCommandQueueDestroy(GpuCommandQueue *queue)
 {
     free(queue);
 }

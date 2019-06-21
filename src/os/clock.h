@@ -1,8 +1,8 @@
-#ifndef OsClock_h
-#define OsClock_h
+#ifndef _OsClock_h
+#define _OsClock_h
 
 #include "spacetime.h"
 
-u64 os_clock_time(void);
+u64 OsClockTime(void);
 
-#endif // OsClock_h
+#endif // _OsClock_h

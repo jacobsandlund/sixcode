@@ -1,5 +1,5 @@
-#ifndef Spacetime_h
-#define Spacetime_h
+#ifndef _Spacetime_h
+#define _Spacetime_h
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -77,4 +77,4 @@ typedef struct {
 
 #endif
 
-#endif // Spacetime_h
+#endif // _Spacetime_h

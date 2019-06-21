@@ -2,16 +2,16 @@
 
 LogManager gLogManager;
 
-void log_manager_init(LogManagerConfig *config)
+void LogManagerInit(LogManagerConfig *config)
 {
-    gLogManager.logs.os = log_create(&config->logs.os);
-    gLogManager.logs.gpu = log_create(&config->logs.gpu);
-    gLogManager.logs.engine = log_create(&config->logs.engine);
+    gLogManager.logs.os = LogCreate(&config->logs.os);
+    gLogManager.logs.gpu = LogCreate(&config->logs.gpu);
+    gLogManager.logs.engine = LogCreate(&config->logs.engine);
 }
 
 void log_manager_destroy(void)
 {
-    log_destroy(gLogManager.logs.os);
-    log_destroy(gLogManager.logs.gpu);
-    log_destroy(gLogManager.logs.engine);
+    LogDestroy(gLogManager.logs.os);
+    LogDestroy(gLogManager.logs.gpu);
+    LogDestroy(gLogManager.logs.engine);
 }

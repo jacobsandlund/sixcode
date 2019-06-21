@@ -5,14 +5,14 @@ struct GpuDevice {
     bool created;
 };
 
-GpuDevice *gpu_device_create(void)
+GpuDevice *GpuDeviceCreate(void)
 {
     GpuDevice *device = malloc(sizeof *device);
     device->created = true;
     return device;
 }
 
-void gpu_device_destroy(GpuDevice *device)
+void GpuDeviceDestroy(GpuDevice *device)
 {
     free(device);
 }
