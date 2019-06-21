@@ -9,8 +9,8 @@ fi
 # specific modules
 src="$SPACETIME_PATH/src"
 
-exclude_mac='mac/|metal/'
-exclude_windows='windows/|directx/'
+exclude_mac='Mac/|Metal/'
+exclude_windows='Windows/|Vulkan/'
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     exclude=$exclude_windows
@@ -29,10 +29,10 @@ for arg in "$@"; do
         exclude="$exclude_mac|$exclude_windows"
         ;;
     test)
-        include_only='test\.c|test\.m$'
+        include_only='Test\.c|Test\.m$'
         ;;
     code)
-        exclude="$exclude|-test.c|-test.m|-mock.c"
+        exclude="$exclude|Test\.c|Test\.m|Mock\.c"
         ;;
     *)
         if [ -d "$arg" ]; then

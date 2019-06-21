@@ -2,7 +2,7 @@
 
 ### Testing
 
-To run all tests, use `bin/test`. All lines starting with `//=> ` are added automatically when the file runs (e.g. `bin/test view-test.c`). Broken tests will result in a `git diff`. If the changed output is desired, simply `git add` the diff.
+To run all tests, use `st test`. All lines starting with `//=> ` are added automatically when the file runs (e.g. `st test ViewTest.c`). Broken tests will result in a `git diff`. If the changed output is desired, simply `git add` the diff.
 
 If you are using Vim, the following `.vimrc` lines add a keyboard shortcut (`<leader>r`) to run the test file and reload any changes, as well as a shortcut to `git add --patch` (`<leader>a`) a file.
 
