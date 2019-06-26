@@ -38,6 +38,7 @@ void OsEventLoopDestroy(OsEventLoop *loop)
 {
     @autoreleasepool {
         NSDate *until = (__bridge_transfer NSDate *)loop->until;
+        until = nil;
     }
 
     free(loop);

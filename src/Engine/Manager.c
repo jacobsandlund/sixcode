@@ -4,7 +4,7 @@
 #include "Os/Screen.h"
 #include "Render/Layout.h"
 
-EngineCallbacks gEngineManagerCallbacks = {
+EngineManagerCallbacks gEngineManagerCallbacks = {
     .os = {
         .application = {
             .will_terminate = EngineManagerDestroy,
@@ -18,7 +18,7 @@ EngineCallbacks gEngineManagerCallbacks = {
     },
 };
 
-EngineConfig gEngineManagerConfig = {
+EngineManagerConfig gEngineManagerConfig = {
     .log = {
         .logs = {
             .os = {
@@ -42,7 +42,7 @@ EngineConfig gEngineManagerConfig = {
     .gpu = {
         .view = {
             .preferred_frames_per_second = 60,
-            .color_pixel_format = MTLPixelFormatBGRA8Unorm_sRGB,
+            .color_pixel_format = GpuPixelFormatBGRA8Unorm_sRGB,
         },
     },
     .render = {
@@ -57,7 +57,8 @@ EngineConfig gEngineManagerConfig = {
     .world_grid_random_count = 10000000,
 };
 
-void EngineManagerInit(EngineCallbacks *callbacks, EngineConfig *config)
+void EngineManagerInit(EngineManagerCallbacks *callbacks,
+                       EngineManagerConfig *config)
 {
     DEBUG_EngineProfileStart();
 

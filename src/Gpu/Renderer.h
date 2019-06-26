@@ -10,7 +10,7 @@
 #include "Gpu/PipelineState.h"
 #include "Gpu/PixelFormat.h"
 #include "Gpu/View.h"
-#include "spacetime.h"
+#include "Spacetime.h"
 
 typedef struct {
     float2 viewport_size;
@@ -28,7 +28,6 @@ typedef struct {
 
 void GpuRendererInit(GpuRenderer *renderer,
                      GpuDevice *device,
-                     GpuView *view,
                      GpuRendererConfig *config);
 void GpuRendererDestroy(GpuRenderer *renderer);
 void GpuRendererDrawInView(GpuRenderer *renderer,

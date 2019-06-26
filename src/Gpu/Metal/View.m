@@ -1,8 +1,7 @@
 #import "Gpu/Metal/View.h"
 
+#import "Gpu/Metal/PixelFormat.h"
 #import "Log/Manager.h"
-
-const i64 MetalViewColorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 
 static void gpu_view_noop_draw_in_view(GpuView *view)
 {
@@ -76,7 +75,8 @@ GpuView *GpuViewCreate(GpuDevice *device,
 
         MTKView *mtk_view = [[MTKView alloc] initWithFrame:ns_frame
                                                     device:mtl_device];
-        mtk_view.colorPixelFormat = config->color_pixel_format;
+        mtk_view.colorPixelFormat =
+                GpuMetalPixelFormatLookup[config->color_pixel_format];
         mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;
 
         ViewDelegate *delegate = [[ViewDelegate alloc] initWithMtkView:mtk_view

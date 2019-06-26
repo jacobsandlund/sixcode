@@ -1,6 +1,8 @@
 #ifndef _OsEvent_h
 #define _OsEvent_h
 
+#include "Spacetime.h"
+
 typedef enum {
     OsEventTypeMouseMove = 0x00000001,
     OsEventTypeMouseDrag = 0x00000002,

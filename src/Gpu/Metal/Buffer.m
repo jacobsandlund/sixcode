@@ -27,13 +27,13 @@ GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device,
 void GpuBufferDestroy(GpuBuffer *buffer)
 {
     @autoreleasepool {
-        id<MTLBuffer> mtl_buffer = (__bridge_transfer GpuBuffer *)buffer;
+        id<MTLBuffer> mtl_buffer = (__bridge_transfer id<MTLBuffer>)buffer;
         mtl_buffer = nil;
     }
 }
 
 void *GpuBufferContents(GpuBuffer *buffer)
 {
-    id<MTLBuffer> mtl_buffer = (__bridge GpuBuffer *)buffer;
+    id<MTLBuffer> mtl_buffer = (__bridge id<MTLBuffer>)buffer;
     return mtl_buffer.contents;
 }

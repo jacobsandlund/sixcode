@@ -1,5 +1,6 @@
 #import "Gpu/PipelineState.h"
 
+#import "Gpu/Metal/PixelFormat.h"
 #import "Log/Manager.h"
 
 @import MetalKit;
@@ -13,13 +14,15 @@ GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device,
         id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
         MTLRenderPipelineDescriptor *pipelineStateDescriptor =
                 [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.label = config->label;
+        pipelineStateDescriptor.label =
+                [NSString stringWithCString:config->label
+                                   encoding:NSUTF8StringEncoding];
         pipelineStateDescriptor.vertexFunction =
                 (__bridge id<MTLFunction>)config->vertex_function;
         pipelineStateDescriptor.fragmentFunction =
                 (__bridge id<MTLFunction>)config->fragment_function;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat =
-                config->pixel_format;
+                GpuMetalPixelFormatLookup[config->pixel_format];
 
         NSError *error = NULL;
         id<MTLRenderPipelineState> mtl_pipeline_state = [mtl_device

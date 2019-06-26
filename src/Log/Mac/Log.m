@@ -20,8 +20,8 @@ Log *LogCreate(LogConfig *config)
 {
     Log *log;
     @autoreleasepool {
-        ;
-        cn log = (__bridge_retained Log *)os_log;
+        os_log_t os_log = os_log_create(config->subsystem, config->category);
+        log = (__bridge_retained Log *)os_log;
     }
     return log;
 }

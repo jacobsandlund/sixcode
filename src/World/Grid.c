@@ -12,7 +12,7 @@ void WorldGridInit(WorldGrid *wg, i32 size)
         { -half_size, -half_size },
         { half_size - 1, half_size - 1 },
     };
-    quad_to_size_quad(&wg->size_quad, &wg->quad);
+    QuadToSizeQuad(&wg->size_quad, &wg->quad);
     i64 capacity = SizeQuadCapacity(&wg->size_quad);
     wg->styles = calloc(capacity, sizeof *wg->styles);
 }

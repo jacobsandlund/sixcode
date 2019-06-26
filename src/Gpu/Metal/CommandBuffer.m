@@ -1,5 +1,7 @@
 #import "Gpu/CommandBuffer.h"
 
+#import "Gpu/Metal/View.h"
+
 @import MetalKit;
 
 GpuCommandBuffer *GpuCommandBufferCreate(GpuCommandQueue *queue)

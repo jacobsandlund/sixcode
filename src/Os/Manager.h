@@ -1,7 +1,7 @@
 #ifndef _OsManager_h
 #define _OsManager_h
 
-#include "Gpu/view.h"
+#include "Gpu/View.h"
 #include "Os/Application.h"
 #include "Os/EventLoop.h"
 #include "Os/EventQueue.h"

@@ -10,7 +10,7 @@ void GpuCmdSetViewport(GpuCommandEncoder *encoder, float2 viewport_size)
             (__bridge id<MTLRenderCommandEncoder>)encoder;
 
     MTLViewport viewport = {
-        0.0, 0.0, _viewport_size.x, _viewport_size.y, -1.0, 1.0,
+        0.0, 0.0, viewport_size.x, viewport_size.y, -1.0, 1.0,
     };
     [mtl_encoder setViewport:viewport];
 }
@@ -34,7 +34,7 @@ void GpuCmdBindVertexBuffer(GpuCommandEncoder *encoder,
             (__bridge id<MTLRenderCommandEncoder>)encoder;
     id<MTLBuffer> mtl_buffer = (__bridge id<MTLBuffer>)buffer;
 
-    [mtl_encoder setVertexBuffer:mtl_buffer offset:offset atIndexindex];
+    [mtl_encoder setVertexBuffer:mtl_buffer offset:offset atIndex:index];
 }
 
 void GpuCmdBindVertexBytes(GpuCommandEncoder *encoder,

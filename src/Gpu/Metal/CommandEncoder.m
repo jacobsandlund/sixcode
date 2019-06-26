@@ -9,18 +9,20 @@ void GpuCommandEncoderBeginRenderEncoding(
 {
     @autoreleasepool {
         id<MTLCommandBuffer> mtl_buffer = (__bridge id<MTLCommandBuffer>)buffer;
-        id<MTLRenderCommandEncoder> mtl_encoder =
-                [mtl_buffer renderCommandEncoderWithDescriptor:
-                                    (__bridge id<MTLRenderPassDescriptor>)
-                                            render_pass_config];
+        id<MTLRenderCommandEncoder> mtl_encoder = [mtl_buffer
+                renderCommandEncoderWithDescriptor:
+                        (__bridge MTLRenderPassDescriptor *)render_pass_config];
         *encoder = (__bridge_retained GpuCommandEncoder *)mtl_encoder;
     }
 }
 
 void GpuCommandEncoderLabel(GpuCommandEncoder *encoder, const char *label)
 {
-    id<MTLCommandEncoder> mtl_encoder = (__bridge id<MTLCommandEncoder>)encoder;
-    mtl_encoder.label = label;
+    @autoreleasepool {
+        id<MTLCommandEncoder> mtl_encoder = (__bridge id<MTLCommandEncoder>)encoder;
+        mtl_encoder.label = [NSString stringWithCString:label
+                                               encoding:NSUTF8StringEncoding];
+    }
 }
 
 void GpuCommandEncoderEndEncoding(GpuCommandEncoder *encoder)

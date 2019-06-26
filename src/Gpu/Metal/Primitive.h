@@ -1,6 +1,10 @@
 #ifndef _GpuMetalPrimitive_h
 #define _GpuMetalPrimitive_h
 
-extern const i32 GpuMetalPrimitiveTypeLookup[];
+#include "Gpu/Primitive.h"
+
+@import MetalKit;
+
+extern const MTLPrimitiveType GpuMetalPrimitiveTypeLookup[];
 
 #endif  // _GpuMetalPrimitive_h

@@ -16,7 +16,6 @@ command -nargs=0 GitAddPatch execute 'silent !git add --intent-to-add -- % && gi
 nnoremap <leader>a :w<CR>:GitAddPatch<CR>
 
 function! ClangFormat()
-  let l:formatdiff = 1
   pyf /usr/local/share/clang/clang-format.py
 endfunction
 

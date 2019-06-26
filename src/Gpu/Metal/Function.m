@@ -9,8 +9,10 @@ GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name)
     @autoreleasepool {
         id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
         id<MTLLibrary> defaultLibrary = [mtl_device newDefaultLibrary];
+        NSString *ns_name = [NSString stringWithCString:name
+                                               encoding:NSUTF8StringEncoding];
         id<MTLFunction> mtl_function =
-                [defaultLibrary newFunctionWithName:name];
+                [defaultLibrary newFunctionWithName:ns_name];
         function = (__bridge_retained GpuFunction *)mtl_function;
     }
 

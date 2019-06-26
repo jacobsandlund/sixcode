@@ -13,8 +13,7 @@ void GpuManagerInit(OsScreenFrame frame, GpuManagerConfig *config)
         .viewport_size = GpuViewViewportSize(gGpuManager.view),
         .pixel_format = config->view.color_pixel_format,
     };
-    GpuRendererInit(
-            &gGpuManager.renderer, device, gGpuManager.view, &renderer_config);
+    GpuRendererInit(&gGpuManager.renderer, device, &renderer_config);
 }
 
 void GpuManagerDestroy(void)

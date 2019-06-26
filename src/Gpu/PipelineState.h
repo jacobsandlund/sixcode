@@ -1,9 +1,9 @@
 #ifndef _GpuPipelineState_h
 #define _GpuPipelineState_h
 
-#include "gpu/device.h"
-#include "gpu/function.h"
-#include "spacetime.h"
+#include "Gpu/Device.h"
+#include "Gpu/Function.h"
+#include "Spacetime.h"
 
 typedef struct {
     char *label;

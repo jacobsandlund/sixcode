@@ -1,5 +1,7 @@
 #include "Gpu/Renderer.h"
 
+#include "Gpu/Cmd.h"
+#include "Gpu/Primitive.h"
 #include "Gpu/ShaderTypes.h"
 
 #include <stdlib.h>
@@ -7,7 +9,6 @@
 
 void GpuRendererInit(GpuRenderer *renderer,
                      GpuDevice *device,
-                     GpuView *view,
                      GpuRendererConfig *config)
 {
     renderer->viewport_size = config->viewport_size;
