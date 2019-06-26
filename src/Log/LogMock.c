@@ -1,7 +1,8 @@
 #include "Log/Log.h"
-#include <stdlib.h>
+
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define LogMockBufferLength 4096
@@ -34,8 +35,7 @@ Log *LogCreate(LogConfig *config)
 
     log->subsystem = strcpy(log->buffer, config->subsystem);
     log->buffer_i_start = strlen(config->subsystem) + 1;
-    log->category = strcpy(&log->buffer[log->buffer_i_start],
-            config->category);
+    log->category = strcpy(&log->buffer[log->buffer_i_start], config->category);
     log->buffer_i_start += strlen(config->category) + 1;
 
     log_mock_reset(log);
@@ -50,15 +50,15 @@ void LogDestroy(Log *log)
 
 void LogAtLevel(Log *log, LogLevel level, const char *format, ...)
 {
-	va_list argptr;
-	va_start(argptr, format);
+    va_list argptr;
+    va_start(argptr, format);
 
-    const char *level_string = LogMockLevelStrings[(i32) level];
-    i32f level_string_length = (i32f) strlen(level_string);
+    const char *level_string = LogMockLevelStrings[(i32)level];
+    i32f level_string_length = (i32f)strlen(level_string);
 
-	i64 size = LogMockBufferLength - log->buffer_i;
+    i64 size = LogMockBufferLength - log->buffer_i;
 
-	if (size > level_string_length) {
+    if (size > level_string_length) {
         for (i32f i = 0; i < level_string_length; i++) {
             log->buffer[log->buffer_i++] = level_string[i];
         }
@@ -67,16 +67,16 @@ void LogAtLevel(Log *log, LogLevel level, const char *format, ...)
     }
 
     if (size > 0) {
-		i64 output_length = vsnprintf(&log->buffer[log->buffer_i], size,
-                format, argptr);
+        i64 output_length =
+                vsnprintf(&log->buffer[log->buffer_i], size, format, argptr);
         if (output_length >= size) {
             output_length = size - 1;
         }
 
-		log->buffer_i += output_length;
-		log->buffer[log->buffer_i++] = '\n';
-		log->buffer[log->buffer_i] = '\0';
-	}
+        log->buffer_i += output_length;
+        log->buffer[log->buffer_i++] = '\n';
+        log->buffer[log->buffer_i] = '\0';
+    }
 
     va_end(argptr);
 }

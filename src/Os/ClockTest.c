@@ -1,4 +1,5 @@
 #include "Os/ClockMock.c"
+
 #include "Test.h"
 
 Test(OsClockTime)

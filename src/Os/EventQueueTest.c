@@ -1,5 +1,7 @@
 #include "Os/EventQueue.c"
+
 #include "Log/ManagerMock.c"
+
 #include "Test.h"
 
 Test(OsEventQueueInit)
@@ -33,7 +35,7 @@ Test(OsEventQueueWrite)
     OsEvent event = {
         .type = OsEventTypeMouseClick,
         .time = 1234567890,
-        .location = {1000, 800},
+        .location = { 1000, 800 },
     };
 
     OsEventQueueInit(eq, 4, 1);
@@ -74,7 +76,7 @@ Test(OsEventQueueRead)
     OsEvent event = {
         .type = OsEventTypeMouseClick,
         .time = 1234567890,
-        .location = {1000, 800},
+        .location = { 1000, 800 },
     };
     OsEvent read_event;
 
@@ -99,7 +101,7 @@ Test(OsEventQueueRead)
 
     // Read far behind
 
-    OsEventQueueWrite(eq, &event);    // skip read
+    OsEventQueueWrite(eq, &event);  // skip read
     event.time = 9876543210;
     OsEventQueueWrite(eq, &event);
     event.time = 1234567890;

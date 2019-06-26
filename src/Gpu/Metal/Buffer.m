@@ -7,7 +7,9 @@ static const i32 MetalResourceStorageModeLookup[] = {
     MTLResourceStorageModeShared,
 };
 
-GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device, i64 length, GpuBufferStorageMode storage_mode)
+GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device,
+                                     i64 length,
+                                     GpuBufferStorageMode storage_mode)
 {
     GpuBuffer *buffer;
 
@@ -15,7 +17,7 @@ GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device, i64 length, GpuBufferSto
         id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
         i32 options = MetalResourceStorageModeLookup[storage_mode];
         id<MTLBuffer> mtl_buffer = [mtl_device newBufferWithLength:length
-                options:options];
+                                                           options:options];
         buffer = (__bridge_retained GpuBuffer *)mtl_buffer;
     }
 

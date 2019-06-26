@@ -1,14 +1,16 @@
 #include "Render/Manager.c"
-#include "Gpu/ViewMock.c"
+
 #include "Gpu/DeviceMock.c"
+#include "Gpu/ViewMock.c"
 #include "Render/Layout.c"
+
 #include "Test.h"
 
 Test(RenderManagerInit)
 {
     RenderManagerConfig config = {
         .layout_type = RenderLayoutTypeRect,
-        .viewport_size = {2560, 1440},
+        .viewport_size = { 2560, 1440 },
     };
 
     RenderManagerInit(&config);
@@ -23,14 +25,14 @@ Test(RenderManagerInit)
 
 Test(RenderManagerSizeChanged)
 {
-    float2 old_viewport_size = {1920, 1080};
-    float2 new_viewport_size = {2560, 1920};
+    float2 old_viewport_size = { 1920, 1080 };
+    float2 new_viewport_size = { 2560, 1920 };
     RenderManagerConfig render_config = {
         .layout_type = RenderLayoutTypeRect,
     };
 
     OsScreenFrame visible_frame = {
-        .origin = {0, 0},
+        .origin = { 0, 0 },
         .size = old_viewport_size,
     };
     GpuDevice *device = GpuDeviceCreate();

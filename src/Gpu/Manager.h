@@ -1,12 +1,12 @@
 #ifndef _GpuManager_h
 #define _GpuManager_h
 
-#include "Spacetime.h"
-#include "Os/Screen.h"
-#include "Gpu/Device.h"
-#include "Gpu/View.h"
-#include "Gpu/Renderer.h"
 #include "Gpu/CommandQueue.h"
+#include "Gpu/Device.h"
+#include "Gpu/Renderer.h"
+#include "Gpu/View.h"
+#include "Os/Screen.h"
+#include "Spacetime.h"
 
 typedef struct {
     GpuViewConfig view;
@@ -31,4 +31,4 @@ void GpuManagerRegisterCallbacks(GpuManagerCallbacks *callbacks);
 void GpuManagerDrawInView(GpuView *view);
 void GpuManagerSizeChanged(GpuView *view, float2 viewport_size);
 
-#endif // _GpuManager_h
+#endif  // _GpuManager_h

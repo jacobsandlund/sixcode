@@ -1,4 +1,5 @@
 #include "Log/ManagerMock.c"
+
 #include "Test.h"
 
 Test(LogManagerInit)
@@ -15,8 +16,10 @@ Test(LogManagerInit)
     _s(gLogManager.logs.engine->category);
     //=> default
 
-    LogAtLevel(gLogManager.logs.os, LogLevelDefault,
-            "This is a test log %s", "foo");
+    LogAtLevel(gLogManager.logs.os,
+               LogLevelDefault,
+               "This is a test log %s",
+               "foo");
 
     LogDebug(gLogManager.logs.os, "Debug this %d", 42);
 

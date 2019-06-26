@@ -1,10 +1,10 @@
 #ifndef _RenderManager_h
 #define _RenderManager_h
 
-#include "Spacetime.h"
+#include "Gpu/View.h"
 #include "Render/Layout.h"
 #include "Render/Viewport.h"
-#include "Gpu/View.h"
+#include "Spacetime.h"
 
 typedef struct {
     RenderLayoutType layout_type;
@@ -22,4 +22,4 @@ void RenderManagerInit(RenderManagerConfig *config);
 void RenderManagerDestroy(void);
 void RenderManagerSizeChanged(GpuView *view, float2 viewport_size);
 
-#endif // _RenderManager_h
+#endif  // _RenderManager_h

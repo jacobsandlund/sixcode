@@ -1,4 +1,5 @@
 #include "Gpu/Buffer.h"
+
 #include <stdlib.h>
 
 struct GpuBuffer {
@@ -8,7 +9,9 @@ struct GpuBuffer {
     i64 length;
 };
 
-GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device, i64 length, GpuBufferStorageMode storage_mode)
+GpuBuffer *GpuBufferCreateWithLength(GpuDevice *device,
+                                     i64 length,
+                                     GpuBufferStorageMode storage_mode)
 {
     GpuBuffer *buffer = malloc(sizeof *buffer);
 

@@ -21,4 +21,4 @@ void FillMeshIndicesHexSet(void *contents, uintptr_t content_init_options);
 void FillMeshVerticesRectSet(void *contents, uintptr_t content_init_options);
 void FillMeshIndicesRectSet(void *contents, uintptr_t content_init_options);
 
-#endif // _Mesh_h
+#endif  // _Mesh_h

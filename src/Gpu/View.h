@@ -1,11 +1,11 @@
 #ifndef _GpuView_h
 #define _GpuView_h
 
-#include "Spacetime.h"
-#include "Os/Screen.h"
 #include "Gpu/Device.h"
-#include "Gpu/RenderPassConfig.h"
 #include "Gpu/PixelFormat.h"
+#include "Gpu/RenderPassConfig.h"
+#include "Os/Screen.h"
+#include "Spacetime.h"
 
 typedef struct GpuView GpuView;
 
@@ -22,10 +22,12 @@ typedef struct {
     GpuViewSizeChangedFn size_changed;
 } GpuViewCallbacks;
 
-GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config);
+GpuView *GpuViewCreate(GpuDevice *device,
+                       OsScreenFrame frame,
+                       GpuViewConfig *config);
 void GpuViewDestroy(GpuView *view);
 void GpuViewRegisterCallbacks(GpuView *view, GpuViewCallbacks *callbacks);
 float2 GpuViewViewportSize(GpuView *view);
 GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view);
 
-#endif // _GpuView_h
+#endif  // _GpuView_h

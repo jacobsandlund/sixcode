@@ -1,12 +1,14 @@
 #include "Os/Manager.c"
-#include "Os/ApplicationMock.c"
-#include "Os/ClockMock.c"
-#include "Os/ScreenMock.c"
-#include "Os/EventLoopMock.c"
-#include "Os/EventQueue.c"
-#include "Os/WindowMock.c"
+
 #include "Gpu/ViewMock.c"
 #include "Log/ManagerMock.c"
+#include "Os/ApplicationMock.c"
+#include "Os/ClockMock.c"
+#include "Os/EventLoopMock.c"
+#include "Os/EventQueue.c"
+#include "Os/ScreenMock.c"
+#include "Os/WindowMock.c"
+
 #include "Test.h"
 
 bool test_application_will_terminate_called = false;
@@ -36,7 +38,8 @@ Test(OsManagerInit)
     //=> 32
     _d(gOsManager.event_queue.safe_read_behind);
     //=> 24
-    _d(gOsManager.application->will_terminate == test_application_will_terminate);
+    _d(gOsManager.application->will_terminate ==
+       test_application_will_terminate);
     //=> 1
 
     OsManagerDestroy();
@@ -44,7 +47,7 @@ Test(OsManagerInit)
 
 Test(os_manager_window_init_and_finish_launching)
 {
-    float2 screen_size = {2560, 1440};
+    float2 screen_size = { 2560, 1440 };
     os_screen_mock_init(screen_size);
     OsScreenFrame frame = OsScreenVisibleFrame();
     GpuView *view = GpuViewCreate(NULL, frame, &gGpuViewMockConfig);
@@ -79,7 +82,7 @@ Test(OsManagerEventLoopRun)
     OsManagerRegisterCallbacks(&test_manager_callbacks);
 
     OsEventLoop *loop = gOsManager.event_loop;
-    float2 location = {1300, 400};
+    float2 location = { 1300, 400 };
     os_event_loop_mock_next_event_location(loop, location);
     os_event_loop_mock_event_type(loop, OsEventTypeMouseMove);
     os_event_loop_mock_event_type(loop, OsEventTypeMouseClick);

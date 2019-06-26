@@ -1,12 +1,11 @@
 #include "Math/Quad.h"
+
 #include <math.h>
 
 bool QuadContains(Quad *q, int2 h)
 {
-    return (
-        q->min.x <= h.x && h.x <= q->max.x &&
-        q->min.y <= h.y && h.y <= q->max.y
-    );
+    return (q->min.x <= h.x && h.x <= q->max.x && q->min.y <= h.y &&
+            h.y <= q->max.y);
 }
 
 void QuadIntersect(Quad *out_q, Quad *a, Quad *b)
@@ -20,7 +19,7 @@ void QuadIntersect(Quad *out_q, Quad *a, Quad *b)
 void QuadToSizeQuad(SizeQuad *out_sq, Quad *q)
 {
     out_sq->min = q->min;
-    out_sq->size = (int2) {
+    out_sq->size = (int2){
         q->max.x - q->min.x + 1,
         q->max.y - q->min.y + 1,
     };
@@ -32,7 +31,7 @@ void SizeQuadEvenAlign(SizeQuad *out_sq, SizeQuad *sq)
     out_sq->min.x = sq->min.x;
     out_sq->min.y = sq->min.y & ~1;
     out_sq->size.x = sq->size.x;
-    out_sq->size.y = (i32) (sq->size.y + odd_row);
+    out_sq->size.y = (i32)(sq->size.y + odd_row);
 }
 
 i64 SizeQuadCapacity(SizeQuad *sq)

@@ -5,4 +5,4 @@ if [[ $1 == 'help' ]]; then
     exit 0
 fi
 
-sed -i '' -E '/-test\.c|-test\.m|-mock\.c/d' $SPACETIME_PATH/Spacetime.xcodeproj/project.pbxproj
+sed -i '' -E '/Test\.c|Test\.m|Mock\.c/d' $SPACETIME_PATH/Spacetime.xcodeproj/project.pbxproj

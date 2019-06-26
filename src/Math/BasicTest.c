@@ -1,9 +1,10 @@
 #include "Math/Basic.h"
+
 #include "Test.h"
 
 Test(float2_int2_conversions)
 {
-    float2 v = {3.1, -42.7};
+    float2 v = { 3.1, -42.7 };
     _f2(v);
     //=> 3.1, -42.7
 
@@ -17,8 +18,8 @@ Test(float2_int2_conversions)
 
 Test(int2_math)
 {
-    int2 v1 = {3, -7};
-    int2 v2 = {5, 11};
+    int2 v1 = { 3, -7 };
+    int2 v2 = { 5, 11 };
 
     _i2(Int2Add(v1, v2));
     //=> 8, 4

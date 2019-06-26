@@ -5,4 +5,4 @@ typedef enum {
     GpuPixelFormatBGRA8Unorm_sRGB,
 } GpuPixelFormat;
 
-#endif // _GpuPixelFormat_h
+#endif  // _GpuPixelFormat_h

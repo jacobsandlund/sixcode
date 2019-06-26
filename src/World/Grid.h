@@ -1,8 +1,8 @@
 #ifndef _WorldGrid_h
 #define _WorldGrid_h
 
-#include "Spacetime.h"
 #include "Math/Quad.h"
+#include "Spacetime.h"
 
 typedef struct {
     Quad quad;
@@ -16,4 +16,4 @@ u8 WorldGridGet(WorldGrid *g, int2 h);
 void WorldGridSet(WorldGrid *g, int2 h, u8 style);
 void WorldGridClear(WorldGrid *g, int2 h);
 
-#endif // _WorldGrid_h
+#endif  // _WorldGrid_h

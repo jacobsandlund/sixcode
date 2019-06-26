@@ -1,7 +1,8 @@
-#include "Os/EventLoopMock.c"
-#include "Os/ClockMock.c"
-#include "Os/EventQueue.c"
 #include "Log/ManagerMock.c"
+#include "Os/ClockMock.c"
+#include "Os/EventLoopMock.c"
+#include "Os/EventQueue.c"
+
 #include "Test.h"
 
 Test(os_event_loop)
@@ -16,13 +17,13 @@ Test(os_event_loop)
     _d(loop->incoming_events.next_read_event_id);
     //=> 1
 
-    float2 location = {1300, 400};
+    float2 location = { 1300, 400 };
     os_event_loop_mock_next_event_location(loop, location);
     _f2(loop->next_incoming_event_location);
     //=> 1300, 400
 
     os_event_loop_mock_event_type(loop, OsEventTypeMouseMove);
-    location = (float2) {700, 800};
+    location = (float2){ 700, 800 };
     os_event_loop_mock_next_event_location(loop, location);
     os_event_loop_mock_event_type(loop, OsEventTypeMouseClick);
     os_event_loop_mock_event_type(loop, OsEventTypeTerminateLoop);

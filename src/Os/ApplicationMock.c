@@ -1,4 +1,5 @@
 #include "Os/Application.h"
+
 #include <stdlib.h>
 
 struct OsApplication {
@@ -23,7 +24,8 @@ void OsApplicationDestroy(OsApplication *app)
     free(app);
 }
 
-void OsApplicationRegisterCallbacks(OsApplication *app, OsApplicationCallbacks *callbacks)
+void OsApplicationRegisterCallbacks(OsApplication *app,
+                                    OsApplicationCallbacks *callbacks)
 {
     app->will_terminate = callbacks->will_terminate;
 }

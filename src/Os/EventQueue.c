@@ -1,11 +1,13 @@
 #include "Os/EventQueue.h"
+
+#include "Log/Manager.h"
+
 #include <assert.h>
 #include <stdlib.h>
-#include "Log/Manager.h"
 
 void OsEventQueueInit(OsEventQueue *eq, i64 length, i64 safe_length_remaining)
 {
-    assert(length && !(length & (length - 1)));    // Power of 2
+    assert(length && !(length & (length - 1)));  // Power of 2
     eq->next_read_event_id = 1;
     eq->next_write_event_id = 1;
     eq->index_mask = length - 1;
@@ -28,10 +30,12 @@ i64 OsEventQueueRead(OsEventQueue *eq, OsEvent *event)
     } else if (behind > eq->safe_read_behind) {
         i64 skipping = behind - eq->safe_read_behind;
         LogDefault(gLogManager.logs.os,
-                "Event queue read behind by %" PRId64
-                " above safe level of %" PRId64
-                ": skipping %" PRId64 " messages",
-                behind, eq->safe_read_behind, skipping);
+                   "Event queue read behind by %" PRId64
+                   " above safe level of %" PRId64 ": skipping %" PRId64
+                   " messages",
+                   behind,
+                   eq->safe_read_behind,
+                   skipping);
         eq->next_read_event_id += skipping;
     }
 

@@ -1,11 +1,13 @@
 #include "World/Grid.c"
+
 #include "Math/Quad.c"
+
 #include "Test.h"
 
 Test(world_grid_basics)
 {
-    int2 h1 = {5, 27};
-    int2 h2 = {48, 62};
+    int2 h1 = { 5, 27 };
+    int2 h2 = { 48, 62 };
     WorldGrid *wg = tmalloc(sizeof *wg);
 
     WorldGridInit(wg, 128);

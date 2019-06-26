@@ -13,7 +13,8 @@ typedef struct OsApplication OsApplication;
 
 OsApplication *OsApplicationCreate(void);
 void OsApplicationDestroy(OsApplication *app);
-void OsApplicationRegisterCallbacks(OsApplication *app, OsApplicationCallbacks *callbacks);
+void OsApplicationRegisterCallbacks(OsApplication *app,
+                                    OsApplicationCallbacks *callbacks);
 void OsApplicationFinishLaunching(OsApplication *app);
 
-#endif // _OsApplication_h
+#endif  // _OsApplication_h

@@ -10,4 +10,4 @@ typedef struct {
 
 OsScreenFrame OsScreenVisibleFrame(void);
 
-#endif // _OsScreen_h
+#endif  // _OsScreen_h

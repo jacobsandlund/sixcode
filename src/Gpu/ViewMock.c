@@ -1,4 +1,5 @@
 #include "Gpu/View.h"
+
 #include <stdlib.h>
 
 struct GpuView {
@@ -24,13 +25,13 @@ void gpu_view_mock_draw_in_view(GpuView *view)
 
 static void gpu_view_mock_noop_draw_in_view(GpuView *view)
 {
-    (void) view;
+    (void)view;
 }
 
 static void gpu_view_mock_noop_size_changed(GpuView *view, float2 viewport_size)
 {
-    (void) view;
-    (void) viewport_size;
+    (void)view;
+    (void)viewport_size;
 }
 
 GpuViewCallbacks gGpuViewMockNoopCallbacks = {
@@ -43,7 +44,9 @@ GpuViewConfig gGpuViewMockConfig = {
     .color_pixel_format = 1,
 };
 
-GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
+GpuView *GpuViewCreate(GpuDevice *device,
+                       OsScreenFrame frame,
+                       GpuViewConfig *config)
 {
     GpuView *view = malloc(sizeof *view);
 
@@ -78,7 +81,7 @@ GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
 {
     if (view->has_current_render_pass) {
         // Return an arbitrary pointer
-        return (GpuRenderPassConfig *) view;
+        return (GpuRenderPassConfig *)view;
     } else {
         return NULL;
     }

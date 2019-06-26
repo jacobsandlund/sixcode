@@ -1,4 +1,5 @@
 #include "Gpu/DeviceMock.c"
+
 #include "Test.h"
 
 Test(gpu_device)

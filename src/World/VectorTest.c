@@ -1,5 +1,7 @@
 #include "World/Vector.c"
+
 #include "Render/Layout.c"
+
 #include "Test.h"
 
 Test(WorldVectorRoundHex)
@@ -7,10 +9,10 @@ Test(WorldVectorRoundHex)
     RenderLayout l;
     RenderLayoutSetType(&l, RenderLayoutTypeHex);
 
-    float2 a = {0, 0};
-    float2 b = {0.5, -1};
-    float2 c = {-0.5, -1};
-    float2 d = {-14.5, 63};
+    float2 a = { 0, 0 };
+    float2 b = { 0.5, -1 };
+    float2 c = { -0.5, -1 };
+    float2 d = { -14.5, 63 };
     float2 closer_to_a = {
         a.x * 0.4 + b.x * 0.3 + c.x * 0.3,
         a.y * 0.4 + b.y * 0.3 + c.y * 0.3,
@@ -49,10 +51,10 @@ Test(WorldVectorRoundRect)
     RenderLayout l;
     RenderLayoutSetType(&l, RenderLayoutTypeRect);
 
-    float2 a = {0, 0};
-    float2 b = {1, -1};
-    float2 c = {0, -1};
-    float2 d = {-15, 63};
+    float2 a = { 0, 0 };
+    float2 b = { 1, -1 };
+    float2 c = { 0, -1 };
+    float2 d = { -15, 63 };
     float2 closer_to_a = {
         a.x * 0.6 + b.x * 0.4,
         a.y * 0.6 + b.y * 0.4,

@@ -5,7 +5,5 @@ if [[ $1 == 'help' ]]; then
     exit 0
 fi
 
-$SPACETIME_PATH/bin/format
-$SPACETIME_PATH/bin/build
-$SPACETIME_PATH/bin/test
-$SPACETIME_PATH/bin/valgrind
+cd $SPACETIME_PATH
+clang-format -i $(bin/ls all)

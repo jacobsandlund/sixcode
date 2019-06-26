@@ -1,8 +1,8 @@
 #ifndef _CameraManager_h
 #define _CameraManager_h
 
-#include "Spacetime.h"
 #include "Camera/Camera.h"
+#include "Spacetime.h"
 
 typedef struct {
     float3 position;
@@ -17,4 +17,4 @@ extern CameraManager gCameraManager;
 void CameraManagerInit(CameraManagerConfig *config);
 void CameraManagerDestroy(void);
 
-#endif // _CameraManager_h
+#endif  // _CameraManager_h

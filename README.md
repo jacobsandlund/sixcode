@@ -7,10 +7,19 @@ To run all tests, use `st test`. All lines starting with `//=> ` are added autom
 If you are using Vim, the following `.vimrc` lines add a keyboard shortcut (`<leader>r`) to run the test file and reload any changes, as well as a shortcut to `git add --patch` (`<leader>a`) a file.
 
 ``` vim
-" spacetime configs:
+""""""""""""""""""""
+" Spacetime configs:
 command -nargs=0 RunSpacetime execute 'silent !$SPACETIME_PATH/bin/test --no-diff % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
 nnoremap <leader>r :w<CR>:RunSpacetime<CR>:e!<CR>
 
 command -nargs=0 GitAddPatch execute 'silent !git add --intent-to-add -- % && git add --patch -- %' | redraw!
 nnoremap <leader>a :w<CR>:GitAddPatch<CR>
+
+function! ClangFormat()
+  let l:formatdiff = 1
+  pyf /usr/local/share/clang/clang-format.py
+endfunction
+
+autocmd BufWritePre *.h,*.c,*.m,*.cc,*.cpp call ClangFormat()
+""""""""""""""""""""
 ```

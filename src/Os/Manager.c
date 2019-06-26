@@ -5,8 +5,8 @@ OsManager gOsManager;
 void OsManagerInit(OsManagerConfig *config)
 {
     OsEventQueueInit(&gOsManager.event_queue,
-            config->event_queue_length,
-            config->event_queue_safe_length_remaining);
+                     config->event_queue_length,
+                     config->event_queue_safe_length_remaining);
 
     gOsManager.application = OsApplicationCreate();
 
@@ -22,7 +22,8 @@ void OsManagerDestroy(void)
 
 void OsManagerRegisterCallbacks(OsManagerCallbacks *callbacks)
 {
-    OsApplicationRegisterCallbacks(gOsManager.application, &callbacks->application);
+    OsApplicationRegisterCallbacks(gOsManager.application,
+                                   &callbacks->application);
 }
 
 void OsManagerWindowInit(GpuView *view)

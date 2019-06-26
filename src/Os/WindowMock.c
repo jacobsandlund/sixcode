@@ -1,4 +1,5 @@
 #include "Os/Window.h"
+
 #include <stdlib.h>
 
 struct OsWindow {

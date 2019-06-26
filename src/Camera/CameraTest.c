@@ -1,20 +1,22 @@
 #include "Camera/Camera.c"
+
 #include "Render/Layout.c"
 #include "Render/Vector.c"
 #include "Render/Viewport.h"
 #include "World/Vector.c"
+
 #include "Test.h"
 
 Test(CameraTranslate)
 {
     Camera c = {
-        .position = {500, -2000, 20.0},
+        .position = { 500, -2000, 20.0 },
     };
     RenderViewport vp = {
-        .size = {1000, 600},
+        .size = { 1000, 600 },
     };
     RenderLayoutSetType(&vp.layout, RenderLayoutTypeHex);
-    float2 delta = {300, 400};
+    float2 delta = { 300, 400 };
 
     CameraTranslate(&c, &vp, delta);
 
@@ -25,10 +27,10 @@ Test(CameraTranslate)
 Test(CameraZoomAtScreenVector)
 {
     Camera c = {
-        .position = {500, -2000, 20.0},
+        .position = { 500, -2000, 20.0 },
     };
     RenderViewport vp = {
-        .size = {1000, 600},
+        .size = { 1000, 600 },
     };
     RenderLayoutSetType(&vp.layout, RenderLayoutTypeHex);
 
@@ -37,7 +39,7 @@ Test(CameraZoomAtScreenVector)
     _f3(c.position);
     //=> 504.811, -1996.67, 30
 
-    v = (float2) {300, 400};
+    v = (float2){ 300, 400 };
     CameraZoomAtScreenVector(&c, &vp, v, 10.0);
 
     _f3(c.position);

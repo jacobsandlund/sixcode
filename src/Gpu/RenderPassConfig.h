@@ -3,4 +3,4 @@
 
 typedef struct GpuRenderPassConfig GpuRenderPassConfig;
 
-#endif // _GpuRenderPassConfig_h
+#endif  // _GpuRenderPassConfig_h

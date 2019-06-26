@@ -2,9 +2,9 @@
 
 @import AppKit;
 
+#import <os/log.h>
 #import <stdarg.h>
 #import <stdio.h>
-#import <os/log.h>
 
 #define MacLogBufferLength 4096
 
@@ -20,8 +20,8 @@ Log *LogCreate(LogConfig *config)
 {
     Log *log;
     @autoreleasepool {
-        ;cn
-        log = (__bridge_retained Log *)os_log;
+        ;
+        cn log = (__bridge_retained Log *)os_log;
     }
     return log;
 }
@@ -37,11 +37,11 @@ void LogDestroy(Log *log)
 void LogAtLevel(Log *log, LogLevel level, const char *format, ...)
 {
     static char log_buffer[MacLogBufferLength];
-	va_list argptr;
-	va_start(argptr, format);
+    va_list argptr;
+    va_start(argptr, format);
 
-    os_log_t os_log = (__bridge os_log_t) log;
-    i32 log_type = MacLogTypeLookup[(i32) level];
+    os_log_t os_log = (__bridge os_log_t)log;
+    i32 log_type = MacLogTypeLookup[(i32)level];
     vsnprintf(log_buffer, MacLogBufferLength, format, argptr);
     os_log_with_type(os_log, log_type, "%{public}s", log_buffer);
 

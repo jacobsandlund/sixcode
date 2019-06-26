@@ -1,9 +1,9 @@
 #ifndef _GpuPipelineState_h
 #define _GpuPipelineState_h
 
-#include "spacetime.h"
 #include "gpu/device.h"
 #include "gpu/function.h"
+#include "spacetime.h"
 
 typedef struct {
     char *label;
@@ -14,7 +14,8 @@ typedef struct {
 
 typedef struct GpuPipelineState GpuPipelineState;
 
-GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device, GpuPipelineStateConfig *config);
+GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device,
+                                         GpuPipelineStateConfig *config);
 void GpuPipelineStateDestroy(GpuPipelineState *state);
 
-#endif // _GpuPipelineState_h
+#endif  // _GpuPipelineState_h

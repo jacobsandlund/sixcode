@@ -1,8 +1,8 @@
 #ifndef _LogManager_h
 #define _LogManager_h
 
-#include "Spacetime.h"
 #include "Log/Log.h"
+#include "Spacetime.h"
 
 typedef struct {
     LogConfig os;
@@ -39,4 +39,4 @@ extern LogManager gLogManager;
 void LogManagerInit(LogManagerConfig *config);
 void log_manager_destroy(void);
 
-#endif // _LogManager_h
+#endif  // _LogManager_h

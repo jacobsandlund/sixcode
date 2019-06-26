@@ -1,4 +1,5 @@
 #include "World/Grid.h"
+
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -7,9 +8,9 @@
 void WorldGridInit(WorldGrid *wg, i32 size)
 {
     i32 half_size = size / 2;
-    wg->quad = (Quad) {
-        {-half_size, -half_size},
-        {half_size - 1, half_size - 1},
+    wg->quad = (Quad){
+        { -half_size, -half_size },
+        { half_size - 1, half_size - 1 },
     };
     quad_to_size_quad(&wg->size_quad, &wg->quad);
     i64 capacity = SizeQuadCapacity(&wg->size_quad);

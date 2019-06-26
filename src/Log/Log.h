@@ -21,4 +21,4 @@ Log *LogCreate(LogConfig *config);
 void LogDestroy(Log *log);
 void LogAtLevel(Log *log, LogLevel level, const char *format, ...);
 
-#endif // _Log_h
+#endif  // _Log_h

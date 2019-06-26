@@ -1,6 +1,8 @@
 #include "Engine/Manager.c"
 
+// clang-format off
 // From: bin/ls ManagerTest.c | grep -v 'Engine/ManagerTest\.c' | xargs grep -h '#include' | grep -v 'Test\.h' | sort -u
+// clang-format on
 #include "Camera/Camera.c"
 #include "Camera/Manager.c"
 #include "Gpu/DeviceMock.c"
@@ -27,7 +29,7 @@
 
 Test(engine_manager)
 {
-    float2 screen_size = {1920, 1080};
+    float2 screen_size = { 1920, 1080 };
     os_screen_mock_init(screen_size);
     os_clock_mock_init(12345, 321);
 
@@ -40,7 +42,7 @@ Test(engine_manager)
     //=> 0, 0
 
     GpuView *view = gGpuManager.view;
-    float2 viewport_size = {2560, 1440};
+    float2 viewport_size = { 2560, 1440 };
     gpu_view_mock_size_changed(view, viewport_size);
 
     _f2(gRenderManager.viewport.size);
@@ -52,7 +54,7 @@ Test(engine_manager)
     //=> 1
 
     OsEventLoop *loop = gOsManager.event_loop;
-    float2 location = {1300, 400};
+    float2 location = { 1300, 400 };
     os_event_loop_mock_next_event_location(loop, location);
     os_event_loop_mock_event_type(loop, OsEventTypeMouseMove);
     os_event_loop_mock_event_type(loop, OsEventTypeMouseClick);

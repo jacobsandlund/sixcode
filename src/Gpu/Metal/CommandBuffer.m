@@ -7,7 +7,7 @@ GpuCommandBuffer *GpuCommandBufferCreate(GpuCommandQueue *queue)
     GpuCommandBuffer *buffer;
 
     @autoreleasepool {
-        id<MTLCommandQueue> mtl_queue = (__bridge id<MTLCommandQueue)queue;
+        id<MTLCommandQueue> mtl_queue = (__bridge id<MTLCommandQueue>)queue;
         id<MTLCommandBuffer> mtl_buffer = [mtl_queue commandBuffer];
         buffer = (__bridge_retained GpuCommandBuffer *)mtl_buffer;
     }
@@ -18,7 +18,8 @@ GpuCommandBuffer *GpuCommandBufferCreate(GpuCommandQueue *queue)
 void GpuCommandBufferDestroy(GpuCommandBuffer *buffer)
 {
     @autoreleasepool {
-        id<MTLCommandBuffer> mtl_buffer = (__bridge_transfer id<MTLCommandBuffer>)buffer;
+        id<MTLCommandBuffer> mtl_buffer =
+                (__bridge_transfer id<MTLCommandBuffer>)buffer;
         mtl_buffer = nil;
     }
 }

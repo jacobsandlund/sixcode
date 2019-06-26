@@ -1,4 +1,5 @@
 #include "Render/Manager.h"
+
 #include "Render/Layout.h"
 
 RenderManager gRenderManager;
@@ -16,6 +17,6 @@ void RenderManagerDestroy(void)
 
 void RenderManagerSizeChanged(GpuView *view, float2 viewport_size)
 {
-    (void) view;
+    (void)view;
     gRenderManager.viewport.size = viewport_size;
 }

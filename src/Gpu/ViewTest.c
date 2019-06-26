@@ -1,5 +1,6 @@
-#include "Gpu/ViewMock.c"
 #include "Gpu/DeviceMock.c"
+#include "Gpu/ViewMock.c"
+
 #include "Test.h"
 
 float2 test_view_size;
@@ -7,26 +8,26 @@ bool test_draw_in_view_called;
 
 void test_size_changed(GpuView *view, float2 viewport_size)
 {
-    (void) view;
+    (void)view;
     test_view_size = viewport_size;
 }
 
 void test_draw_in_view(GpuView *view)
 {
-    (void) view;
+    (void)view;
     test_draw_in_view_called = true;
 }
 
 Test(gpu_view)
 {
-    float2 old_viewport_size = {1920, 1080};
-    float2 new_viewport_size = {2560, 1920};
+    float2 old_viewport_size = { 1920, 1080 };
+    float2 new_viewport_size = { 2560, 1920 };
     GpuViewConfig config = {
         .preferred_frames_per_second = 60,
         .color_pixel_format = 2,
     };
     OsScreenFrame visible_frame = {
-        .origin = {0, 0},
+        .origin = { 0, 0 },
         .size = old_viewport_size,
     };
     GpuDevice *device = GpuDeviceCreate();
@@ -77,7 +78,7 @@ Test(gpu_view_mock_config)
     // Doesn't blow up
 
     gpu_view_mock_draw_in_view(view);
-    float2 size = {3, 4};
+    float2 size = { 3, 4 };
     gpu_view_mock_size_changed(view, size);
 
     GpuViewDestroy(view);

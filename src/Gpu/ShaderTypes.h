@@ -13,4 +13,4 @@ typedef struct {
     float4 color;
 } GpuVertex;
 
-#endif // _GpuShaderTypes_h
+#endif  // _GpuShaderTypes_h

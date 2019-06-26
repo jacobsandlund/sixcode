@@ -1,12 +1,12 @@
 #ifndef _OsManager_h
 #define _OsManager_h
 
-#include "Spacetime.h"
-#include "Os/EventQueue.h"
-#include "Os/EventLoop.h"
-#include "Os/Application.h"
-#include "Os/Window.h"
 #include "Gpu/view.h"
+#include "Os/Application.h"
+#include "Os/EventLoop.h"
+#include "Os/EventQueue.h"
+#include "Os/Window.h"
+#include "Spacetime.h"
 
 typedef struct {
     i64 event_queue_length;
@@ -34,4 +34,4 @@ void OsManagerWindowDestroy(void);
 void OsManagerFinishLaunching(void);
 void OsManagerEventLoopRun(void);
 
-#endif // _OsManager_h
+#endif  // _OsManager_h

@@ -18,4 +18,4 @@ typedef struct {
     float2 location;
 } OsEvent;
 
-#endif // _OsEvent_h
+#endif  // _OsEvent_h

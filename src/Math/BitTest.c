@@ -1,4 +1,5 @@
 #include "Math/Bit.h"
+
 #include "Test.h"
 
 Test(BitHighestBit)

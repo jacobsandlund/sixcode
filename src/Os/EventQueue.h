@@ -1,8 +1,8 @@
 #ifndef _OsEventQueue_h
 #define _OsEventQueue_h
 
-#include "Spacetime.h"
 #include "Os/Event.h"
+#include "Spacetime.h"
 
 typedef struct {
     i64 next_read_event_id;
@@ -22,4 +22,4 @@ static inline void OsEventQueueWrite(OsEventQueue *eq, OsEvent *event)
     eq->events[eq->next_write_event_id++ & eq->index_mask] = *event;
 }
 
-#endif // _OsEventQueue_h
+#endif  // _OsEventQueue_h

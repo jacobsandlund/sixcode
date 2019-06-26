@@ -5,4 +5,4 @@
 
 u64 OsClockTime(void);
 
-#endif // _OsClock_h
+#endif  // _OsClock_h

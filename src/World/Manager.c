@@ -1,7 +1,9 @@
 #include "World/Manager.h"
+
+#include "Os/Clock.h"
+
 #include <math.h>
 #include <stdlib.h>
-#include "Os/Clock.h"
 
 #define WorldManagerHexFillMin 1
 #define WorldManagerHexFillMax 15
@@ -20,7 +22,7 @@ void WorldManagerDestroy(void)
 
 void WorldManagerLoadRandom(i64 count)
 {
-    srand((unsigned int) OsClockTime());
+    srand((unsigned int)OsClockTime());
     i64 style = 0;
 
     WorldGrid *g = &gWorldManager.grid;
@@ -35,8 +37,8 @@ void WorldManagerLoadRandom(i64 count)
     };
 
     for (i64 i = 0; i < count; i++) {
-        double rand1 = (double) rand() / (double) RAND_MAX;
-        double rand2 = (double) rand() / (double) RAND_MAX;
+        double rand1 = (double)rand() / (double)RAND_MAX;
+        double rand2 = (double)rand() / (double)RAND_MAX;
         int2 h = {
             floor(rand1 * size.x) - half_size.x,
             floor(rand2 * size.y) - half_size.y,

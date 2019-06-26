@@ -1,4 +1,5 @@
 #include "Os/Clock.h"
+
 #include <time.h>
 
 u64 OsClockTime(void)

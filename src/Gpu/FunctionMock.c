@@ -1,4 +1,5 @@
 #include "Gpu/Function.h"
+
 #include <stdlib.h>
 
 struct GpuFunction {
@@ -8,7 +9,7 @@ struct GpuFunction {
 GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name)
 {
     GpuFunction *function = malloc(sizeof *function);
-    function->name = (char *) name;
+    function->name = (char *)name;
     return function;
 }
 

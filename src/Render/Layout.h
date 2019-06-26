@@ -17,4 +17,4 @@ typedef struct {
 
 void RenderLayoutSetType(RenderLayout *rl, RenderLayoutType type);
 
-#endif // _RenderLayout_h
+#endif  // _RenderLayout_h

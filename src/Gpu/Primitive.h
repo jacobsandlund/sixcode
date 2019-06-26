@@ -5,4 +5,4 @@ typedef enum {
     GpuPrimitiveTypeTriangle,
 } GpuPrimitiveType;
 
-#endif // _GpuPrimitive_h
+#endif  // _GpuPrimitive_h

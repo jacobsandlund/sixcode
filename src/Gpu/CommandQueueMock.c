@@ -1,4 +1,5 @@
 #include "Gpu/CommandQueue.h"
+
 #include <stdlib.h>
 
 struct GpuCommandQueue {

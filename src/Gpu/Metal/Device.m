@@ -2,26 +2,25 @@
 
 @import MetalKit;
 
-#import <stdlib.h>
 #import "Log/Manager.h"
+
+#import <stdlib.h>
 
 GpuDevice *GpuDeviceCreate(void)
 {
     GpuDevice *device;
 
     @autoreleasepool {
+        id<MTLDevice> mtl_device = MTLCreateSystemDefaultDevice();
+        if (!mtl_device) {
+            LogDefault(gLogManager.logs.gpu,
+                       "Metal is not supported on this device");
+            abort();
+            return NULL;
+        }
 
-    id<MTLDevice> mtl_device = MTLCreateSystemDefaultDevice();
-    if (!mtl_device) {
-        LogDefault(gLogManager.logs.gpu,
-                "Metal is not supported on this device");
-        abort();
-        return NULL;
+        device = (__bridge_retained GpuDevice *)mtl_device;
     }
-
-    device = (__bridge_retained GpuDevice *)mtl_device;
-
-    } // @autoreleasepool
 
     return device;
 }

@@ -1,4 +1,5 @@
 #include "Log/LogMock.c"
+
 #include "Test.h"
 
 Test(log)

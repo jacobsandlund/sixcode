@@ -9,7 +9,10 @@ void RenderViewMatrixInit(float4x4 *vm)
     }
 }
 
-void RenderViewMatrixUpdate(float4x4 *vm, RenderViewport *viewport, float3 *camera, float2 draw_offset)
+void RenderViewMatrixUpdate(float4x4 *vm,
+                            RenderViewport *viewport,
+                            float3 *camera,
+                            float2 draw_offset)
 {
     double scale_x = viewport->layout.scale.x / viewport->size.x;
     double scale_y = viewport->layout.scale.y / viewport->size.y;

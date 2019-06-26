@@ -1,6 +1,8 @@
 #include "Gpu/Renderer.c"
+
 #include "Gpu/DeviceMock.c"
 #include "Gpu/ViewMock.c"
+
 #include "Test.h"
 
 GpuRenderer *renderer;
@@ -23,8 +25,8 @@ GpuViewCallbacks test_callbacks = {
 Test(gpu_renderer)
 {
     OsScreenFrame frame = {
-        .origin = {0, 0},
-        .size = {640, 480},
+        .origin = { 0, 0 },
+        .size = { 640, 480 },
     };
 
     GpuDevice *device = GpuDeviceCreate();

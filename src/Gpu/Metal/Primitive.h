@@ -3,4 +3,4 @@
 
 extern const i32 GpuMetalPrimitiveTypeLookup[];
 
-#endif // _GpuMetalPrimitive_h
+#endif  // _GpuMetalPrimitive_h

@@ -1,7 +1,6 @@
 #ifndef _GpuRenderer_h
 #define _GpuRenderer_h
 
-#include "spacetime.h"
 #include "Gpu/Buffer.h"
 #include "Gpu/CommandBuffer.h"
 #include "Gpu/CommandEncoder.h"
@@ -11,6 +10,7 @@
 #include "Gpu/PipelineState.h"
 #include "Gpu/PixelFormat.h"
 #include "Gpu/View.h"
+#include "spacetime.h"
 
 typedef struct {
     float2 viewport_size;
@@ -26,9 +26,16 @@ typedef struct {
     i64 num_vertices;
 } GpuRenderer;
 
-void GpuRendererInit(GpuRenderer *renderer, GpuDevice *device, GpuView *view, GpuRendererConfig *config);
+void GpuRendererInit(GpuRenderer *renderer,
+                     GpuDevice *device,
+                     GpuView *view,
+                     GpuRendererConfig *config);
 void GpuRendererDestroy(GpuRenderer *renderer);
-void GpuRendererDrawInView(GpuRenderer *renderer, GpuView *view, GpuCommandQueue *queue);
-void GpuRendererSizeChanged(GpuRenderer *renderer, GpuView *view, float2 viewport_size);
+void GpuRendererDrawInView(GpuRenderer *renderer,
+                           GpuView *view,
+                           GpuCommandQueue *queue);
+void GpuRendererSizeChanged(GpuRenderer *renderer,
+                            GpuView *view,
+                            float2 viewport_size);
 
-#endif // _GpuRenderer_h
+#endif  // _GpuRenderer_h

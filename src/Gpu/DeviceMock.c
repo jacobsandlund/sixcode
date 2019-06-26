@@ -1,4 +1,5 @@
 #include "Gpu/Device.h"
+
 #include <stdlib.h>
 
 struct GpuDevice {

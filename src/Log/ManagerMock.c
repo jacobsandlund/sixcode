@@ -1,5 +1,5 @@
-#include "Log/Manager.c"
 #include "Log/LogMock.c"
+#include "Log/Manager.c"
 
 LogManagerConfig gLogManagerMockConfig = {
     .logs = {

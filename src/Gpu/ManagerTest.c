@@ -1,7 +1,9 @@
 #include "Gpu/Manager.c"
-#include "Gpu/ViewMock.c"
+
 #include "Gpu/DeviceMock.c"
 #include "Gpu/Renderer.c"
+#include "Gpu/ViewMock.c"
+
 #include "Test.h"
 
 Test(gpu_manager)
@@ -15,11 +17,11 @@ Test(gpu_manager)
         .view = {
             .draw_in_view = GpuManagerDrawInView,
             .size_changed = GpuManagerSizeChanged,
-        }
+        },
     };
     OsScreenFrame visible_frame = {
-        .origin = {0, 0},
-        .size = {640, 480},
+        .origin = { 0, 0 },
+        .size = { 640, 480 },
     };
 
     GpuManagerInit(visible_frame, &config);

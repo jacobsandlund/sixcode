@@ -1,5 +1,6 @@
-#include "Os/WindowMock.c"
 #include "Gpu/ViewMock.c"
+#include "Os/WindowMock.c"
+
 #include "Test.h"
 
 Test(os_window)

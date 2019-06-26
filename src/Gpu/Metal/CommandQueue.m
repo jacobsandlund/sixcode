@@ -18,7 +18,8 @@ GpuCommandQueue *GpuCommandQueueCreate(GpuDevice *device)
 void GpuCommandQueueDestroy(GpuCommandQueue *queue)
 {
     @autoreleasepool {
-        id<MTLCommandQueue> mtl_queue = (__bridge_transfer id<MTLCommandQueue>)queue;
+        id<MTLCommandQueue> mtl_queue =
+                (__bridge_transfer id<MTLCommandQueue>)queue;
         mtl_queue = nil;
     }
 }

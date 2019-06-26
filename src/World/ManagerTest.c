@@ -1,7 +1,9 @@
 #include "World/Manager.c"
+
 #include "Math/Quad.c"
 #include "Os/ClockMock.c"
 #include "World/Grid.c"
+
 #include "Test.h"
 
 Test(WorldManagerInit__WorldManagerLoadRandom)

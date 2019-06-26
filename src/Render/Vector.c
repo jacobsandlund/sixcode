@@ -1,5 +1,7 @@
 #include "Render/Vector.h"
+
 #include "World/Vector.h"
+
 #include <math.h>
 #include <stdlib.h>
 
@@ -11,45 +13,49 @@ static const double RenderVectorDoubleEpsilon = 1e-9;
 float2 RenderVectorScreenToWorld(RenderViewport *vp, float3 *camera, float2 v)
 {
     float2 v_moved = {
-         v.x - vp->size.x / 2.0f,
+        v.x - vp->size.x / 2.0f,
         -v.y + vp->size.y / 2.0f,
     };
 
     float2 v_scaled = {
-        (double) v_moved.x / vp->layout.scale.x / (double) camera->z,
-        (double) v_moved.y / vp->layout.scale.y / (double) camera->z,
+        (double)v_moved.x / vp->layout.scale.x / (double)camera->z,
+        (double)v_moved.y / vp->layout.scale.y / (double)camera->z,
     };
 
-    return (float2) {
+    return (float2){
         v_scaled.x + camera->x,
         v_scaled.y + camera->y,
     };
 }
 
-static void RenderVectorViewportToWorldQuadHex(RenderViewport *vp, float3 *camera, Quad *out_q)
+static void RenderVectorViewportToWorldQuadHex(RenderViewport *vp,
+                                               float3 *camera,
+                                               Quad *out_q)
 {
-    float2 top_left_point = {-1, -1};
+    float2 top_left_point = { -1, -1 };
     float2 bottom_right_point = {
         vp->size.x + 1,
         vp->size.y + 1,
     };
     float2 top_left = RenderVectorScreenToWorld(vp, camera, top_left_point);
-    float2 bottom_right = RenderVectorScreenToWorld(vp, camera, bottom_right_point);
+    float2 bottom_right =
+            RenderVectorScreenToWorld(vp, camera, bottom_right_point);
 
     i64 top = floor(top_left.y);
     i64 double_left = floor(2.0 * top_left.x);
     i64 bottom = floor(bottom_right.y);
-    i64 double_right = ceil(2.0 * (double) bottom_right.x + RenderVectorDoubleEpsilon);
+    i64 double_right =
+            ceil(2.0 * (double)bottom_right.x + RenderVectorDoubleEpsilon);
 
     top += top_left.y - top > RenderVectorHexBottomPointCutoff;
     bottom += bottom_right.y - bottom > RenderVectorHexTopPointCutoff;
 
-    out_q->min = (int2) {(i32) (double_left >> 1), (i32) top};
-    out_q->max = (int2) {(i32) (double_right >> 1), (i32) bottom};
+    out_q->min = (int2){ (i32)(double_left >> 1), (i32)top };
+    out_q->max = (int2){ (i32)(double_right >> 1), (i32)bottom };
 
     if (double_right - double_left <= 2 || bottom - top <= 2) {
-        float2 top_right = {bottom_right.x, top_left.y};
-        float2 bottom_left = {top_left.x, bottom_right.y};
+        float2 top_right = { bottom_right.x, top_left.y };
+        float2 bottom_left = { top_left.x, bottom_right.y };
 
         int2 top_left_hex = WorldVectorRoundHex(top_left);
         int2 top_right_hex = WorldVectorRoundHex(top_right);
@@ -74,9 +80,11 @@ static void RenderVectorViewportToWorldQuadHex(RenderViewport *vp, float3 *camer
     }
 }
 
-static void RenderVectorViewportToWorldQuadRect(RenderViewport *vp, float3 *camera, Quad *out_q)
+static void RenderVectorViewportToWorldQuadRect(RenderViewport *vp,
+                                                float3 *camera,
+                                                Quad *out_q)
 {
-    float2 top_left_point = {-1, -1};
+    float2 top_left_point = { -1, -1 };
     float2 bottom_right_point = {
         vp->size.x + 1,
         vp->size.y + 1,
@@ -88,7 +96,9 @@ static void RenderVectorViewportToWorldQuadRect(RenderViewport *vp, float3 *came
             RenderVectorScreenToWorld(vp, camera, bottom_right_point));
 }
 
-void RenderVectorViewportToWorldQuad(RenderViewport *vp, float3 *camera, Quad *out_q)
+void RenderVectorViewportToWorldQuad(RenderViewport *vp,
+                                     float3 *camera,
+                                     Quad *out_q)
 {
     switch (vp->layout.type) {
     case RenderLayoutTypeHex:

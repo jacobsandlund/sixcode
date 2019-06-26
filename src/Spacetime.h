@@ -1,9 +1,9 @@
 #ifndef _Spacetime_h
 #define _Spacetime_h
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <inttypes.h>
 
 typedef int_fast32_t i32f;
 typedef uint_fast32_t u32f;
@@ -17,7 +17,7 @@ typedef uint16_t u16;
 typedef int8_t i8;
 typedef uint8_t u8;
 
-typedef u64 sid;    // String id
+typedef u64 sid;  // String id
 
 #if __APPLE__
 
@@ -77,4 +77,4 @@ typedef struct {
 
 #endif
 
-#endif // _Spacetime_h
+#endif  // _Spacetime_h

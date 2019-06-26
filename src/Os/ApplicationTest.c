@@ -1,4 +1,5 @@
 #include "Os/ApplicationMock.c"
+
 #include "test.h"
 
 static bool called_will_terminate = false;

@@ -1,17 +1,18 @@
 #import "Gpu/Metal/View.h"
+
 #import "Log/Manager.h"
 
 const i64 MetalViewColorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 
 static void gpu_view_noop_draw_in_view(GpuView *view)
 {
-    (void) view;
+    (void)view;
 }
 
 static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
 {
-    (void) view;
-    (void) viewport_size;
+    (void)view;
+    (void)viewport_size;
 }
 
 @implementation ViewDelegate {
@@ -19,7 +20,8 @@ static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
     GpuViewSizeChangedFn _size_changed;
 }
 
-- (instancetype)initWithMtkView:(MTKView *)mtk_view config:(GpuViewConfig *)config {
+- (instancetype)initWithMtkView:(MTKView *)mtk_view
+                         config:(GpuViewConfig *)config {
     (void)config;
 
     self = [super init];
@@ -41,11 +43,14 @@ static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
 
 - (void)mtkView:(MTKView *)mtk_view drawableSizeWillChange:(CGSize)size {
     _mtk_view = mtk_view;
-    _viewport_size = (float2) {
+    _viewport_size = (float2){
         (float)size.width,
         (float)size.height,
     };
-    LogDebug(gLogManager.logs.os, "drawableSizeWillChange %g, %g", _viewport_size.x, _viewport_size.y);
+    LogDebug(gLogManager.logs.os,
+             "drawableSizeWillChange %g, %g",
+             _viewport_size.x,
+             _viewport_size.y);
 
     _size_changed((__bridge GpuView *)self, _viewport_size);
 }
@@ -57,32 +62,29 @@ static void gpu_view_noop_size_changed(GpuView *view, float2 viewport_size)
 
 @end
 
-GpuView *GpuViewCreate(GpuDevice *device, OsScreenFrame frame, GpuViewConfig *config)
+GpuView *GpuViewCreate(GpuDevice *device,
+                       OsScreenFrame frame,
+                       GpuViewConfig *config)
 {
     GpuView *view;
 
     @autoreleasepool {
+        id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
 
-    id<MTLDevice> mtl_device = (__bridge id<MTLDevice>)device;
+        NSRect ns_frame = NSMakeRect(
+                frame.origin.x, frame.origin.y, frame.size.x, frame.size.y);
 
-    NSRect ns_frame = NSMakeRect(
-            frame.origin.x,
-            frame.origin.y,
-            frame.size.x,
-            frame.size.y);
+        MTKView *mtk_view = [[MTKView alloc] initWithFrame:ns_frame
+                                                    device:mtl_device];
+        mtk_view.colorPixelFormat = config->color_pixel_format;
+        mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;
 
-    MTKView *mtk_view = [[MTKView alloc] initWithFrame: ns_frame
-            device: mtl_device];
-    mtk_view.colorPixelFormat = config->color_pixel_format;
-    mtk_view.preferredFramesPerSecond = config->preferred_frames_per_second;
+        ViewDelegate *delegate = [[ViewDelegate alloc] initWithMtkView:mtk_view
+                                                                config:config];
+        mtk_view.delegate = delegate;
 
-    ViewDelegate *delegate = [[ViewDelegate alloc]
-            initWithMtkView:mtk_view config:config];
-    mtk_view.delegate = delegate;
-
-    view = (__bridge_retained GpuView *)delegate;
-
-    } // @autoreleasepool
+        view = (__bridge_retained GpuView *)delegate;
+    }
 
     return view;
 }
@@ -112,5 +114,6 @@ GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
 
     // TODO: check if needs to be retained
-    return (__bridge GpuRenderPassConfig *)delegate.mtk_view.currentRenderPassDescriptor;
+    return (__bridge GpuRenderPassConfig *)
+            delegate.mtk_view.currentRenderPassDescriptor;
 }

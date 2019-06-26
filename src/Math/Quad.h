@@ -19,4 +19,4 @@ void QuadToSizeQuad(SizeQuad *out_sq, Quad *q);
 void SizeQuadEvenAlign(SizeQuad *out_sq, SizeQuad *sq);
 i64 SizeQuadCapacity(SizeQuad *sq);
 
-#endif // _Quad_h
+#endif  // _Quad_h

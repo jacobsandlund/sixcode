@@ -1,4 +1,5 @@
 #include "Gpu/PipelineState.h"
+
 #include <stdlib.h>
 
 struct GpuPipelineState {
@@ -8,7 +9,8 @@ struct GpuPipelineState {
     i64 pixel_format;
 };
 
-GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device, GpuPipelineStateConfig *config)
+GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device,
+                                         GpuPipelineStateConfig *config)
 {
     GpuPipelineState *state = malloc(sizeof *state);
     state->label = config->label;

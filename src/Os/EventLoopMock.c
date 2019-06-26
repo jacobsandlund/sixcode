@@ -1,6 +1,7 @@
-#include "Os/EventLoop.h"
-#include <stdlib.h>
 #include "Os/Clock.h"
+#include "Os/EventLoop.h"
+
+#include <stdlib.h>
 
 struct OsEventLoop {
     float2 next_incoming_event_location;
@@ -27,13 +28,13 @@ void os_event_loop_mock_event_type(OsEventLoop *loop, OsEventType event_type)
 OsEventLoop *OsEventLoopCreate(void)
 {
     OsEventLoop *loop = malloc(sizeof *loop);
-    loop->next_incoming_event_location = (float2) {
+    loop->next_incoming_event_location = (float2){
         0.0,
         0.0,
     };
     OsEventQueueInit(&loop->incoming_events,
-            OsEventLoopMockNumEvents,
-            OsEventLoopMockEventsSafeLengthRemaining);
+                     OsEventLoopMockNumEvents,
+                     OsEventLoopMockEventsSafeLengthRemaining);
 
     return loop;
 }
@@ -49,9 +50,8 @@ void OsEventLoopRun(OsEventLoop *loop, OsEventQueue *queue)
     OsEventQueue *incoming = &loop->incoming_events;
     OsEvent i_event;
 
-    while (
-            OsEventQueueRead(incoming, &i_event) > 0 &&
-            i_event.type != OsEventTypeTerminateLoop) {
+    while (OsEventQueueRead(incoming, &i_event) > 0 &&
+           i_event.type != OsEventTypeTerminateLoop) {
         OsEvent event = {
             .type = i_event.type,
             .time = OsClockTime(),

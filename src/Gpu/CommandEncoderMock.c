@@ -1,4 +1,5 @@
 #include "Gpu/CommandEncoder.h"
+
 #include <stdlib.h>
 
 struct GpuCommandEncoder {
@@ -20,18 +21,21 @@ struct GpuCommandEncoder {
     i64 draw_vertex_count;
 };
 
-void GpuCommandEncoderBeginRenderEncoding(GpuCommandEncoder **encoder, GpuCommandBuffer *buffer, GpuRenderPassConfig *render_pass_config)
+void GpuCommandEncoderBeginRenderEncoding(
+        GpuCommandEncoder **encoder,
+        GpuCommandBuffer *buffer,
+        GpuRenderPassConfig *render_pass_config)
 {
     *encoder = malloc(sizeof *encoder);
 
-    **encoder = (GpuCommandEncoder) {};
+    **encoder = (GpuCommandEncoder){};
     encoder->buffer = buffer;
     encoder->render_pass_config = render_pass_config;
 }
 
 void GpuCommandEncoderLabel(GpuCommandEncoder *encoder, const char *label)
 {
-    encoder->label = (char *) label;
+    encoder->label = (char *)label;
 }
 
 void GpuCommandEncoderEndEncoding(GpuCommandEncoder *encoder)
