@@ -1,4 +1,4 @@
-#include "Gpu/Renderer.c"
+#include "Render/Renderer.c"
 
 #include "Gpu/BufferMock.c"
 #include "Gpu/CmdMock.c"
@@ -10,25 +10,28 @@
 #include "Gpu/PipelineStateMock.c"
 #include "Gpu/RenderPassConfigMock.c"
 #include "Gpu/ViewMock.c"
+#include "Render/Layout.c"
 
 #include "Test.h"
 
-GpuRenderer renderer;
+RenderViewport viewport;
+Renderer renderer;
 GpuCommandQueue *queue;
 
-void TestGpuRendererDrawInViewFn(GpuView *view)
+void TestRendererDrawInViewFn(GpuView *view)
 {
-    GpuRendererDrawInView(&renderer, view, queue);
+    RendererDrawInView(&renderer, view, &viewport, queue);
 }
 
-void TestGpuRendererSizeChangedFn(GpuView *view, float2 viewport_size)
+void TestRendererSizeChangedFn(GpuView *view, float2 viewport_size)
 {
-    GpuRendererSizeChanged(&renderer, view, viewport_size);
+    (void)view;
+    viewport.size = viewport_size;
 }
 
 GpuViewCallbacks test_callbacks = {
-    .draw_in_view = TestGpuRendererDrawInViewFn,
-    .size_changed = TestGpuRendererSizeChangedFn,
+    .draw_in_view = TestRendererDrawInViewFn,
+    .size_changed = TestRendererSizeChangedFn,
 };
 
 Test(gpu_renderer)
@@ -43,11 +46,16 @@ Test(gpu_renderer)
 
     queue = GpuCommandQueueCreate(device);
 
-    GpuRendererConfig config = {
-        .viewport_size = GpuViewViewportSize(view),
-        .pixel_format = GpuPixelFormatBGRA8Unorm_sRGB,
+    RendererConfig config = {
+        .view = {
+            .color_pixel_format = GpuPixelFormatBGRA8Unorm_sRGB,
+        },
     };
-    GpuRendererInit(&renderer, device, &config);
+
+    RenderViewportLayout(&viewport, RenderLayoutTypeHex);
+    viewport.size = GpuViewViewportSize(view);
+
+    RendererInit(&renderer, device, &config);
 
     GpuViewRegisterCallbacks(view, &test_callbacks);
 
@@ -56,7 +64,7 @@ Test(gpu_renderer)
     _d(gGpuCommandEncoderMock.draw_vertex_count);
     //=> 2250
 
-    GpuRendererDestroy(&renderer);
+    RendererDestroy(&renderer);
 
     GpuCommandQueueDestroy(queue);
     GpuViewDestroy(view);

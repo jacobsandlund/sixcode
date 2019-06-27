@@ -54,7 +54,9 @@ fi
 
 check_single() {
     test_file=$1
-    output_file="$out/valgrind-output/$test_file.txt"
+
+    test_file_relative="${test_file/$SPACETIME_PATH\//}"
+    output_file="$out/valgrind-output/$test_file_relative.txt"
     if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
         echo
         echo '!! NOT CLEAN'
@@ -70,7 +72,8 @@ valgrind_single() {
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    output_file="$out/valgrind-output/$test_file.txt"
+    test_file_relative="${test_file/$SPACETIME_PATH\//}"
+    output_file="$out/valgrind-output/$test_file_relative.txt"
     mkdir -p $(dirname $output_file)
     echo st valgrind "$@" > $output_file
     echo >> $output_file
@@ -124,8 +127,9 @@ elif [[ $valgrind_mode == 'all' ]]; then
     mv -f $out/valgrind-output $out/valgrind-output-previous
 
     for test_file in $($bin/ls docker 'Test.c'); do
-        output_file="$out/valgrind-output/$test_file.txt"
-        previous_file="$out/valgrind-output-previous/$test_file.txt"
+        test_file_relative="${test_file/$SPACETIME_PATH\//}"
+        output_file="$out/valgrind-output/$test_file_relative.txt"
+        previous_file="$out/valgrind-output-previous/$test_file_relative.txt"
         mkdir -p $(dirname $output_file)
         test -f $previous_file && cp $previous_file $output_file
     done

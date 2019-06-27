@@ -1,5 +1,6 @@
-#include "Gpu/ViewMock.c"
 #include "Os/WindowMock.c"
+
+#include "Gpu/ViewMock.c"
 
 #include "Test.h"
 

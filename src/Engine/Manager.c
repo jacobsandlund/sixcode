@@ -12,8 +12,8 @@ EngineManagerCallbacks gEngineManagerCallbacks = {
     },
     .gpu = {
         .view = {
-            .draw_in_view = GpuManagerDrawInView,
-            .size_changed = GpuManagerSizeChanged,
+            .draw_in_view = RenderManagerDrawInView,
+            .size_changed = RenderManagerSizeChanged,
         },
     },
 };
@@ -74,6 +74,7 @@ void EngineManagerInit(EngineManagerCallbacks *callbacks,
     OsManagerWindowInit(gGpuManager.view);
     DEBUG_EngineProfileEnd("OsManagerWindowInit");
 
+    config->render.renderer.view = config->gpu.view;
     RenderManagerInit(&config->render);
     DEBUG_EngineProfileEnd("RenderManagerInit");
 

@@ -1,6 +1,7 @@
+#include "Os/EventLoopMock.c"
+
 #include "Log/ManagerMock.c"
 #include "Os/ClockMock.c"
-#include "Os/EventLoopMock.c"
 #include "Os/EventQueue.c"
 
 #include "Test.h"

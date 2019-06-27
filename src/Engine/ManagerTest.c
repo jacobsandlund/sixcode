@@ -16,7 +16,6 @@
 #include "Gpu/Manager.c"
 #include "Gpu/PipelineStateMock.c"
 #include "Gpu/RenderPassConfigMock.c"
-#include "Gpu/Renderer.c"
 #include "Gpu/ViewMock.c"
 #include "Log/ManagerMock.c"
 #include "Math/Quad.c"
@@ -29,6 +28,7 @@
 #include "Os/WindowMock.c"
 #include "Render/Layout.c"
 #include "Render/Manager.c"
+#include "Render/Renderer.c"
 #include "Render/Vector.c"
 #include "World/Grid.c"
 #include "World/Manager.c"
@@ -48,14 +48,14 @@ Test(EngineManager)
     EngineManagerInit(&gEngineManagerCallbacks, &gEngineManagerConfig);
 
     _f2(gRenderManager.viewport.size);
-    //=> 0, 0
+    //=> 1920, 1080
 
     GpuView *view = gGpuManager.view;
     float2 viewport_size = { 2560, 1440 };
     GpuViewMockSizeChanged(view, viewport_size);
 
     _f2(gRenderManager.viewport.size);
-    //=> 0, 0
+    //=> 2560, 1440
 
     GpuViewMockDrawInView(view);
 

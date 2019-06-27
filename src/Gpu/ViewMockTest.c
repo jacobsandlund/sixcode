@@ -1,5 +1,7 @@
-#include "Gpu/DeviceMock.c"
 #include "Gpu/ViewMock.c"
+
+#include "Gpu/DeviceMock.c"
+#include "Gpu/RenderPassConfigMock.c"
 
 #include "Test.h"
 
@@ -60,8 +62,12 @@ Test(gpu_view)
     _d(test_draw_in_view_called);
     //=> 1
 
-    _d(GpuViewCurrentRenderPassConfig(view) != NULL);
+    GpuRenderPassConfig *render_pass_config =
+            GpuViewCurrentRenderPassConfig(view);
+    _d(render_pass_config != NULL);
     //=> 1
+    GpuRenderPassConfigDestroy(render_pass_config);
+
     view->has_current_render_pass = false;
     _d(GpuViewCurrentRenderPassConfig(view) != NULL);
     //=> 0

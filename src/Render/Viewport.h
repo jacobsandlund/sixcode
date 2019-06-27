@@ -10,4 +10,10 @@ typedef struct {
     float2 size;
 } RenderViewport;
 
+static inline void RenderViewportLayout(RenderViewport *viewport,
+                                        RenderLayoutType type)
+{
+    RenderLayoutSetType(&viewport->layout, type);
+}
+
 #endif  // _Viewport_h

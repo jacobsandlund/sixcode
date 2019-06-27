@@ -1,18 +1,29 @@
 #include "Render/Manager.h"
 
-#include "Render/Layout.h"
+#include "Gpu/Manager.h"
 
 RenderManager gRenderManager;
 
 void RenderManagerInit(RenderManagerConfig *config)
 {
-    RenderLayoutSetType(&gRenderManager.viewport.layout, config->layout_type);
-    gRenderManager.viewport.size = config->viewport_size;
+    RenderViewportLayout(&gRenderManager.viewport, config->layout_type);
+    gRenderManager.viewport.size = GpuViewViewportSize(gGpuManager.view);
+
+    RendererInit(
+            &gRenderManager.renderer, gGpuManager.device, &config->renderer);
 }
 
 void RenderManagerDestroy(void)
 {
-    // Do nothing
+    RendererDestroy(&gRenderManager.renderer);
+}
+
+void RenderManagerDrawInView(GpuView *view)
+{
+    RendererDrawInView(&gRenderManager.renderer,
+                       view,
+                       &gRenderManager.viewport,
+                       gGpuManager.command_queue);
 }
 
 void RenderManagerSizeChanged(GpuView *view, float2 viewport_size)

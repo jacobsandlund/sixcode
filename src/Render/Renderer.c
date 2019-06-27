@@ -1,4 +1,4 @@
-#include "Gpu/Renderer.h"
+#include "Render/Renderer.h"
 
 #include "Gpu/Cmd.h"
 #include "Gpu/Primitive.h"
@@ -7,11 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void GpuRendererInit(GpuRenderer *renderer,
-                     GpuDevice *device,
-                     GpuRendererConfig *config)
+void RendererInit(Renderer *renderer, GpuDevice *device, RendererConfig *config)
 {
-    renderer->viewport_size = config->viewport_size;
     renderer->vertex_function =
             GpuFunctionCreateWithName(device, "vertex_shader");
     renderer->fragment_function =
@@ -21,7 +18,7 @@ void GpuRendererInit(GpuRenderer *renderer,
         .label = "Simple Pipeline",
         .vertex_function = renderer->vertex_function,
         .fragment_function = renderer->fragment_function,
-        .pixel_format = config->pixel_format,
+        .pixel_format = config->view.color_pixel_format,
     };
 
     renderer->pipeline_state =
@@ -75,7 +72,7 @@ void GpuRendererInit(GpuRenderer *renderer,
     }
 }
 
-void GpuRendererDestroy(GpuRenderer *renderer)
+void RendererDestroy(Renderer *renderer)
 {
     GpuBufferDestroy(renderer->vertex_buffer);
     GpuPipelineStateDestroy(renderer->pipeline_state);
@@ -83,9 +80,10 @@ void GpuRendererDestroy(GpuRenderer *renderer)
     GpuFunctionDestroy(renderer->vertex_function);
 }
 
-void GpuRendererDrawInView(GpuRenderer *renderer,
-                           GpuView *view,
-                           GpuCommandQueue *queue)
+void RendererDrawInView(Renderer *renderer,
+                        GpuView *view,
+                        RenderViewport *viewport,
+                        GpuCommandQueue *queue)
 {
     GpuCommandBuffer *command_buffer = GpuCommandBufferCreate(queue);
     GpuRenderPassConfig *render_pass_config =
@@ -97,7 +95,7 @@ void GpuRendererDrawInView(GpuRenderer *renderer,
                 &encoder, command_buffer, render_pass_config);
         GpuCommandEncoderLabel(encoder, "MyRenderEncoder");
 
-        GpuCmdSetViewport(encoder, renderer->viewport_size);
+        GpuCmdSetViewport(encoder, viewport->size);
 
         GpuCmdSetPipelineState(encoder, renderer->pipeline_state);
 
@@ -105,8 +103,8 @@ void GpuRendererDrawInView(GpuRenderer *renderer,
                 encoder, renderer->vertex_buffer, 0, GpuVertexIndexVertices);
 
         GpuCmdBindVertexBytes(encoder,
-                              &renderer->viewport_size,
-                              sizeof(renderer->viewport_size),
+                              &viewport->size,
+                              sizeof(viewport->size),
                               GpuVertexIndexViewportSize);
 
         GpuCmdDrawPrimitives(
@@ -119,12 +117,4 @@ void GpuRendererDrawInView(GpuRenderer *renderer,
 
     GpuCommandBufferCommit(command_buffer);
     GpuCommandBufferDestroy(command_buffer);
-}
-
-void GpuRendererSizeChanged(GpuRenderer *renderer,
-                            GpuView *view,
-                            float2 viewport_size)
-{
-    (void)view;
-    renderer->viewport_size = viewport_size;
 }

@@ -9,10 +9,20 @@
 #include "Gpu/FunctionMock.c"
 #include "Gpu/PipelineStateMock.c"
 #include "Gpu/RenderPassConfigMock.c"
-#include "Gpu/Renderer.c"
 #include "Gpu/ViewMock.c"
 
 #include "Test.h"
+
+void TestDrawInView(GpuView *view)
+{
+    (void)view;
+}
+
+void TestSizeChanged(GpuView *view, float2 viewport_size)
+{
+    (void)view;
+    (void)viewport_size;
+}
 
 Test(gpu_manager)
 {
@@ -24,8 +34,8 @@ Test(gpu_manager)
     };
     GpuManagerCallbacks callbacks = {
         .view = {
-            .draw_in_view = GpuManagerDrawInView,
-            .size_changed = GpuManagerSizeChanged,
+            .draw_in_view = TestDrawInView,
+            .size_changed = TestSizeChanged,
         },
     };
     OsScreenFrame visible_frame = {
@@ -35,18 +45,17 @@ Test(gpu_manager)
 
     GpuManagerInit(visible_frame, &config);
 
-    _d(gGpuManager.renderer.pipeline_state->device == gGpuManager.device);
+    _d(gGpuManager.view->device == gGpuManager.device);
+    //=> 1
+    _d(gGpuManager.command_queue->device == gGpuManager.device);
     //=> 1
 
     GpuManagerRegisterCallbacks(&callbacks);
 
-    _d(gGpuManager.view->draw_in_view == GpuManagerDrawInView);
+    _d(gGpuManager.view->draw_in_view == TestDrawInView);
     //=> 1
-
-    GpuViewMockDrawInView(gGpuManager.view);
-
-    _d(gGpuCommandEncoderMock.draw_vertex_count);
-    //=> 2250
+    _d(gGpuManager.view->size_changed == TestSizeChanged);
+    //=> 1
 
     GpuManagerDestroy();
 }

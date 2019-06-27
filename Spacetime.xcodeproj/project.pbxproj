@@ -19,7 +19,6 @@
 		6550DBBB22C41FE200E67E11 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB3622C41FE100E67E11 /* Device.m */; };
 		6550DBBC22C41FE200E67E11 /* View.m in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB3722C41FE100E67E11 /* View.m */; };
 		6550DBBD22C41FE200E67E11 /* CommandBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB3822C41FE100E67E11 /* CommandBuffer.m */; };
-		6550DBC822C41FE200E67E11 /* Renderer.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB4C22C41FE200E67E11 /* Renderer.c */; };
 		6550DBC922C41FE200E67E11 /* Manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB4D22C41FE200E67E11 /* Manager.c */; };
 		6550DBCD22C41FE200E67E11 /* Manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB5822C41FE200E67E11 /* Manager.c */; };
 		6550DBCE22C41FE200E67E11 /* Camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DB5922C41FE200E67E11 /* Camera.c */; };
@@ -45,6 +44,7 @@
 		6550DC0022C41FE200E67E11 /* Manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DBAF22C41FE200E67E11 /* Manager.c */; };
 		656A1126228DFA2800DCAD49 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 656A1125228DFA2800DCAD49 /* MetalKit.framework */; };
 		659AAF9822C53FDE00D66260 /* RenderPassConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 659AAF9722C53FDD00D66260 /* RenderPassConfig.m */; };
+		65D0F0CD22C563A9005F63DB /* Renderer.c in Sources */ = {isa = PBXBuildFile; fileRef = 65D0F0CC22C563A9005F63DB /* Renderer.c */; };
 		65DA5D9A22BD9B9E005FB5F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65DA5D9722BD9B9E005FB5F1 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -70,13 +70,11 @@
 		6550DB3922C41FE100E67E11 /* PixelFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PixelFormat.h; sourceTree = "<group>"; };
 		6550DB3A22C41FE100E67E11 /* CommandEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandEncoder.h; sourceTree = "<group>"; };
 		6550DB3C22C41FE100E67E11 /* Manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manager.h; sourceTree = "<group>"; };
-		6550DB3F22C41FE100E67E11 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
 		6550DB4122C41FE100E67E11 /* CommandBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandBuffer.h; sourceTree = "<group>"; };
 		6550DB4422C41FE100E67E11 /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
 		6550DB4522C41FE100E67E11 /* ShaderTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		6550DB4722C41FE100E67E11 /* Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Buffer.h; sourceTree = "<group>"; };
 		6550DB4922C41FE200E67E11 /* PipelineState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PipelineState.h; sourceTree = "<group>"; };
-		6550DB4C22C41FE200E67E11 /* Renderer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Renderer.c; sourceTree = "<group>"; };
 		6550DB4D22C41FE200E67E11 /* Manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Manager.c; sourceTree = "<group>"; };
 		6550DB4E22C41FE200E67E11 /* CommandQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandQueue.h; sourceTree = "<group>"; };
 		6550DB4F22C41FE200E67E11 /* Cmd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cmd.h; sourceTree = "<group>"; };
@@ -135,6 +133,8 @@
 		6550DBAF22C41FE200E67E11 /* Manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Manager.c; sourceTree = "<group>"; };
 		656A1125228DFA2800DCAD49 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		659AAF9722C53FDD00D66260 /* RenderPassConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RenderPassConfig.m; sourceTree = "<group>"; };
+		65D0F0CB22C563A9005F63DB /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		65D0F0CC22C563A9005F63DB /* Renderer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Renderer.c; sourceTree = "<group>"; };
 		65DA5D9722BD9B9E005FB5F1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65DA5D9822BD9B9E005FB5F1 /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
 		65DA5D9922BD9B9E005FB5F1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -197,13 +197,11 @@
 				6550DB2A22C41FE100E67E11 /* Metal */,
 				6550DB3A22C41FE100E67E11 /* CommandEncoder.h */,
 				6550DB3C22C41FE100E67E11 /* Manager.h */,
-				6550DB3F22C41FE100E67E11 /* Renderer.h */,
 				6550DB4122C41FE100E67E11 /* CommandBuffer.h */,
 				6550DB4422C41FE100E67E11 /* View.h */,
 				6550DB4522C41FE100E67E11 /* ShaderTypes.h */,
 				6550DB4722C41FE100E67E11 /* Buffer.h */,
 				6550DB4922C41FE200E67E11 /* PipelineState.h */,
-				6550DB4C22C41FE200E67E11 /* Renderer.c */,
 				6550DB4D22C41FE200E67E11 /* Manager.c */,
 				6550DB4E22C41FE200E67E11 /* CommandQueue.h */,
 				6550DB4F22C41FE200E67E11 /* Cmd.h */,
@@ -250,6 +248,8 @@
 		6550DB5A22C41FE200E67E11 /* Render */ = {
 			isa = PBXGroup;
 			children = (
+				65D0F0CC22C563A9005F63DB /* Renderer.c */,
+				65D0F0CB22C563A9005F63DB /* Renderer.h */,
 				6550DB5B22C41FE200E67E11 /* Layout.c */,
 				6550DB5D22C41FE200E67E11 /* Viewport.h */,
 				6550DB5E22C41FE200E67E11 /* Vector.c */,
@@ -472,6 +472,7 @@
 				6550DBF722C41FE200E67E11 /* Window.m in Sources */,
 				6550DBC922C41FE200E67E11 /* Manager.c in Sources */,
 				6550DBE122C41FE200E67E11 /* main.c in Sources */,
+				65D0F0CD22C563A9005F63DB /* Renderer.c in Sources */,
 				6550DBB922C41FE200E67E11 /* Primitive.m in Sources */,
 				6550DBBA22C41FE200E67E11 /* CommandEncoder.m in Sources */,
 				6550DBEA22C41FE200E67E11 /* Manager.c in Sources */,
@@ -479,7 +480,6 @@
 				659AAF9822C53FDE00D66260 /* RenderPassConfig.m in Sources */,
 				6550DBD622C41FE200E67E11 /* ViewMatrix.c in Sources */,
 				6550DBBD22C41FE200E67E11 /* CommandBuffer.m in Sources */,
-				6550DBC822C41FE200E67E11 /* Renderer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
