@@ -2,7 +2,7 @@
 
 @import MetalKit;
 
-GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name)
+GpuFunction *GpuFunctionCreateWithName(GpuDevice *device, const char *name)
 {
     GpuFunction *function;
 
@@ -19,7 +19,7 @@ GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name)
     return function;
 }
 
-void gpu_function_destroy(GpuFunction *function)
+void GpuFunctionDestroy(GpuFunction *function)
 {
     @autoreleasepool {
         id<MTLFunction> mtl_function =

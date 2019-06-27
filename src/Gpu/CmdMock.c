@@ -1,12 +1,18 @@
-#include "Gpu/CommandEncoderMock.c"
+#include "Gpu/CommandEncoderMock.h"
+
+#include <assert.h>
 
 void GpuCmdSetViewport(GpuCommandEncoder *encoder, float2 viewport_size)
 {
+    assert(gGpuCommandEncoderMockState ==
+           GpuCommandEncoderMockStateRenderEncoding);
     encoder->viewport_size = viewport_size;
 }
 
 void GpuCmdSetPipelineState(GpuCommandEncoder *encoder, GpuPipelineState *state)
 {
+    assert(gGpuCommandEncoderMockState ==
+           GpuCommandEncoderMockStateRenderEncoding);
     encoder->pipeline_state = state;
 }
 
@@ -15,6 +21,8 @@ void GpuCmdBindVertexBuffer(GpuCommandEncoder *encoder,
                             i32 offset,
                             i32 index)
 {
+    assert(gGpuCommandEncoderMockState ==
+           GpuCommandEncoderMockStateRenderEncoding);
     encoder->vertex_buffer = buffer;
     encoder->vertex_buffer_offset = offset;
     encoder->vertex_buffer_index = index;
@@ -25,6 +33,8 @@ void GpuCmdBindVertexBytes(GpuCommandEncoder *encoder,
                            i32 length,
                            i32 index)
 {
+    assert(gGpuCommandEncoderMockState ==
+           GpuCommandEncoderMockStateRenderEncoding);
     encoder->vertex_bytes = bytes;
     encoder->vertex_bytes_length = length;
     encoder->vertex_bytes_index = index;
@@ -35,6 +45,8 @@ void GpuCmdDrawPrimitives(GpuCommandEncoder *encoder,
                           i64 vertex_start,
                           i64 vertex_count)
 {
+    assert(gGpuCommandEncoderMockState ==
+           GpuCommandEncoderMockStateRenderEncoding);
     encoder->draw_primitive_type = primitive_type;
     encoder->draw_vertex_start = vertex_start;
     encoder->draw_vertex_count = vertex_count;

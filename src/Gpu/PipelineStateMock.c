@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 struct GpuPipelineState {
+    GpuDevice *device;
     char *label;
     GpuFunction *vertex_function;
     GpuFunction *fragment_function;
@@ -13,6 +14,7 @@ GpuPipelineState *GpuPipelineStateCreate(GpuDevice *device,
                                          GpuPipelineStateConfig *config)
 {
     GpuPipelineState *state = malloc(sizeof *state);
+    state->device = device;
     state->label = config->label;
     state->vertex_function = config->vertex_function;
     state->fragment_function = config->fragment_function;

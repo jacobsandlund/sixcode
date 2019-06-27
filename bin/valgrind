@@ -100,7 +100,7 @@ elif [[ $valgrind_mode == 'summary' ]]; then
     find $out/valgrind-output -type f | xargs cat | grep -E 'valgrind|heap usage'
 elif [[ $valgrind_mode == 'check' ]]; then
     if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-        for test_file in $($bin/ls docker $test_dir 'test.c'); do
+        for test_file in $($bin/ls docker $test_dir 'Test.c'); do
             echo "st valgrind check $test_file"
             check_single $test_file
         done
@@ -123,14 +123,14 @@ elif [[ $valgrind_mode == 'all' ]]; then
     rm -rf $out/valgrind-output-previous
     mv -f $out/valgrind-output $out/valgrind-output-previous
 
-    for test_file in $($bin/ls docker 'test.c'); do
+    for test_file in $($bin/ls docker 'Test.c'); do
         output_file="$out/valgrind-output/$test_file.txt"
         previous_file="$out/valgrind-output-previous/$test_file.txt"
         mkdir -p $(dirname $output_file)
         test -f $previous_file && cp $previous_file $output_file
     done
 
-    for test_file in $($bin/ls docker $test_dir 'test.c'); do
+    for test_file in $($bin/ls docker $test_dir 'Test.c'); do
         echo st valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done

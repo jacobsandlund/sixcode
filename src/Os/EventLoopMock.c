@@ -1,5 +1,6 @@
-#include "Os/Clock.h"
 #include "Os/EventLoop.h"
+
+#include "Os/Clock.h"
 
 #include <stdlib.h>
 

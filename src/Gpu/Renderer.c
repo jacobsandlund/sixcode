@@ -13,9 +13,9 @@ void GpuRendererInit(GpuRenderer *renderer,
 {
     renderer->viewport_size = config->viewport_size;
     renderer->vertex_function =
-            gpu_function_create_with_name(device, "vertex_shader");
+            GpuFunctionCreateWithName(device, "vertex_shader");
     renderer->fragment_function =
-            gpu_function_create_with_name(device, "fragment_shader");
+            GpuFunctionCreateWithName(device, "fragment_shader");
 
     GpuPipelineStateConfig pipeline_state_config = {
         .label = "Simple Pipeline",
@@ -64,8 +64,9 @@ void GpuRendererInit(GpuRenderer *renderer,
                 for (i32f vertex_in_quad = 0;
                      vertex_in_quad < NumVerticesPerQuad;
                      vertex_in_quad++) {
-                    current_quad[vertex_in_quad].position +=
-                            upper_left_position;
+                    GpuVertex *current_vertex = &current_quad[vertex_in_quad];
+                    current_vertex->position.x += upper_left_position.x;
+                    current_vertex->position.y += upper_left_position.y;
                 }
 
                 current_quad += NumVerticesPerQuad;
@@ -78,8 +79,8 @@ void GpuRendererDestroy(GpuRenderer *renderer)
 {
     GpuBufferDestroy(renderer->vertex_buffer);
     GpuPipelineStateDestroy(renderer->pipeline_state);
-    gpu_function_destroy(renderer->fragment_function);
-    gpu_function_destroy(renderer->vertex_function);
+    GpuFunctionDestroy(renderer->fragment_function);
+    GpuFunctionDestroy(renderer->vertex_function);
 }
 
 void GpuRendererDrawInView(GpuRenderer *renderer,
@@ -116,6 +117,7 @@ void GpuRendererDrawInView(GpuRenderer *renderer,
     }
 
     GpuCommandBufferCommit(command_buffer);
+    GpuCommandBufferDestroy(command_buffer);
 }
 
 void GpuRendererSizeChanged(GpuRenderer *renderer,

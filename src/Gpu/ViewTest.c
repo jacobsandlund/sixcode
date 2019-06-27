@@ -48,14 +48,14 @@ Test(gpu_view)
     };
     GpuViewRegisterCallbacks(view, &callbacks);
 
-    gpu_view_mock_size_changed(view, new_viewport_size);
+    GpuViewMockSizeChanged(view, new_viewport_size);
 
     _f2(GpuViewViewportSize(view));
     //=> 2560, 1920
     _f2(test_view_size);
     //=> 2560, 1920
 
-    gpu_view_mock_draw_in_view(view);
+    GpuViewMockDrawInView(view);
 
     _d(test_draw_in_view_called);
     //=> 1
@@ -77,9 +77,9 @@ Test(gpu_view_mock_config)
 
     // Doesn't blow up
 
-    gpu_view_mock_draw_in_view(view);
+    GpuViewMockDrawInView(view);
     float2 size = { 3, 4 };
-    gpu_view_mock_size_changed(view, size);
+    GpuViewMockSizeChanged(view, size);
 
     GpuViewDestroy(view);
 }

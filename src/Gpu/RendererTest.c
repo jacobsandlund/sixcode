@@ -1,25 +1,33 @@
 #include "Gpu/Renderer.c"
 
+#include "Gpu/BufferMock.c"
+#include "Gpu/CmdMock.c"
+#include "Gpu/CommandBufferMock.c"
+#include "Gpu/CommandEncoderMock.c"
+#include "Gpu/CommandQueueMock.c"
 #include "Gpu/DeviceMock.c"
+#include "Gpu/FunctionMock.c"
+#include "Gpu/PipelineStateMock.c"
 #include "Gpu/ViewMock.c"
 
 #include "Test.h"
 
-GpuRenderer *renderer;
+GpuRenderer renderer;
+GpuCommandQueue *queue;
 
-void test_gpu_renderer_draw_in_view(GpuView *view)
+void TestGpuRendererDrawInViewFn(GpuView *view)
 {
-    GpuRendererDrawInView(renderer, view);
+    GpuRendererDrawInView(&renderer, view, queue);
 }
 
-void test_gpu_renderer_size_changed(GpuView *view, float2 viewport_size)
+void TestGpuRendererSizeChangedFn(GpuView *view, float2 viewport_size)
 {
-    GpuRendererSizeChanged(renderer, view, viewport_size);
+    GpuRendererSizeChanged(&renderer, view, viewport_size);
 }
 
 GpuViewCallbacks test_callbacks = {
-    .draw_in_view = test_gpu_renderer_draw_in_view,
-    .size_changed = test_gpu_renderer_size_changed,
+    .draw_in_view = TestGpuRendererDrawInViewFn,
+    .size_changed = TestGpuRendererSizeChangedFn,
 };
 
 Test(gpu_renderer)
@@ -32,13 +40,24 @@ Test(gpu_renderer)
     GpuDevice *device = GpuDeviceCreate();
     GpuView *view = GpuViewCreate(device, frame, &gGpuViewMockConfig);
 
-    float2 viewport_size = GpuViewViewportSize(view);
-    renderer = gpu_renderer_create(device, view, viewport_size);
+    queue = GpuCommandQueueCreate(device);
+
+    GpuRendererConfig config = {
+        .viewport_size = GpuViewViewportSize(view),
+        .pixel_format = GpuPixelFormatBGRA8Unorm_sRGB,
+    };
+    GpuRendererInit(&renderer, device, &config);
 
     GpuViewRegisterCallbacks(view, &test_callbacks);
 
-    GpuRendererDestroy(renderer);
+    GpuViewMockDrawInView(view);
 
+    _d(gGpuCommandEncoderMock.draw_vertex_count);
+    //=> 2250
+
+    GpuRendererDestroy(&renderer);
+
+    GpuCommandQueueDestroy(queue);
     GpuViewDestroy(view);
     GpuDeviceDestroy(device);
 }

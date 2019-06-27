@@ -1,12 +1,19 @@
 #include "Engine/Manager.c"
 
 // clang-format off
-// From: bin/ls ManagerTest.c | grep -v 'Engine/ManagerTest\.c' | xargs grep -h '#include' | grep -v 'Test\.h' | sort -u
+// From: st ls ManagerTest.c | grep -v 'Engine/ManagerTest\.c' | xargs grep -h '#include' | grep -v 'Test\.h' | sort -u
 // clang-format on
 #include "Camera/Camera.c"
 #include "Camera/Manager.c"
+#include "Gpu/BufferMock.c"
+#include "Gpu/CmdMock.c"
+#include "Gpu/CommandBufferMock.c"
+#include "Gpu/CommandEncoderMock.c"
+#include "Gpu/CommandQueueMock.c"
 #include "Gpu/DeviceMock.c"
+#include "Gpu/FunctionMock.c"
 #include "Gpu/Manager.c"
+#include "Gpu/PipelineStateMock.c"
 #include "Gpu/Renderer.c"
 #include "Gpu/ViewMock.c"
 #include "Log/ManagerMock.c"
@@ -27,7 +34,7 @@
 
 #include "Test.h"
 
-Test(engine_manager)
+Test(EngineManager)
 {
     float2 screen_size = { 1920, 1080 };
     os_screen_mock_init(screen_size);
@@ -43,15 +50,15 @@ Test(engine_manager)
 
     GpuView *view = gGpuManager.view;
     float2 viewport_size = { 2560, 1440 };
-    gpu_view_mock_size_changed(view, viewport_size);
+    GpuViewMockSizeChanged(view, viewport_size);
 
     _f2(gRenderManager.viewport.size);
     //=> 0, 0
 
-    gpu_view_mock_draw_in_view(view);
+    GpuViewMockDrawInView(view);
 
-    _d(gGpuManager.renderer->drew_in_view == view);
-    //=> 1
+    _d(gGpuCommandEncoderMock.draw_vertex_count);
+    //=> 2250
 
     OsEventLoop *loop = gOsManager.event_loop;
     float2 location = { 1300, 400 };
@@ -60,7 +67,7 @@ Test(engine_manager)
     os_event_loop_mock_event_type(loop, OsEventTypeMouseClick);
     os_event_loop_mock_event_type(loop, OsEventTypeTerminateLoop);
 
-    engine_manager_run();
+    EngineManagerRun();
 
     OsEventQueue *queue = &gOsManager.event_queue;
     OsEvent event;
@@ -72,7 +79,7 @@ Test(engine_manager)
     _f2(event.location);
     //=> 1300, 400
     _u64(event.time);
-    //=> 17802
+    //=> 17160
 
     _d(OsEventQueueRead(queue, &event));
     //=> 2
@@ -81,7 +88,7 @@ Test(engine_manager)
     _f2(event.location);
     //=> 1300, 400
     _u64(event.time);
-    //=> 18123
+    //=> 17481
 
     os_application_mock_terminate(gOsManager.application);
 }

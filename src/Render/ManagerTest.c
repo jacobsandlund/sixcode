@@ -50,7 +50,7 @@ Test(RenderManagerSizeChanged)
     };
 
     GpuViewRegisterCallbacks(view, &view_callbacks);
-    gpu_view_mock_size_changed(view, new_viewport_size);
+    GpuViewMockSizeChanged(view, new_viewport_size);
 
     _f2(gRenderManager.viewport.size);
     //=> 2560, 1920

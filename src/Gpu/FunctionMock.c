@@ -3,17 +3,19 @@
 #include <stdlib.h>
 
 struct GpuFunction {
+    GpuDevice *device;
     char *name;
 };
 
-GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name)
+GpuFunction *GpuFunctionCreateWithName(GpuDevice *device, const char *name)
 {
     GpuFunction *function = malloc(sizeof *function);
+    function->device = device;
     function->name = (char *)name;
     return function;
 }
 
-void gpu_function_destroy(GpuFunction *function)
+void GpuFunctionDestroy(GpuFunction *function)
 {
     free(function);
 }

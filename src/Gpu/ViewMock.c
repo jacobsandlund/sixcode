@@ -12,31 +12,31 @@ struct GpuView {
     bool has_current_render_pass;
 };
 
-void gpu_view_mock_size_changed(GpuView *view, float2 viewport_size)
+void GpuViewMockSizeChanged(GpuView *view, float2 viewport_size)
 {
     view->viewport_size = viewport_size;
     view->size_changed(view, viewport_size);
 }
 
-void gpu_view_mock_draw_in_view(GpuView *view)
+void GpuViewMockDrawInView(GpuView *view)
 {
     view->draw_in_view(view);
 }
 
-static void gpu_view_mock_noop_draw_in_view(GpuView *view)
+static void GpuViewMockNoopDrawInView(GpuView *view)
 {
     (void)view;
 }
 
-static void gpu_view_mock_noop_size_changed(GpuView *view, float2 viewport_size)
+static void GpuViewMockNoopSizeChanged(GpuView *view, float2 viewport_size)
 {
     (void)view;
     (void)viewport_size;
 }
 
 GpuViewCallbacks gGpuViewMockNoopCallbacks = {
-    .draw_in_view = gpu_view_mock_noop_draw_in_view,
-    .size_changed = gpu_view_mock_noop_size_changed,
+    .draw_in_view = GpuViewMockNoopDrawInView,
+    .size_changed = GpuViewMockNoopSizeChanged,
 };
 
 GpuViewConfig gGpuViewMockConfig = {
@@ -56,7 +56,7 @@ GpuView *GpuViewCreate(GpuDevice *device,
     view->has_current_render_pass = true;
 
     GpuViewRegisterCallbacks(view, &gGpuViewMockNoopCallbacks);
-    gpu_view_mock_size_changed(view, frame.size);
+    GpuViewMockSizeChanged(view, frame.size);
 
     return view;
 }

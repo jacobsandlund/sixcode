@@ -19,7 +19,8 @@ void GpuCommandEncoderBeginRenderEncoding(
 void GpuCommandEncoderLabel(GpuCommandEncoder *encoder, const char *label)
 {
     @autoreleasepool {
-        id<MTLCommandEncoder> mtl_encoder = (__bridge id<MTLCommandEncoder>)encoder;
+        id<MTLCommandEncoder> mtl_encoder =
+                (__bridge id<MTLCommandEncoder>)encoder;
         mtl_encoder.label = [NSString stringWithCString:label
                                                encoding:NSUTF8StringEncoding];
     }

@@ -6,7 +6,7 @@
 
 typedef struct GpuFunction GpuFunction;
 
-GpuFunction *gpu_function_create_with_name(GpuDevice *device, const char *name);
-void gpu_function_destroy(GpuFunction *function);
+GpuFunction *GpuFunctionCreateWithName(GpuDevice *device, const char *name);
+void GpuFunctionDestroy(GpuFunction *function);
 
 #endif  // _GpuFunction_h
