@@ -1,8 +1,9 @@
 #include "Engine/Manager.c"
 
-// clang-format off
-// From: st ls ManagerTest.c | grep -v 'Engine/ManagerTest\.c' | xargs grep -h '#include' | grep -v 'Test\.h' | sort -u
-// clang-format on
+// From:
+// st ls ManagerTest.c | grep -v 'Engine/ManagerTest\.c' |
+// xargs grep -h '#include' | grep -v 'Test\.h' | sort -u
+
 #include "Camera/Camera.c"
 #include "Camera/Manager.c"
 #include "Gpu/BufferMock.c"
@@ -14,6 +15,7 @@
 #include "Gpu/FunctionMock.c"
 #include "Gpu/Manager.c"
 #include "Gpu/PipelineStateMock.c"
+#include "Gpu/RenderPassConfigMock.c"
 #include "Gpu/Renderer.c"
 #include "Gpu/ViewMock.c"
 #include "Log/ManagerMock.c"

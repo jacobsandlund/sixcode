@@ -113,7 +113,6 @@ GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
 {
     ViewDelegate *delegate = (__bridge ViewDelegate *)view;
 
-    // TODO: check if needs to be retained
-    return (__bridge GpuRenderPassConfig *)
+    return (__bridge_retained GpuRenderPassConfig *)
             delegate.mtk_view.currentRenderPassDescriptor;
 }

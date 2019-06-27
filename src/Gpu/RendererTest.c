@@ -8,6 +8,7 @@
 #include "Gpu/DeviceMock.c"
 #include "Gpu/FunctionMock.c"
 #include "Gpu/PipelineStateMock.c"
+#include "Gpu/RenderPassConfigMock.c"
 #include "Gpu/ViewMock.c"
 
 #include "Test.h"

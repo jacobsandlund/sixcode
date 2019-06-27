@@ -81,7 +81,7 @@ GpuRenderPassConfig *GpuViewCurrentRenderPassConfig(GpuView *view)
 {
     if (view->has_current_render_pass) {
         // Return an arbitrary pointer
-        return (GpuRenderPassConfig *)view;
+        return malloc(1);
     } else {
         return NULL;
     }

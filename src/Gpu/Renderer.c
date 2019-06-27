@@ -114,6 +114,7 @@ void GpuRendererDrawInView(GpuRenderer *renderer,
 
         GpuCommandEncoderEndEncoding(encoder);
         GpuCommandBufferPresentDrawable(command_buffer, view);
+        GpuRenderPassConfigDestroy(render_pass_config);
     }
 
     GpuCommandBufferCommit(command_buffer);

@@ -44,6 +44,7 @@
 		6550DBFC22C41FE200E67E11 /* Manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DBA622C41FE200E67E11 /* Manager.c */; };
 		6550DC0022C41FE200E67E11 /* Manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 6550DBAF22C41FE200E67E11 /* Manager.c */; };
 		656A1126228DFA2800DCAD49 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 656A1125228DFA2800DCAD49 /* MetalKit.framework */; };
+		659AAF9822C53FDE00D66260 /* RenderPassConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 659AAF9722C53FDD00D66260 /* RenderPassConfig.m */; };
 		65DA5D9A22BD9B9E005FB5F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65DA5D9722BD9B9E005FB5F1 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -133,6 +134,7 @@
 		6550DBAD22C41FE200E67E11 /* Manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manager.h; sourceTree = "<group>"; };
 		6550DBAF22C41FE200E67E11 /* Manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Manager.c; sourceTree = "<group>"; };
 		656A1125228DFA2800DCAD49 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		659AAF9722C53FDD00D66260 /* RenderPassConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RenderPassConfig.m; sourceTree = "<group>"; };
 		65DA5D9722BD9B9E005FB5F1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65DA5D9822BD9B9E005FB5F1 /* Spacetime.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Spacetime.entitlements; sourceTree = "<group>"; };
 		65DA5D9922BD9B9E005FB5F1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 		6550DB2A22C41FE100E67E11 /* Metal */ = {
 			isa = PBXGroup;
 			children = (
+				659AAF9722C53FDD00D66260 /* RenderPassConfig.m */,
 				6550DB2B22C41FE100E67E11 /* Primitive.h */,
 				6550DB2C22C41FE100E67E11 /* Buffer.m */,
 				6550DB2D22C41FE100E67E11 /* PipelineState.m */,
@@ -473,6 +476,7 @@
 				6550DBBA22C41FE200E67E11 /* CommandEncoder.m in Sources */,
 				6550DBEA22C41FE200E67E11 /* Manager.c in Sources */,
 				6550DC0022C41FE200E67E11 /* Manager.c in Sources */,
+				659AAF9822C53FDE00D66260 /* RenderPassConfig.m in Sources */,
 				6550DBD622C41FE200E67E11 /* ViewMatrix.c in Sources */,
 				6550DBBD22C41FE200E67E11 /* CommandBuffer.m in Sources */,
 				6550DBC822C41FE200E67E11 /* Renderer.c in Sources */,

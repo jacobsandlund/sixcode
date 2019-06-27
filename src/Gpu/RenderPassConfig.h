@@ -3,4 +3,6 @@
 
 typedef struct GpuRenderPassConfig GpuRenderPassConfig;
 
+void GpuRenderPassConfigDestroy(GpuRenderPassConfig *config);
+
 #endif  // _GpuRenderPassConfig_h
