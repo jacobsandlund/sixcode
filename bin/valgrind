@@ -1,143 +1,47 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st valgrind [opts] [dir|foo.c] Run valgrind on all|dir|file'
-    echo 'Usage: st valgrind check [dir|foo.c]  Check results for hazards'
-    echo 'Usage: st valgrind summary            See summary of valgrind results'
-    echo 'Usage: st valgrind --tool=massif <foo.c> Run massif tool on file'
-    echo 'Usage: st valgrind -h|--help          See valgrind help'
-    exit 0
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/valgrind "$@"
+    exit
 fi
-
-if [[ $PWD != "$SPACETIME_PATH"* ]]; then
-    echo 'Must be run from $SPACETIME_PATH or descendants'
-    echo "(\$SPACETIME_PATH=$SPACETIME_PATH)"
-    exit 1
-fi
-
-if [[ $1 == '--dir' ]]; then
-    shift
-    cd $1
-    shift
-else
-    dir="${PWD/$SPACETIME_PATH//spacetime}"
-fi
-
-if [[ $1 == '-h' ]] || [[ $1 == '--help' ]] || [[ $1 == '--version' ]] || [[ $1 == '--help-debug' ]]; then
-    valgrind_mode='help'
-elif [[ $1 == 'check' ]]; then
-    valgrind_mode='check'
-    shift
-elif [[ $1 == 'summary' ]]; then
-    valgrind_mode='summary'
-    shift
-elif [[ $1 == '--tool=massif' ]]; then
-    valgrind_mode='massif'
-elif [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-    valgrind_mode='all'
-else
-    valgrind_mode='single'
-fi
-
-if      [[ $valgrind_mode != 'check' ]] && \
-        [[ $valgrind_mode != 'summary' ]] && \
-        ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null
-then
-    docker exec -it spacetime bin/valgrind --dir "$dir" "$@"
-
-    if [[ $valgrind_mode == 'all' ]]; then
-        valgrind_mode='check'
-    else
-        exit
-    fi
-fi
-
-check_single() {
-    test_file=$1
-
-    test_file_relative="${test_file/$SPACETIME_PATH\//}"
-    output_file="$out/valgrind-output/$test_file_relative.txt"
-    if grep -E '(LEAK SUMMARY:)|( still reachable: [1-9])|( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
-        echo
-        echo '!! NOT CLEAN'
-        exit 1
-    fi
-}
-
-compile() {
-    $bin/compile -I$SPACETIME_PATH/development $1
-}
 
 valgrind_single() {
     test_file="${@: -1}"
     options_length=$(($#-1))
     options=${@:1:$options_length}
-    test_file_relative="${test_file/$SPACETIME_PATH\//}"
-    output_file="$out/valgrind-output/$test_file_relative.txt"
-    mkdir -p $(dirname $output_file)
-    echo st valgrind "$@" > $output_file
+    output_file="out/valgrind-output/$test_file.txt"
+    echo bin/valgrind "$@" > $output_file
     echo >> $output_file
 
-    compile $test_file
+    bin/compile $test_file
     valgrind --log-fd=1 $options ./a.out |
         cut -d' ' -f 2- | tee -a $output_file
-    rm -rf a.out*
+    rm a.out
 }
 
-trap "rm -rf a.out*" EXIT
-out="$SPACETIME_PATH/out"
-bin="$SPACETIME_PATH/bin"
-mkdir -p $out/valgrind-output
+trap "rm -f a.out" EXIT
 
-if [[ $# -ge 1 ]] && [ -d $1 ]; then
-    test_dir="$1"
-    shift
-else
-    test_dir=''
-fi
+mkdir -p out/valgrind-output
 
-if [[ $valgrind_mode == 'help' ]]; then
-    echo st valgrind [src/directory] [options] [test-file.c]
-    valgrind "$@"
-elif [[ $valgrind_mode == 'summary' ]]; then
-    find $out/valgrind-output -type f | xargs cat | grep -E 'valgrind|heap usage'
-elif [[ $valgrind_mode == 'check' ]]; then
-    if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
-        for test_file in $($bin/ls docker $test_dir 'Test.c'); do
-            echo "st valgrind check $test_file"
-            check_single $test_file
-        done
+if [ "$#" -eq 0 ] || [ ! -f ${@: -1} ]; then
+    rm -rf out/valgrind-output-previous
+    cp -R out/valgrind-output out/valgrind-output-previous
 
-        git --no-pager diff --no-index $out/valgrind-output-previous/$test_dir $out/valgrind-output/$test_dir
-    else
-        check_single "$@"
-    fi
-elif [[ $valgrind_mode == 'massif' ]]; then
-    massif_file="$out/valgrind-output.massif"
-    test_file="${@: -1}"
-    options_length=$(($#-1))
-    options=${@:1:$options_length}
-    compile $test_file
-    valgrind --massif-out-file=$massif_file $options ./a.out
-    rm -rf a.out*
-    ms_print $massif_file
-elif [[ $valgrind_mode == 'all' ]]; then
-
-    rm -rf $out/valgrind-output-previous
-    mv -f $out/valgrind-output $out/valgrind-output-previous
-
-    for test_file in $($bin/ls docker 'Test.c'); do
-        test_file_relative="${test_file/$SPACETIME_PATH\//}"
-        output_file="$out/valgrind-output/$test_file_relative.txt"
-        previous_file="$out/valgrind-output-previous/$test_file_relative.txt"
-        mkdir -p $(dirname $output_file)
-        test -f $previous_file && cp $previous_file $output_file
-    done
-
-    for test_file in $($bin/ls docker $test_dir 'Test.c'); do
-        echo st valgrind "$@" $test_file
+    for test_file in *-test.c; do
+        echo bin/valgrind "$@" $test_file
         valgrind_single "$@" $test_file >> /dev/null
     done
-elif [[ $valgrind_mode == 'single' ]]; then
+
+    for output_file in out/valgrind-output/*; do
+        echo "Checking $output_file"
+        if grep -E '( lost: [1-9])|(ERROR SUMMARY: [1-9])' $output_file; then
+            echo
+            echo '!! NOT CLEAN'
+            exit 1
+        fi
+    done
+
+    git --no-pager diff --no-index out/valgrind-output-previous/ out/valgrind-output
+else
     valgrind_single "$@"
 fi

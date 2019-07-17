@@ -1,8 +1,3 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st docker-run                  Run docker container'
-    exit 0
-fi
-
-docker run -it --rm --mount "type=bind,source=$SPACETIME_PATH,target=/spacetime" --name spacetime jacobsandlund/spacetime:latest "$@"
+docker run -it --rm --mount "type=bind,source=$PWD,target=/sixcode" -p 8080:8080 --name sixcode jacobsandlund/sixcode:latest "$@"

@@ -1,14 +1,8 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st run [release|debug]         Build and then run Spacetime'
-    exit 0
-fi
-
-if [[ $1 == "release" ]] || [[ $1 == "archive" ]]; then
-    out="$SPACETIME_PATH/out/Release"
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/run "$@"
 else
-    out="$SPACETIME_PATH/out/Debug"
+    trap "rm -f a.out" EXIT
+    bin/compile "$@" && ./a.out
 fi
-
-$SPACETIME_PATH/bin/build "$@" && open $out/Spacetime.app

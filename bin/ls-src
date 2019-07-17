@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+ls -1 *.c *.h electron/*.c | grep -Ev '\-test.c|test.h|valgrind.h|glmock.c'

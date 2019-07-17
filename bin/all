@@ -1,11 +1,9 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st all                         Build, test, and run valgrind'
-    exit 0
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/all "$@"
+else
+    bin/make
+    bin/test
+    bin/valgrind
 fi
-
-$SPACETIME_PATH/bin/format
-$SPACETIME_PATH/bin/build
-$SPACETIME_PATH/bin/test
-$SPACETIME_PATH/bin/valgrind

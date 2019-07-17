@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+wc -l $(bin/ls-src)

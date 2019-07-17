@@ -1,32 +1,14 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st test [dir|Test.c]           Test all|dir|file'
-    exit 0
-fi
-
-trap "rm -rf a.out*" EXIT
-
-run() {
-    $SPACETIME_PATH/bin/compile -I$SPACETIME_PATH/development "$@" && ./a.out
-}
-
-if [ "$#" -gt 1 ] && [[ $1 == "--no-diff" ]]; then
-    shift
-    run "$@"
-elif [[ $# -eq 1 ]] && [ -f $1 ]; then
-    run "$@" && git diff --exit-code -- $1
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/test "$@"
+elif [ "$#" -eq 1 ]; then
+    bin/run $1 && git diff --exit-code -- $1
 else
-    if [[ $# -eq 1 ]] && [ -d $1 ]; then
-        test_dir="$1"
-    else
-        test_dir=''
-    fi
-
-    for test_file in $($SPACETIME_PATH/bin/ls $test_dir 'test'); do
-        echo st test $test_file
-        run $test_file
+    for test_file in *-test.c; do
+        echo bin/run $test_file
+        bin/run $test_file
     done
 
-    git diff --exit-code -- $($SPACETIME_PATH/bin/ls $test_dir 'test')
+    git diff --exit-code -- *-test.c
 fi

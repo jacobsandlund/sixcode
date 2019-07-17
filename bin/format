@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st all                         Build, test, and run valgrind'
-    exit 0
-fi
-
-cd $SPACETIME_PATH
-clang-format -i $(bin/ls all)

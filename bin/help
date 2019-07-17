@@ -1,17 +1,14 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st help [command]              Display this help, or help for command'
-    exit 0
-fi
-
-if [[ $# -eq 1 ]]; then
-    $SPACETIME_PATH/bin/$1 help
-    exit 0
-fi
-
-echo 'Usage:' 'st <command> [args*]'
+echo "Usage: bin/<command> [<args>*]"
 echo
-echo 'Commands:'
-
-grep 'Usage:[ ]' $(ls $SPACETIME_PATH/bin/* | sort) | sed -e 's#.*Usage:[ ]st #    #' -e "s/'$//"
+echo "Commands:"
+echo "    bin/all                Make, test, and run valgrind"
+echo "    bin/make               Make core.js/wasm with emscripten"
+echo "    bin/docker-run         Run the development docker file"
+echo "    bin/docker-build       Build the development docker image"
+echo "    bin/docker-exec <cmd>  Execute the command in docker container"
+echo "    bin/test [<file>]      Test all files (or specified file)"
+echo "    bin/valgrind [<file>]  Run files (or file) through Valgrind"
+echo "    bin/run <file>         Compile and then run file"
+echo "    bin/help               Display this help"

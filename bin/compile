@@ -1,17 +1,8 @@
 #!/bin/bash -e
 
-if [[ $1 == 'all' ]]; then
-    echo 'Usage: st compile <file.c>            Compile source file'
-    exit 0
-fi
-
-file="${@: -1}"
-if [[ $file == *".m" ]]; then
-    lang_options="-x objective-c -fobjc-arc -fmodules"
+if ! grep -q 'docker\|lxc' /proc/1/cgroup 2>/dev/null; then
+    docker exec -it sixcode bin/compile "$@"
 else
-    lang_options="-x c"
+    CFLAGS="$(grep '^CFLAGS' development/Makefile | sed 's/CFLAGS = //')"
+    clang $CFLAGS "$@"
 fi
-
-warnings="-Werror -Wall -Wextra -Wshorten-64-to-32 -Wstrict-prototypes"
-
-clang $lang_options -std=gnu11 -O1 -lm $warnings -I$SPACETIME_PATH/src -DDEBUG=1 "$@"

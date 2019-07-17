@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-if [[ $1 == 'help' ]]; then
-    echo 'Usage: st docker-exec [command]       Execute command (or bash) in docker'
-    exit 0
-fi
 
 if [ "$#" -eq 0 ]; then
     command=/bin/bash
@@ -12,4 +8,4 @@ else
     shift
 fi
 
-docker exec -it spacetime $command "$@"
+docker exec -it sixcode $command "$@"
