@@ -8,4 +8,4 @@ else
     shift
 fi
 
-docker exec -it sixcode $command "$@"
+docker exec -it spacetime $command "$@"

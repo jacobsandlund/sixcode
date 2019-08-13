@@ -1,5 +1,8 @@
 {
-  "name": "sixcode",
+  "name": "spacetime",
   "private": true,
-  "main": "main.js"
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "^7.0.0-beta.2"
+  }
 }

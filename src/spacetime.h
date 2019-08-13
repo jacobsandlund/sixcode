@@ -1,5 +1,5 @@
-#ifndef __SIXCODE_H__
-#define __SIXCODE_H__
+#ifndef __SPACETIME_H__
+#define __SPACETIME_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -57,8 +57,8 @@ static inline ivec2 ivec2_sub(ivec2 a, ivec2 b)
 	return (ivec2) {a.x - b.x, a.y - b.y};
 }
 
-// log_error is defined in test.h and electron/sixcode.c
+// log_error is defined in test.h and electron/spacetime.c
 void log_error(const char *format, ...);
-#define SIXCODE_ERROR(...) log_error(__VA_ARGS__)
+#define SPACETIME_ERROR(...) log_error(__VA_ARGS__)
 
-#endif // __SIXCODE_H__
+#endif // __SPACETIME_H__

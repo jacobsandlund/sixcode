@@ -1,13 +1,13 @@
 #ifndef __UI_H__
 #define __UI_H__
 
-#include "sixcode.h"
-#include <GLES3/gl3.h>
 #include "grid.h"
 #include "mesh.h"
 #include "shader.h"
+#include "spacetime.h"
 #include "texture.h"
 #include "view.h"
+#include <GLES3/gl3.h>
 
 #define UI_MESH_MAX_SIZE 8
 #define UI_NUM_MESHES 4	// 8, 4, 2, 1

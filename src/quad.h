@@ -1,7 +1,7 @@
 #ifndef __QUAD_H__
 #define __QUAD_H__
 
-#include "sixcode.h"
+#include "spacetime.h"
 
 typedef struct {
 	ivec2 min;

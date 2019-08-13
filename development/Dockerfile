@@ -1,8 +1,9 @@
 FROM debian:9.6-slim
 
-WORKDIR /sixcode
+WORKDIR /spacetime
 
-ENV EMSCRIPTEN_VERSION 1.38.31
+ENV LLVM_VERSION master
+ENV EMSCRIPTEN_VERSION 1.38.40
 
 RUN apt-get update && apt-get install -y curl gnupg2 && \
     curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
@@ -15,22 +16,29 @@ RUN apt-get update && apt-get install -y curl gnupg2 && \
         nodejs \
         python2.7 \
         && \
-    mkdir /emscripten && \
-    cd /emscripten && git clone https://github.com/kripken/emscripten-fastcomp && \
-        cd emscripten-fastcomp && git checkout $EMSCRIPTEN_VERSION && \
-        git clone https://github.com/kripken/emscripten-fastcomp-clang tools/clang && \
-        cd tools/clang && git checkout $EMSCRIPTEN_VERSION && cd ../.. && \
+    mkdir /deps && \
+    cd /deps && git clone https://github.com/llvm/llvm-project && \
+        cd llvm-project && git checkout $LLVM_VERSION && \
         mkdir build && cd build && \
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="host;JSBackend" -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF -DCLANG_INCLUDE_TESTS=OFF && \
+        cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLLVM_ENABLE_PROJECTS="clang;lld" \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DLLVM_TARGETS_TO_BUILD="host;WebAssembly" \
+            -DLLVM_INCLUDE_EXAMPLES=OFF \
+            -DLLVM_INCLUDE_TESTS=OFF \
+            -DCLANG_INCLUDE_TESTS=OFF \
+            -G "Unix Makefiles" \
+            ../llvm && \
         make "-j$(nproc --all)" && make install && \
-    cd /emscripten && git clone https://github.com/WebAssembly/binaryen && \
-        cd binaryen && git checkout $EMSCRIPTEN_VERSION && \
+    cd /deps && git clone https://github.com/WebAssembly/binaryen && \
+        cd binaryen && \
         cmake . && make "-j$(nproc --all)" && make install && \
-    cd /emscripten && git clone https://github.com/kripken/emscripten.git && \
+    cd /deps && git clone https://github.com/emscripten-core/emscripten && \
         cd emscripten && git checkout $EMSCRIPTEN_VERSION && \
-    cd /emscripten && \
+    cd /deps && \
         rm -rf binaryen && \
-        rm -rf emscripten-fastcomp && \
+        rm -rf llvm-project && \
         rm -rf emscripten/.git && \
     apt-get remove --purge -y \
         build-essential \
@@ -61,14 +69,6 @@ RUN apt-get update && \
         ;
 
 COPY development/emscripten_config /root/.emscripten
-
-RUN mkdir electron/
-
-COPY *.c *.h development/Makefile ./
-COPY electron/*.c electron/*.h ./electron/
-
-RUN /emscripten/emscripten/emmake make && \
-    rm *.c *.h Makefile && rm -r electron
 
 EXPOSE 8080
 

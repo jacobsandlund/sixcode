@@ -1,4 +1,4 @@
-#include "../core.c"
+#include "../src/core.c"
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 #include <stdarg.h>
@@ -148,9 +148,9 @@ int main()
 	assert(res == EMSCRIPTEN_RESULT_SUCCESS);
 	assert(emscripten_webgl_get_current_context() == context);
 
-	EM_ASM( sixcode_initialized() );
+        EM_ASM(spacetime_initialized());
 
-	return 0;
+        return 0;
 }
 
 #endif

@@ -33,9 +33,9 @@
 		aq.bottom_left.x, aq.bottom_left.y, \
 		aq.bottom_right.x, aq.bottom_right.y);
 
-#define _TEST_SIXCODE_ERROR() { \
-	_s(test_sixcode_error); \
-	test_reset_sixcode_error(); \
+#define _TEST_SPACETIME_ERROR() { \
+	_s(test_spacetime_error); \
+	test_reset_spacetime_error(); \
 }
 
 #define MAX_FILE_LEN 1000000
@@ -83,8 +83,8 @@ typedef struct {
 	int num_results;
 } FileInfo;
 
-static char test_sixcode_error[MAX_OUTPUT_LEN];
-static int test_sixcode_error_i = 0;
+static char test_spacetime_error[MAX_OUTPUT_LEN];
+static int test_spacetime_error_i = 0;
 static FileInfo *all_file_info[MAX_FILES];
 static int num_files;
 static int is_focus_on = 0;
@@ -127,24 +127,24 @@ void log_error(const char *format, ...)
 	va_list argptr;
 	va_start(argptr, format);
 
-	int size = MAX_OUTPUT_LEN - test_sixcode_error_i;
+	int size = MAX_OUTPUT_LEN - test_spacetime_error_i;
 
 	if (size > 0) {
 		int output_len = vsnprintf(
-				&test_sixcode_error[test_sixcode_error_i],
+				&test_spacetime_error[test_spacetime_error_i],
 				size,
 				format,
 				argptr);
 
-		test_sixcode_error_i += output_len;
+		test_spacetime_error_i += output_len;
 	}
 	va_end(argptr);
 }
 
-void test_reset_sixcode_error()
+void test_reset_spacetime_error()
 {
-	test_sixcode_error_i = 0;
-	test_sixcode_error[0] = '\0';
+	test_spacetime_error_i = 0;
+        test_spacetime_error[0] = '\0';
 }
 
 void split_lines(LineData *line_data, char *contents, int len)

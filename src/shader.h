@@ -1,8 +1,8 @@
 #ifndef __SHADER_H__
 #define __SHADER_H__
 
+#include "spacetime.h"
 #include <GLES3/gl3.h>
-#include "sixcode.h"
 
 typedef struct {
 	GLuint vertex;

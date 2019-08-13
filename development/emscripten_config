@@ -1,4 +1,4 @@
-EMSCRIPTEN_ROOT = '/emscripten/emscripten'
+EMSCRIPTEN_ROOT = '/deps/emscripten'
 LLVM_ROOT = '/usr/local/bin'
 BINARYEN_ROOT = '/usr/local'
 NODE_JS = '/usr/bin/node'

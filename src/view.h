@@ -1,8 +1,8 @@
 #ifndef __VIEW_H__
 #define __VIEW_H__
 
-#include "sixcode.h"
 #include "quad.h"
+#include "spacetime.h"
 
 typedef enum {
 	VIEW_LAYOUT_HEX = 0,

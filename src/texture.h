@@ -1,10 +1,10 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
-#include "sixcode.h"
-#include <GLES3/gl3.h>
 #include "grid.h"
 #include "quad.h"
+#include "spacetime.h"
+#include <GLES3/gl3.h>
 
 #define TEXTURE_MAX_SIZE 4096
 

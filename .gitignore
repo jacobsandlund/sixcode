@@ -1,3 +1,4 @@
 out/
-electron/sixcode.*
-!electron/sixcode.c
+node_modules/
+electron/spacetime.*
+!electron/spacetime.c

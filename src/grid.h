@@ -1,8 +1,8 @@
 #ifndef __GRID_H__
 #define __GRID_H__
 
-#include "sixcode.h"
 #include "quad.h"
+#include "spacetime.h"
 
 typedef struct {
 	Quad quad;

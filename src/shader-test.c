@@ -9,37 +9,37 @@ TEST(shader_print_gl_error)
 
 	GLmock.force_gl_error = GL_INVALID_ENUM;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:11 - An unacceptable value is specified for an enumerated argument.
 	//=>
 
 	GLmock.force_gl_error = GL_INVALID_VALUE;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:17 - A numeric argument is out of range.
 	//=>
 
 	GLmock.force_gl_error = GL_INVALID_OPERATION;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:23 - The specified operation is not allowed in the current state.
 	//=>
 
 	GLmock.force_gl_error = GL_INVALID_FRAMEBUFFER_OPERATION;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:29 - The command is trying to render to or read from the framebuffer while the currently bound framebuffer is not framebuffer complete.
 	//=>
 
 	GLmock.force_gl_error = GL_OUT_OF_MEMORY;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:35 - There is not enough memory left to execute the command.
 	//=>
 
 	GLmock.force_gl_error = 1;
 	shader_print_gl_error(__FILE__, __LINE__);
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:41 - Unknown GL Error 1
 	//=>
 }
@@ -72,7 +72,7 @@ TEST(shader_load_and_delete)
 
 	_d(shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__));
 	//=> 0
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:73 - The specified operation is not allowed in the current state.
 	//=>
 
@@ -85,7 +85,7 @@ TEST(shader_load_and_delete)
 
 	_d(shader_load(GL_VERTEX_SHADER, TEST_VERTEX_SHADER_SOURCE, __FILE__, __LINE__));
 	//=> 0
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> Error compiling shader:
 	//=> [Info Log] - Compilation failed
 	//=> shader-test.c:86 - There is not enough memory left to execute the command.
@@ -153,7 +153,7 @@ TEST(shader_program_create_and_delete)
 
 	_d(shader_program_create(&s, vertex, fragment, __FILE__, __LINE__));
 	//=> 0
-	_TEST_SIXCODE_ERROR();
+	_TEST_SPACETIME_ERROR();
 	//=> shader-test.c:154 - The specified operation is not allowed in the current state.
 	//=> Error creating program.
 	//=>
@@ -223,8 +223,8 @@ TEST(shader_program_link)
 	//=> 0
 	_d(GLmock.programs[s.program].deleted);
 	//=> 1
-	_TEST_SIXCODE_ERROR();
-	//=> Error linking program:
+        _TEST_SPACETIME_ERROR();
+        //=> Error linking program:
 	//=> [Info Log] Link program failed
 	//=> shader-test.c:217 - A numeric argument is out of range.
 	//=>
