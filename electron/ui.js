@@ -1,4 +1,4 @@
-const RENDER_LOOP = true;
+const RENDER_LOOP = false;
 
 const SCALE_LEVELS = [
   0.5,
@@ -69,7 +69,7 @@ let view;
 
 let scaleLevel = SCALE_LEVELS.indexOf(16.0);
 
-function sixcode_initialized() {
+function spacetime_initialized() {
   canvas = Module['canvas'];
   resizeUI();
   canvas.style.backgroundColor = CANVAS_BACKGROUND_COLOR;
@@ -164,14 +164,13 @@ function setGradient(scaleLevel, oldScaleLevel) {
 
   if (gradient !== oldGradient) {
     if (gradient) {
-      canvas.style['background-image'] =
-        'radial-gradient(farthest-side ellipse at ' +
-        mouseX +
-        'px ' +
-        mouseY +
-        'px, ' +
-        gradient +
-        ')';
+      let dpr = window.devicePixelRatio;
+      let x = mouseX / dpr;
+      let y = mouseY / dpr;
+
+      canvas.style[
+        'background-image'
+      ] = `radial-gradient(farthest-side ellipse at ${x}px ${y}px, ${gradient})`;
     } else {
       canvas.style['background-image'] = null;
     }
@@ -316,13 +315,9 @@ function keyDown(e) {
 
       draw();
       break;
-
-    case 'KeyT':
-      ipcRenderer.send('trace', 7000);
-      break;
   }
 }
 
-if (isSixcodeInitialized) {
-  sixcode_initialized();
+if (isSpacetimeInitialized) {
+  spacetime_initialized();
 }
