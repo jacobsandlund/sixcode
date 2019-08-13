@@ -89,6 +89,11 @@ EMSCRIPTEN_KEEPALIVE void web_texture_update(Ui *ui, Grid *g)
 	texture_update(&ui->grid_styles_texture, g);
 }
 
+EMSCRIPTEN_KEEPALIVE void web_ui_blend_enabled(Ui *ui, bool enabled)
+{
+	ui->blend_enabled = enabled;
+}
+
 
 //////////////////
 // Core
@@ -127,19 +132,8 @@ int main()
 {
 	EmscriptenWebGLContextAttributes attrs;
 	emscripten_webgl_init_context_attributes(&attrs);
-
 	attrs.majorVersion = 2;
 	attrs.minorVersion = 0;
-	//attrs.alpha = EM_FALSE;
-	attrs.alpha = EM_TRUE;
-	//attrs.depth = EM_FALSE;
-	//attrs.stencil = EM_FALSE;
-	//attrs.antialias = EM_FALSE;
-	attrs.antialias = EM_TRUE;
-	//attrs.premultipliedAlpha = EM_TRUE;
-	//attrs.preserveDrawingBuffer = EM_FALSE;
-	//attrs.failIfMajorPerformanceCaveat = EM_TRUE;
-	//attrs.enableExtensionsByDefault = EM_FALSE;
 
 	EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context("#canvas", &attrs);
 	assert(context > 0);

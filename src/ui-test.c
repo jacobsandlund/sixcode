@@ -17,6 +17,9 @@ TEST(ui)
 	_d(ui_initialize(ui));
 	//=> 1
 
+	_d(ui->blend_enabled);
+	//=> 1
+
 	///////////////////////
 	// load/create/link
 
@@ -112,7 +115,7 @@ TEST(ui)
 	_dd(fill_colors_texture->width, fill_colors_texture->height);
 	//=> 256, 1
 	_d(fill_colors_texture->format == GL_RGBA);
-	//=> 0
+	//=> 1
 	_d(fill_colors_texture->type == GL_UNSIGNED_BYTE);
 	//=> 1
 	_d(fill_colors_texture->data == UI_FILL_COLORS);
@@ -330,6 +333,23 @@ TEST(ui_draw_fill)
 	_d(GLmock.bound_textures[1] == ui->fill_colors_texture.texture);
 	//=> 1
 
+	// Blend + Fill color
+
+	_d(GLmock.enabled_capability == GL_BLEND);
+	//=> 1
+	_d(GLmock.blend_source_factor == GL_SRC_ALPHA);
+	//=> 1
+	_d(GLmock.blend_destination_factor == GL_ZERO);
+	//=> 1
+
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->fill_colors_texture.texture];
+	_d(fill_colors_texture->data == UI_FILL_COLORS);
+	//=> 1
+	_dd(fill_colors_texture->width, fill_colors_texture->height);
+	//=> 1, 1
+	_dd(fill_colors_texture->xoffset, fill_colors_texture->yoffset);
+	//=> 0, 0
+
 	// Instance Buffer
 
 	InstanceMesh *imesh = &ui->instance_mesh;
@@ -400,6 +420,60 @@ TEST(ui_draw_fill)
 	//=> 36864
 	_d(GLmock.draw_elements_instanced_primcount);
 	//=> 48
+
+	grid_terminate(g);
+	ui_terminate(ui);
+
+	free(vw);
+	free(g);
+	free(ui);
+}
+
+TEST(ui_draw_fill_blend_or_not)
+{
+	vec2 viewport_size = {1000, 600};
+	vec2 translation = {100, 100};
+	float scale = 6.0;
+
+	View *vw = malloc(sizeof *vw);
+	Grid *g = malloc(sizeof *g);
+	Ui *ui = malloc(sizeof *ui);
+
+	glmock_initialize();
+	view_initialize(vw, viewport_size, translation, scale);
+	grid_initialize(g);
+	ui_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
+
+	ui_draw(ui, vw, g);
+
+	// Zoomed out == no blend
+
+	_d(GLmock.disabled_capability == GL_BLEND);
+	//=> 1
+
+	GLmockTexture *fill_colors_texture = &GLmock.textures[ui->fill_colors_texture.texture];
+	_d(fill_colors_texture->data == UI_EMPTY_FILL_COLOR_NO_BLEND);
+	//=> 1
+
+	// Blend disabled
+
+	ui_terminate(ui);
+
+	scale = 10.0;
+	view_initialize(vw, viewport_size, translation, scale);
+	glmock_initialize();
+	ui_initialize(ui);
+	texture_update(&ui->grid_styles_texture, g);
+	ui->blend_enabled = false;
+
+	ui_draw(ui, vw, g);
+
+	_d(GLmock.disabled_capability == GL_BLEND);
+	//=> 1
+
+	_d(fill_colors_texture->data == UI_EMPTY_FILL_COLOR_NO_BLEND);
+	//=> 1
 
 	grid_terminate(g);
 	ui_terminate(ui);

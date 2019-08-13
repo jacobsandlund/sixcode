@@ -48,6 +48,8 @@ typedef struct {
 
 	UiLayoutData layouts[VIEW_NUM_LAYOUTS];
 	InstanceMesh instance_mesh;
+
+	bool blend_enabled;
 } Ui;
 
 bool ui_initialize(Ui *ui);

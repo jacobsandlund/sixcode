@@ -1,34 +1,64 @@
-const { ipcRenderer } = require('electron');
-
 const RENDER_LOOP = true;
 
 const SCALE_LEVELS = [
-    0.5,
-    0.75,
-    1.0,
-    1.5,
-    2.0,
-    3.0,
-    4.0,
-    6.0,
-    8.0,
-    12.0,
-    16.0,
-    23.0,
-    32.0,
-    46.0,
-    64.0,
-    90.0,
-    128.0,
-    181.0,
-    256.0,
-    362.0,
-    512.0,
-    724.0,
-    1024.0,
-    1448.0,
-    2048.0,
+  0.5,
+  0.75,
+  1.0,
+  1.5,
+  2.0,
+  3.0,
+  4.0,
+  6.0,
+  8.0,
+  12.0,
+  16.0,
+  23.0,
+  32.0,
+  46.0,
+  64.0,
+  90.0,
+  128.0,
+  181.0,
+  256.0,
+  362.0,
+  512.0,
+  724.0,
+  1024.0,
+  1448.0,
+  2048.0,
 ];
+
+const CANVAS_BACKGROUND_COLOR = 'rgb(48,48,48)';
+
+const GRADIENT_COLOR = [
+  null, // 0.5,
+  null, // 0.75,
+  null, // 1.0,
+  null, // 1.5,
+  null, // 2.0,
+  null, // 3.0,
+  null, // 4.0,
+  null, // 6.0,
+  'rgb(60, 60, 60), rgb(36, 36, 36)', // 8.0,
+  'rgb(74, 74, 74), rgb(22, 22, 22)', // 12.0,
+  'rgb(88, 88, 88), rgb(8, 8, 8)', // 16.0,
+  'rgb(100, 100, 100), rgb(0, 0, 0)', // 23.0,
+  'rgb(110, 110, 110), rgb(0, 0, 0)', // 32.0,
+  'rgb(120, 120, 120), rgb(0, 0, 0)', // 46.0,
+  'rgb(130, 130, 130), rgb(0, 0, 0)', // 64.0,
+  'rgb(140, 140, 140), rgb(0, 0, 0)', // 90.0,
+  'rgb(142, 142, 142), rgb(0, 0, 0)', // 128.0,
+  'rgb(144, 144, 144), rgb(0, 0, 0)', // 181.0,
+  'rgb(158, 158, 158), rgb(0, 0, 0)', // 256.0,
+  'rgb(174, 174, 174), rgb(0, 0, 0)', // 362.0,
+  'rgb(194, 194, 194), rgb(0, 0, 0)', // 512.0,
+  'rgb(214, 214, 214), rgb(0, 0, 0)', // 724.0,
+  'rgb(234, 234, 234), rgb(0, 0, 0)', // 1024.0,
+  'rgb(254, 254, 254), rgb(0, 0, 0)', // 1448.0,
+  'rgb(254, 254, 254), rgb(0, 0, 0)', // 2048.0,
+];
+
+const NO_GRADIENT_INDEX = GRADIENT_COLOR.lastIndexOf(null);
 
 const VIEW_NUM_LAYOUTS = 2;
 
@@ -40,90 +70,112 @@ let view;
 let scaleLevel = SCALE_LEVELS.indexOf(16.0);
 
 function sixcode_initialized() {
-    canvas = Module['canvas'];
-    resizeUI();
-    mouseX = window.innerWidth / 2;
-    mouseY = window.innerHeight / 2;
+  canvas = Module['canvas'];
+  resizeUI();
+  canvas.style.backgroundColor = CANVAS_BACKGROUND_COLOR;
+  mouseX = window.innerWidth / 2;
+  mouseY = window.innerHeight / 2;
+  setGradient(scaleLevel, NO_GRADIENT_INDEX);
 
-    grid = Module._web_grid_malloc();
-    Module._web_core_grid_initialize(grid);
+  grid = Module._web_grid_malloc();
+  Module._web_core_grid_initialize(grid);
 
-    // Big
+  // Big
 
-    let count = 6000000;
-    let size = 4096 - 2;
+  let count = 6000000;
+  let size = 4096 - 2;
 
-    for (let i = 0; i < count; ++i) {
-        let y = Math.floor(Math.random() * size) - 4096/2 + 1;
-        let x = Math.floor(Math.random() * size) - 4096/2 + 1;
-        let style = Math.floor(Math.random() * 15) + 1;
-        Module._web_grid_set(grid, x, y, style);
-    }
+  for (let i = 0; i < count; ++i) {
+    let y = Math.floor(Math.random() * size) - 4096 / 2 + 1;
+    let x = Math.floor(Math.random() * size) - 4096 / 2 + 1;
+    let style = Math.floor(Math.random() * 15) + 1;
+    Module._web_grid_set(grid, x, y, style);
+  }
 
-    // Small
+  // Small
 
-    //let count = 512;
-    //let size = 64 - 2;
+  //let count = 512;
+  //let size = 64 - 2;
 
-    //for (let i = 0; i < count; ++i) {
-    //    let y = Math.floor(Math.random() * size) + 1;
-    //    let x = Math.floor(Math.random() * size) + 1;
-    //    let style = Math.floor(Math.random() * 15) + 1;
-    //    Module._web_grid_set(grid, x, y, style);
-    //}
+  //for (let i = 0; i < count; ++i) {
+  //    let y = Math.floor(Math.random() * size) + 1;
+  //    let x = Math.floor(Math.random() * size) + 1;
+  //    let style = Math.floor(Math.random() * 15) + 1;
+  //    Module._web_grid_set(grid, x, y, style);
+  //}
 
-    let scale = SCALE_LEVELS[scaleLevel];
-    view = Module._web_view_malloc();
-    Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
+  let scale = SCALE_LEVELS[scaleLevel];
+  view = Module._web_view_malloc();
+  Module._web_view_initialize(view, canvas.width, canvas.height, 0, 0, scale);
 
-    ui = Module._web_ui_malloc();
-    Module._web_ui_initialize(ui);
-    Module._web_texture_update(ui, grid);
+  ui = Module._web_ui_malloc();
+  Module._web_ui_initialize(ui);
+  Module._web_texture_update(ui, grid);
 
-    window.addEventListener('resize', resize);
-    canvas.addEventListener('wheel', wheel, {passive: true});
-    canvas.addEventListener('mousedown', mouseDown);
-    window.addEventListener('mousemove', mouseMove);
-    window.addEventListener('mouseup', mouseUp);
-    window.addEventListener('keydown', keyDown);
-    window.oncontextmenu = function () {
-        return false;
-    };
+  window.addEventListener('resize', resize);
+  canvas.addEventListener('wheel', wheel, {passive: true});
+  canvas.addEventListener('mousedown', mouseDown);
+  window.addEventListener('mousemove', mouseMove);
+  window.addEventListener('mouseup', mouseUp);
+  window.addEventListener('keydown', keyDown);
+  window.oncontextmenu = function() {
+    return false;
+  };
 
-    if (RENDER_LOOP) {
-        window.requestAnimationFrame(drawLoop);
-    } else {
-        draw();
-    }
+  if (RENDER_LOOP) {
+    window.requestAnimationFrame(drawLoop);
+  } else {
+    draw();
+  }
 }
 
 function drawLoop() {
-    Module._web_core_tick(ui, view, grid);
-    window.requestAnimationFrame(drawLoop);
+  Module._web_core_tick(ui, view, grid);
+  window.requestAnimationFrame(drawLoop);
 }
 
 function draw() {
-    if (!RENDER_LOOP) {
-        Module._web_core_tick(ui, view, grid);
-    }
+  if (!RENDER_LOOP) {
+    Module._web_core_tick(ui, view, grid);
+  }
 }
 
 function resizeUI() {
-    let dpr = window.devicePixelRatio;
-    let newWidth = window.innerWidth * dpr;
-    let newHeight = window.innerHeight * dpr;
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-    canvas.style.width = window.innerWidth;
-    canvas.style.height = window.innerHeight;
+  let dpr = window.devicePixelRatio;
+  let newWidth = window.innerWidth * dpr;
+  let newHeight = window.innerHeight * dpr;
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+  canvas.style.width = window.innerWidth;
+  canvas.style.height = window.innerHeight;
 }
 
 function resize() {
-    resizeUI();
+  resizeUI();
 
-    Module._web_view_resize(view, canvas.width, canvas.height);
+  Module._web_view_resize(view, canvas.width, canvas.height);
 
-    draw();
+  draw();
+}
+
+function setGradient(scaleLevel, oldScaleLevel) {
+  let gradient = GRADIENT_COLOR[scaleLevel];
+  let oldGradient = GRADIENT_COLOR[oldScaleLevel];
+
+  if (gradient !== oldGradient) {
+    if (gradient) {
+      canvas.style['background-image'] =
+        'radial-gradient(farthest-side ellipse at ' +
+        mouseX +
+        'px ' +
+        mouseY +
+        'px, ' +
+        gradient +
+        ')';
+    } else {
+      canvas.style['background-image'] = null;
+    }
+  }
 }
 
 const CHANGE_SCALE_TIMEOUT = 100;
@@ -134,56 +186,57 @@ let wheelDeltaY = 0.0;
 let changeScaleTimeout = null;
 
 function wheel(e) {
-    wheelDeltaY += e.deltaY;
+  wheelDeltaY += e.deltaY;
 
-    let absDelta = Math.abs(wheelDeltaY);
-    let wheelSign = wheelDeltaY < 0 ? -1 : +1;
+  let absDelta = Math.abs(wheelDeltaY);
+  let wheelSign = wheelDeltaY < 0 ? -1 : +1;
 
-    let absLevelChange = Math.floor(absDelta / WHEEL_DELTA_THRESHOLD);
-    let firstTime = !changeScaleTimeout;
+  let absLevelChange = Math.floor(absDelta / WHEEL_DELTA_THRESHOLD);
+  let firstTime = !changeScaleTimeout;
 
-    if (
-        absLevelChange === 0 &&
-        firstTime &&
-        absDelta > FIRST_TIME_WHEEL_DELTA_THRESHOLD
-    ) {
-        absLevelChange = 1;
+  if (
+    absLevelChange === 0 &&
+    firstTime &&
+    absDelta > FIRST_TIME_WHEEL_DELTA_THRESHOLD
+  ) {
+    absLevelChange = 1;
+  }
+
+  if (absLevelChange > 0) {
+    wheelDeltaY = 0.0;
+  }
+
+  let levelChange = -wheelSign * absLevelChange;
+  let newScaleLevel = scaleLevel + levelChange;
+
+  if (newScaleLevel < 0) {
+    newScaleLevel = 0;
+  } else if (newScaleLevel >= SCALE_LEVELS.length) {
+    newScaleLevel = SCALE_LEVELS.length - 1;
+  }
+
+  if (newScaleLevel !== scaleLevel) {
+    setGradient(newScaleLevel, scaleLevel);
+    scaleLevel = newScaleLevel;
+
+    let scale = SCALE_LEVELS[newScaleLevel];
+    let dpr = window.devicePixelRatio;
+    let x = e.clientX * dpr;
+    let y = e.clientY * dpr;
+
+    Module._web_view_zoom_at_screen_point(view, x, y, scale);
+
+    draw();
+
+    if (changeScaleTimeout) {
+      clearTimeout(changeScaleTimeout);
     }
 
-    if (absLevelChange > 0) {
-        wheelDeltaY = 0.0;
-    }
-
-    let levelChange = -wheelSign * absLevelChange;
-    let newScaleLevel = scaleLevel + levelChange;
-
-    if (newScaleLevel < 0) {
-        newScaleLevel = 0;
-    } else if (newScaleLevel >= SCALE_LEVELS.length) {
-        newScaleLevel = SCALE_LEVELS.length - 1;
-    }
-
-    if (newScaleLevel !== scaleLevel) {
-        scaleLevel = newScaleLevel;
-
-        let scale = SCALE_LEVELS[newScaleLevel];
-        let dpr = window.devicePixelRatio;
-        let x = e.clientX * dpr;
-        let y = e.clientY * dpr;
-
-        Module._web_view_zoom_at_screen_point(view, x, y, scale);
-
-        draw();
-
-        if (changeScaleTimeout) {
-            clearTimeout(changeScaleTimeout);
-        }
-
-        changeScaleTimeout = setTimeout(() => {
-            changeScaleTimeout = null;
-            wheelDeltaY = 0.0;
-        }, CHANGE_SCALE_TIMEOUT);
-    }
+    changeScaleTimeout = setTimeout(() => {
+      changeScaleTimeout = null;
+      wheelDeltaY = 0.0;
+    }, CHANGE_SCALE_TIMEOUT);
+  }
 }
 
 let mouseDownTime = 0;
@@ -193,69 +246,83 @@ let mouseX = 0.0;
 let mouseY = 0.0;
 
 function mouseDown(e) {
-    let dpr = window.devicePixelRatio;
-    mouseX = e.clientX * dpr;
-    mouseY = e.clientY * dpr;
-    isMouseDown = true;
-    mouseDownTime = Date.now();
+  let dpr = window.devicePixelRatio;
+  mouseX = e.clientX * dpr;
+  mouseY = e.clientY * dpr;
+  isMouseDown = true;
+  mouseDownTime = Date.now();
 }
 
 function mouseUp(e) {
-    if (!draggingMouse) {
-        let x = e.clientX * window.devicePixelRatio;
-        let y = e.clientY * window.devicePixelRatio;
+  if (draggingMouse) {
+    Module._web_ui_blend_enabled(ui, true);
+    setGradient(scaleLevel, NO_GRADIENT_INDEX);
 
-        Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
+    draw();
+  } else {
+    let startTime = performance.now();
 
-        draw();
-    }
+    let x = e.clientX * window.devicePixelRatio;
+    let y = e.clientY * window.devicePixelRatio;
 
-    isMouseDown = false;
-    draggingMouse = false;
+    Module._web_core_toggle_hex_at_point(ui, view, grid, x, y);
+
+    let endTime = performance.now();
+    console.log('click in ' + (endTime - startTime) + ' ms');
+
+    draw();
+  }
+
+  isMouseDown = false;
+  draggingMouse = false;
 }
 
 function mouseMove(e) {
-    let dpr = window.devicePixelRatio;
-    let newMouseX = e.clientX * dpr;
-    let newMouseY = e.clientY * dpr;
-    let deltaX = mouseX - newMouseX;
-    let deltaY = mouseY - newMouseY;
+  let dpr = window.devicePixelRatio;
+  let newMouseX = e.clientX * dpr;
+  let newMouseY = e.clientY * dpr;
+  let deltaX = mouseX - newMouseX;
+  let deltaY = mouseY - newMouseY;
 
-    mouseX = newMouseX;
-    mouseY = newMouseY;
+  mouseX = newMouseX;
+  mouseY = newMouseY;
 
-    if (isMouseDown) {
-        if (
-            Date.now() - mouseDownTime > 100 ||
-            deltaX * deltaX + deltaY * deltaY >= 30 * dpr * dpr
-        ) {
-            draggingMouse = true;
-        }
+  if (isMouseDown) {
+    if (
+      Date.now() - mouseDownTime > 100 ||
+      deltaX * deltaX + deltaY * deltaY >= 30 * dpr * dpr
+    ) {
+      draggingMouse = true;
+      Module._web_ui_blend_enabled(ui, false);
+      setGradient(NO_GRADIENT_INDEX, scaleLevel);
     }
+  }
 
-    if (draggingMouse) {
-        Module._web_view_translate(view, deltaX, deltaY);
+  if (draggingMouse) {
+    Module._web_view_translate(view, deltaX, deltaY);
 
-        draw();
-    }
+    draw();
+  } else {
+    setGradient(scaleLevel, null);
+  }
 }
 
 function keyDown(e) {
-    switch (e.code) {
+  switch (e.code) {
     case 'Digit1':
-        let layout = Module._web_view_layout_get(view);
-        layout = (layout + 1) % VIEW_NUM_LAYOUTS;
-        Module._web_view_layout_set(view, layout);
+      let layout = Module._web_view_layout_get(view);
+      layout = (layout + 1) % VIEW_NUM_LAYOUTS;
+      Module._web_view_layout_set(view, layout);
 
-        draw();
-        break;
+      draw();
+      break;
 
     case 'KeyT':
-        ipcRenderer.send('trace', 7000);
-        break;
-    }
+      ipcRenderer.send('trace', 7000);
+      break;
+  }
 }
 
 if (isSixcodeInitialized) {
-    sixcode_initialized();
+  sixcode_initialized();
 }
