@@ -2,6 +2,16 @@
 
 `spacetime` is coding using hexagons.
 
+### Setup
+
+``` bash
+$ bin/docker-pull
+$ bin/docker-run
+$ bin/make  # This had issues, but compiled successfully. Needed to kill -9 the process.
+$ cd web
+$ python -m http.server
+```
+
 ### Testing
 
 To run all tests, use `bin/test`. All lines starting with `//=> ` are added automatically when the file runs (e.g. `bin/run hex-test.c`). Broken tests will result in a `git diff`. If the changed output is desired, simply `git add` the diff.

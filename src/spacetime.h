@@ -57,7 +57,7 @@ static inline ivec2 ivec2_sub(ivec2 a, ivec2 b)
 	return (ivec2) {a.x - b.x, a.y - b.y};
 }
 
-// log_error is defined in test.h and electron/spacetime.c
+// log_error is defined in test.h and web/spacetime.c
 void log_error(const char *format, ...);
 #define SPACETIME_ERROR(...) log_error(__VA_ARGS__)
 

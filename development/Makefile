@@ -4,8 +4,8 @@ CFLAGS = -std=gnu11 -m32 -lm -O1 -Werror -Wall -Wextra
 EMSCRIPTEN_FLAGS = -g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_WEBGL2=1 -s
 SRC = $(shell bin/ls-src | grep -v '\.h')
 
-electron/spacetime.js: $(SRC)
-	$(CC) -o $@ electron/spacetime.c $(EMSCRIPTEN_FLAGS) $(CFLAGS)
+web/spacetime.js: $(SRC)
+	$(CC) -o $@ web/spacetime.c $(EMSCRIPTEN_FLAGS) $(CFLAGS)
 
 clean:
-	@rm -f electron/spacetime.js electron/spacetime.was*
+	@rm -f web/spacetime.js web/spacetime.was*
