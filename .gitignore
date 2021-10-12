@@ -1,4 +1,2 @@
 out/
 node_modules/
-electron/spacetime.*
-!electron/spacetime.c
