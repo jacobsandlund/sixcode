@@ -1,6 +1,6 @@
-# spacetime
+# Sixcode
 
-`spacetime` is coding using hexagons.
+`Sixcode` is coding using hexagons.
 
 ### Setup
 
@@ -8,7 +8,6 @@
 $ bin/docker-pull
 $ bin/docker-run
 $ bin/make  # This had issues, but compiled successfully. Needed to kill -9 the process.
-$ cd web
 $ python -m http.server
 ```
 
@@ -19,9 +18,9 @@ To run all tests, use `bin/test`. All lines starting with `//=> ` are added auto
 If you are using Vim, the following `.vimrc` lines add a keyboard shortcut (`<leader>r`) to run the test file and reload any changes, as well as a shortcut to `git add --patch` (`<leader>a`) a file.
 
 ``` vim
-" spacetime configs:
-command -nargs=0 RunSpacetime execute 'silent !bin/run % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
-nnoremap <leader>r :w<CR>:RunSpacetime<CR>:e!<CR>
+" Sixcode configs:
+command -nargs=0 RunSixcode execute 'silent !bin/run % || read -n1 -r -p "=============== Press any key to continue..."' | redraw!
+nnoremap <leader>r :w<CR>:RunSixcode<CR>:e!<CR>
 
 command -nargs=0 GitAddPatch execute 'silent !git add --intent-to-add -- % && git add --patch -- %' | redraw!
 nnoremap <leader>a :w<CR>:GitAddPatch<CR>
